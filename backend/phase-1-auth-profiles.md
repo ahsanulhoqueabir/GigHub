@@ -130,7 +130,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 
 - [ ] **1.4.1** Create JWT strategy (`JwtStrategy` extending `PassportStrategy`):
   - Extract token from Authorization header
-  - Validate and decode payload: `{ profile_id, username, role, is_verified }`
+  - Validate and decode payload: `{ profile_id, username, is_verified, role }`
 - [ ] **1.4.2** Create `JwtAuthGuard` (used globally or per-route)
 - [ ] **1.4.3** Create `RolesGuard` for admin-only routes
 - [ ] **1.4.4** Create `@CurrentUser()` decorator to extract user from request
@@ -255,7 +255,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 ## Definition of Done
 
 - [ ] All auth endpoints working (register, login, Google, refresh, logout)
-- [ ] JWT tokens correctly issued with profile_id, username, role, is_verified
+- [ ] JWT tokens correctly issued with profile_id, username, is_verified, role
 - [ ] Profile CRUD fully functional
 - [ ] Avatar upload to R2 working
 - [ ] Generic file/image upload to R2 working

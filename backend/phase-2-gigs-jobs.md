@@ -28,19 +28,18 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.2 Directus Collections Setup
 
 - [ ] **2.2.1** Create `gh_gigs` collection with all fields and indexes
-- [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig_id`, `tier`)
+- [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig`, `tier`)
 - [ ] **2.2.3** Create `gh_gig_images` collection
 - [ ] **2.2.4** Create `gh_jobs` collection with all fields and indexes
-- [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job_id`, `applicant_id`)
+- [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job`, `applicant`)
 - [ ] **2.2.6** Set up relations in Directus:
-  - `gh_gigs.seller_id` → `gh_profiles.id`
-  - `gh_gigs.category_id` → `gh_categories.id`
-  - `gh_gig_packages.gig_id` → `gh_gigs.id` (cascade delete)
-  - `gh_gig_images.gig_id` → `gh_gigs.id` (cascade delete)
-  - `gh_jobs.poster_id` → `gh_profiles.id`
-  - `gh_jobs.category_id` → `gh_categories.id`
-  - `gh_proposals.job_id` → `gh_jobs.id`
-  - `gh_proposals.applicant_id` → `gh_profiles.id`
+  - `gh_gigs.seller` → `gh_profiles.id`
+  - `gh_gigs.category` → `gh_categories.id`
+  - `gh_gig_packages.gig` → `gh_gigs.id` (cascade delete)
+  - `gh_jobs.poster` → `gh_profiles.id`
+  - `gh_jobs.category` → `gh_categories.id`
+  - `gh_proposals.job` → `gh_jobs.id`
+  - `gh_proposals.applicant` → `gh_profiles.id`
 - [ ] **2.2.7** Create full-text search indexes on `gh_gigs(title, description)` and `gh_jobs(title, description)`
 - [ ] **2.2.8** Create GIN indexes on `gh_gigs.tags` and `gh_jobs.required_skills`
 
@@ -60,15 +59,14 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   4. Generate unique slug from title
   5. Create `gh_gigs` record
   6. Create `gh_gig_packages` records (1–3 packages)
-  7. Create `gh_gig_images` records (if images provided)
-  8. Return created gig with packages and images
+  7. Return created gig with packages and images array
 
 - [ ] **2.3.3** Implement `PATCH /gigs/:id` — Update gig:
-  1. Verify current user is the seller (`seller_id = profile_id`)
+  1. Verify current user is the seller (`seller = profile_id`)
   2. Validate updated fields
   3. Update `gh_gigs` record
   4. Upsert packages (delete old, create new)
-  5. Update images if changed
+  5. Update images array if changed
 
 - [ ] **2.3.4** Implement `DELETE /gigs/:id` — Soft-delete gig:
   1. Verify ownership
@@ -268,7 +266,6 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 | ----------------- | ------ |
 | `gh_gigs`         | 🔲     |
 | `gh_gig_packages` | 🔲     |
-| `gh_gig_images`   | 🔲     |
 | `gh_jobs`         | 🔲     |
 | `gh_proposals`    | 🔲     |
 

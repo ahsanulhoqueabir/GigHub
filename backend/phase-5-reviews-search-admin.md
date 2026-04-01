@@ -17,14 +17,14 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.1 Directus Collections Setup
 
 - [ ] **5.1.1** Create `gh_reviews` collection with all fields and indexes
-- [ ] **5.1.2** Create `gh_bookmarks` collection with UNIQUE constraint on (`profile_id`, `entity_type`, `entity_id`)
+- [ ] **5.1.2** Create `gh_bookmarks` collection with UNIQUE constraint on (`profile`, `entity_type`, `entity_id`)
 - [ ] **5.1.3** Create `gh_reports` collection with all fields
 - [ ] **5.1.4** Set up foreign key relations:
-  - `gh_reviews.order_id` → `gh_orders.id`
-  - `gh_reviews.gig_id` → `gh_gigs.id`
-  - `gh_reviews.reviewer_id` / `reviewee_id` → `gh_profiles.id`
-  - `gh_bookmarks.profile_id` → `gh_profiles.id`
-  - `gh_reports.reporter_id` / `resolved_by` → `gh_profiles.id`
+  - `gh_reviews.order` → `gh_orders.id`
+  - `gh_reviews.gig` → `gh_gigs.id`
+  - `gh_reviews.reviewer` / `reviewee` → `gh_profiles.id`
+  - `gh_bookmarks.profile` → `gh_profiles.id`
+  - `gh_reports.reporter` / `resolved_by` → `gh_profiles.id`
 
 ### 5.2 Reviews Module
 
@@ -41,7 +41,7 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   3. Check reviewer hasn't already reviewed this order
   4. Validate ratings (1.0–5.0 range, 0.5 increments)
   5. Create `gh_reviews` record
-  6. Set `gig_id` if order source_type is 'gig'
+  6. Set `gig` if order source_type is 'gig'
   7. **Recalculate reviewee's aggregate ratings:**
      - Update `gh_profiles.avg_rating` and `total_reviews` for the reviewee
      - Update `gh_gigs.avg_rating` and `total_reviews` for the gig (if applicable)
@@ -66,8 +66,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 - [ ] **5.2.6** Implement rating aggregation utility:
 
   ```typescript
-  async recalculateRatings(profileId: string): Promise<void>
-  async recalculateGigRatings(gigId: string): Promise<void>
+  async recalculateRatings(profile: string): Promise<void>
+  async recalculateGigRatings(gig: string): Promise<void>
   ```
 
   - Calculate weighted average from all visible reviews

@@ -21,13 +21,13 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.1.3** Create `gh_notifications` collection with all fields and indexes
 - [ ] **4.1.4** Set up foreign key relations:
   - `gh_conversations.participant_1` / `participant_2` → `gh_profiles.id`
-  - `gh_conversations.order_id` → `gh_orders.id`
-  - `gh_conversations.gig_id` → `gh_gigs.id`
-  - `gh_messages.conversation_id` → `gh_conversations.id` (cascade delete)
-  - `gh_messages.sender_id` → `gh_profiles.id`
-  - `gh_notifications.profile_id` → `gh_profiles.id`
-- [ ] **4.1.5** Create partial index on `gh_messages(conversation_id, is_read)` WHERE `is_read = false`
-- [ ] **4.1.6** Create index on `gh_notifications(profile_id, is_read)` WHERE `is_read = false`
+  - `gh_conversations.order` → `gh_orders.id`
+  - `gh_conversations.gig` → `gh_gigs.id`
+  - `gh_messages.conversation` → `gh_conversations.id` (cascade delete)
+  - `gh_messages.sender` → `gh_profiles.id`
+  - `gh_notifications.profile` → `gh_profiles.id`
+- [ ] **4.1.5** Create partial index on `gh_messages(conversation, is_read)` WHERE `is_read = false`
+- [ ] **4.1.6** Create index on `gh_notifications(profile, is_read)` WHERE `is_read = false`
 
 ### 4.2 Chat Module — REST Endpoints
 
@@ -127,7 +127,7 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.3.9** Implement system messages:
   - Create helper: `sendSystemMessage(conversationId, content)`
   - Used for order events: "Order started", "Delivery submitted", "Order completed", etc.
-  - `message_type = 'system'`, `sender_id` = null or system user
+  - `message_type = 'system'`, `sender` = null or system user
 
 ### 4.4 Chat File Sharing
 
@@ -157,7 +157,7 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 
   ```typescript
   async createNotification(params: {
-    profile_id: string,
+    profile: string,
     type: NotificationType,
     title: string,
     body: string,
