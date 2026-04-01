@@ -23,35 +23,60 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 - [ ] **1.1.2** Set up project structure:
   ```
   src/
-  ├── common/
-  │   ├── decorators/         # Custom decorators (@CurrentUser, @Roles)
-  │   ├── filters/            # Exception filters
-  │   ├── guards/             # AuthGuard, RolesGuard
-  │   ├── interceptors/       # Response transform, logging
-  │   ├── pipes/              # Validation pipes
-  │   ├── dto/                # Shared DTOs
-  │   └── utils/              # Helpers (slug, pagination, etc.)
-  ├── config/                 # Config module (env validation)
+  ├── common/                 # Shared utilities, decorators, filters, etc.
+  ├── config/                 # Environment and application configuration
   ├── modules/
-  │   ├── auth/               # Phase 1
-  │   ├── profiles/           # Phase 1
-  │   ├── upload/             # Phase 1
-  │   ├── gigs/               # Phase 2
-  │   ├── jobs/               # Phase 2
-  │   ├── proposals/          # Phase 2
-  │   ├── categories/         # Phase 2
-  │   ├── orders/             # Phase 3
-  │   ├── payments/           # Phase 3
-  │   ├── escrow/             # Phase 3
-  │   ├── withdrawals/        # Phase 3
-  │   ├── chat/               # Phase 4
-  │   ├── notifications/      # Phase 4
-  │   ├── reviews/            # Phase 5
-  │   ├── bookmarks/          # Phase 5
-  │   ├── reports/            # Phase 5
-  │   └── admin/              # Phase 5
+  │   ├── auth/               # Special Module: Firebase + JWT logic
+  │   │   ├── auth.controller.ts
+  │   │   ├── auth.module.ts
+  │   │   ├── auth.service.ts
+  │   │   └── types/
+  │   │       └── auth.types.ts
+  │   ├── profiles/           # Domain: gh_profiles
+  │   │   ├── profiles.controller.ts
+  │   │   ├── profiles.module.ts
+  │   │   ├── profiles.service.ts
+  │   │   └── types/
+  │   │       └── profiles.types.ts
+  │   ├── categories/         # Domain: gh_categories
+  │   │   ├── categories.controller.ts
+  │   │   ├── categories.module.ts
+  │   │   ├── categories.service.ts
+  │   │   └── types/
+  │   │       └── categories.types.ts
+  │   └── upload/             # Domain: Infrastructure (R2)
+  │       ├── upload.controller.ts
+  │       ├── upload.module.ts
+  │       ├── upload.service.ts
+  │       └── types/
+  │           └── upload.types.ts
   └── main.ts
   ```
+
+### 1.1.2b Service & Type Architecture Pattern
+
+To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
+
+1.  **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` -> `ProfileService`).
+2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication.
+3.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
+4.  **Auth Exception**: `AuthService` handles multi-provider logic (Firebase + JWT) and isn't tied to a single collection, but uses other services (like `ProfileService`) for DB operations.
+5.  **Type Organization**: Every domain has a `types/` folder with `*.types.ts` files (e.g., `profiles.types.ts`) containing interfaces and enums for that domain.
+
+**Service Example:**
+```typescript
+export class ProfileService {
+  private static collection = "gh_profiles";
+
+  private static getProfileFields() {
+    return ['id', 'display_name', 'username', 'avatar'];
+  }
+
+  static async getProfileById(id: string) {
+    // Direct DB communication via Directus SDK
+  }
+}
+```
 - [ ] **1.1.3** Install core dependencies:
   ```
   @nestjs/config, @nestjs/jwt, @nestjs/passport
@@ -141,8 +166,9 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 ### 1.5 Profile Module
 
 - [ ] **1.5.1** Create `ProfilesModule` with:
-  - `ProfilesService` — CRUD via Directus SDK
+  - `ProfilesService` — Static methods for `gh_profiles` CRUD
   - `ProfilesController` — REST endpoints
+  - `types/profiles.types.ts` — Profile interfaces and enums
   - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
 - [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
 - [ ] **1.5.3** Implement `PATCH /profiles/me` — update profile fields:

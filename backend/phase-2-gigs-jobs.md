@@ -17,8 +17,9 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.1 Categories Module (Complete)
 
 - [ ] **2.1.1** Create `CategoriesModule` with:
-  - `CategoriesService` — CRUD via Directus
+  - `CategoriesService` — Static methods for `gh_categories` CRUD
   - `CategoriesController` — REST endpoints
+  - `types/categories.types.ts` — Category interfaces and enums
 - [ ] **2.1.2** Implement `GET /categories` — list all active categories (public, cached)
 - [ ] **2.1.3** Implement `POST /categories` — admin-only: create new category
 - [ ] **2.1.4** Implement `PATCH /categories/:id` — admin-only: update category
@@ -46,8 +47,9 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.3 Gigs Module
 
 - [ ] **2.3.1** Create `GigsModule` with:
-  - `GigsService` — business logic
+  - `GigService` — Static methods for `gh_gigs` and `gh_gig_packages` logic
   - `GigsController` — REST endpoints
+  - `types/gigs.types.ts` — Gig, Package, and Image interfaces
   - DTOs: `CreateGigDto`, `UpdateGigDto`, `GigQueryDto`, `GigResponseDto`, `GigDetailResponseDto`
 
 #### Gig CRUD
@@ -103,8 +105,9 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.4 Jobs Module
 
 - [ ] **2.4.1** Create `JobsModule` with:
-  - `JobsService` — business logic
+  - `JobService` — Static methods for `gh_jobs` logic
   - `JobsController` — REST endpoints
+  - `types/jobs.types.ts` — Job interfaces and enums
   - DTOs: `CreateJobDto`, `UpdateJobDto`, `JobQueryDto`, `JobResponseDto`
 
 #### Job CRUD
@@ -152,8 +155,9 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.5 Proposals Module
 
 - [ ] **2.5.1** Create `ProposalsModule` with:
-  - `ProposalsService` — business logic
+  - `ProposalService` — Static methods for `gh_proposals` logic
   - `ProposalsController` — REST endpoints
+  - `types/proposals.types.ts` — Proposal interfaces and enums
   - DTOs: `CreateProposalDto`, `ProposalResponseDto`
 
 - [ ] **2.5.2** Implement `POST /jobs/:jobId/proposals` — Submit proposal:

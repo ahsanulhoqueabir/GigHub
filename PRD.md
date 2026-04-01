@@ -124,7 +124,7 @@ Every registered student automatically has **full dual-sided access**:
 
 | Layer                  | Technology                     | Purpose                                                                     |
 | ---------------------- | ------------------------------ | --------------------------------------------------------------------------- |
-| **Backend API**        | NestJS (TypeScript)            | REST endpoints + WebSocket gateway                                          |
+| **Backend API**        | NestJS (TypeScript)            | REST endpoints + WebSocket gateway; follows collection-centric service pattern |
 | **Authentication**     | Firebase Auth                  | Email/password + Google OAuth (future providers via Firebase SSO)           |
 | **Custom Auth**        | NestJS JWT                     | Platform-issued tokens with `profile_id`, `username`, `is_verified`, `role` |
 | **Database / CMS**     | Directus + PostgreSQL          | Data storage, collections, admin UI                                         |
@@ -133,6 +133,7 @@ Every registered student automatically has **full dual-sided access**:
 | **Payments**           | SSLCommerz + bKash API         | Escrow-based payment processing                                             |
 | **Real-time**          | Socket.IO (NestJS Gateway)     | Chat messaging, live notifications                                          |
 | **File Storage**       | Cloudflare R2                  | Images, documents, chat attachments                                         |
+| **Architecture**       | Static Collection Services     | Services are collection-centric with static methods for DB logic            |
 | **Email**              | Resend / Nodemailer            | Transactional emails                                                        |
 | **Push Notifications** | Firebase Cloud Messaging (FCM) | Mobile push notifications                                                   |
 
