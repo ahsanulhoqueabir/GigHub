@@ -78,8 +78,9 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
   - Emit WebSocket event to other participant
   - Return created message
 
-- [ ] **4.2.7** Implement `PATCH /conversations/:id/read` — Mark all as read:
-  - Update all unread messages where sender ≠ current user
+- [ ] **4.2.7** Implement `PATCH /conversations/:id` — Consolidated update:
+  - Expects `type` field in payload: `mark_read`
+  - Logic: Update all unread messages where sender ≠ current user
   - Set `is_read = true`, `read_at = now()`
   - Emit read receipt via WebSocket
 
@@ -180,11 +181,11 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.5.4** Implement `GET /notifications/unread-count`:
   - Return count of unread notifications
 
-- [ ] **4.5.5** Implement `PATCH /notifications/:id/read`:
-  - Mark single notification as read
-
-- [ ] **4.5.6** Implement `PATCH /notifications/read-all`:
-  - Mark all notifications as read for current user
+- [ ] **4.5.5** Implement `PATCH /notifications` — Consolidated read actions:
+  - Expects `type` field in payload: `read_single`, `read_all`
+  - Logic: Controller calls specific `NotificationService` methods based on `type`
+  - If `read_single`: Mark one notification with given `id` as read
+  - If `read_all`: Mark all as read for current user
 
 #### Push Notifications (FCM)
 
@@ -306,11 +307,10 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 | `GET`   | `/conversations/:id`          | 🔲     |
 | `GET`   | `/conversations/:id/messages` | 🔲     |
 | `POST`  | `/conversations/:id/messages` | 🔲     |
-| `PATCH` | `/conversations/:id/read`     | 🔲     |
+| `PATCH` | `/conversations/:id`          | 🔲     |
 | `GET`   | `/notifications`              | 🔲     |
 | `GET`   | `/notifications/unread-count` | 🔲     |
-| `PATCH` | `/notifications/:id/read`     | 🔲     |
-| `PATCH` | `/notifications/read-all`     | 🔲     |
+| `PATCH` | `/notifications`              | 🔲     |
 
 ### WebSocket Events
 

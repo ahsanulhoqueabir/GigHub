@@ -92,16 +92,11 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   2. Check not already bookmarked (UNIQUE constraint)
   3. Create `gh_bookmarks` record
 
-- [ ] **5.3.3** Implement `GET /bookmarks` — List my bookmarks:
-  - Filter by `entity_type` (gig/job)
-  - Include basic entity info (title, price/budget, image, status)
-  - Paginated
-
-- [ ] **5.3.4** Implement `DELETE /bookmarks/:id` — Remove bookmark
-
-- [ ] **5.3.5** Implement `GET /bookmarks/check` — Check if bookmarked:
-  - Query params: `entity_type`, `entity_id`
-  - Return `{ is_bookmarked: true/false }`
+- [ ] **5.3.3** Implement `GET /bookmarks` — Consolidated bookmarks logic:
+  - Support `?type=...` query param: `list` (default), `check`
+  - If `type=list`: Return paginated bookmarks for current user
+  - If `type=check`: Verify if entity is bookmarked (requires `entity_type`, `entity_id`)
+  - Logic: Controller calls specific `BookmarkService` functions based on `type`
 
 ### 5.4 Reports Module
 
@@ -282,8 +277,6 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 | `POST`   | `/reviews/:id/response`             | 🔲     |
 | `GET`    | `/bookmarks`                        | 🔲     |
 | `POST`   | `/bookmarks`                        | 🔲     |
-| `DELETE` | `/bookmarks/:id`                    | 🔲     |
-| `GET`    | `/bookmarks/check`                  | 🔲     |
 | `POST`   | `/reports`                          | 🔲     |
 | `GET`    | `/reports/me`                       | 🔲     |
 | `GET`    | `/admin/users`                      | 🔲     |

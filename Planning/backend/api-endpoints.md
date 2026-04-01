@@ -198,16 +198,14 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ## 2. Profiles
 
-| Method  | Endpoint                          | Auth      | Description                     |
-| ------- | --------------------------------- | --------- | ------------------------------- |
-| `GET`   | `/profiles/me`                    | Protected | Get current user's profile      |
-| `PATCH` | `/profiles/me`                    | Protected | Update current user's profile   |
-| `GET`   | `/profiles/:username`             | Public    | Get public profile by username  |
-| `GET`   | `/profiles/:username/gigs`        | Public    | List gigs by user               |
-| `GET`   | `/profiles/:username/reviews`     | Public    | List reviews received by user   |
-| `PATCH` | `/profiles/me/avatar`             | Protected | Upload/update avatar            |
-| `PATCH` | `/profiles/me/fcm-token`          | Protected | Update FCM token                |
-| `PATCH` | `/profiles/me/notification-prefs` | Protected | Update notification preferences |
+| Method  | Endpoint              | Auth      | Description                        |
+| ------- | --------------------- | --------- | ---------------------------------- |
+| `GET`   | `/profiles/me`        | Protected | Get current user's profile         |
+| `PATCH` | `/profiles/me`        | Protected | Consolidated: Update profile/prefs |
+| `GET`   | `/profiles/:username` | Public    | Consolidated: Get profile + extras |
+| `PATCH` | `/profiles/me/avatar` | Protected | (Optional) direct upload           |
+
+> **Note:** `/profiles/me` PATCH now expects a `type` payload to handle specific updates (basic info, fcm-token, notification-prefs, etc.). Same logic for GET with `?type=...` query param.
 
 ### GET `/profiles/me`
 
@@ -236,15 +234,61 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ### PATCH `/profiles/me`
 
+**Payload Contract:**
 ```json
-// Request
+// Type: basic_info (Update bio, display_name, etc.)
 {
-  "display_name": "Rafiq Ahmed Updated",
-  "bio": "Updated bio text",
-  "skills": ["React", "Node.js", "Figma", "Flutter"],
-  "availability_status": "busy"
+  "type": "basic_info",
+  "data": {
+    "display_name": "Rafiq Ahmed Updated",
+    "bio": "Updated bio text",
+    "skills": ["React", "Node.js", "Figma", "Flutter"],
+    "availability_status": "busy"
+  }
+}
+
+// Type: avatar (Update avatar URL)
+{
+  "type": "avatar",
+  "data": {
+    "avatar_url": "https://r2.gighub.app/avatars/uuid.jpg"
+  }
+}
+
+// Type: fcm_token (Update push token)
+{
+  "type": "fcm_token",
+  "data": {
+    "token": "fcm-device-token-string"
+  }
+}
+
+// Type: notification_prefs (Update settings)
+{
+  "type": "notification_prefs",
+  "data": {
+    "email_notifications": true,
+    "push_notifications": false,
+    "order_updates": true
+  }
 }
 ```
+
+### GET `/profiles/:username`
+
+**Query Parameters:**
+| Param  | Type   | Description                                                               |
+| ------ | ------ | ------------------------------------------------------------------------- |
+| `type` | string | `profile` (default), `gigs` (owner's gigs), `reviews` (received reviews), `full` |
+
+```json
+// Response 200 (type=gigs)
+{
+  "success": true,
+  "data": [ { "id": "uuid", "title": "Gig title", ... } ]
+}
+```
+
 
 ---
 
@@ -291,10 +335,26 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `GET`    | `/gigs`            | Public            | List/search gigs with filters     |
 | `GET`    | `/gigs/:slug`      | Public            | Get gig detail by slug            |
 | `POST`   | `/gigs`            | Protected         | Create new gig                    |
-| `PATCH`  | `/gigs/:id`        | Protected (owner) | Update gig                        |
-| `DELETE` | `/gigs/:id`        | Protected (owner) | Soft-delete gig                   |
-| `GET`    | `/gigs/me`         | Protected         | List current user's gigs          |
-| `PATCH`  | `/gigs/:id/status` | Protected (owner) | Change gig status (active/paused) |
+| `PATCH`  | `/gigs/:id` | Protected (owner) | Consolidated: Update gig/status |
+| `DELETE` | `/gigs/:id` | Protected (owner) | Soft-delete gig                 |
+| `GET`    | `/gigs/me`  | Protected         | List current user's gigs        |
+
+### PATCH `/gigs/:id`
+
+**Payload Contract:**
+```json
+// Type: edit (Standard update)
+{
+  "type": "edit",
+  "data": { "title": "Updated Title", "description": "..." }
+}
+
+// Type: status (Change visibility)
+{
+  "type": "status",
+  "data": { "status": "paused" } // "active", "paused"
+}
+```
 
 ### GET `/gigs` — Query Parameters
 
@@ -445,10 +505,22 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `POST`  | `/jobs/:jobId/proposals`  | Protected             | Submit proposal for a job   |
 | `GET`   | `/jobs/:jobId/proposals`  | Protected (job owner) | List proposals for a job    |
 | `GET`   | `/proposals/me`           | Protected             | List my submitted proposals |
-| `GET`   | `/proposals/:id`          | Protected             | Get proposal detail         |
-| `PATCH` | `/proposals/:id/withdraw` | Protected (applicant) | Withdraw proposal           |
-| `PATCH` | `/proposals/:id/accept`   | Protected (job owner) | Accept proposal             |
-| `PATCH` | `/proposals/:id/reject`   | Protected (job owner) | Reject proposal             |
+| `GET`   | `/proposals/:id` | Protected             | Get proposal detail            |
+| `PATCH` | `/proposals/:id` | Protected (multiple)  | Consolidated: Action on proposal |
+
+### PATCH `/proposals/:id`
+
+**Payload Contract:**
+```json
+// Type: withdraw (Applicant)
+{ "type": "withdraw" }
+
+// Type: accept (Job Owner)
+{ "type": "accept" }
+
+// Type: reject (Job Owner)
+{ "type": "reject" }
+```
 
 ### POST `/jobs/:jobId/proposals`
 
@@ -471,13 +543,46 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `POST`  | `/orders/gig`          | Protected                | Create order from gig package       |
 | `POST`  | `/orders/job`          | Protected                | Create order from accepted proposal |
 | `GET`   | `/orders`              | Protected                | List my orders (as buyer & seller)  |
-| `GET`   | `/orders/:id`          | Protected (buyer/seller) | Get order detail                    |
-| `PATCH` | `/orders/:id/start`    | Protected (seller)       | Mark order as in_progress           |
-| `PATCH` | `/orders/:id/deliver`  | Protected (seller)       | Submit delivery                     |
-| `PATCH` | `/orders/:id/approve`  | Protected (buyer)        | Approve delivery → complete order   |
-| `PATCH` | `/orders/:id/revision` | Protected (buyer)        | Request revision                    |
-| `PATCH` | `/orders/:id/cancel`   | Protected (buyer/seller) | Request cancellation                |
-| `PATCH` | `/orders/:id/dispute`  | Protected (buyer/seller) | Open dispute                        |
+| `GET`   | `/orders/:id` | Protected (buyer/seller) | Get order detail             |
+| `PATCH` | `/orders/:id` | Protected (multiple)     | Consolidated: Action on order |
+
+### PATCH `/orders/:id`
+
+**Payload Contract:**
+```json
+// Type: start (Seller)
+{ "type": "start" }
+
+// Type: deliver (Seller)
+{
+  "type": "deliver",
+  "data": {
+    "message": "...",
+    "files": ["..."]
+  }
+}
+
+// Type: approve (Buyer)
+{ "type": "approve" }
+
+// Type: revision (Buyer)
+{
+  "type": "revision",
+  "data": { "notes": "..." }
+}
+
+// Type: cancel (Both)
+{
+  "type": "cancel",
+  "data": { "reason": "..." }
+}
+
+// Type: dispute (Both)
+{
+  "type": "dispute",
+  "data": { "reason": "..." }
+}
+```
 
 ### POST `/orders/gig`
 
@@ -629,9 +734,17 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `GET`   | `/conversations`              | Protected               | List my conversations                        |
 | `POST`  | `/conversations`              | Protected               | Start a new conversation (pre-order inquiry) |
 | `GET`   | `/conversations/:id`          | Protected (participant) | Get conversation with messages               |
-| `GET`   | `/conversations/:id/messages` | Protected (participant) | Paginated messages                           |
-| `POST`  | `/conversations/:id/messages` | Protected (participant) | Send a message (REST fallback)               |
-| `PATCH` | `/conversations/:id/read`     | Protected (participant) | Mark all messages as read                    |
+| `GET`   | `/conversations/:id/messages` | Protected (participant) | Paginated messages         |
+| `POST`  | `/conversations/:id/messages` | Protected (participant) | Send a message (REST fallback) |
+| `PATCH` | `/conversations/:id`          | Protected (participant) | Consolidated: Update convo     |
+
+### PATCH `/conversations/:id`
+
+**Payload Contract:**
+```json
+// Type: mark_read
+{ "type": "mark_read" }
+```
 
 ### POST `/conversations`
 
@@ -713,9 +826,19 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | Method  | Endpoint                      | Auth      | Description                      |
 | ------- | ----------------------------- | --------- | -------------------------------- |
 | `GET`   | `/notifications`              | Protected | List my notifications            |
-| `GET`   | `/notifications/unread-count` | Protected | Get unread notification count    |
-| `PATCH` | `/notifications/:id/read`     | Protected | Mark single notification as read |
-| `PATCH` | `/notifications/read-all`     | Protected | Mark all notifications as read   |
+| `GET`   | `/notifications/unread-count` | Protected | Get unread notification count |
+| `PATCH` | `/notifications`              | Protected | Consolidated: Read actions     |
+
+### PATCH `/notifications`
+
+**Payload Contract:**
+```json
+// Type: read_single
+{ "type": "read_single", "id": "uuid" }
+
+// Type: read_all
+{ "type": "read_all" }
+```
 
 ### GET `/notifications` — Query Parameters
 
@@ -730,10 +853,33 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 | Method   | Endpoint           | Auth      | Description                   |
 | -------- | ------------------ | --------- | ----------------------------- |
-| `GET`    | `/bookmarks`       | Protected | List my bookmarks             |
-| `POST`   | `/bookmarks`       | Protected | Add bookmark                  |
-| `DELETE` | `/bookmarks/:id`   | Protected | Remove bookmark               |
-| `GET`    | `/bookmarks/check` | Protected | Check if entity is bookmarked |
+| `GET`    | `/bookmarks`     | Protected | Consolidated: List/Check bookmarks |
+| `POST`   | `/bookmarks`     | Protected | Add/Remove bookmark               |
+
+### GET `/bookmarks`
+
+**Query Parameters:**
+| Param  | Type   | Description                                                     |
+| ------ | ------ | --------------------------------------------------------------- |
+| `type` | string | `list` (default), `check` (requires `entity_id` & `entity_type`) |
+
+### POST `/bookmarks`
+
+**Payload Contract:**
+```json
+// Type: add
+{
+  "type": "add",
+  "entity_type": "gig",
+  "entity_id": "uuid"
+}
+
+// Type: remove
+{
+  "type": "remove",
+  "id": "uuid"
+}
+```
 
 ### POST `/bookmarks`
 
