@@ -179,9 +179,9 @@ gighub-web/
   ```
   NEXT_PUBLIC_API_URL=http://localhost:3000/v1
   NEXT_PUBLIC_WS_URL=http://localhost:3000
-  NEXT_PUBLIC_SUPABASE_URL=...
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-  NEXT_PUBLIC_GOOGLE_CLIENT_ID=...
+  NEXT_PUBLIC_FIREBASE_API_KEY=...
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
   ```
 - [ ] **1.1.6** Create the directory structure as defined above
 
@@ -203,8 +203,8 @@ gighub-web/
 
   ```typescript
   register(data: RegisterInput): Promise<AuthResponse>
-  login(data: LoginInput): Promise<AuthResponse>
-  loginWithGoogle(idToken: string): Promise<AuthResponse>
+  login(data: LoginInput): Promise<AuthResponse> // provider: 'password'
+  loginWithProvider(provider: 'google' | 'github' | 'microsoft' | 'apple', firebaseIdToken: string): Promise<AuthResponse>
   refreshToken(refreshToken: string): Promise<TokenResponse>
   logout(): Promise<void>
   forgotPassword(email: string): Promise<void>
@@ -348,9 +348,13 @@ gighub-web/
 
 - [ ] **1.5.4** Create Forgot Password page
 - [ ] **1.5.5** Implement Google OAuth flow:
-  - Use `@react-oauth/google` or Supabase JS client
-  - On Google sign-in: send ID token to backend `/auth/login/google`
+  - Use Firebase JS SDK (`firebase/auth`) Google provider flow
+  - On Google sign-in: send `{ provider: 'google', firebase_id_token }` to backend `/auth/login`
   - Handle new user flow vs returning user
+
+- [ ] **1.5.5b** Design social auth abstraction for future providers:
+  - Single helper: `loginWithProvider(provider: 'google' | 'github' | 'microsoft' | 'apple')`
+  - All providers must return Firebase ID token before backend `/auth/login` call
 
 - [ ] **1.5.6** Create `SocialLoginButton` component:
   - Google branded button with icon

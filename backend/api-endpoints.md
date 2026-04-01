@@ -64,15 +64,16 @@
 
 ## 1. Authentication
 
-| Method | Endpoint                | Auth      | Description                                   |
-| ------ | ----------------------- | --------- | --------------------------------------------- |
-| `POST` | `/auth/register`        | Public    | Register with email/password via Supabase     |
-| `POST` | `/auth/login`           | Public    | Login with Supabase token, receive NestJS JWT |
-| `POST` | `/auth/login/google`    | Public    | Google OAuth via Supabase, receive NestJS JWT |
-| `POST` | `/auth/refresh`         | Public    | Refresh NestJS JWT using refresh token        |
-| `POST` | `/auth/logout`          | Protected | Invalidate current session                    |
-| `POST` | `/auth/forgot-password` | Public    | Trigger password reset email via Supabase     |
-| `POST` | `/auth/reset-password`  | Public    | Complete password reset                       |
+| Method | Endpoint                | Auth      | Description                                                               |
+| ------ | ----------------------- | --------- | ------------------------------------------------------------------------- |
+| `POST` | `/auth/register`        | Public    | Register with email/password via Firebase Auth                            |
+| `POST` | `/auth/login`           | Public    | Single login endpoint for password and social providers via Firebase Auth |
+| `POST` | `/auth/refresh`         | Public    | Refresh NestJS JWT using refresh token                                    |
+| `POST` | `/auth/logout`          | Protected | Invalidate current session                                                |
+| `POST` | `/auth/forgot-password` | Public    | Trigger password reset email via Firebase Auth                            |
+| `POST` | `/auth/reset-password`  | Public    | Complete password reset                                                   |
+
+> **Auth Contract:** NestJS accepts only Firebase credentials/tokens through a single sign-in endpoint (`/auth/login`).
 
 ### POST `/auth/register`
 
@@ -106,8 +107,9 @@
 ### POST `/auth/login`
 
 ```json
-// Request
+// Request (email/password)
 {
+  "provider": "password",
   "email": "user@jnu.ac.bd",
   "password": "securePassword123"
 }
@@ -124,15 +126,24 @@
 }
 ```
 
-### POST `/auth/login/google`
-
 ```json
-// Request
+// Request (Google)
 {
-  "google_id_token": "eyJhbGciOiJSUzI1NiIs..."
+  "provider": "google",
+  "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
 }
 
-// Response 200 (same as /auth/login)
+// Response 200 (same as above)
+```
+
+```json
+// Request (future third-party SSO example)
+{
+  "provider": "github",
+  "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
+}
+
+// Response 200 (same as above)
 ```
 
 ### POST `/auth/refresh`

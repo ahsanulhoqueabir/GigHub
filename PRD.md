@@ -109,7 +109,7 @@ Every registered student automatically has **full dual-sided access**:
       ┌──────────┘   │   └──────────┐
       │              │              │
 ┌─────▼─────┐ ┌─────▼─────┐ ┌──────▼──────┐
-│ Supabase   │ │ Directus  │ │ Cloudflare  │
+│ Firebase   │ │ Directus  │ │ Cloudflare  │
 │ Auth       │ │ (DB/CMS)  │ │ R2 Storage  │
 └────────────┘ └───────────┘ └─────────────┘
                     │
@@ -125,7 +125,7 @@ Every registered student automatically has **full dual-sided access**:
 | Layer                  | Technology                     | Purpose                                                                     |
 | ---------------------- | ------------------------------ | --------------------------------------------------------------------------- |
 | **Backend API**        | NestJS (TypeScript)            | REST endpoints + WebSocket gateway                                          |
-| **Authentication**     | Supabase Auth                  | Email/password + Google OAuth                                               |
+| **Authentication**     | Firebase Auth                  | Email/password + Google OAuth (future providers via Firebase SSO)           |
 | **Custom Auth**        | NestJS JWT                     | Platform-issued tokens with `profile_id`, `role`, `username`, `is_verified` |
 | **Database / CMS**     | Directus + PostgreSQL          | Data storage, collections, admin UI                                         |
 | **Web Frontend**       | Next.js 14 (App Router)        | Server-side rendered web application                                        |
@@ -139,14 +139,16 @@ Every registered student automatically has **full dual-sided access**:
 ### 5.2 Auth Flow (Detailed)
 
 ```
-Student → Supabase Auth (email/Google) → Supabase returns access_token
-    → NestJS /auth/login receives supabase_token
-    → NestJS verifies with Supabase, checks/creates gh_profiles record
+Student → Firebase Auth (email/Google) → Firebase returns ID token
+    → NestJS /auth/login receives firebase_id_token
+    → NestJS verifies with Firebase Admin SDK, checks/creates gh_profiles record
     → NestJS signs custom JWT { profile_id, username, role, is_verified }
     → Client stores NestJS JWT, uses it for ALL subsequent API calls
 ```
 
-**Critical Rule:** `gh_profiles.id` is the **sole identifier** used across ALL collections. `supabase_uid` is internal to `gh_profiles` only.
+For future third-party SSO (GitHub/Microsoft/Apple/etc.), the flow remains identical: provider login through Firebase Auth, then backend verification of Firebase ID token.
+
+**Critical Rule:** `gh_profiles.id` is the **sole identifier** used across ALL collections. `firebase_uid` is internal to `gh_profiles` only.
 
 ---
 
@@ -155,7 +157,7 @@ Student → Supabase Auth (email/Google) → Supabase returns access_token
 ### 6.1 Registration & Onboarding
 
 1. Student opens app → Signup screen
-2. Signs up via email/password or Google (Supabase Auth)
+2. Signs up via email/password or Google (Firebase Auth)
 3. Backend auto-creates `gh_profiles` record
 4. Student completes profile: display_name, username, bio, skills, avatar
 5. Student lands on unified dashboard
@@ -206,15 +208,16 @@ Dispute: Buyer disputes → Admin reviews → Admin decides (refund/release/spli
 
 ### FR-1: Authentication & Identity
 
-| ID     | Requirement                                                             | Priority |
-| ------ | ----------------------------------------------------------------------- | -------- |
-| FR-1.1 | Email/password registration via Supabase Auth                           | P0       |
-| FR-1.2 | Google OAuth login via Supabase Auth                                    | P0       |
-| FR-1.3 | NestJS custom JWT issuance with profile_id, role, username, is_verified | P0       |
-| FR-1.4 | Auto-creation of gh_profiles record on first login                      | P0       |
-| FR-1.5 | JWT refresh token mechanism                                             | P0       |
-| FR-1.6 | Logout / token invalidation                                             | P0       |
-| FR-1.7 | Password reset via Supabase                                             | P1       |
+| ID      | Requirement                                                             | Priority |
+| ------- | ----------------------------------------------------------------------- | -------- |
+| FR-1.1  | Email/password registration via Firebase Auth                           | P0       |
+| FR-1.2  | Google OAuth login via Firebase Auth                                    | P0       |
+| FR-1.2b | Future third-party SSO via Firebase Auth providers                      | P1       |
+| FR-1.3  | NestJS custom JWT issuance with profile_id, role, username, is_verified | P0       |
+| FR-1.4  | Auto-creation of gh_profiles record on first login                      | P0       |
+| FR-1.5  | JWT refresh token mechanism                                             | P0       |
+| FR-1.6  | Logout / token invalidation                                             | P0       |
+| FR-1.7  | Password reset via Firebase Auth                                        | P1       |
 
 ### FR-2: Profile Management
 
@@ -390,7 +393,7 @@ All Directus collections use the `gh_` prefix. See [backend/db-schema.md](backen
 
 ### Phase 1 — Foundation (Auth, Profiles, Infrastructure)
 
-- Supabase Auth setup (email + Google)
+- Firebase Auth setup (email + Google)
 - NestJS project scaffolding with JWT module
 - Directus setup with gh_profiles collection
 - Cloudflare R2 integration

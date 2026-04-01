@@ -8,7 +8,7 @@
 
 ## Phase Overview
 
-Set up the NestJS project, integrate Supabase Auth, implement custom JWT issuance, create `gh_profiles` in Directus, and build the file upload pipeline to Cloudflare R2.
+Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuance, create `gh_profiles` in Directus, and build the file upload pipeline to Cloudflare R2.
 
 ---
 
@@ -56,12 +56,12 @@ Set up the NestJS project, integrate Supabase Auth, implement custom JWT issuanc
   ```
   @nestjs/config, @nestjs/jwt, @nestjs/passport
   passport, passport-jwt, class-validator, class-transformer
-  @supabase/supabase-js, @directus/sdk
+  firebase-admin, @directus/sdk
   @aws-sdk/client-s3 (for R2), helmet, @nestjs/throttler
   ```
 - [ ] **1.1.4** Set up environment configuration module with validation:
   ```
-  SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+  FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
   DIRECTUS_URL, DIRECTUS_ADMIN_TOKEN
   JWT_SECRET, JWT_EXPIRES_IN, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRES_IN
   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL
@@ -86,32 +86,31 @@ Set up the NestJS project, integrate Supabase Auth, implement custom JWT issuanc
   - **Public Role**: read-only on `gh_categories`, `gh_platform_config`
 - [ ] **1.2.7** Create Directus service module in NestJS (singleton SDK client)
 
-### 1.3 Supabase Auth Integration
+### 1.3 Firebase Auth Integration
 
-- [ ] **1.3.1** Create Supabase project and configure:
+- [ ] **1.3.1** Create Firebase project and configure:
   - Enable email/password sign-up
   - Enable Google OAuth provider
+  - Define future third-party SSO providers in Firebase Auth (e.g., GitHub, Microsoft, Apple)
   - Disable email confirmation (handle verification at platform level)
   - Set redirect URLs for web and mobile
 - [ ] **1.3.2** Create `AuthModule` in NestJS with:
   - `AuthService` — business logic
   - `AuthController` — REST endpoints
-  - `SupabaseService` — Supabase client wrapper
+  - `FirebaseService` — Firebase Admin SDK wrapper
 - [ ] **1.3.3** Implement `POST /auth/register`:
   1. Validate input (email, password, display_name, username)
   2. Check username uniqueness against `gh_profiles`
-  3. Create Supabase user via `supabase.auth.signUp()`
-  4. Create `gh_profiles` record in Directus with `supabase_uid`
+  3. Create Firebase user via `firebase-admin` Auth API
+  4. Create `gh_profiles` record in Directus with `firebase_uid`
   5. Sign and return NestJS JWT + refresh token
 - [ ] **1.3.4** Implement `POST /auth/login`:
-  1. Authenticate via `supabase.auth.signInWithPassword()`
-  2. Look up `gh_profiles` by `supabase_uid`
-  3. Sign and return NestJS JWT + refresh token
-- [ ] **1.3.5** Implement `POST /auth/login/google`:
-  1. Receive Google ID token from client
-  2. Verify via Supabase (`supabase.auth.signInWithIdToken()`)
-  3. Check if `gh_profiles` exists for this `supabase_uid`; if not, create one
-  4. Sign and return NestJS JWT + refresh token
+  1. Accept a single payload contract: `provider` + provider-specific credentials/token
+  2. If `provider=password`, authenticate via Firebase Auth REST API (email/password)
+  3. If social provider (`google` now; others later), verify Firebase ID token via Firebase Admin SDK (`verifyIdToken`)
+  4. Enforce allowlist of supported providers
+  5. Check/create `gh_profiles` by `firebase_uid`
+  6. Sign and return NestJS JWT + refresh token
 - [ ] **1.3.6** Implement `POST /auth/refresh`:
   1. Verify refresh token
   2. Issue new access + refresh token pair
@@ -143,7 +142,7 @@ Set up the NestJS project, integrate Supabase Auth, implement custom JWT issuanc
   - Username change: check uniqueness, limit frequency (once per 30 days)
 - [ ] **1.5.4** Implement `GET /profiles/:username` — public profile view:
   - Return: display_name, username, avatar, bio, skills, availability_status, avg_rating, total_reviews, created_at
-  - Exclude: email, supabase_uid, fcm_token, notification_prefs
+  - Exclude: email, firebase_uid, fcm_token, notification_prefs
 - [ ] **1.5.5** Implement `GET /profiles/:username/gigs` — list user's active gigs (placeholder, completed in Phase 2)
 - [ ] **1.5.6** Implement `GET /profiles/:username/reviews` — list reviews for user (placeholder, completed in Phase 5)
 - [ ] **1.5.7** Implement `PATCH /profiles/me/fcm-token` — update FCM token
@@ -218,7 +217,6 @@ Set up the NestJS project, integrate Supabase Auth, implement custom JWT issuanc
 | -------- | --------------------------------- | ------ |
 | `POST`   | `/auth/register`                  | 🔲     |
 | `POST`   | `/auth/login`                     | 🔲     |
-| `POST`   | `/auth/login/google`              | 🔲     |
 | `POST`   | `/auth/refresh`                   | 🔲     |
 | `POST`   | `/auth/logout`                    | 🔲     |
 | `POST`   | `/auth/forgot-password`           | 🔲     |

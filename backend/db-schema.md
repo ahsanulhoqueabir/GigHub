@@ -1,7 +1,7 @@
 # GigHub Backend — Database Schema Design
 
 > All Directus collections use the `gh_` prefix.
-> All foreign keys referencing users point to `gh_profiles.id` (never `supabase_uid`).
+> All foreign keys referencing users point to `gh_profiles.id` (never `firebase_uid`).
 > File/image fields store **Cloudflare R2 URL strings** — Directus file management is NOT used.
 
 ---
@@ -39,7 +39,7 @@
 | Column                | Type            | Constraints         | Description                                                         |
 | --------------------- | --------------- | ------------------- | ------------------------------------------------------------------- |
 | `id`                  | `uuid`          | PK, auto-generated  | Canonical user identifier used everywhere                           |
-| `supabase_uid`        | `varchar(255)`  | UNIQUE, NOT NULL    | Supabase Auth UID — internal linkage only                           |
+| `firebase_uid`        | `varchar(255)`  | UNIQUE, NOT NULL    | Firebase Auth UID — internal linkage only                           |
 | `display_name`        | `varchar(100)`  | NOT NULL            | User's display name                                                 |
 | `username`            | `varchar(50)`   | UNIQUE, NOT NULL    | Unique handle (e.g., @rafiq)                                        |
 | `email`               | `varchar(255)`  | UNIQUE, NOT NULL    | User's email address                                                |
@@ -60,7 +60,7 @@
 **Indexes:**
 
 - `idx_profiles_username` on `username`
-- `idx_profiles_supabase_uid` on `supabase_uid`
+- `idx_profiles_firebase_uid` on `firebase_uid`
 - `idx_profiles_skills` GIN index on `skills`
 
 ---

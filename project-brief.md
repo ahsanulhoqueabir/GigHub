@@ -20,7 +20,7 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 | Layer          | Technology                                               |
 | -------------- | -------------------------------------------------------- |
 | Backend API    | NestJS (REST + WebSocket)                                |
-| Auth           | Supabase Auth (email/social login) + NestJS JWT (custom) |
+| Auth           | Firebase Auth (email/social login) + NestJS JWT (custom) |
 | CMS / DB Layer | Directus (collections, permissions, admin UI)            |
 | Web Frontend   | Next.js                                                  |
 | Mobile App     | Flutter                                                  |
@@ -36,19 +36,21 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 
 **Auth Flow**
 
-- Email/password registration and login via Supabase Auth
-- Social login (Google) via Supabase Auth
-- After Supabase authenticates the user, the NestJS backend issues its own signed JWT
-- All subsequent API requests carry the **NestJS-issued JWT** (not the Supabase token)
+- Email/password registration and login via Firebase Auth
+- Social login (Google) via Firebase Auth
+- Future third-party SSO (GitHub/Microsoft/Apple/etc.) via Firebase Auth providers
+- After Firebase authenticates the user, the NestJS backend issues its own signed JWT
+- All subsequent API requests carry the **NestJS-issued JWT** (not the Firebase token)
+- Backend accepts only Firebase-issued ID tokens for all sign-in paths
 - NestJS JWT payload includes: `profile_id`, `username`, `role`, `is_verified`, `institution`
 - All authorization and identity resolution across the platform uses `gh_profiles.id` from the JWT payload
 
 **Profile — Directus (`gh_profiles` collection)**
 
 - On first login, NestJS creates a `gh_profiles` record in Directus; the record's auto-generated `id` becomes the canonical user identifier
-- `supabase_uid` is stored internally in `gh_profiles` only for auth linkage — it is **never used as a foreign key** anywhere else
+- `firebase_uid` is stored internally in `gh_profiles` only for auth linkage — it is **never used as a foreign key** anywhere else
 - All platform data (gigs, jobs, orders, reviews, chat, etc.) references `gh_profiles.id` as the user identifier
-- Profile fields: `id`, `supabase_uid` (internal only), `display_name`, `username`, `avatar` (R2 URL string), `bio`, `skills[]`, `availability_status`, `is_verified`, `role`, `created_at`
+- Profile fields: `id`, `firebase_uid` (internal only), `display_name`, `username`, `avatar` (R2 URL string), `bio`, `skills[]`, `availability_status`, `is_verified`, `role`, `created_at`
 - Institution is fixed: **Jagannath University, Dhaka, Bangladesh** — not a user-selectable field
 - Role field: `student` (default) or `admin`
 - Students do NOT choose a Freelancer or Client role — all students are dual-sided by default
@@ -134,7 +136,7 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 
 The following features constitute the Minimum Viable Product:
 
-- [ ] Supabase Auth: email/password + Google login
+- [ ] Firebase Auth: email/password + Google login (+ future SSO providers)
 - [ ] NestJS issues custom signed JWT with `profile_id`, `role`, `username`, `is_verified` in payload
 - [ ] `gh_profiles` record auto-created in Directus on first login; `gh_profiles.id` used as canonical identifier everywhere
 - [ ] JnU student verification (`is_verified` flag)
@@ -178,7 +180,7 @@ The following features constitute the Minimum Viable Product:
 
 - Exclusively for Jagannath University — a trusted, closed campus ecosystem
 - Every student is dual-sided: no forced role choice, post gigs and jobs from day one
-- Supabase Auth + NestJS custom JWT + Directus `gh_profiles.id` as single source of truth for identity
+- Firebase Auth + NestJS custom JWT + Directus `gh_profiles.id` as single source of truth for identity
 - Cloudflare R2 for all file/image storage; DB stores only URL strings — no Directus file management
 - Free and volunteer task types beyond just paid gigs
 - Student-first UX: mobile-first via Flutter, lightweight onboarding

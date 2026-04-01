@@ -166,8 +166,8 @@ gighub_app/
     shared_preferences: ^2.x # Local settings
     json_annotation: ^4.x # JSON serialization
     freezed_annotation: ^2.x # Immutable models
-    google_sign_in: ^6.x # Google OAuth
     firebase_core: ^3.x # Firebase
+    firebase_auth: ^5.x # Firebase Auth (email/password + social providers)
     firebase_messaging: ^15.x # FCM push (Phase 4)
     flutter_local_notifications: ^17.x
     image_picker: ^1.x # Camera/gallery
@@ -191,7 +191,7 @@ gighub_app/
   ```
 
 - [ ] **1.1.3** Set up environment config:
-  - `.env.development`: API_URL, WS_URL, GOOGLE_CLIENT_ID
+  - `.env.development`: API_URL, WS_URL
   - `.env.production`: production URLs
   - `app_config.dart` to load from env
 
@@ -380,8 +380,8 @@ gighub_app/
     final ApiClient _client;
 
     Future<AuthResponse> register(RegisterInput input);
-    Future<AuthResponse> login(LoginInput input);
-    Future<AuthResponse> loginWithGoogle(String idToken);
+    Future<AuthResponse> login(LoginInput input); // provider: 'password'
+    Future<AuthResponse> loginWithProvider(String provider, String firebaseIdToken);
     Future<AuthResponse> refreshToken(String refreshToken);
     Future<void> logout();
     Future<void> forgotPassword(String email);
@@ -420,7 +420,7 @@ gighub_app/
 
     Future<void> login(LoginInput input);
     Future<void> register(RegisterInput input);
-    Future<void> loginWithGoogle();
+    Future<void> loginWithProvider(String provider);
     Future<void> logout();
     Future<void> initialize(); // check stored tokens
   }
@@ -530,9 +530,13 @@ gighub_app/
   - Success: "Check your email" message
 
 - [ ] **1.8.4** Implement Google Sign-In flow:
-  - Use `google_sign_in` package
-  - On success: get ID token → send to backend `/auth/login/google`
+  - Use `firebase_auth` Google provider flow
+  - On success: get Firebase ID token → send `{ provider: 'google', firebase_id_token }` to backend `/auth/login`
   - Handle both new and existing users
+
+- [ ] **1.8.4b** Prepare future third-party SSO flow:
+  - Use Firebase Auth provider-based sign-in for GitHub/Microsoft/Apple when enabled
+  - Keep same backend contract: send `{ provider, firebase_id_token }` to `/auth/login`
 
 - [ ] **1.8.5** Create `SocialLoginButton` widget:
   - Google branded button
@@ -639,18 +643,17 @@ gighub_app/
 
 ## Backend Endpoints Consumed
 
-| Endpoint                     | Usage                |
-| ---------------------------- | -------------------- |
-| `POST /auth/register`        | Register new account |
-| `POST /auth/login`           | Email/password login |
-| `POST /auth/login/google`    | Google OAuth login   |
-| `POST /auth/refresh`         | Token refresh        |
-| `POST /auth/logout`          | Logout               |
-| `POST /auth/forgot-password` | Password reset       |
-| `GET /profiles/me`           | Get own profile      |
-| `PATCH /profiles/me`         | Update own profile   |
-| `GET /profiles/:username`    | Get public profile   |
-| `POST /upload/image`         | Avatar upload        |
+| Endpoint                     | Usage                                               |
+| ---------------------------- | --------------------------------------------------- |
+| `POST /auth/register`        | Register new account                                |
+| `POST /auth/login`           | Provider-based login (password, Google, future SSO) |
+| `POST /auth/refresh`         | Token refresh                                       |
+| `POST /auth/logout`          | Logout                                              |
+| `POST /auth/forgot-password` | Password reset                                      |
+| `GET /profiles/me`           | Get own profile                                     |
+| `PATCH /profiles/me`         | Update own profile                                  |
+| `GET /profiles/:username`    | Get public profile                                  |
+| `POST /upload/image`         | Avatar upload                                       |
 
 ---
 
