@@ -245,7 +245,7 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   - No N+1 queries
 - [ ] **5.7.9** Security audit:
   - Input sanitization on all text fields (prevent XSS)
-  - SQL injection prevention (parameterized queries via Directus SDK)
+  - SQL injection prevention (parameterized queries via Directus REST API)
   - File upload validation (MIME type check, file size limits)
   - JWT best practices (short expiry, secure refresh rotation)
 - [ ] **5.7.10** Error monitoring setup (Sentry or similar)

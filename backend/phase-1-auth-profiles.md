@@ -55,22 +55,24 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
 
 1.  **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` -> `ProfileService`).
-2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication.
+2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication via Directus REST API.
 3.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
 4.  **Auth Exception**: `AuthService` handles multi-provider logic (Firebase + JWT) and isn't tied to a single collection, but uses other services (like `ProfileService`) for DB operations.
 5.  **Type Organization**: ALL types MUST be centralized in `src/types/` as independent files (e.g., `src/types/profile.types.ts`). Services and controllers import from this central location. Types can be imported between type files if cross-domain definitions are needed.
 
-**Service Example:**
+**Service Example (REST API Pattern):**
 ```typescript
+import axios from 'axios';
+
 export class ProfileService {
   private static collection = "gh_profiles";
-
-  private static getProfileFields() {
-    return ['id', 'display_name', 'username', 'avatar'];
-  }
+  private static baseUrl = process.env.DIRECTUS_URL;
 
   static async getProfileById(id: string) {
-    // Direct DB communication via Directus SDK
+    const { data } = await axios.get(`${this.baseUrl}/items/${this.collection}/${id}`, {
+      params: { fields: ['id', 'display_name', 'username', 'avatar'].join(',') }
+    });
+    return data.data;
   }
 }
 ```
@@ -78,7 +80,7 @@ export class ProfileService {
   ```
   @nestjs/config, @nestjs/jwt, @nestjs/passport
   passport, passport-jwt, class-validator, class-transformer
-  firebase-admin, @directus/sdk
+  firebase-admin, axios
   @aws-sdk/client-s3 (for R2), helmet, @nestjs/throttler
   ```
 - [ ] **1.1.4** Set up environment configuration module with validation:
@@ -106,7 +108,7 @@ export class ProfileService {
 - [ ] **1.2.6** Set up Directus roles & permissions:
   - **API Role** (used by NestJS): full CRUD on all `gh_*` collections
   - **Public Role**: read-only on `gh_categories`, `gh_platform_config`
-- [ ] **1.2.7** Create Directus service module in NestJS (singleton SDK client)
+- [ ] **1.2.7** Create Directus service module in NestJS (REST client wrapper with auth headers)
 
 ### 1.3 Firebase Auth Integration
 
@@ -228,7 +230,7 @@ export class ProfileService {
   { success: true, data: ..., meta: ... }
   ```
 - [ ] **1.7.4** Create global exception filter with structured error responses
-- [ ] **1.7.5** Create Directus query helper (filter builder, sort, pagination)
+- [ ] **1.7.5** Create Directus REST helper (URL builder for filter, sort, pagination)
 
 ### 1.8 Testing & Validation
 
