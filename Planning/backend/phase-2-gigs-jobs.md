@@ -16,9 +16,10 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 
 ### 2.1 Categories Module (Complete)
 
-- [ ] **2.1.1** Create `CategoriesModule` with:
-  - `CategoriesService` — CRUD via Directus
-  - `CategoriesController` — REST endpoints
+- [ ] **2.1.1** Create `CategoryModule` with:
+  - `CategoryService` — Static methods for `gh_categories` CRUD
+  - `CategoryController` — REST endpoints
+  - `src/types/category.types.ts` — Category interfaces and enums
 - [ ] **2.1.2** Implement `GET /categories` — list all active categories (public, cached)
 - [ ] **2.1.3** Implement `POST /categories` — admin-only: create new category
 - [ ] **2.1.4** Implement `PATCH /categories/:id` — admin-only: update category
@@ -28,27 +29,27 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ### 2.2 Directus Collections Setup
 
 - [ ] **2.2.1** Create `gh_gigs` collection with all fields and indexes
-- [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig_id`, `tier`)
+- [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig`, `tier`)
 - [ ] **2.2.3** Create `gh_gig_images` collection
 - [ ] **2.2.4** Create `gh_jobs` collection with all fields and indexes
-- [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job_id`, `applicant_id`)
+- [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job`, `applicant`)
 - [ ] **2.2.6** Set up relations in Directus:
-  - `gh_gigs.seller_id` → `gh_profiles.id`
-  - `gh_gigs.category_id` → `gh_categories.id`
-  - `gh_gig_packages.gig_id` → `gh_gigs.id` (cascade delete)
-  - `gh_gig_images.gig_id` → `gh_gigs.id` (cascade delete)
-  - `gh_jobs.poster_id` → `gh_profiles.id`
-  - `gh_jobs.category_id` → `gh_categories.id`
-  - `gh_proposals.job_id` → `gh_jobs.id`
-  - `gh_proposals.applicant_id` → `gh_profiles.id`
+  - `gh_gigs.seller` → `gh_profiles.id`
+  - `gh_gigs.category` → `gh_categories.id`
+  - `gh_gig_packages.gig` → `gh_gigs.id` (cascade delete)
+  - `gh_jobs.poster` → `gh_profiles.id`
+  - `gh_jobs.category` → `gh_categories.id`
+  - `gh_proposals.job` → `gh_jobs.id`
+  - `gh_proposals.applicant` → `gh_profiles.id`
 - [ ] **2.2.7** Create full-text search indexes on `gh_gigs(title, description)` and `gh_jobs(title, description)`
 - [ ] **2.2.8** Create GIN indexes on `gh_gigs.tags` and `gh_jobs.required_skills`
 
 ### 2.3 Gigs Module
 
-- [ ] **2.3.1** Create `GigsModule` with:
-  - `GigsService` — business logic
-  - `GigsController` — REST endpoints
+- [ ] **2.3.1** Create `GigModule` with:
+  - `GigService` — Static methods for `gh_gigs` and `gh_gig_packages` logic
+  - `GigController` — REST endpoints
+  - `src/types/gig.types.ts` — Gig, Package, and Image interfaces
   - DTOs: `CreateGigDto`, `UpdateGigDto`, `GigQueryDto`, `GigResponseDto`, `GigDetailResponseDto`
 
 #### Gig CRUD
@@ -60,15 +61,14 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   4. Generate unique slug from title
   5. Create `gh_gigs` record
   6. Create `gh_gig_packages` records (1–3 packages)
-  7. Create `gh_gig_images` records (if images provided)
-  8. Return created gig with packages and images
+  7. Return created gig with packages and images array
 
 - [ ] **2.3.3** Implement `PATCH /gigs/:id` — Update gig:
-  1. Verify current user is the seller (`seller_id = profile_id`)
+  1. Verify current user is the seller (`seller = profile_id`)
   2. Validate updated fields
   3. Update `gh_gigs` record
   4. Upsert packages (delete old, create new)
-  5. Update images if changed
+  5. Update images array if changed
 
 - [ ] **2.3.4** Implement `DELETE /gigs/:id` — Soft-delete gig:
   1. Verify ownership
@@ -104,9 +104,10 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 
 ### 2.4 Jobs Module
 
-- [ ] **2.4.1** Create `JobsModule` with:
-  - `JobsService` — business logic
-  - `JobsController` — REST endpoints
+- [ ] **2.4.1** Create `JobModule` with:
+  - `JobService` — Static methods for `gh_jobs` logic
+  - `JobController` — REST endpoints
+  - `src/types/job.types.ts` — Job interfaces and enums
   - DTOs: `CreateJobDto`, `UpdateJobDto`, `JobQueryDto`, `JobResponseDto`
 
 #### Job CRUD
@@ -153,9 +154,10 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 
 ### 2.5 Proposals Module
 
-- [ ] **2.5.1** Create `ProposalsModule` with:
-  - `ProposalsService` — business logic
-  - `ProposalsController` — REST endpoints
+- [ ] **2.5.1** Create `ProposalModule` with:
+  - `ProposalService` — Static methods for `gh_proposals` logic
+  - `ProposalController` — REST endpoints
+  - `src/types/proposal.types.ts` — Proposal interfaces and enums
   - DTOs: `CreateProposalDto`, `ProposalResponseDto`
 
 - [ ] **2.5.2** Implement `POST /jobs/:jobId/proposals` — Submit proposal:
@@ -268,7 +270,6 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 | ----------------- | ------ |
 | `gh_gigs`         | 🔲     |
 | `gh_gig_packages` | 🔲     |
-| `gh_gig_images`   | 🔲     |
 | `gh_jobs`         | 🔲     |
 | `gh_proposals`    | 🔲     |
 

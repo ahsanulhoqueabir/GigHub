@@ -124,15 +124,16 @@ Every registered student automatically has **full dual-sided access**:
 
 | Layer                  | Technology                     | Purpose                                                                     |
 | ---------------------- | ------------------------------ | --------------------------------------------------------------------------- |
-| **Backend API**        | NestJS (TypeScript)            | REST endpoints + WebSocket gateway                                          |
+| **Backend API**        | NestJS (TypeScript)            | REST endpoints + WebSocket gateway; follows collection-centric service pattern |
 | **Authentication**     | Firebase Auth                  | Email/password + Google OAuth (future providers via Firebase SSO)           |
-| **Custom Auth**        | NestJS JWT                     | Platform-issued tokens with `profile_id`, `role`, `username`, `is_verified` |
+| **Custom Auth**        | NestJS JWT                     | Platform-issued tokens with `profile_id`, `username`, `is_verified`, `role` |
 | **Database / CMS**     | Directus + PostgreSQL          | Data storage, collections, admin UI                                         |
 | **Web Frontend**       | Next.js 14 (App Router)        | Server-side rendered web application                                        |
 | **Mobile App**         | Flutter (Dart)                 | Cross-platform mobile app (Android primary, iOS secondary)                  |
 | **Payments**           | SSLCommerz + bKash API         | Escrow-based payment processing                                             |
 | **Real-time**          | Socket.IO (NestJS Gateway)     | Chat messaging, live notifications                                          |
 | **File Storage**       | Cloudflare R2                  | Images, documents, chat attachments                                         |
+| **Architecture**       | Static Collection Services     | Services are collection-centric with static methods for DB logic            |
 | **Email**              | Resend / Nodemailer            | Transactional emails                                                        |
 | **Push Notifications** | Firebase Cloud Messaging (FCM) | Mobile push notifications                                                   |
 
@@ -142,7 +143,7 @@ Every registered student automatically has **full dual-sided access**:
 Student → Firebase Auth (email/Google) → Firebase returns ID token
     → NestJS /auth/login receives firebase_id_token
     → NestJS verifies with Firebase Admin SDK, checks/creates gh_profiles record
-    → NestJS signs custom JWT { profile_id, username, role, is_verified }
+    → NestJS signs custom JWT { profile_id, username, is_verified, role }
     → Client stores NestJS JWT, uses it for ALL subsequent API calls
 ```
 
@@ -213,7 +214,7 @@ Dispute: Buyer disputes → Admin reviews → Admin decides (refund/release/spli
 | FR-1.1  | Email/password registration via Firebase Auth                           | P0       |
 | FR-1.2  | Google OAuth login via Firebase Auth                                    | P0       |
 | FR-1.2b | Future third-party SSO via Firebase Auth providers                      | P1       |
-| FR-1.3  | NestJS custom JWT issuance with profile_id, role, username, is_verified | P0       |
+| FR-1.3  | NestJS custom JWT issuance with profile_id, username, is_verified, role | P0       |
 | FR-1.4  | Auto-creation of gh_profiles record on first login                      | P0       |
 | FR-1.5  | JWT refresh token mechanism                                             | P0       |
 | FR-1.6  | Logout / token invalidation                                             | P0       |
@@ -367,24 +368,23 @@ All Directus collections use the `gh_` prefix. See [backend/db-schema.md](backen
 | Collection            | Purpose                            | Key Relations                                              |
 | --------------------- | ---------------------------------- | ---------------------------------------------------------- |
 | `gh_profiles`         | User profiles (canonical identity) | —                                                          |
-| `gh_gigs`             | Service listings                   | `seller_id` → `gh_profiles.id`                             |
-| `gh_gig_packages`     | Gig pricing tiers                  | `gig_id` → `gh_gigs.id`                                    |
-| `gh_gig_images`       | Gig gallery images                 | `gig_id` → `gh_gigs.id`                                    |
+| `gh_gigs`             | Service listings                   | `seller`, `category` → `gh_profiles.id`, `gh_categories.id` |
+| `gh_gig_packages`     | Gig pricing tiers                  | `gig` → `gh_gigs.id`                                       |
 | `gh_categories`       | Gig/job categories                 | —                                                          |
-| `gh_jobs`             | Job/task postings                  | `poster_id` → `gh_profiles.id`                             |
-| `gh_proposals`        | Job proposals                      | `job_id` → `gh_jobs.id`, `applicant_id` → `gh_profiles.id` |
-| `gh_orders`           | Orders (gig or job)                | `buyer_id`, `seller_id` → `gh_profiles.id`                 |
-| `gh_order_milestones` | Milestone tracking                 | `order_id` → `gh_orders.id`                                |
-| `gh_order_deliveries` | Delivery submissions               | `order_id` → `gh_orders.id`                                |
-| `gh_escrow`           | Payment escrow records             | `order_id` → `gh_orders.id`                                |
-| `gh_transactions`     | Payment transactions               | `profile_id` → `gh_profiles.id`                            |
-| `gh_withdrawals`      | Withdrawal requests                | `profile_id` → `gh_profiles.id`                            |
+| `gh_jobs`             | Job/task postings                  | `poster`, `category` → `gh_profiles.id`, `gh_categories.id`|
+| `gh_proposals`        | Job proposals                      | `job` → `gh_jobs.id`, `applicant` → `gh_profiles.id`       |
+| `gh_orders`           | Orders (gig or job)                | `buyer`, `seller` → `gh_profiles.id`                       |
+| `gh_order_milestones` | Milestone tracking                 | `order` → `gh_orders.id`                                   |
+| `gh_order_deliveries` | Delivery submissions               | `order` → `gh_orders.id`                                   |
+| `gh_escrow`           | Payment escrow records             | `order` → `gh_orders.id`                                   |
+| `gh_transactions`     | Payment transactions               | `profile` → `gh_profiles.id`                               |
+| `gh_withdrawals`      | Withdrawal requests                | `profile` → `gh_profiles.id`                               |
 | `gh_conversations`    | Chat conversations                 | `participant_1`, `participant_2` → `gh_profiles.id`        |
-| `gh_messages`         | Chat messages                      | `conversation_id` → `gh_conversations.id`                  |
-| `gh_reviews`          | Ratings & reviews                  | `reviewer_id`, `reviewee_id` → `gh_profiles.id`            |
-| `gh_notifications`    | User notifications                 | `profile_id` → `gh_profiles.id`                            |
-| `gh_bookmarks`        | Saved gigs/jobs                    | `profile_id` → `gh_profiles.id`                            |
-| `gh_reports`          | Content reports/flags              | `reporter_id` → `gh_profiles.id`                           |
+| `gh_messages`         | Chat messages                      | `conversation` → `gh_conversations.id`                     |
+| `gh_reviews`          | Ratings & reviews                  | `reviewer`, `reviewee` → `gh_profiles.id`                  |
+| `gh_notifications`    | User notifications                 | `profile` → `gh_profiles.id`                               |
+| `gh_bookmarks`        | Saved gigs/jobs                    | `profile` → `gh_profiles.id`                               |
+| `gh_reports`          | Content reports/flags              | `reporter` → `gh_profiles.id`                              |
 | `gh_platform_config`  | Platform settings                  | —                                                          |
 
 ---

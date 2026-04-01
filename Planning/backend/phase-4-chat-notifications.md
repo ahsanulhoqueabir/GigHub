@@ -21,20 +21,23 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.1.3** Create `gh_notifications` collection with all fields and indexes
 - [ ] **4.1.4** Set up foreign key relations:
   - `gh_conversations.participant_1` / `participant_2` → `gh_profiles.id`
-  - `gh_conversations.order_id` → `gh_orders.id`
-  - `gh_conversations.gig_id` → `gh_gigs.id`
-  - `gh_messages.conversation_id` → `gh_conversations.id` (cascade delete)
-  - `gh_messages.sender_id` → `gh_profiles.id`
-  - `gh_notifications.profile_id` → `gh_profiles.id`
-- [ ] **4.1.5** Create partial index on `gh_messages(conversation_id, is_read)` WHERE `is_read = false`
-- [ ] **4.1.6** Create index on `gh_notifications(profile_id, is_read)` WHERE `is_read = false`
+  - `gh_conversations.order` → `gh_orders.id`
+  - `gh_conversations.gig` → `gh_gigs.id`
+  - `gh_messages.conversation` → `gh_conversations.id` (cascade delete)
+  - `gh_messages.sender` → `gh_profiles.id`
+  - `gh_notifications.profile` → `gh_profiles.id`
+- [ ] **4.1.5** Create partial index on `gh_messages(conversation, is_read)` WHERE `is_read = false`
+- [ ] **4.1.6** Create index on `gh_notifications(profile, is_read)` WHERE `is_read = false`
 
 ### 4.2 Chat Module — REST Endpoints
 
 - [ ] **4.2.1** Create `ChatModule` with:
-  - `ChatService` — conversation & message management
+  - `ConversationService` — Static methods for `gh_conversations` logic
+  - `MessageService` — Static methods for `gh_messages` logic
   - `ChatController` — REST endpoints
   - `ChatGateway` — Socket.IO WebSocket gateway
+  - `src/types/conversation.types.ts` — Conversation interfaces
+  - `src/types/message.types.ts` — Message interfaces
   - DTOs: `CreateConversationDto`, `SendMessageDto`, `ConversationResponseDto`, `MessageResponseDto`
 
 - [ ] **4.2.2** Implement `POST /conversations` — Start conversation:
@@ -127,7 +130,7 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.3.9** Implement system messages:
   - Create helper: `sendSystemMessage(conversationId, content)`
   - Used for order events: "Order started", "Delivery submitted", "Order completed", etc.
-  - `message_type = 'system'`, `sender_id` = null or system user
+  - `message_type = 'system'`, `sender` = null or system user
 
 ### 4.4 Chat File Sharing
 
@@ -143,13 +146,14 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
   - Client uploads audio to R2 via `/upload/file` (folder: `chat`)
   - Sends message with `message_type: 'voice'`, `file_url`, `file_size`
 
-### 4.5 Notifications Module
+### 4.5 Notification Module
 
-- [ ] **4.5.1** Create `NotificationsModule` with:
-  - `NotificationsService` — create, list, manage notifications
-  - `NotificationsController` — REST endpoints
-  - `PushNotificationService` — FCM integration
-  - `EmailNotificationService` — transactional emails
+- [ ] **4.5.1** Create `NotificationModule` with:
+  - `NotificationService` — Static methods for `gh_notifications` logic
+  - `NotificationController` — REST endpoints
+  - `PushNotificationService` — FCM integration (static methods)
+  - `EmailNotificationService` — transactional emails (static methods)
+  - `src/types/notification.types.ts` — Notification interfaces and enums
 
 #### In-App Notifications
 
@@ -157,7 +161,7 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 
   ```typescript
   async createNotification(params: {
-    profile_id: string,
+    profile: string,
     type: NotificationType,
     title: string,
     body: string,

@@ -17,20 +17,21 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.1 Directus Collections Setup
 
 - [ ] **5.1.1** Create `gh_reviews` collection with all fields and indexes
-- [ ] **5.1.2** Create `gh_bookmarks` collection with UNIQUE constraint on (`profile_id`, `entity_type`, `entity_id`)
+- [ ] **5.1.2** Create `gh_bookmarks` collection with UNIQUE constraint on (`profile`, `entity_type`, `entity_id`)
 - [ ] **5.1.3** Create `gh_reports` collection with all fields
 - [ ] **5.1.4** Set up foreign key relations:
-  - `gh_reviews.order_id` → `gh_orders.id`
-  - `gh_reviews.gig_id` → `gh_gigs.id`
-  - `gh_reviews.reviewer_id` / `reviewee_id` → `gh_profiles.id`
-  - `gh_bookmarks.profile_id` → `gh_profiles.id`
-  - `gh_reports.reporter_id` / `resolved_by` → `gh_profiles.id`
+  - `gh_reviews.order` → `gh_orders.id`
+  - `gh_reviews.gig` → `gh_gigs.id`
+  - `gh_reviews.reviewer` / `reviewee` → `gh_profiles.id`
+  - `gh_bookmarks.profile` → `gh_profiles.id`
+  - `gh_reports.reporter` / `resolved_by` → `gh_profiles.id`
 
 ### 5.2 Reviews Module
 
-- [ ] **5.2.1** Create `ReviewsModule` with:
-  - `ReviewsService` — review creation & aggregation
-  - `ReviewsController` — REST endpoints
+- [ ] **5.2.1** Create `ReviewModule` with:
+  - `ReviewService` — Static methods for `gh_reviews` logic
+  - `ReviewController` — REST endpoints
+  - `src/types/review.types.ts` — Review interfaces and enums
   - DTOs: `CreateReviewDto`, `ReviewResponseDto`, `ReviewResponseReplyDto`
 
 - [ ] **5.2.2** Implement `POST /orders/:orderId/reviews` — Submit review:
@@ -41,7 +42,7 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   3. Check reviewer hasn't already reviewed this order
   4. Validate ratings (1.0–5.0 range, 0.5 increments)
   5. Create `gh_reviews` record
-  6. Set `gig_id` if order source_type is 'gig'
+  6. Set `gig` if order source_type is 'gig'
   7. **Recalculate reviewee's aggregate ratings:**
      - Update `gh_profiles.avg_rating` and `total_reviews` for the reviewee
      - Update `gh_gigs.avg_rating` and `total_reviews` for the gig (if applicable)
@@ -66,8 +67,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 - [ ] **5.2.6** Implement rating aggregation utility:
 
   ```typescript
-  async recalculateRatings(profileId: string): Promise<void>
-  async recalculateGigRatings(gigId: string): Promise<void>
+  async recalculateRatings(profile: string): Promise<void>
+  async recalculateGigRatings(gig: string): Promise<void>
   ```
 
   - Calculate weighted average from all visible reviews
@@ -81,9 +82,10 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ### 5.3 Bookmarks Module
 
-- [ ] **5.3.1** Create `BookmarksModule` with:
-  - `BookmarksService`
-  - `BookmarksController`
+- [ ] **5.3.1** Create `BookmarkModule` with:
+  - `BookmarkService` — Static methods for `gh_bookmarks` logic
+  - `BookmarkController` — REST endpoints
+  - `src/types/bookmark.types.ts` — Bookmark interfaces and enums
 
 - [ ] **5.3.2** Implement `POST /bookmarks` — Add bookmark:
   1. Validate entity exists (gig or job)
@@ -103,9 +105,10 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ### 5.4 Reports Module
 
-- [ ] **5.4.1** Create `ReportsModule` with:
-  - `ReportsService`
-  - `ReportsController`
+- [ ] **5.4.1** Create `ReportModule` with:
+  - `ReportService` — Static methods for `gh_reports` logic
+  - `ReportController` — REST endpoints
+  - `src/types/report.types.ts` — Report interfaces and enums
 
 - [ ] **5.4.2** Implement `POST /reports` — Submit report:
   1. Validate entity exists
@@ -118,8 +121,9 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.5 Admin Module
 
 - [ ] **5.5.1** Create `AdminModule` with:
-  - `AdminService` — admin business logic
+  - `AdminService` — Static methods for admin business logic
   - `AdminController` — admin REST endpoints
+  - `src/types/admin.types.ts` — Admin stats and management interfaces
   - Apply `RolesGuard('admin')` to all routes
 
 #### User Management
@@ -241,7 +245,7 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   - No N+1 queries
 - [ ] **5.7.9** Security audit:
   - Input sanitization on all text fields (prevent XSS)
-  - SQL injection prevention (parameterized queries via Directus SDK)
+  - SQL injection prevention (parameterized queries via Directus REST API)
   - File upload validation (MIME type check, file size limits)
   - JWT best practices (short expiry, secure refresh rotation)
 - [ ] **5.7.10** Error monitoring setup (Sentry or similar)

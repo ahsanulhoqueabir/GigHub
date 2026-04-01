@@ -23,40 +23,64 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 - [ ] **1.1.2** Set up project structure:
   ```
   src/
-  ├── common/
-  │   ├── decorators/         # Custom decorators (@CurrentUser, @Roles)
-  │   ├── filters/            # Exception filters
-  │   ├── guards/             # AuthGuard, RolesGuard
-  │   ├── interceptors/       # Response transform, logging
-  │   ├── pipes/              # Validation pipes
-  │   ├── dto/                # Shared DTOs
-  │   └── utils/              # Helpers (slug, pagination, etc.)
-  ├── config/                 # Config module (env validation)
+  ├── common/                 # Shared utilities, decorators, filters, etc.
+  ├── config/                 # Environment and application configuration
   ├── modules/
-  │   ├── auth/               # Phase 1
-  │   ├── profiles/           # Phase 1
-  │   ├── upload/             # Phase 1
-  │   ├── gigs/               # Phase 2
-  │   ├── jobs/               # Phase 2
-  │   ├── proposals/          # Phase 2
-  │   ├── categories/         # Phase 2
-  │   ├── orders/             # Phase 3
-  │   ├── payments/           # Phase 3
-  │   ├── escrow/             # Phase 3
-  │   ├── withdrawals/        # Phase 3
-  │   ├── chat/               # Phase 4
-  │   ├── notifications/      # Phase 4
-  │   ├── reviews/            # Phase 5
-  │   ├── bookmarks/          # Phase 5
-  │   ├── reports/            # Phase 5
-  │   └── admin/              # Phase 5
+  │   ├── auth/               # Special Module: Firebase + JWT logic
+  │   │   ├── auth.controller.ts
+  │   │   ├── auth.module.ts
+  │   │   └── auth.service.ts
+  │   ├── profile/            # Domain: gh_profiles
+  │   │   ├── profile.controller.ts
+  │   │   ├── profile.module.ts
+  │   │   └── profile.service.ts
+  │   ├── category/           # Domain: gh_categories
+  │   │   ├── category.controller.ts
+  │   │   ├── category.module.ts
+  │   │   └── category.service.ts
+  │   └── upload/             # Domain: Infrastructure (R2)
+  │       ├── upload.controller.ts
+  │       ├── upload.module.ts
+  │       └── upload.service.ts
+  ├── types/                  # Centralized Types (Independent files)
+  │   ├── auth.types.ts
+  │   ├── profile.types.ts
+  │   ├── category.types.ts
+  │   └── upload.types.ts
   └── main.ts
   ```
+
+### 1.1.2b Service & Type Architecture Pattern
+
+To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
+
+1.  **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` -> `ProfileService`).
+2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication via Directus REST API.
+3.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
+4.  **Auth Exception**: `AuthService` handles multi-provider logic (Firebase + JWT) and isn't tied to a single collection, but uses other services (like `ProfileService`) for DB operations.
+5.  **Type Organization**: ALL types MUST be centralized in `src/types/` as independent files (e.g., `src/types/profile.types.ts`). Services and controllers import from this central location. Types can be imported between type files if cross-domain definitions are needed.
+
+**Service Example (REST API Pattern):**
+```typescript
+import axios from 'axios';
+
+export class ProfileService {
+  private static collection = "gh_profiles";
+  private static baseUrl = process.env.DIRECTUS_URL;
+
+  static async getProfileById(id: string) {
+    const { data } = await axios.get(`${this.baseUrl}/items/${this.collection}/${id}`, {
+      params: { fields: ['id', 'display_name', 'username', 'avatar'].join(',') }
+    });
+    return data.data;
+  }
+}
+```
 - [ ] **1.1.3** Install core dependencies:
   ```
   @nestjs/config, @nestjs/jwt, @nestjs/passport
   passport, passport-jwt, class-validator, class-transformer
-  firebase-admin, @directus/sdk
+  firebase-admin, axios
   @aws-sdk/client-s3 (for R2), helmet, @nestjs/throttler
   ```
 - [ ] **1.1.4** Set up environment configuration module with validation:
@@ -84,7 +108,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 - [ ] **1.2.6** Set up Directus roles & permissions:
   - **API Role** (used by NestJS): full CRUD on all `gh_*` collections
   - **Public Role**: read-only on `gh_categories`, `gh_platform_config`
-- [ ] **1.2.7** Create Directus service module in NestJS (singleton SDK client)
+- [ ] **1.2.7** Create Directus service module in NestJS (REST client wrapper with auth headers)
 
 ### 1.3 Firebase Auth Integration
 
@@ -130,7 +154,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 
 - [ ] **1.4.1** Create JWT strategy (`JwtStrategy` extending `PassportStrategy`):
   - Extract token from Authorization header
-  - Validate and decode payload: `{ profile_id, username, role, is_verified }`
+  - Validate and decode payload: `{ profile_id, username, is_verified, role }`
 - [ ] **1.4.2** Create `JwtAuthGuard` (used globally or per-route)
 - [ ] **1.4.3** Create `RolesGuard` for admin-only routes
 - [ ] **1.4.4** Create `@CurrentUser()` decorator to extract user from request
@@ -140,9 +164,10 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 
 ### 1.5 Profile Module
 
-- [ ] **1.5.1** Create `ProfilesModule` with:
-  - `ProfilesService` — CRUD via Directus SDK
-  - `ProfilesController` — REST endpoints
+- [ ] **1.5.1** Create `ProfileModule` with:
+  - `ProfileService` — Static methods for `gh_profiles` CRUD
+  - `ProfileController` — REST endpoints
+  - `src/types/profile.types.ts` — Profile interfaces and enums
   - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
 - [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
 - [ ] **1.5.3** Implement `PATCH /profiles/me` — update profile fields:
@@ -205,7 +230,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
   { success: true, data: ..., meta: ... }
   ```
 - [ ] **1.7.4** Create global exception filter with structured error responses
-- [ ] **1.7.5** Create Directus query helper (filter builder, sort, pagination)
+- [ ] **1.7.5** Create Directus REST helper (URL builder for filter, sort, pagination)
 
 ### 1.8 Testing & Validation
 
@@ -255,7 +280,7 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 ## Definition of Done
 
 - [ ] All auth endpoints working (register, login, Google, refresh, logout)
-- [ ] JWT tokens correctly issued with profile_id, username, role, is_verified
+- [ ] JWT tokens correctly issued with profile_id, username, is_verified, role
 - [ ] Profile CRUD fully functional
 - [ ] Avatar upload to R2 working
 - [ ] Generic file/image upload to R2 working

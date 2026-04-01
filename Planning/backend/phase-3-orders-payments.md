@@ -17,23 +17,23 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.1 Directus Collections Setup
 
 - [ ] **3.1.1** Create `gh_orders` collection with all fields, indexes, and status enum
-- [ ] **3.1.2** Create `gh_order_milestones` collection with cascade delete on `order_id`
+- [ ] **3.1.2** Create `gh_order_milestones` collection with cascade delete on `order`
 - [ ] **3.1.3** Create `gh_order_deliveries` collection
-- [ ] **3.1.4** Create `gh_escrow` collection with UNIQUE constraint on `order_id`
+- [ ] **3.1.4** Create `gh_escrow` collection with UNIQUE constraint on `order`
 - [ ] **3.1.5** Create `gh_transactions` collection (immutable log)
 - [ ] **3.1.6** Create `gh_withdrawals` collection
 - [ ] **3.1.7** Set up all foreign key relations:
-  - `gh_orders.buyer_id` / `seller_id` → `gh_profiles.id`
-  - `gh_orders.gig_id` → `gh_gigs.id`
-  - `gh_orders.job_id` → `gh_jobs.id`
-  - `gh_orders.gig_package_id` → `gh_gig_packages.id`
-  - `gh_orders.proposal_id` → `gh_proposals.id`
-  - `gh_order_milestones.order_id` → `gh_orders.id`
-  - `gh_order_deliveries.order_id` → `gh_orders.id`
-  - `gh_escrow.order_id` → `gh_orders.id`
-  - `gh_transactions.profile_id` → `gh_profiles.id`
-  - `gh_transactions.order_id` → `gh_orders.id`
-  - `gh_withdrawals.profile_id` → `gh_profiles.id`
+  - `gh_orders.buyer` / `seller` → `gh_profiles.id`
+  - `gh_orders.gig` → `gh_gigs.id`
+  - `gh_orders.job` → `gh_jobs.id`
+  - `gh_orders.gig_package` → `gh_gig_packages.id`
+  - `gh_orders.proposal` → `gh_proposals.id`
+  - `gh_order_milestones.order` → `gh_orders.id`
+  - `gh_order_deliveries.order` → `gh_orders.id`
+  - `gh_escrow.order` → `gh_orders.id`
+  - `gh_transactions.profile` → `gh_profiles.id`
+  - `gh_transactions.order` → `gh_orders.id`
+  - `gh_withdrawals.profile` → `gh_profiles.id`
 
 ### 3.2 Order Number Generator
 
@@ -44,15 +44,16 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.3 Orders Module
 
-- [ ] **3.3.1** Create `OrdersModule` with:
-  - `OrdersService` — order lifecycle management
-  - `OrdersController` — REST endpoints
+- [ ] **3.3.1** Create `OrderModule` with:
+  - `OrderService` — Static methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
+  - `OrderController` — REST endpoints
+  - `src/types/order.types.ts` — Order, Milestone, and Delivery interfaces
   - DTOs: `CreateGigOrderDto`, `CreateJobOrderDto`, `OrderQueryDto`, `DeliverDto`, `RevisionDto`
 
 #### Order Creation
 
 - [ ] **3.3.2** Implement `POST /orders/gig` — Create order from gig:
-  1. Validate `gig_id` and `package_id` — gig must be active
+  1. Validate `gig` and `package` — gig must be active
   2. Buyer cannot be the gig seller
   3. Calculate: `amount` (from package), `platform_fee` (from config), `seller_earnings`
   4. Calculate `delivery_deadline` (now + delivery_days)
@@ -153,10 +154,11 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.4 Payments Module (SSLCommerz)
 
-- [ ] **3.4.1** Create `PaymentsModule` with:
-  - `PaymentsService` — payment processing logic
-  - `PaymentsController` — REST endpoints + webhooks
-  - `SslcommerzService` — SSLCommerz API wrapper
+- [ ] **3.4.1** Create `PaymentModule` with:
+  - `PaymentService` — Static methods for `gh_transactions` and payment processing logic
+  - `PaymentController` — REST endpoints + webhooks
+  - `SslcommerzService` — SSLCommerz API wrapper (static methods)
+  - `src/types/payment.types.ts` — Transaction and payment session interfaces
 
 - [ ] **3.4.2** Implement SSLCommerz integration:
   - Install SSLCommerz SDK or implement API calls directly
@@ -215,7 +217,8 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.5 Escrow Module
 
 - [ ] **3.5.1** Create `EscrowModule` with:
-  - `EscrowService` — escrow lifecycle management
+  - `EscrowService` — Static methods for `gh_escrow` logic
+  - `src/types/escrow.types.ts` — Escrow status and interfaces
 
 - [ ] **3.5.2** Implement escrow hold:
   - Called after successful payment
@@ -246,9 +249,10 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.6 Withdrawals Module
 
-- [ ] **3.6.1** Create `WithdrawalsModule` with:
-  - `WithdrawalsService`
-  - `WithdrawalsController`
+- [ ] **3.6.1** Create `WithdrawalModule` with:
+  - `WithdrawalService` — Static methods for `gh_withdrawals` logic
+  - `WithdrawalController` — REST endpoints
+  - `src/types/withdrawal.types.ts` — Withdrawal interfaces and enums
 
 - [ ] **3.6.2** Implement `POST /withdrawals` — Request withdrawal:
   1. Validate amount ≥ `min_withdrawal_amount` from config
@@ -327,7 +331,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 | `POST`  | `/payments/sslcommerz/ipn`     | 🔲     |
 | `GET`   | `/payments/transactions`       | 🔲     |
 | `GET`   | `/payments/balance`            | 🔲     |
-| `GET`   | `/payments/escrow/:orderId`    | 🔲     |
+| `GET`   | `/payments/escrow/:order`    | 🔲     |
 | `POST`  | `/withdrawals`                 | 🔲     |
 | `GET`   | `/withdrawals`                 | 🔲     |
 | `GET`   | `/withdrawals/:id`             | 🔲     |

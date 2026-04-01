@@ -306,7 +306,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `max_delivery` | integer | Maximum delivery days      |
 | `min_rating`   | number  | Minimum average rating     |
 | `tags`         | string  | Comma-separated tag filter |
-| `seller_id`    | uuid    | Filter by seller           |
+| `seller`       | uuid    | Filter by seller           |
 
 ### POST `/gigs`
 
@@ -315,7 +315,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 {
   "title": "I will design a modern logo for your brand",
   "description": "Full description of the gig...",
-  "category_id": "uuid",
+  "category": "uuid",
   "tags": ["logo", "branding", "minimalist"],
   "packages": [
     {
@@ -346,7 +346,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
       "features": ["5 concepts", "All formats", "Unlimited revisions", "Brand guideline"]
     }
   ],
-  "images": ["https://r2.gighub.app/gigs/uuid/img1.jpg"]
+  "images": [ { "url": "...", "sort_order": 0 } ]
 }
 
 // Response 201
@@ -425,7 +425,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 {
   "title": "Build a Flutter mobile app for event management",
   "description": "Detailed job description...",
-  "category_id": "uuid",
+  "category": "uuid",
   "job_type": "paid",
   "budget_type": "fixed",
   "budget_min": 5000,
@@ -484,8 +484,8 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ```json
 // Request
 {
-  "gig_id": "uuid",
-  "package_id": "uuid",
+  "gig": "uuid",
+  "package": "uuid",
   "requirements": "Please use blue and green colors..."
 }
 
@@ -508,8 +508,8 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ```json
 // Request
 {
-  "job_id": "uuid",
-  "proposal_id": "uuid",
+  "job": "uuid",
+  "proposal": "uuid",
   "milestones": [
     { "title": "UI Design", "amount": 3000, "due_date": "2026-03-25" },
     { "title": "Development", "amount": 4500, "due_date": "2026-04-10" }
@@ -573,7 +573,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ```json
 // Request
 {
-  "order_id": "uuid",
+  "order": "uuid",
   "payment_method": "sslcommerz"
 }
 
@@ -638,15 +638,15 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ```json
 // Request — Pre-order inquiry
 {
-  "participant_id": "uuid",
-  "gig_id": "uuid",
+  "participant": "uuid",
+  "gig": "uuid",
   "initial_message": "Hi, can you do X for me?"
 }
 
 // Request — Order-linked
 {
-  "participant_id": "uuid",
-  "order_id": "uuid"
+  "participant": "uuid",
+  "order": "uuid"
 }
 ```
 
