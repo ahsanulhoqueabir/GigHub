@@ -317,8 +317,24 @@ gighub_app/
   @freezed
   class RegisterInput with _$RegisterInput { ... }
   @freezed
-  class LoginInput with _$LoginInput { ... }
+  class LoginInput with _$LoginInput {
+    const factory LoginInput.password({
+      required String provider, // 'password'
+      required String email,
+      required String password,
+    }) = _PasswordLoginInput;
+
+    const factory LoginInput.provider({
+      required String provider, // 'google' | 'github' | 'microsoft' | 'apple'
+      required String firebaseIdToken,
+    }) = _ProviderLoginInput;
+  }
   ```
+
+  Provider validation matrix (must match backend):
+  - `password` => send `{ provider, email, password }`
+  - `google|github|microsoft|apple` => send `{ provider, firebase_id_token }`
+  - Never send mixed payload fields in one request
 
 - [ ] **1.4.2** Create profile models (`data/models/profile_model.dart`):
 

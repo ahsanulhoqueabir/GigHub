@@ -98,6 +98,14 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
   - `AuthService` — business logic
   - `AuthController` — REST endpoints
   - `FirebaseService` — Firebase Admin SDK wrapper
+- [ ] **1.3.2b** Define shared DTO contract for `POST /auth/login`:
+  - `provider=password` requires: `email`, `password`
+  - social provider (`google`, `github`, `microsoft`, `apple`) requires: `firebase_id_token`
+  - validate provider allowlist and conditional required fields
+  - enforce validation matrix:
+    - `password` => allow only `email`, `password`
+    - social providers => allow only `firebase_id_token`
+    - unknown provider => `400 INVALID_PROVIDER`
 - [ ] **1.3.3** Implement `POST /auth/register`:
   1. Validate input (email, password, display_name, username)
   2. Check username uniqueness against `gh_profiles`

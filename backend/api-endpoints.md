@@ -75,6 +75,35 @@
 
 > **Auth Contract:** NestJS accepts only Firebase credentials/tokens through a single sign-in endpoint (`/auth/login`).
 
+**Canonical Login Payload Contract (`POST /auth/login`)**
+
+```json
+// Password provider
+{
+  "provider": "password",
+  "email": "user@jnu.ac.bd",
+  "password": "securePassword123"
+}
+
+// Social provider (Google now, others later)
+{
+  "provider": "google",
+  "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
+}
+```
+
+**Provider Allowlist & Validation Matrix**
+
+| `provider` value | Required fields     | Forbidden/ignored fields |
+| ---------------- | ------------------- | ------------------------ |
+| `password`       | `email`, `password` | `firebase_id_token`      |
+| `google`         | `firebase_id_token` | `email`, `password`      |
+| `github`         | `firebase_id_token` | `email`, `password`      |
+| `microsoft`      | `firebase_id_token` | `email`, `password`      |
+| `apple`          | `firebase_id_token` | `email`, `password`      |
+
+If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
+
 ### POST `/auth/register`
 
 ```json

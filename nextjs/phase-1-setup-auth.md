@@ -267,10 +267,20 @@ gighub-web/
     username: string;
   }
   interface LoginInput {
+    provider: "password";
     email: string;
     password: string;
   }
+  interface ProviderLoginInput {
+    provider: "google" | "github" | "microsoft" | "apple";
+    firebase_id_token: string;
+  }
   ```
+
+  Provider validation matrix (must match backend):
+  - `password` => send `{ provider, email, password }`
+  - `google|github|microsoft|apple` => send `{ provider, firebase_id_token }`
+  - Never mix password fields with `firebase_id_token` in the same payload
 
 - [ ] **1.3.3** Define profile types (`lib/types/profile.ts`):
   ```typescript
