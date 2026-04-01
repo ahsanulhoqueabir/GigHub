@@ -32,9 +32,12 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 ### 4.2 Chat Module — REST Endpoints
 
 - [ ] **4.2.1** Create `ChatModule` with:
-  - `ChatService` — conversation & message management
+  - `ConversationService` — Static methods for `gh_conversations` logic
+  - `MessageService` — Static methods for `gh_messages` logic
   - `ChatController` — REST endpoints
   - `ChatGateway` — Socket.IO WebSocket gateway
+  - `src/types/conversation.types.ts` — Conversation interfaces
+  - `src/types/message.types.ts` — Message interfaces
   - DTOs: `CreateConversationDto`, `SendMessageDto`, `ConversationResponseDto`, `MessageResponseDto`
 
 - [ ] **4.2.2** Implement `POST /conversations` — Start conversation:
@@ -143,13 +146,14 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
   - Client uploads audio to R2 via `/upload/file` (folder: `chat`)
   - Sends message with `message_type: 'voice'`, `file_url`, `file_size`
 
-### 4.5 Notifications Module
+### 4.5 Notification Module
 
-- [ ] **4.5.1** Create `NotificationsModule` with:
-  - `NotificationsService` — create, list, manage notifications
-  - `NotificationsController` — REST endpoints
-  - `PushNotificationService` — FCM integration
-  - `EmailNotificationService` — transactional emails
+- [ ] **4.5.1** Create `NotificationModule` with:
+  - `NotificationService` — Static methods for `gh_notifications` logic
+  - `NotificationController` — REST endpoints
+  - `PushNotificationService` — FCM integration (static methods)
+  - `EmailNotificationService` — transactional emails (static methods)
+  - `src/types/notification.types.ts` — Notification interfaces and enums
 
 #### In-App Notifications
 

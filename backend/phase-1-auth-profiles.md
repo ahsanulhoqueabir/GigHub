@@ -29,27 +29,24 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
   │   ├── auth/               # Special Module: Firebase + JWT logic
   │   │   ├── auth.controller.ts
   │   │   ├── auth.module.ts
-  │   │   ├── auth.service.ts
-  │   │   └── types/
-  │   │       └── auth.types.ts
-  │   ├── profiles/           # Domain: gh_profiles
-  │   │   ├── profiles.controller.ts
-  │   │   ├── profiles.module.ts
-  │   │   ├── profiles.service.ts
-  │   │   └── types/
-  │   │       └── profiles.types.ts
-  │   ├── categories/         # Domain: gh_categories
-  │   │   ├── categories.controller.ts
-  │   │   ├── categories.module.ts
-  │   │   ├── categories.service.ts
-  │   │   └── types/
-  │   │       └── categories.types.ts
+  │   │   └── auth.service.ts
+  │   ├── profile/            # Domain: gh_profiles
+  │   │   ├── profile.controller.ts
+  │   │   ├── profile.module.ts
+  │   │   └── profile.service.ts
+  │   ├── category/           # Domain: gh_categories
+  │   │   ├── category.controller.ts
+  │   │   ├── category.module.ts
+  │   │   └── category.service.ts
   │   └── upload/             # Domain: Infrastructure (R2)
   │       ├── upload.controller.ts
   │       ├── upload.module.ts
-  │       ├── upload.service.ts
-  │       └── types/
-  │           └── upload.types.ts
+  │       └── upload.service.ts
+  ├── types/                  # Centralized Types (Independent files)
+  │   ├── auth.types.ts
+  │   ├── profile.types.ts
+  │   ├── category.types.ts
+  │   └── upload.types.ts
   └── main.ts
   ```
 
@@ -61,7 +58,7 @@ To maintain a clean, collection-centric codebase, all modules MUST follow these 
 2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication.
 3.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
 4.  **Auth Exception**: `AuthService` handles multi-provider logic (Firebase + JWT) and isn't tied to a single collection, but uses other services (like `ProfileService`) for DB operations.
-5.  **Type Organization**: Every domain has a `types/` folder with `*.types.ts` files (e.g., `profiles.types.ts`) containing interfaces and enums for that domain.
+5.  **Type Organization**: ALL types MUST be centralized in `src/types/` as independent files (e.g., `src/types/profile.types.ts`). Services and controllers import from this central location. Types can be imported between type files if cross-domain definitions are needed.
 
 **Service Example:**
 ```typescript
@@ -165,10 +162,10 @@ export class ProfileService {
 
 ### 1.5 Profile Module
 
-- [ ] **1.5.1** Create `ProfilesModule` with:
-  - `ProfilesService` — Static methods for `gh_profiles` CRUD
-  - `ProfilesController` — REST endpoints
-  - `types/profiles.types.ts` — Profile interfaces and enums
+- [ ] **1.5.1** Create `ProfileModule` with:
+  - `ProfileService` — Static methods for `gh_profiles` CRUD
+  - `ProfileController` — REST endpoints
+  - `src/types/profile.types.ts` — Profile interfaces and enums
   - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
 - [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
 - [ ] **1.5.3** Implement `PATCH /profiles/me` — update profile fields:

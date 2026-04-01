@@ -44,9 +44,10 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.3 Orders Module
 
-- [ ] **3.3.1** Create `OrdersModule` with:
-  - `OrdersService` — order lifecycle management
-  - `OrdersController` — REST endpoints
+- [ ] **3.3.1** Create `OrderModule` with:
+  - `OrderService` — Static methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
+  - `OrderController` — REST endpoints
+  - `src/types/order.types.ts` — Order, Milestone, and Delivery interfaces
   - DTOs: `CreateGigOrderDto`, `CreateJobOrderDto`, `OrderQueryDto`, `DeliverDto`, `RevisionDto`
 
 #### Order Creation
@@ -153,10 +154,11 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.4 Payments Module (SSLCommerz)
 
-- [ ] **3.4.1** Create `PaymentsModule` with:
-  - `PaymentsService` — payment processing logic
-  - `PaymentsController` — REST endpoints + webhooks
-  - `SslcommerzService` — SSLCommerz API wrapper
+- [ ] **3.4.1** Create `PaymentModule` with:
+  - `PaymentService` — Static methods for `gh_transactions` and payment processing logic
+  - `PaymentController` — REST endpoints + webhooks
+  - `SslcommerzService` — SSLCommerz API wrapper (static methods)
+  - `src/types/payment.types.ts` — Transaction and payment session interfaces
 
 - [ ] **3.4.2** Implement SSLCommerz integration:
   - Install SSLCommerz SDK or implement API calls directly
@@ -215,7 +217,8 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.5 Escrow Module
 
 - [ ] **3.5.1** Create `EscrowModule` with:
-  - `EscrowService` — escrow lifecycle management
+  - `EscrowService` — Static methods for `gh_escrow` logic
+  - `src/types/escrow.types.ts` — Escrow status and interfaces
 
 - [ ] **3.5.2** Implement escrow hold:
   - Called after successful payment
@@ -246,9 +249,10 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 ### 3.6 Withdrawals Module
 
-- [ ] **3.6.1** Create `WithdrawalsModule` with:
-  - `WithdrawalsService`
-  - `WithdrawalsController`
+- [ ] **3.6.1** Create `WithdrawalModule` with:
+  - `WithdrawalService` — Static methods for `gh_withdrawals` logic
+  - `WithdrawalController` — REST endpoints
+  - `src/types/withdrawal.types.ts` — Withdrawal interfaces and enums
 
 - [ ] **3.6.2** Implement `POST /withdrawals` — Request withdrawal:
   1. Validate amount ≥ `min_withdrawal_amount` from config

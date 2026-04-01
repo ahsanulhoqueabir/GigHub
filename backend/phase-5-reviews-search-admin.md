@@ -28,9 +28,10 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ### 5.2 Reviews Module
 
-- [ ] **5.2.1** Create `ReviewsModule` with:
-  - `ReviewsService` — review creation & aggregation
-  - `ReviewsController` — REST endpoints
+- [ ] **5.2.1** Create `ReviewModule` with:
+  - `ReviewService` — Static methods for `gh_reviews` logic
+  - `ReviewController` — REST endpoints
+  - `src/types/review.types.ts` — Review interfaces and enums
   - DTOs: `CreateReviewDto`, `ReviewResponseDto`, `ReviewResponseReplyDto`
 
 - [ ] **5.2.2** Implement `POST /orders/:orderId/reviews` — Submit review:
@@ -81,9 +82,10 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ### 5.3 Bookmarks Module
 
-- [ ] **5.3.1** Create `BookmarksModule` with:
-  - `BookmarksService`
-  - `BookmarksController`
+- [ ] **5.3.1** Create `BookmarkModule` with:
+  - `BookmarkService` — Static methods for `gh_bookmarks` logic
+  - `BookmarkController` — REST endpoints
+  - `src/types/bookmark.types.ts` — Bookmark interfaces and enums
 
 - [ ] **5.3.2** Implement `POST /bookmarks` — Add bookmark:
   1. Validate entity exists (gig or job)
@@ -103,9 +105,10 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ### 5.4 Reports Module
 
-- [ ] **5.4.1** Create `ReportsModule` with:
-  - `ReportsService`
-  - `ReportsController`
+- [ ] **5.4.1** Create `ReportModule` with:
+  - `ReportService` — Static methods for `gh_reports` logic
+  - `ReportController` — REST endpoints
+  - `src/types/report.types.ts` — Report interfaces and enums
 
 - [ ] **5.4.2** Implement `POST /reports` — Submit report:
   1. Validate entity exists
@@ -118,8 +121,9 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.5 Admin Module
 
 - [ ] **5.5.1** Create `AdminModule` with:
-  - `AdminService` — admin business logic
+  - `AdminService` — Static methods for admin business logic
   - `AdminController` — admin REST endpoints
+  - `src/types/admin.types.ts` — Admin stats and management interfaces
   - Apply `RolesGuard('admin')` to all routes
 
 #### User Management
