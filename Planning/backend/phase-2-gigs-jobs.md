@@ -63,21 +63,19 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   6. Create `gh_gig_packages` records (1–3 packages)
   7. Return created gig with packages and images array
 
-- [ ] **2.3.3** Implement `PATCH /gigs/:id` — Update gig:
+- [ ] **2.3.3** Implement `PATCH /gigs/:id` — Consolidated update:
   1. Verify current user is the seller (`seller = profile_id`)
-  2. Validate updated fields
-  3. Update `gh_gigs` record
-  4. Upsert packages (delete old, create new)
-  5. Update images array if changed
+  2. Expects `type` field in payload: `edit`, `status`
+  3. If `type=edit`: Validate updated fields, update `gh_gigs` record, upsert packages, update images
+  4. If `type=status`: Allow toggling between `active` ↔ `paused`
+  5. Logic: Controller calls specific `GigService` function based on `type`
 
 - [ ] **2.3.4** Implement `DELETE /gigs/:id` — Soft-delete gig:
   1. Verify ownership
   2. Check no active orders exist for this gig
   3. Set status to `deleted`
 
-- [ ] **2.3.5** Implement `PATCH /gigs/:id/status` — Toggle gig status:
-  1. Verify ownership
-  2. Allow: `active` ↔ `paused`
+
 
 #### Gig Listing & Detail
 
@@ -181,24 +179,13 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 - [ ] **2.5.5** Implement `GET /proposals/:id` — Get proposal detail:
   - Accessible by applicant or job poster only
 
-- [ ] **2.5.6** Implement `PATCH /proposals/:id/withdraw` — Withdraw proposal:
-  1. Verify applicant is current user
-  2. Only allow if status is `pending`
-  3. Set status to `withdrawn`
-  4. Decrement `gh_jobs.total_proposals`
-
-- [ ] **2.5.7** Implement `PATCH /proposals/:id/accept` — Accept proposal:
-  1. Verify current user is the job poster
-  2. Set proposal status to `accepted`
-  3. Set job status to `in_progress`
-  4. Reject all other pending proposals for this job
-  5. **Trigger notification** to accepted applicant
-  6. Auto-create order if job is paid (or return data for order creation in Phase 3)
-
-- [ ] **2.5.8** Implement `PATCH /proposals/:id/reject` — Reject proposal:
-  1. Verify current user is the job poster
-  2. Set status to `rejected`
-  3. **Trigger notification** to applicant
+- [ ] **2.5.6** Implement `PATCH /proposals/:id` — Consolidated action:
+  1. Verify permissions (applicant for withdraw, job poster for accept/reject)
+  2. Expects `type` field in payload: `withdraw`, `accept`, `reject`
+  3. **Withdraw**: Set status to `withdrawn`, decrement `gh_jobs.total_proposals`
+  4. **Accept**: Set status to `accepted`, set job to `in_progress`, reject others, trigger notification
+  5. **Reject**: Set status to `rejected`, trigger notification
+  6. Logic: Controller calls specific `ProposalService` functions based on `type`
 
 ### 2.6 Search & Discovery Utilities
 
@@ -247,7 +234,6 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 | `PATCH`  | `/gigs/:id`               | 🔲     |
 | `DELETE` | `/gigs/:id`               | 🔲     |
 | `GET`    | `/gigs/me`                | 🔲     |
-| `PATCH`  | `/gigs/:id/status`        | 🔲     |
 | `GET`    | `/jobs`                   | 🔲     |
 | `GET`    | `/jobs/:slug`             | 🔲     |
 | `POST`   | `/jobs`                   | 🔲     |
@@ -258,9 +244,8 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 | `GET`    | `/jobs/:jobId/proposals`  | 🔲     |
 | `GET`    | `/proposals/me`           | 🔲     |
 | `GET`    | `/proposals/:id`          | 🔲     |
-| `PATCH`  | `/proposals/:id/withdraw` | 🔲     |
-| `PATCH`  | `/proposals/:id/accept`   | 🔲     |
-| `PATCH`  | `/proposals/:id/reject`   | 🔲     |
+| `GET`   | `/proposals/:id`          | 🔲     |
+| `PATCH` | `/proposals/:id`          | 🔲     |
 
 ---
 

@@ -74,57 +74,16 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 #### Order Lifecycle
 
-- [ ] **3.3.4** Implement `PATCH /orders/:id/start` — Seller starts work:
-  1. Verify seller
-  2. Verify order status is `pending` or `active` (payment confirmed)
-  3. Set status to `in_progress`
-  4. **Trigger notification** to buyer
-
-- [ ] **3.3.5** Implement `PATCH /orders/:id/deliver` — Seller delivers:
-  1. Verify seller
-  2. Verify order is `in_progress` or `revision_requested`
-  3. Create `gh_order_deliveries` record with files and message
-  4. Set order status to `delivered`
-  5. Set `delivery_type` to 'delivery' or 'revision' based on context
-  6. **Trigger notification** to buyer
-
-- [ ] **3.3.6** Implement `PATCH /orders/:id/approve` — Buyer approves:
-  1. Verify buyer
-  2. Verify order is `delivered`
-  3. Set order status to `completed`
-  4. Set `completed_at` timestamp
-  5. **Release escrow** (trigger payment release)
-  6. Credit seller's `total_earnings` in `gh_profiles`
-  7. Create `gh_transactions` records (earning for seller, platform_fee)
-  8. **Trigger notification** to seller
-  9. Both parties can now leave reviews
-
-- [ ] **3.3.7** Implement `PATCH /orders/:id/revision` — Buyer requests revision:
-  1. Verify buyer
-  2. Verify order is `delivered`
-  3. Check `revisions_used < revision_count` (or unlimited if -1)
-  4. Increment `revisions_used`
-  5. Set order status to `revision_requested`
-  6. Store revision notes
-  7. **Trigger notification** to seller
-
-- [ ] **3.3.8** Implement `PATCH /orders/:id/cancel` — Cancel order:
-  1. Verify buyer or seller
-  2. Allow cancellation only if: `pending`, `active`, or `in_progress` (with conditions)
-  3. If `pending` (payment not made): simply cancel
-  4. If `active`/`in_progress`:
-     - Mutual cancellation: both parties agree → full refund
-     - One-sided: create dispute automatically
-  5. Set status to `cancelled` or `disputed`
-  6. Set `cancelled_at` and `cancellation_reason`
-  7. **Process refund** if applicable
-  8. **Trigger notification**
-
-- [ ] **3.3.9** Implement `PATCH /orders/:id/dispute` — Open dispute:
-  1. Verify buyer or seller
-  2. Verify order is `delivered` or `in_progress`
-  3. Set order status to `disputed`
-  4. **Trigger notification** to both parties + admin queue
+- [ ] **3.3.4** Implement `PATCH /orders/:id` — Consolidated order action:
+  1. Verify permissions (buyer/seller role check per action)
+  2. Expects `type` field in payload: `start`, `deliver`, `approve`, `revision`, `cancel`, `dispute`
+  3. **Start**: Mark `in_progress`, trigger notification (Seller)
+  4. **Deliver**: Create `gh_order_deliveries` record, set `delivered`, trigger notification (Seller)
+  5. **Approve**: Set `completed`, set `completed_at`, release escrow, credit seller, trigger notification (Buyer)
+  6. **Revision**: Check count, increment `revisions_used`, set `revision_requested`, trigger notification (Buyer)
+  7. **Cancel**: Validate status, set `cancelled` or `disputed`, process refund, trigger notification (Buyer/Seller)
+  8. **Dispute**: Set `disputed`, trigger notification (Buyer/Seller)
+  9. Logic: Controller calls specific `OrderService` functions based on `type`
 
 #### Order Queries
 
@@ -142,10 +101,10 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 #### Milestones
 
 - [ ] **3.3.12** Implement milestone management:
-  - `PATCH /orders/:orderId/milestones/:milestoneId/start` — mark milestone in_progress
-  - `PATCH /orders/:orderId/milestones/:milestoneId/deliver` — deliver milestone
-  - `PATCH /orders/:orderId/milestones/:milestoneId/approve` — approve milestone (releases milestone escrow)
+  - Extend `PATCH /orders/:id` with milestone actions: `type=milestone_start`, `type=milestone_deliver`, `type=milestone_approve`
+  - Logic: Milestone ID and data included in payload `data` field
   - Partial payment release per milestone
+  - Ownership and status checks per milestone action
 
 #### Deliveries
 
@@ -206,13 +165,12 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   - Check: `val_id`, `amount`, `store_amount`, `status: VALID`
   - Prevent replay attacks (check `tran_id` not already processed)
 
-- [ ] **3.4.6** Implement `GET /payments/transactions` — Transaction history:
-  - Filter by type, direction, date range
-  - Paginated list
-
-- [ ] **3.4.7** Implement `GET /payments/balance` — Current wallet balance:
-  - Calculate: sum of credits - sum of debits from `gh_transactions`
-  - Or maintain running balance in `gh_profiles.total_earnings`
+- [ ] **3.4.6** Implement `GET /payments` — Consolidated payment queries:
+  - Support `?type=...` query param: `transactions` (default), `balance`, `escrow`
+  - Transaction history: filter by type, direction, date range, paginated
+  - Balance: calculate wallet balance
+  - Escrow: get status for specific order (requires `order_id`)
+  - Logic: Controller calls appropriate service methods based on `type`
 
 ### 3.5 Escrow Module
 
@@ -245,7 +203,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   - Auto-release funds to seller
   - Create system notification
 
-- [ ] **3.5.6** Implement `GET /payments/escrow/:orderId` — Escrow status
+
 
 ### 3.6 Withdrawals Module
 
@@ -263,8 +221,10 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   6. Create `gh_transactions` record (debit, status pending)
   7. **Trigger notification** to admin queue
 
-- [ ] **3.6.3** Implement `GET /withdrawals` — List my withdrawals
-- [ ] **3.6.4** Implement `GET /withdrawals/:id` — Withdrawal detail
+- [ ] **3.6.3** Implement `GET /withdrawals` — Consolidated withdrawal queries:
+  - Support `?type=...` query param: `list` (default), `detail` (requires `id`)
+  - Paginated list or single record retrieval
+  - Logic: Controller calls appropriate service methods based on `type`
 
 ### 3.7 Platform Fee Calculator
 
@@ -316,12 +276,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 | `POST`  | `/orders/job`                  | 🔲     |
 | `GET`   | `/orders`                      | 🔲     |
 | `GET`   | `/orders/:id`                  | 🔲     |
-| `PATCH` | `/orders/:id/start`            | 🔲     |
-| `PATCH` | `/orders/:id/deliver`          | 🔲     |
-| `PATCH` | `/orders/:id/approve`          | 🔲     |
-| `PATCH` | `/orders/:id/revision`         | 🔲     |
-| `PATCH` | `/orders/:id/cancel`           | 🔲     |
-| `PATCH` | `/orders/:id/dispute`          | 🔲     |
+| `PATCH` | `/orders/:id`                  | 🔲     |
 | `GET`   | `/orders/:orderId/deliveries`  | 🔲     |
 | `GET`   | `/deliveries/:id`              | 🔲     |
 | `POST`  | `/payments/initiate`           | 🔲     |
@@ -329,12 +284,9 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 | `POST`  | `/payments/sslcommerz/fail`    | 🔲     |
 | `POST`  | `/payments/sslcommerz/cancel`  | 🔲     |
 | `POST`  | `/payments/sslcommerz/ipn`     | 🔲     |
-| `GET`   | `/payments/transactions`       | 🔲     |
-| `GET`   | `/payments/balance`            | 🔲     |
-| `GET`   | `/payments/escrow/:order`    | 🔲     |
+| `GET`   | `/payments`                    | 🔲     |
 | `POST`  | `/withdrawals`                 | 🔲     |
 | `GET`   | `/withdrawals`                 | 🔲     |
-| `GET`   | `/withdrawals/:id`             | 🔲     |
 
 ---
 

@@ -170,16 +170,17 @@ export class ProfileService {
   - `src/types/profile.types.ts` — Profile interfaces and enums
   - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
 - [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
-- [ ] **1.5.3** Implement `PATCH /profiles/me` — update profile fields:
-  - Allowed fields: `display_name`, `bio`, `skills`, `availability_status`
-  - Username change: check uniqueness, limit frequency (once per 30 days)
-- [ ] **1.5.4** Implement `GET /profiles/:username` — public profile view:
+- [ ] **1.5.3** Implement `PATCH /profiles/me` — Consolidated update:
+  - Expects `type` field in payload: `basic_info`, `avatar`, `fcm_token`, `notification_prefs`
+  - Logic: Controller calls specific `ProfileService` function based on `type`
+  - Payload validation: DTO should validate `data` based on `type`
+  - Username change (within `basic_info`): check uniqueness, limit frequency (once per 30 days)
+- [ ] **1.5.4** Implement `GET /profiles/:username` — Consolidated view:
+  - Support `?type=...` query param: `profile` (default), `gigs`, `reviews`, `full`
+  - Logic: Controller calls appropriate service methods based on `type`
   - Return: display_name, username, avatar, bio, skills, availability_status, avg_rating, total_reviews, created_at
   - Exclude: email, firebase_uid, fcm_token, notification_prefs
-- [ ] **1.5.5** Implement `GET /profiles/:username/gigs` — list user's active gigs (placeholder, completed in Phase 2)
-- [ ] **1.5.6** Implement `GET /profiles/:username/reviews` — list reviews for user (placeholder, completed in Phase 5)
-- [ ] **1.5.7** Implement `PATCH /profiles/me/fcm-token` — update FCM token
-- [ ] **1.5.8** Implement `PATCH /profiles/me/notification-prefs` — update notification preferences
+
 
 ### 1.6 Cloudflare R2 Upload Module
 
@@ -257,9 +258,7 @@ export class ProfileService {
 | `GET`    | `/profiles/me`                    | 🔲     |
 | `PATCH`  | `/profiles/me`                    | 🔲     |
 | `GET`    | `/profiles/:username`             | 🔲     |
-| `PATCH`  | `/profiles/me/avatar`             | 🔲     |
-| `PATCH`  | `/profiles/me/fcm-token`          | 🔲     |
-| `PATCH`  | `/profiles/me/notification-prefs` | 🔲     |
+| `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/file`                    | 🔲     |
 | `DELETE` | `/upload`                         | 🔲     |
