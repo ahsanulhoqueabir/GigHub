@@ -173,7 +173,7 @@ export class ProfileService {
 - [ ] **1.5.3** Implement `PATCH /profiles/me` — Consolidated update:
   - Expects `type` field in payload: `basic_info`, `avatar`, `fcm_token`, `notification_prefs`
   - Logic: Controller calls specific `ProfileService` function based on `type`
-  - Payload validation: DTO should validate `data` based on `type`
+  - Payload validation: DTO should validate `data` based on `type`. Specifically for `avatar`, accept Base64 string.
   - Username change (within `basic_info`): check uniqueness, limit frequency (once per 30 days)
 - [ ] **1.5.4** Implement `GET /profiles/:username` — Consolidated view:
   - Support `?type=...` query param: `profile` (default), `gigs`, `reviews`, `full`
@@ -210,8 +210,9 @@ export class ProfileService {
 - [ ] **1.6.5** Implement `DELETE /upload`:
   - Accept R2 key, delete from bucket
   - Verify the requesting user owns the resource (or is admin)
-- [ ] **1.6.6** Implement `PATCH /profiles/me/avatar`:
-  - Upload image to R2 under `avatars/` folder
+- [ ] **1.6.6** Implement Avatar upload integration in `PATCH /profiles/me` (type: avatar):
+  - Accept Base64 image payload (e.g., `data:image/png;base64,...`)
+  - Decode and upload to R2 under `avatars/` folder
   - Delete old avatar if exists
   - Update `gh_profiles.avatar` field in Directus
 
@@ -258,7 +259,6 @@ export class ProfileService {
 | `GET`    | `/profiles/me`                    | 🔲     |
 | `PATCH`  | `/profiles/me`                    | 🔲     |
 | `GET`    | `/profiles/:username`             | 🔲     |
-| `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/file`                    | 🔲     |
 | `DELETE` | `/upload`                         | 🔲     |

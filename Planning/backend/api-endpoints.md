@@ -203,7 +203,6 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `GET`   | `/profiles/me`        | Protected | Get current user's profile         |
 | `PATCH` | `/profiles/me`        | Protected | Consolidated: Update profile/prefs |
 | `GET`   | `/profiles/:username` | Public    | Consolidated: Get profile + extras |
-| `PATCH` | `/profiles/me/avatar` | Protected | (Optional) direct upload           |
 
 > **Note:** `/profiles/me` PATCH now expects a `type` payload to handle specific updates (basic info, fcm-token, notification-prefs, etc.). Same logic for GET with `?type=...` query param.
 
@@ -247,11 +246,11 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
   }
 }
 
-// Type: avatar (Update avatar URL)
+// Type: avatar (Upload avatar via Base64)
 {
   "type": "avatar",
   "data": {
-    "avatar_url": "https://r2.gighub.app/avatars/uuid.jpg"
+    "file": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
   }
 }
 
