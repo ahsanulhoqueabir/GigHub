@@ -33,21 +33,20 @@
 ## Common Response Format
 
 ```json
-// Success
+// Success Response
 {
   "success": true,
   "data": { ... },
-  "meta": { "page": 1, "limit": 20, "total": 100, "totalPages": 5 }
+  "message": "Operation successful (optional)",
+  "meta": { "page": 1, "limit": 20, "total": 100, "totalPages": 5 } // For paginated lists
 }
 
-// Error
+// Error Response
 {
   "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Human-readable error message",
-    "details": [ ... ]
-  }
+  "error": "Error title or code",
+  "details": "Detailed error message or object",
+  "status": 400
 }
 ```
 
