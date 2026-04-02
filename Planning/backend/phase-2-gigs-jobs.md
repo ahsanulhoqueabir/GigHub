@@ -30,7 +30,7 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 
 - [ ] **2.2.1** Create `gh_gigs` collection with all fields and indexes
 - [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig`, `tier`)
-- [ ] **2.2.3** Create `gh_gig_images` collection
+- [ ] **2.2.3** Configure `images` field in `gh_gigs` as JSON repeater `[{url, sort_order}]`
 - [ ] **2.2.4** Create `gh_jobs` collection with all fields and indexes
 - [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job`, `applicant`)
 - [ ] **2.2.6** Set up relations in Directus:
@@ -263,7 +263,7 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 ## Definition of Done
 
 - [ ] Full gig CRUD with 3-tier package system
-- [ ] Gig gallery image management
+- [ ] Gig gallery JSON image management in `gh_gigs.images`
 - [ ] Full job CRUD with all job types
 - [ ] Proposal submit/accept/reject/withdraw flow
 - [ ] Search & filter working for both gigs and jobs

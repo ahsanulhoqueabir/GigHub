@@ -441,7 +441,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
       "total_reviews": 12
     },
     "packages": [ ... ],
-    "images": [ { "id": "uuid", "image_url": "...", "sort_order": 0 } ],
+    "images": [ { "url": "...", "sort_order": 0 } ],
     "tags": ["logo", "branding"],
     "avg_rating": 4.90,
     "total_reviews": 8,
