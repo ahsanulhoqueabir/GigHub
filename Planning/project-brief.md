@@ -38,7 +38,6 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 
 - Email/password registration and login via Firebase Auth
 - Social login (Google) via Firebase Auth
-- Future third-party SSO (GitHub/Microsoft/Apple/etc.) via Firebase Auth providers
 - After Firebase authenticates the user, the NestJS backend issues its own signed JWT
 - All subsequent API requests carry the **NestJS-issued JWT** (not the Firebase token)
 - Backend accepts only Firebase-issued ID tokens for all sign-in paths
@@ -68,7 +67,7 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 ### 3. Job / Task Board (Upwork-style)
 
 - Any student can post jobs/tasks with budget, deadline, required skills, type (one-time / recurring)
-- Job types: Free, Paid, Internship, Volunteer, Contest
+- Job types: Free, Paid, Internship, Volunteer, Tuition
 - Any student (other than the poster) can submit proposals with cover letter, timeline, and quoted price
 - Poster reviews proposals and selects a student
 - Milestone-based project breakdown for larger tasks
@@ -132,11 +131,11 @@ GigHub is a freelance & task marketplace platform exclusively for **Jagannath Un
 
 ---
 
-## MVP Scope
+## Current Implementation Scope
 
 The following features constitute the Minimum Viable Product:
 
-- [ ] Firebase Auth: email/password + Google login (+ future SSO providers)
+- [ ] Firebase Auth: email/password + Google login
 - [ ] NestJS issues custom signed JWT with `profile_id`, `role`, `username`, `is_verified` in payload
 - [ ] `gh_profiles` record auto-created in Directus on first login; `gh_profiles.id` used as canonical identifier everywhere
 - [ ] JnU student verification (`is_verified` flag)
@@ -150,31 +149,6 @@ The following features constitute the Minimum Viable Product:
 - [ ] Unified student dashboard (seller + buyer views in one)
 - [ ] Push & in-app notifications
 - [ ] Admin panel (via Directus)
-
----
-
-## Post-MVP / Interesting Features
-
-| Feature                       | Description                                                                     |
-| ----------------------------- | ------------------------------------------------------------------------------- |
-| **Campus Leaderboard**        | Top rated freelancers per institution per category                              |
-| **Skill Badges**              | Earned via completed orders, tests, or endorsements                             |
-| **Contest Posts**             | Clients post a brief; multiple freelancers submit; client picks winner and pays |
-| **Team / Group Bids**         | Multiple freelancers collaborate and bid as a team                              |
-| **GigHub Credits**            | Internal credit system for free-tier tasks or referral rewards                  |
-| **Referral Program**          | Earn credits for referring new users                                            |
-| **Portfolio Showcase**        | Public-facing portfolio page generated from completed work                      |
-| **Skill Assessment Tests**    | Short MCQ or practical tests to earn a verified skill tag                       |
-| **Campus Feed / Newsfeed**    | Activity feed showing new gigs, jobs, and completions within a campus           |
-| **Saved / Wishlist**          | Save gigs or jobs for later                                                     |
-| **Availability Calendar**     | Freelancers set their availability window                                       |
-| **Recurring Orders**          | Clients can subscribe to a freelancer for ongoing work                          |
-| **AI Job Matching**           | Auto-suggest matching freelancers when a job is posted                          |
-| **Analytics for Freelancers** | Gig views, click-through, conversion, earnings chart                            |
-| **Organization Accounts**     | Campus clubs/depts. can register as a student account with an org-type flag     |
-| **Campus Ambassador Program** | Student reps promote GigHub and earn rewards                                    |
-
----
 
 ## Key Differentiators from Generic Platforms
 

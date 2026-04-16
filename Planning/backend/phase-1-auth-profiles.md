@@ -62,20 +62,26 @@ To maintain a clean, collection-centric codebase, all modules MUST follow these 
 6.  **Type Organization**: ALL types MUST be centralized in `src/types/` (e.g., `src/types/profile.types.ts`).
 
 **Service Example (Standard Pattern):**
+
 ```typescript
-import directusApi from '@/utils/directus.api';
-import { successResponse, errorResponse } from '@/utils/service-response';
-import type { ServiceResponse } from '@/types/services/common.types';
-import type { Profile } from '@/types/profile.types';
+import directusApi from "@/utils/directus.api";
+import { successResponse, errorResponse } from "@/utils/service-response";
+import type { ServiceResponse } from "@/types/services/common.types";
+import type { Profile } from "@/types/profile.types";
 
 export class ProfileService {
   private static collection = "tb_profiles"; // Standardized prefix
 
   static async getProfileById(id: string): Promise<ServiceResponse<Profile>> {
     try {
-      const { data } = await directusApi.get(`/items/${this.collection}/${id}`, {
-        params: { fields: ['id', 'display_name', 'username', 'avatar'].join(',') }
-      });
+      const { data } = await directusApi.get(
+        `/items/${this.collection}/${id}`,
+        {
+          params: {
+            fields: ["id", "display_name", "username", "avatar"].join(","),
+          },
+        },
+      );
       return successResponse(data.data);
     } catch (error) {
       return errorResponse("Failed to fetch profile", error);
@@ -83,6 +89,7 @@ export class ProfileService {
   }
 }
 ```
+
 - [ ] **1.1.3** Install core dependencies:
   ```
   @nestjs/config, @nestjs/jwt, @nestjs/passport
@@ -122,7 +129,6 @@ export class ProfileService {
 - [ ] **1.3.1** Create Firebase project and configure:
   - Enable email/password sign-up
   - Enable Google OAuth provider
-  - Define future third-party SSO providers in Firebase Auth (e.g., GitHub, Microsoft, Apple)
   - Disable email confirmation (handle verification at platform level)
   - Set redirect URLs for web and mobile
 - [ ] **1.3.2** Create `AuthModule` in NestJS with:
@@ -131,11 +137,11 @@ export class ProfileService {
   - `FirebaseService` — Firebase Admin SDK wrapper
 - [ ] **1.3.2b** Define shared DTO contract for `POST /auth/login`:
   - `provider=password` requires: `email`, `password`
-  - social provider (`google`, `github`, `microsoft`, `apple`) requires: `firebase_id_token`
+  - social provider (`google`) requires: `firebase_id_token`
   - validate provider allowlist and conditional required fields
   - enforce validation matrix:
     - `password` => allow only `email`, `password`
-    - social providers => allow only `firebase_id_token`
+    - social provider => allow only `firebase_id_token`
     - unknown provider => `400 INVALID_PROVIDER`
 - [ ] **1.3.3** Implement `POST /auth/register`:
   1. Validate input (email, password, display_name, username)
@@ -146,7 +152,7 @@ export class ProfileService {
 - [ ] **1.3.4** Implement `POST /auth/login`:
   1. Accept a single payload contract: `provider` + provider-specific credentials/token
   2. If `provider=password`, authenticate via Firebase Auth REST API (email/password)
-  3. If social provider (`google` now; others later), verify Firebase ID token via Firebase Admin SDK (`verifyIdToken`)
+  3. If social provider (`google`), verify Firebase ID token via Firebase Admin SDK (`verifyIdToken`)
   4. Enforce allowlist of supported providers
   5. Check/create `gh_profiles` by `firebase_uid`
   6. Sign and return NestJS JWT + refresh token
@@ -187,7 +193,6 @@ export class ProfileService {
   - Logic: Controller calls appropriate service methods based on `type`
   - Return: display_name, username, avatar, bio, skills, availability_status, avg_rating, total_reviews, created_at
   - Exclude: email, firebase_uid, fcm_token, notification_prefs
-
 
 ### 1.6 Cloudflare R2 Upload Module
 
@@ -253,21 +258,21 @@ export class ProfileService {
 
 ## Endpoints Delivered in This Phase
 
-| Method   | Endpoint                          | Status |
-| -------- | --------------------------------- | ------ |
-| `POST`   | `/auth/register`                  | 🔲     |
-| `POST`   | `/auth/login`                     | 🔲     |
-| `POST`   | `/auth/refresh`                   | 🔲     |
-| `POST`   | `/auth/logout`                    | 🔲     |
-| `POST`   | `/auth/forgot-password`           | 🔲     |
-| `POST`   | `/auth/reset-password`            | 🔲     |
-| `GET`    | `/profiles/me`                    | 🔲     |
-| `PATCH`  | `/profiles/me`                    | 🔲     |
-| `GET`    | `/profiles/:username`             | 🔲     |
-| `POST`   | `/upload/image`                   | 🔲     |
-| `POST`   | `/upload/file`                    | 🔲     |
-| `DELETE` | `/upload`                         | 🔲     |
-| `GET`    | `/categories`                     | 🔲     |
+| Method   | Endpoint                | Status |
+| -------- | ----------------------- | ------ |
+| `POST`   | `/auth/register`        | 🔲     |
+| `POST`   | `/auth/login`           | 🔲     |
+| `POST`   | `/auth/refresh`         | 🔲     |
+| `POST`   | `/auth/logout`          | 🔲     |
+| `POST`   | `/auth/forgot-password` | 🔲     |
+| `POST`   | `/auth/reset-password`  | 🔲     |
+| `GET`    | `/profiles/me`          | 🔲     |
+| `PATCH`  | `/profiles/me`          | 🔲     |
+| `GET`    | `/profiles/:username`   | 🔲     |
+| `POST`   | `/upload/image`         | 🔲     |
+| `POST`   | `/upload/file`          | 🔲     |
+| `DELETE` | `/upload`               | 🔲     |
+| `GET`    | `/categories`           | 🔲     |
 
 ---
 

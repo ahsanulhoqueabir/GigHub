@@ -158,7 +158,6 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 - **P0** — Must Have (MVP blocking)
 - **P1** — Should Have (near-MVP, high value)
-- **P2** — Could Have (post-MVP)
 
 ---
 
@@ -298,18 +297,17 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 **Objective:** Enable low-friction real-time communication and timely event awareness.
 
-| ID     | Priority | Requirement                                        |
-| ------ | -------- | -------------------------------------------------- |
-| FR-G1  | P0       | Real-time 1-to-1 messaging between students        |
-| FR-G2  | P0       | Pre-order inquiry chat (before an order is placed) |
-| FR-G3  | P0       | Order-linked dedicated chat channel                |
-| FR-G4  | P0       | File and image attachments in chat                 |
-| FR-G5  | P0       | In-app notification center with unread count badge |
-| FR-G6  | P0       | Mark individual or all notifications as read       |
-| FR-G7  | P0       | Mobile push notifications for key events           |
-| FR-G8  | P1       | Automated system messages for order state changes  |
-| FR-G9  | P1       | Read receipts in chat                              |
-| FR-G10 | P2       | Typing indicator                                   |
+| ID    | Priority | Requirement                                        |
+| ----- | -------- | -------------------------------------------------- |
+| FR-G1 | P0       | Real-time 1-to-1 messaging between students        |
+| FR-G2 | P0       | Pre-order inquiry chat (before an order is placed) |
+| FR-G3 | P0       | Order-linked dedicated chat channel                |
+| FR-G4 | P0       | File and image attachments in chat                 |
+| FR-G5 | P0       | In-app notification center with unread count badge |
+| FR-G6 | P0       | Mark individual or all notifications as read       |
+| FR-G7 | P0       | Mobile push notifications for key events           |
+| FR-G8 | P1       | Automated system messages for order state changes  |
+| FR-G9 | P1       | Read receipts in chat                              |
 
 **Acceptance Criteria:**
 
@@ -330,7 +328,6 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 | FR-H3 | P0       | Written text feedback                                                     |
 | FR-H4 | P0       | Aggregate rating displayed on profile and gig pages                       |
 | FR-H5 | P1       | Seller/buyer can respond to received reviews                              |
-| FR-H6 | P2       | Top-rated badge eligibility logic                                         |
 
 **Acceptance Criteria:**
 
@@ -367,19 +364,18 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 **Objective:** Allow any platform user — including alumni who want to hire a tutor for their child — to post or browse tutoring/tuition offers with minimal friction. The listing is free-form: the poster writes a single description paragraph covering whatever details are relevant (subject, level, schedule, location, mode, student age, etc.). No rigid field structure is enforced beyond a title and a category tag. The feature reuses the same underlying listing and request data model as gigs/jobs — no separate data model is introduced.
 
-| ID     | Priority | Requirement                                                                                                                                   |
-| ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-J1  | P0       | Any user (student or alumni) can post a tuition listing with a title and a free-form description paragraph                                    |
-| FR-J2  | P0       | Listing supports an optional broad category tag (e.g., School, University, Language, Competitive Exam, Other)                                 |
-| FR-J3  | P0       | Users can browse and search tuition listings by keyword or category tag                                                                       |
-| FR-J4  | P0       | A requester can send a contact/session request to the listing poster                                                                          |
-| FR-J5  | P0       | The listing poster can accept or decline incoming requests                                                                                    |
-| FR-J6  | P0       | Accepted requests open a linked chat channel between poster and requester                                                                     |
-| FR-J7  | P0       | All tuition listings and sessions carry zero platform fee — permanently free                                                                  |
-| FR-J8  | P0       | Tuition listings reuse the same listing and request data model as gigs/jobs; no dedicated schema is added                                     |
-| FR-J9  | P1       | Mutual rating after a completed tutoring engagement                                                                                           |
-| FR-J10 | P1       | User's profile shows their active tuition listings and average tuition rating (separate from gig/order rating)                                |
-| FR-J11 | P2       | Recurring session scheduling note (poster describes recurrence in the free-form paragraph; structured scheduling is a post-MVP consideration) |
+| ID     | Priority | Requirement                                                                                                    |
+| ------ | -------- | -------------------------------------------------------------------------------------------------------------- |
+| FR-J1  | P0       | Any user (student or alumni) can post a tuition listing with a title and a free-form description paragraph     |
+| FR-J2  | P0       | Listing supports an optional broad category tag (e.g., School, University, Language, Competitive Exam, Other)  |
+| FR-J3  | P0       | Users can browse and search tuition listings by keyword or category tag                                        |
+| FR-J4  | P0       | A requester can send a contact/session request to the listing poster                                           |
+| FR-J5  | P0       | The listing poster can accept or decline incoming requests                                                     |
+| FR-J6  | P0       | Accepted requests open a linked chat channel between poster and requester                                      |
+| FR-J7  | P0       | All tuition listings and sessions carry zero platform fee — permanently free                                   |
+| FR-J8  | P0       | Tuition listings reuse the same listing and request data model as gigs/jobs; no dedicated schema is added      |
+| FR-J9  | P1       | Mutual rating after a completed tutoring engagement                                                            |
+| FR-J10 | P1       | User's profile shows their active tuition listings and average tuition rating (separate from gig/order rating) |
 
 **Acceptance Criteria:**
 
@@ -444,7 +440,6 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 - Support email/password and Google OAuth through a managed identity provider
 - Server-side token verification on every protected API call
-- Designed for future extension to additional OAuth providers without redesign
 
 ### 8.2 Content and Data Management
 
@@ -459,8 +454,7 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 ### 8.4 Payment Gateways
 
-- Phase 1: SSLCommerz as primary payment gateway with secure callback handling
-- Phase 2: bKash direct payment integration
+- SSLCommerz as primary payment gateway with secure callback handling
 - All payment callbacks must be validated before triggering financial state changes
 
 ### 8.5 Real-Time Communication
@@ -474,7 +468,7 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 
 ### 9.1 Constraints
 
-- Platform is campus-exclusive: only JnU students can register in MVP; architecture supports future multi-campus expansion
+- Platform is campus-exclusive: only JnU students can register in current implementation
 - Payments are subject to Bangladesh payment gateway regulations
 - Platform fee policy in MVP: 5% charge for paid transactions up to BDT 500 (no per-gig override)
 
@@ -492,7 +486,7 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 | Payment callback inconsistency | High — fund mismatches    | Idempotent handlers, reconciliation job, audit alerts                   |
 | Chat or job spam and abuse     | Medium — trust erosion    | Report flow, moderation queue, rate limits                              |
 | Dispute volume overload        | Medium — admin bottleneck | Explicit dispute policy, SLA tiers, admin queue tooling                 |
-| Student identity misuse        | High — safety and trust   | Verification flag, campus email check (future sprint)                   |
+| Student identity misuse        | High — safety and trust   | Verification flag, strict auth checks, moderation enforcement           |
 | Low early adoption             | Medium — revenue impact   | Campus ambassador program, social media push, zero-fee tutoring as hook |
 | Payment gateway downtime       | Medium — order disruption | Graceful degradation message, retry queue                               |
 
@@ -714,7 +708,7 @@ $$
 ### 11.8 Key Economic Notes
 
 - **Tutoring is a strategic loss-leader:** Zero-fee tutoring generates no direct revenue but reduces onboarding friction, increases daily active users, and accelerates paid transaction adoption.
-- **Revenue is conservative:** Projections use only the 5% service fee (up to BDT 500 per paid transaction in MVP). Future premium features (featured listings, promoted gigs, analytics for sellers) are not modeled and would improve ROI further.
+- **Revenue is conservative:** Projections use only the 5% service fee (up to BDT 500 per paid transaction in MVP).
 - **Adoption risk is the primary variable:** If Year 1 adoption stays below 700 active users, monthly break-even shifts to Year 2 late-stage, and full break-even can move beyond Year 3.
 - **Cost model includes no full-time salaries in operations:** Post-launch maintenance assumes a lean part-time team. Scaling beyond Year 3 will require full-time hires, which are partially reflected in the rising Year 3–5 team costs.
 
@@ -731,7 +725,7 @@ $$
 | Estimated team velocity | 35–40 story points per sprint                                                     |
 | Sprint ceremonies       | Planning (day 1), Daily standup (15 min), Review + Retrospective (last day)       |
 | Definition of Done      | Feature code merged, unit tested, reviewed, deployed to staging, QA-signed off    |
-| Backlog tool            | Linear / Jira (to be confirmed)                                                   |
+| Backlog tool            | Linear / Jira                                                                     |
 
 ---
 

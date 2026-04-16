@@ -492,7 +492,6 @@ Implement the communication layer (real-time chat via Socket.IO, push notificati
   - Extract all string literals
   - Set up `flutter_localizations` + `intl`
   - Default: English
-  - Future: Bengali (bn) support structure ready
 
 - [ ] **4.9.5** Security audit:
   - Tokens stored in flutter_secure_storage (encrypted)

@@ -241,7 +241,7 @@ Tuition listings are explicitly out of payment and escrow flow. They stay free a
   ```
 
   - Enforce MVP baseline policy: fee = min(amount \* 0.05, 500)
-  - Keep configuration-extensibility for post-MVP fee experimentation without changing v1 behavior
+  - Keep the implementation fixed to MVP fee policy for current release
 
 ### 3.8 Testing
 

@@ -85,7 +85,7 @@
   "password": "securePassword123"
 }
 
-// Social provider (Google now, others later)
+// Social provider (Google)
 {
   "provider": "google",
   "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
@@ -98,9 +98,6 @@
 | ---------------- | ------------------- | ------------------------ |
 | `password`       | `email`, `password` | `firebase_id_token`      |
 | `google`         | `firebase_id_token` | `email`, `password`      |
-| `github`         | `firebase_id_token` | `email`, `password`      |
-| `microsoft`      | `firebase_id_token` | `email`, `password`      |
-| `apple`          | `firebase_id_token` | `email`, `password`      |
 
 If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
@@ -159,16 +156,6 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 // Request (Google)
 {
   "provider": "google",
-  "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
-}
-
-// Response 200 (same as above)
-```
-
-```json
-// Request (future third-party SSO example)
-{
-  "provider": "github",
   "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
 }
 
