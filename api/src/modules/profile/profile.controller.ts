@@ -70,7 +70,7 @@ export class ProfileController {
         const oldAvatarKey = current.data?.avatar_key ?? null;
 
         // Upload new avatar to R2
-        const upload = await this.uploadService.uploadBase64Image(dto.avatar_base64, 'avatars');
+        const upload = await this.uploadService.base64(dto.avatar_base64, 'avatars');
         if (!upload.success) {
           if (upload.status === 400) throw new BadRequestException(upload.error);
           throw new InternalServerErrorException(upload.error);
@@ -78,7 +78,7 @@ export class ProfileController {
 
         // Delete old avatar if exists
         if (oldAvatarKey) {
-          await this.uploadService.deleteFile(oldAvatarKey).catch(() => {});
+          await this.uploadService.remove(oldAvatarKey).catch(() => {});
         }
 
         // Update profile with new avatar URL and key

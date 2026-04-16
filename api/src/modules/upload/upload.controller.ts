@@ -16,7 +16,14 @@ import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { JwtPayload } from '@/types/auth.types';
 import type { UploadFolder } from '@/types/upload.types';
 
-const ALLOWED_FOLDERS: UploadFolder[] = ['avatars', 'gigs', 'deliveries', 'chat', 'documents', 'misc'];
+const ALLOWED_FOLDERS: UploadFolder[] = [
+  'avatars',
+  'gigs',
+  'deliveries',
+  'chat',
+  'documents',
+  'misc',
+];
 
 @Controller('upload')
 export class UploadController {
@@ -34,7 +41,7 @@ export class UploadController {
       throw new BadRequestException(`folder must be one of: ${ALLOWED_FOLDERS.join(', ')}`);
     }
 
-    const result = await this.uploadService.uploadImage(file, folder);
+    const result = await this.uploadService.image(file, folder);
     if (!result.success) {
       if (result.status === 400) throw new BadRequestException(result.error);
       throw new InternalServerErrorException(result.error);
@@ -54,7 +61,7 @@ export class UploadController {
       throw new BadRequestException(`folder must be one of: ${ALLOWED_FOLDERS.join(', ')}`);
     }
 
-    const result = await this.uploadService.uploadFile(file, folder);
+    const result = await this.uploadService.file(file, folder);
     if (!result.success) {
       if (result.status === 400) throw new BadRequestException(result.error);
       throw new InternalServerErrorException(result.error);
@@ -63,13 +70,10 @@ export class UploadController {
   }
 
   @Delete()
-  async deleteFile(
-    @Body('key') key: string,
-    @CurrentUser() _user: JwtPayload,
-  ) {
+  async remove(@Body('key') key: string, @CurrentUser() _user: JwtPayload) {
     if (!key) throw new BadRequestException('key is required');
 
-    const result = await this.uploadService.deleteFile(key);
+    const result = await this.uploadService.remove(key);
     if (!result.success) throw new InternalServerErrorException(result.error);
     return result;
   }

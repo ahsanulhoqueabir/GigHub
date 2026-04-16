@@ -6,37 +6,36 @@ import type { Category } from '@/types/category.types';
 
 @Injectable()
 export class CategoryService {
-  private static readonly COLLECTION = 'gh_categories';
+  private readonly collection = 'gh_categories';
 
-  static async getAllActive(): Promise<ServiceResponse<Category[]>> {
+  private fields(): string {
+    return ['id', 'name', 'slug', 'icon', 'description', 'sort_order'].join(',');
+  }
+
+  async list(): Promise<ServiceResponse<Category[]>> {
     try {
-      const { data } = await directusApi.get<{ data: Category[] }>(
-        `/items/${CategoryService.COLLECTION}`,
-        {
-          params: {
-            filter: { is_active: { _eq: true } },
-            sort: ['sort_order'],
-            fields: ['id', 'name', 'slug', 'icon', 'description', 'sort_order'].join(','),
-          },
+      const { data } = await directusApi.get<{ data: Category[] }>(`/items/${this.collection}`, {
+        params: {
+          filter: { is_active: { _eq: true } },
+          sort: ['sort_order'],
+          fields: this.fields(),
         },
-      );
+      });
       return successResponse(data.data);
     } catch (error) {
       return errorResponse('Failed to fetch categories', error);
     }
   }
 
-  static async getBySlug(slug: string): Promise<ServiceResponse<Category>> {
+  async find(slug: string): Promise<ServiceResponse<Category>> {
     try {
-      const { data } = await directusApi.get<{ data: Category[] }>(
-        `/items/${CategoryService.COLLECTION}`,
-        {
-          params: {
-            filter: { slug: { _eq: slug }, is_active: { _eq: true } },
-            limit: 1,
-          },
+      const { data } = await directusApi.get<{ data: Category[] }>(`/items/${this.collection}`, {
+        params: {
+          filter: { slug: { _eq: slug }, is_active: { _eq: true } },
+          fields: this.fields(),
+          limit: 1,
         },
-      );
+      });
       if (!data.data[0]) {
         return errorResponse('Category not found', undefined, 404);
       }
