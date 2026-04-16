@@ -1,14 +1,14 @@
-# Backend Phase 2 — Core Marketplace: Gigs, Jobs & Proposals
+# Backend Phase 2 — Core Marketplace: Gigs, Jobs, Proposals & Tuition Listings
 
 > **Duration Estimate:** 2–3 weeks
 > **Dependencies:** Phase 1 complete (Auth, Profiles, R2 uploads)
-> **Outcomes:** Full gig marketplace, job board, proposal system, search & filtering
+> **Outcomes:** Full gig marketplace, job board, proposal system, tuition listing flow, search & filtering
 
 ---
 
 ## Phase Overview
 
-Build the two core marketplace features: the Fiverr-style gig system (with packages, gallery, categories) and the Upwork-style job board (with proposals). Implement search, filtering, and discovery features.
+Build the core marketplace features: the Fiverr-style gig system (with packages, gallery, categories), the Upwork-style job board (with proposals), and the free tuition listing/request flow. Implement search, filtering, and discovery features.
 
 ---
 
@@ -32,6 +32,8 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 - [ ] **2.2.2** Create `gh_gig_packages` collection with UNIQUE constraint on (`gig`, `tier`)
 - [ ] **2.2.3** Configure `images` field in `gh_gigs` as JSON repeater `[{url, sort_order}]`
 - [ ] **2.2.4** Create `gh_jobs` collection with all fields and indexes
+- [ ] **2.2.4a** Extend `gh_jobs.job_type` enum to: `paid`, `free`, `internship`, `volunteer`, `tuition` (remove `contest`)
+- [ ] **2.2.4b** Define tuition modeling rule: tuition listings must reuse `gh_jobs` + `gh_proposals`; no separate tuition collection is introduced
 - [ ] **2.2.5** Create `gh_proposals` collection with UNIQUE constraint on (`job`, `applicant`)
 - [ ] **2.2.6** Set up relations in Directus:
   - `gh_gigs.seller` → `gh_profiles.id`
@@ -75,8 +77,6 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   2. Check no active orders exist for this gig
   3. Set status to `deleted`
 
-
-
 #### Gig Listing & Detail
 
 - [ ] **2.3.6** Implement `GET /gigs` — List gigs with filters:
@@ -108,6 +108,11 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   - `src/types/job.types.ts` — Job interfaces and enums
   - DTOs: `CreateJobDto`, `UpdateJobDto`, `JobQueryDto`, `JobResponseDto`
 
+- [ ] **2.4.1a** Add tuition-specific DTO validation rules:
+  - For `job_type=tuition`: require only `title` and `description`; budget and deadline are optional
+  - Support optional broad tuition category tag in payload (School/University/Language/Competitive Exam/Other)
+  - Enforce that tuition listings are always free (no payment trigger)
+
 #### Job CRUD
 
 - [ ] **2.4.2** Implement `POST /jobs` — Create job:
@@ -117,6 +122,7 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   4. Generate unique slug from title
   5. Create `gh_jobs` record
   6. Return created job
+  7. If `job_type=tuition`, persist as tuition listing and mark discoverable under tuition browse/search
 
 - [ ] **2.4.3** Implement `PATCH /jobs/:id` — Update job:
   1. Verify ownership (`poster_id = profile_id`)
@@ -131,11 +137,17 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 #### Job Listing & Detail
 
 - [ ] **2.4.5** Implement `GET /jobs` — List jobs with filters:
-  - Filters: `category`, `job_type`, `budget_min`, `budget_max`, `skills`, `status`
+  - Filters: `category`, `job_type`, `budget_min`, `budget_max`, `skills`, `status`, `listing_scope` (`jobs` / `tuition`)
   - Search: full-text on `title`, `description`
   - Sort: `-created_at` (default), `budget_desc`, `deadline_asc`
   - Only return `open` jobs by default
   - Include: poster (id, display_name, username, avatar), total_proposals
+
+- [ ] **2.4.8** Implement tuition-focused browse endpoint alias `GET /tuition`:
+  - Internally reuses `GET /jobs` with `job_type=tuition`
+  - Returns tuition listings only, visually/contractually separated from paid job feed
+
+- [ ] **2.4.9** Implement `GET /tuition/:slug` as alias for tuition listing detail
 
 - [ ] **2.4.6** Implement `GET /jobs/:slug` — Job detail:
   - Return full job data with:
@@ -163,6 +175,7 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   2. Validate: applicant is NOT the job poster
   3. Validate: applicant hasn't already submitted a proposal for this job
   4. Validate: cover_letter, quoted_price (if paid job), estimated_days
+     4a. For tuition listings: treat proposal as tuition session request (`quoted_price` must be null or 0)
   5. Create `gh_proposals` record
   6. Increment `gh_jobs.total_proposals`
   7. **Trigger notification** to job poster (notification module placeholder)
@@ -184,6 +197,7 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
   2. Expects `type` field in payload: `withdraw`, `accept`, `reject`
   3. **Withdraw**: Set status to `withdrawn`, decrement `gh_jobs.total_proposals`
   4. **Accept**: Set status to `accepted`, set job to `in_progress`, reject others, trigger notification
+     4a. If accepted proposal is for `job_type=tuition`, do not create order; open linked chat channel between poster and requester
   5. **Reject**: Set status to `rejected`, trigger notification
   6. Logic: Controller calls specific `ProposalService` functions based on `type`
 
@@ -223,29 +237,31 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 
 ## Endpoints Delivered in This Phase
 
-| Method   | Endpoint                  | Status |
-| -------- | ------------------------- | ------ |
-| `POST`   | `/categories`             | 🔲     |
-| `PATCH`  | `/categories/:id`         | 🔲     |
-| `DELETE` | `/categories/:id`         | 🔲     |
-| `GET`    | `/gigs`                   | 🔲     |
-| `GET`    | `/gigs/:slug`             | 🔲     |
-| `POST`   | `/gigs`                   | 🔲     |
-| `PATCH`  | `/gigs/:id`               | 🔲     |
-| `DELETE` | `/gigs/:id`               | 🔲     |
-| `GET`    | `/gigs/me`                | 🔲     |
-| `GET`    | `/jobs`                   | 🔲     |
-| `GET`    | `/jobs/:slug`             | 🔲     |
-| `POST`   | `/jobs`                   | 🔲     |
-| `PATCH`  | `/jobs/:id`               | 🔲     |
-| `DELETE` | `/jobs/:id`               | 🔲     |
-| `GET`    | `/jobs/me`                | 🔲     |
-| `POST`   | `/jobs/:jobId/proposals`  | 🔲     |
-| `GET`    | `/jobs/:jobId/proposals`  | 🔲     |
-| `GET`    | `/proposals/me`           | 🔲     |
-| `GET`    | `/proposals/:id`          | 🔲     |
-| `GET`   | `/proposals/:id`          | 🔲     |
-| `PATCH` | `/proposals/:id`          | 🔲     |
+| Method   | Endpoint                 | Status |
+| -------- | ------------------------ | ------ |
+| `POST`   | `/categories`            | 🔲     |
+| `PATCH`  | `/categories/:id`        | 🔲     |
+| `DELETE` | `/categories/:id`        | 🔲     |
+| `GET`    | `/gigs`                  | 🔲     |
+| `GET`    | `/gigs/:slug`            | 🔲     |
+| `POST`   | `/gigs`                  | 🔲     |
+| `PATCH`  | `/gigs/:id`              | 🔲     |
+| `DELETE` | `/gigs/:id`              | 🔲     |
+| `GET`    | `/gigs/me`               | 🔲     |
+| `GET`    | `/jobs`                  | 🔲     |
+| `GET`    | `/jobs/:slug`            | 🔲     |
+| `POST`   | `/jobs`                  | 🔲     |
+| `PATCH`  | `/jobs/:id`              | 🔲     |
+| `DELETE` | `/jobs/:id`              | 🔲     |
+| `GET`    | `/jobs/me`               | 🔲     |
+| `GET`    | `/tuition`               | 🔲     |
+| `GET`    | `/tuition/:slug`         | 🔲     |
+| `POST`   | `/jobs/:jobId/proposals` | 🔲     |
+| `GET`    | `/jobs/:jobId/proposals` | 🔲     |
+| `GET`    | `/proposals/me`          | 🔲     |
+| `GET`    | `/proposals/:id`         | 🔲     |
+| `GET`    | `/proposals/:id`         | 🔲     |
+| `PATCH`  | `/proposals/:id`         | 🔲     |
 
 ---
 
@@ -266,6 +282,8 @@ Build the two core marketplace features: the Fiverr-style gig system (with packa
 - [ ] Gig gallery JSON image management in `gh_gigs.images`
 - [ ] Full job CRUD with all job types
 - [ ] Proposal submit/accept/reject/withdraw flow
+- [ ] Tuition listing flow working using `gh_jobs` + `gh_proposals` only
+- [ ] Accepted tuition request opens chat without creating order/payment
 - [ ] Search & filter working for both gigs and jobs
 - [ ] Pagination working on all list endpoints
 - [ ] Slug-based URLs for gigs and jobs

@@ -87,23 +87,23 @@
 
 > Service listings created by students.
 
-| Column          | Type           | Constraints                     | Description                                  |
-| --------------- | -------------- | ------------------------------- | -------------------------------------------- |
-| `id`            | `uuid`         | PK, auto-generated              | Gig identifier                               |
-| `seller`        | `uuid`         | FK → `gh_profiles.id`, NOT NULL | Creator of the gig                           |
-| `category`      | `uuid`         | FK → `gh_categories.id`, NOT NULL | Gig category                                 |
-| `title`         | `varchar(200)` | NOT NULL                          | Gig title                                    |
-| `slug`          | `varchar(220)` | UNIQUE, NOT NULL                  | URL-safe slug                                |
-| `description`   | `text`         | NOT NULL                          | Detailed gig description                     |
+| Column          | Type           | Constraints                       | Description                                   |
+| --------------- | -------------- | --------------------------------- | --------------------------------------------- |
+| `id`            | `uuid`         | PK, auto-generated                | Gig identifier                                |
+| `seller`        | `uuid`         | FK → `gh_profiles.id`, NOT NULL   | Creator of the gig                            |
+| `category`      | `uuid`         | FK → `gh_categories.id`, NOT NULL | Gig category                                  |
+| `title`         | `varchar(200)` | NOT NULL                          | Gig title                                     |
+| `slug`          | `varchar(220)` | UNIQUE, NOT NULL                  | URL-safe slug                                 |
+| `description`   | `text`         | NOT NULL                          | Detailed gig description                      |
 | `images`        | `json`         | DEFAULT '[]'                      | Array of image objects: `[{url, sort_order}]` |
-| `tags`          | `json`         | DEFAULT '[]'                      | Array of tag strings                         |
-| `status`        | `varchar(20)`  | DEFAULT 'active'                | Enum: `draft`, `active`, `paused`, `deleted` |
-| `avg_rating`    | `decimal(3,2)` | DEFAULT 0.00                      | Average rating for this gig                  |
-| `total_reviews` | `integer`      | DEFAULT 0                         | Total reviews for this gig                   |
-| `total_orders`  | `integer`      | DEFAULT 0                         | Total completed orders                       |
-| `view_count`    | `integer`      | DEFAULT 0                         | Number of views                              |
-| `created_at`    | `timestamp`    | DEFAULT NOW()                     | —                                            |
-| `updated_at`    | `timestamp`    | DEFAULT NOW()                     | —                                            |
+| `tags`          | `json`         | DEFAULT '[]'                      | Array of tag strings                          |
+| `status`        | `varchar(20)`  | DEFAULT 'active'                  | Enum: `draft`, `active`, `paused`, `deleted`  |
+| `avg_rating`    | `decimal(3,2)` | DEFAULT 0.00                      | Average rating for this gig                   |
+| `total_reviews` | `integer`      | DEFAULT 0                         | Total reviews for this gig                    |
+| `total_orders`  | `integer`      | DEFAULT 0                         | Total completed orders                        |
+| `view_count`    | `integer`      | DEFAULT 0                         | Number of views                               |
+| `created_at`    | `timestamp`    | DEFAULT NOW()                     | —                                             |
+| `updated_at`    | `timestamp`    | DEFAULT NOW()                     | —                                             |
 
 **Indexes:**
 
@@ -138,10 +138,9 @@
 
 ---
 
-
 ## 5. gh_jobs
 
-> Job/task postings created by students.
+> Job/task postings and tuition listings (shared listing model; no separate tuition collection).
 
 | Column            | Type            | Constraints                       | Description                                                |
 | ----------------- | --------------- | --------------------------------- | ---------------------------------------------------------- |
@@ -151,7 +150,7 @@
 | `title`           | `varchar(200)`  | NOT NULL                          | Job title                                                  |
 | `slug`            | `varchar(220)`  | UNIQUE, NOT NULL                  | URL-safe slug                                              |
 | `description`     | `text`          | NOT NULL                          | Detailed job description                                   |
-| `job_type`        | `varchar(20)`   | NOT NULL                          | Enum: `paid`, `free`, `internship`, `volunteer`, `contest` |
+| `job_type`        | `varchar(20)`   | NOT NULL                          | Enum: `paid`, `free`, `internship`, `volunteer`, `tuition` |
 | `budget_type`     | `varchar(20)`   | DEFAULT 'fixed'                   | Enum: `fixed`, `hourly`, `negotiable`                      |
 | `budget_min`      | `decimal(10,2)` | NULL                              | Minimum budget (BDT)                                       |
 | `budget_max`      | `decimal(10,2)` | NULL                              | Maximum budget (BDT)                                       |
@@ -176,7 +175,7 @@
 
 ## 6. gh_proposals
 
-> Proposals submitted by students for job postings.
+> Proposals for jobs and session/contact requests for tuition listings.
 
 | Column           | Type            | Constraints                     | Description                                          |
 | ---------------- | --------------- | ------------------------------- | ---------------------------------------------------- |
@@ -184,7 +183,7 @@
 | `job`            | `uuid`          | FK → `gh_jobs.id`, NOT NULL     | Target job                                           |
 | `applicant`      | `uuid`          | FK → `gh_profiles.id`, NOT NULL | Student submitting the proposal                      |
 | `cover_letter`   | `text`          | NOT NULL                        | Proposal cover letter                                |
-| `quoted_price`   | `decimal(10,2)` | NULL                            | Proposed price (BDT)                                 |
+| `quoted_price`   | `decimal(10,2)` | NULL                            | Proposed price (BDT); null/0 for tuition requests    |
 | `estimated_days` | `integer`       | NULL                            | Estimated delivery in days                           |
 | `attachments`    | `json`          | DEFAULT '[]'                    | Array of R2 URL strings                              |
 | `status`         | `varchar(20)`   | DEFAULT 'pending'               | Enum: `pending`, `accepted`, `rejected`, `withdrawn` |
@@ -252,18 +251,18 @@
 
 > Milestone breakdown for larger orders (especially job-based).
 
-| Column        | Type            | Constraints                                    | Description                                                                   |
-| ------------- | --------------- | ---------------------------------------------- | ----------------------------------------------------------------------------- |
-| `id`          | `uuid`          | PK, auto-generated                             | Milestone identifier                                                          |
+| Column        | Type            | Constraints                                      | Description                                                                   |
+| ------------- | --------------- | ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `id`          | `uuid`          | PK, auto-generated                               | Milestone identifier                                                          |
 | `order`       | `uuid`          | FK → `gh_orders.id`, NOT NULL, ON DELETE CASCADE | Parent order                                                                  |
-| `title`       | `varchar(200)`  | NOT NULL                                       | Milestone title                                                               |
-| `description` | `text`          | NULL                                           | What's included in this milestone                                             |
-| `amount`      | `decimal(10,2)` | NOT NULL                                       | Milestone payment amount (BDT)                                                |
-| `due_date`    | `timestamp`     | NULL                                           | Expected completion date                                                      |
-| `status`      | `varchar(20)`   | DEFAULT 'pending'                               | Enum: `pending`, `in_progress`, `delivered`, `approved`, `revision_requested` |
-| `sort_order`  | `integer`       | DEFAULT 0                                       | Milestone sequence                                                            |
-| `created_at`  | `timestamp`     | DEFAULT NOW()                                  | —                                                                             |
-| `updated_at`  | `timestamp`     | DEFAULT NOW()                                  | —                                                                             |
+| `title`       | `varchar(200)`  | NOT NULL                                         | Milestone title                                                               |
+| `description` | `text`          | NULL                                             | What's included in this milestone                                             |
+| `amount`      | `decimal(10,2)` | NOT NULL                                         | Milestone payment amount (BDT)                                                |
+| `due_date`    | `timestamp`     | NULL                                             | Expected completion date                                                      |
+| `status`      | `varchar(20)`   | DEFAULT 'pending'                                | Enum: `pending`, `in_progress`, `delivered`, `approved`, `revision_requested` |
+| `sort_order`  | `integer`       | DEFAULT 0                                        | Milestone sequence                                                            |
+| `created_at`  | `timestamp`     | DEFAULT NOW()                                    | —                                                                             |
+| `updated_at`  | `timestamp`     | DEFAULT NOW()                                    | —                                                                             |
 
 ---
 
@@ -271,7 +270,7 @@
 
 > Delivery submissions for orders/milestones.
 
-| Column          | Type          | Constraints                      | Description                                       |
+| Column          | Type          | Constraints                         | Description                                       |
 | --------------- | ------------- | ----------------------------------- | ------------------------------------------------- |
 | `id`            | `uuid`        | PK, auto-generated                  | Delivery identifier                               |
 | `order`         | `uuid`        | FK → `gh_orders.id`, NOT NULL       | Parent order                                      |
@@ -293,19 +292,19 @@
 
 > Escrow records for holding payments.
 
-| Column            | Type            | Constraints                        | Description                                      |
-| ----------------- | --------------- | ---------------------------------- | ------------------------------------------------ |
-| `id`              | `uuid`          | PK, auto-generated                 | Escrow identifier                                |
+| Column            | Type            | Constraints                           | Description                                      |
+| ----------------- | --------------- | ------------------------------------- | ------------------------------------------------ |
+| `id`              | `uuid`          | PK, auto-generated                    | Escrow identifier                                |
 | `order`           | `uuid`          | FK → `gh_orders.id`, UNIQUE, NOT NULL | Associated order                                 |
-| `buyer`           | `uuid`          | FK → `gh_profiles.id`, NOT NULL    | Payer                                            |
-| `seller`          | `uuid`          | FK → `gh_profiles.id`, NOT NULL    | Payee                                            |
-| `amount`          | `decimal(10,2)` | NOT NULL                           | Total escrowed amount                            |
-| `platform_fee`    | `decimal(10,2)` | DEFAULT 0.00                       | Fee to be deducted                               |
-| `status`          | `varchar(20)`   | DEFAULT 'held'                     | Enum: `held`, `released`, `refunded`, `disputed` |
-| `released_at`     | `timestamp`     | NULL                               | When funds were released                         |
-| `auto_release_at` | `timestamp`     | NULL                               | Auto-release deadline                            |
-| `created_at`      | `timestamp`     | DEFAULT NOW()                      | —                                                |
-| `updated_at`      | `timestamp`     | DEFAULT NOW()                      | —                                                |
+| `buyer`           | `uuid`          | FK → `gh_profiles.id`, NOT NULL       | Payer                                            |
+| `seller`          | `uuid`          | FK → `gh_profiles.id`, NOT NULL       | Payee                                            |
+| `amount`          | `decimal(10,2)` | NOT NULL                              | Total escrowed amount                            |
+| `platform_fee`    | `decimal(10,2)` | DEFAULT 0.00                          | Fee to be deducted                               |
+| `status`          | `varchar(20)`   | DEFAULT 'held'                        | Enum: `held`, `released`, `refunded`, `disputed` |
+| `released_at`     | `timestamp`     | NULL                                  | When funds were released                         |
+| `auto_release_at` | `timestamp`     | NULL                                  | Auto-release deadline                            |
+| `created_at`      | `timestamp`     | DEFAULT NOW()                         | —                                                |
+| `updated_at`      | `timestamp`     | DEFAULT NOW()                         | —                                                |
 
 ---
 
@@ -313,20 +312,20 @@
 
 > Immutable log of all financial transactions.
 
-| Column              | Type            | Constraints                  | Description                                                        |
-| ------------------- | --------------- | ---------------------------- | ------------------------------------------------------------------ |
-| `id`                | `uuid`          | PK, auto-generated           | Transaction identifier                                             |
+| Column              | Type            | Constraints                     | Description                                                        |
+| ------------------- | --------------- | ------------------------------- | ------------------------------------------------------------------ |
+| `id`                | `uuid`          | PK, auto-generated              | Transaction identifier                                             |
 | `profile`           | `uuid`          | FK → `gh_profiles.id`, NOT NULL | Affected user                                                      |
-| `order`             | `uuid`          | FK → `gh_orders.id`, NULL    | Related order                                                      |
-| `type`              | `varchar(30)`   | NOT NULL                     | Enum: `payment`, `earning`, `platform_fee`, `withdrawal`, `refund` |
-| `amount`            | `decimal(10,2)` | NOT NULL                     | Transaction amount                                                 |
-| `direction`         | `varchar(10)`   | NOT NULL                     | Enum: `credit`, `debit`                                            |
-| `balance_after`     | `decimal(12,2)` | NOT NULL                     | Balance after transaction                                          |
-| `description`       | `text`          | NULL                         | Human-readable description                                         |
-| `payment_method`    | `varchar(30)`   | NULL                         | e.g., `sslcommerz`, `bkash`, `wallet`                              |
-| `payment_reference` | `varchar(255)`  | NULL                         | External payment gateway reference ID                              |
-| `status`            | `varchar(20)`   | DEFAULT 'completed'          | Enum: `pending`, `completed`, `failed`                             |
-| `created_at`        | `timestamp`     | DEFAULT NOW()                | —                                                                  |
+| `order`             | `uuid`          | FK → `gh_orders.id`, NULL       | Related order                                                      |
+| `type`              | `varchar(30)`   | NOT NULL                        | Enum: `payment`, `earning`, `platform_fee`, `withdrawal`, `refund` |
+| `amount`            | `decimal(10,2)` | NOT NULL                        | Transaction amount                                                 |
+| `direction`         | `varchar(10)`   | NOT NULL                        | Enum: `credit`, `debit`                                            |
+| `balance_after`     | `decimal(12,2)` | NOT NULL                        | Balance after transaction                                          |
+| `description`       | `text`          | NULL                            | Human-readable description                                         |
+| `payment_method`    | `varchar(30)`   | NULL                            | e.g., `sslcommerz`, `bkash`, `wallet`                              |
+| `payment_reference` | `varchar(255)`  | NULL                            | External payment gateway reference ID                              |
+| `status`            | `varchar(20)`   | DEFAULT 'completed'             | Enum: `pending`, `completed`, `failed`                             |
+| `created_at`        | `timestamp`     | DEFAULT NOW()                   | —                                                                  |
 
 **Indexes:**
 
@@ -341,17 +340,17 @@
 
 > Withdrawal requests from students.
 
-| Column            | Type            | Constraints                  | Description                                            |
-| ----------------- | --------------- | ---------------------------- | ------------------------------------------------------ |
-| `id`              | `uuid`          | PK, auto-generated           | Withdrawal identifier                                  |
+| Column            | Type            | Constraints                     | Description                                            |
+| ----------------- | --------------- | ------------------------------- | ------------------------------------------------------ |
+| `id`              | `uuid`          | PK, auto-generated              | Withdrawal identifier                                  |
 | `profile`         | `uuid`          | FK → `gh_profiles.id`, NOT NULL | Requesting student                                     |
-| `amount`          | `decimal(10,2)` | NOT NULL                     | Withdrawal amount (BDT)                                |
-| `method`          | `varchar(30)`   | NOT NULL                     | Enum: `bkash`, `nagad`, `bank_transfer`                |
-| `account_details` | `json`          | NOT NULL                     | { number, name, bank_name, branch, etc. }              |
-| `status`          | `varchar(20)`   | DEFAULT 'pending'            | Enum: `pending`, `processing`, `completed`, `rejected` |
-| `admin_note`      | `text`          | NULL                         | Admin notes on rejection/processing                    |
-| `processed_at`    | `timestamp`     | NULL                         | When withdrawal was processed                          |
-| `created_at`      | `timestamp`     | DEFAULT NOW()                | —                                                      |
+| `amount`          | `decimal(10,2)` | NOT NULL                        | Withdrawal amount (BDT)                                |
+| `method`          | `varchar(30)`   | NOT NULL                        | Enum: `bkash`, `nagad`, `bank_transfer`                |
+| `account_details` | `json`          | NOT NULL                        | { number, name, bank_name, branch, etc. }              |
+| `status`          | `varchar(20)`   | DEFAULT 'pending'               | Enum: `pending`, `processing`, `completed`, `rejected` |
+| `admin_note`      | `text`          | NULL                            | Admin notes on rejection/processing                    |
+| `processed_at`    | `timestamp`     | NULL                            | When withdrawal was processed                          |
+| `created_at`      | `timestamp`     | DEFAULT NOW()                   | —                                                      |
 
 ---
 
@@ -359,12 +358,12 @@
 
 > Chat conversations between two students.
 
-| Column              | Type        | Constraints                  | Description                       |
-| ------------------- | ----------- | ---------------------------- | --------------------------------- |
-| `id`                | `uuid`      | PK, auto-generated           | Conversation identifier           |
+| Column              | Type        | Constraints                     | Description                       |
+| ------------------- | ----------- | ------------------------------- | --------------------------------- |
+| `id`                | `uuid`      | PK, auto-generated              | Conversation identifier           |
 | `participant_1`     | `uuid`      | FK → `gh_profiles.id`, NOT NULL | First participant                 |
 | `participant_2`     | `uuid`      | FK → `gh_profiles.id`, NOT NULL | Second participant                |
-| `order`             | `uuid`      | FK → `gh_orders.id`, NULL    | Linked order (if order chat)      |
+| `order`             | `uuid`      | FK → `gh_orders.id`, NULL       | Linked order (if order chat)      |
 | `gig`               | `uuid`      | FK → `gh_gigs.id`, NULL         | Linked gig (if pre-order inquiry) |
 | `last_message_at`   | `timestamp` | NULL                            | Timestamp of last message         |
 | `last_message_text` | `text`      | NULL                            | Preview of last message           |
@@ -387,19 +386,19 @@
 
 > Individual chat messages.
 
-| Column            | Type           | Constraints                                | Description                                      |
-| ----------------- | -------------- | ------------------------------------------ | ------------------------------------------------ |
-| `id`              | `uuid`         | PK, auto-generated                         | Message identifier                               |
-| `conversation`    | `uuid`         | FK → `gh_conversations.id`, NOT NULL, ON DELETE CASCADE | Parent conversation                              |
-| `sender`          | `uuid`         | FK → `gh_profiles.id`, NOT NULL            | Message sender                                   |
-| `content`         | `text`         | NULL                                       | Message text content                             |
-| `message_type`    | `varchar(20)`  | DEFAULT 'text'                             | Enum: `text`, `image`, `file`, `voice`, `system` |
-| `file_url`        | `text`         | NULL                                       | R2 URL for file/image/voice messages             |
-| `file_name`       | `varchar(255)` | NULL                                       | Original file name                               |
-| `file_size`       | `integer`      | NULL                                       | File size in bytes                               |
-| `is_read`         | `boolean`      | DEFAULT false                              | Read receipt                                     |
-| `read_at`         | `timestamp`    | NULL                                       | When message was read                            |
-| `created_at`      | `timestamp`    | DEFAULT NOW()                              | —                                                |
+| Column         | Type           | Constraints                                             | Description                                      |
+| -------------- | -------------- | ------------------------------------------------------- | ------------------------------------------------ |
+| `id`           | `uuid`         | PK, auto-generated                                      | Message identifier                               |
+| `conversation` | `uuid`         | FK → `gh_conversations.id`, NOT NULL, ON DELETE CASCADE | Parent conversation                              |
+| `sender`       | `uuid`         | FK → `gh_profiles.id`, NOT NULL                         | Message sender                                   |
+| `content`      | `text`         | NULL                                                    | Message text content                             |
+| `message_type` | `varchar(20)`  | DEFAULT 'text'                                          | Enum: `text`, `image`, `file`, `voice`, `system` |
+| `file_url`     | `text`         | NULL                                                    | R2 URL for file/image/voice messages             |
+| `file_name`    | `varchar(255)` | NULL                                                    | Original file name                               |
+| `file_size`    | `integer`      | NULL                                                    | File size in bytes                               |
+| `is_read`      | `boolean`      | DEFAULT false                                           | Read receipt                                     |
+| `read_at`      | `timestamp`    | NULL                                                    | When message was read                            |
+| `created_at`   | `timestamp`    | DEFAULT NOW()                                           | —                                                |
 
 **Indexes:**
 
@@ -412,15 +411,17 @@
 
 ## 15. gh_reviews
 
-> Mutual reviews between order parties.
+> Mutual reviews for paid orders and tuition engagements.
 
-| Column                 | Type           | Constraints                  | Description                        |
-| ---------------------- | -------------- | ---------------------------- | ---------------------------------- |
-| `id`                   | `uuid`         | PK, auto-generated           | Review identifier                  |
-| `order`                | `uuid`          | FK → `gh_orders.id`, NOT NULL   | Related order                      |
-| `gig`                  | `uuid`          | FK → `gh_gigs.id`, NULL         | Related gig (for gig-based orders) |
-| `reviewer`             | `uuid`          | FK → `gh_profiles.id`, NOT NULL | Student writing the review         |
-| `reviewee`             | `uuid`          | FK → `gh_profiles.id`, NOT NULL | Student being reviewed             |
+| Column                 | Type           | Constraints                     | Description                        |
+| ---------------------- | -------------- | ------------------------------- | ---------------------------------- |
+| `id`                   | `uuid`         | PK, auto-generated              | Review identifier                  |
+| `review_context`       | `varchar(20)`  | NOT NULL                        | Enum: `order`, `tuition`           |
+| `order`                | `uuid`         | FK → `gh_orders.id`, NULL       | Related paid order                 |
+| `tuition_job`          | `uuid`         | FK → `gh_jobs.id`, NULL         | Related tuition listing            |
+| `gig`                  | `uuid`         | FK → `gh_gigs.id`, NULL         | Related gig (for gig-based orders) |
+| `reviewer`             | `uuid`         | FK → `gh_profiles.id`, NOT NULL | Student writing the review         |
+| `reviewee`             | `uuid`         | FK → `gh_profiles.id`, NOT NULL | Student being reviewed             |
 | `rating_overall`       | `decimal(2,1)` | NOT NULL                        | Overall rating (1.0–5.0)           |
 | `rating_quality`       | `decimal(2,1)` | NULL                            | Quality rating (1.0–5.0)           |
 | `rating_communication` | `decimal(2,1)` | NULL                            | Communication rating (1.0–5.0)     |
@@ -433,11 +434,14 @@
 
 **Constraints:**
 
-- UNIQUE(`order`, `reviewer`) — one review per party per order
+- UNIQUE(`order`, `reviewer`) WHERE `order` IS NOT NULL — one review per party per paid order
+- UNIQUE(`tuition_job`, `reviewer`) WHERE `tuition_job` IS NOT NULL — one review per party per tuition engagement
+- CHECK: exactly one of `order` or `tuition_job` must be set based on `review_context`
 
 **Indexes:**
 
 - `idx_reviews_order` on `order`
+- `idx_reviews_tuition_job` on `tuition_job`
 - `idx_reviews_reviewee` on `reviewee`
 - `idx_reviews_gig` on `gig`
 - `idx_reviews_rating` on `rating_overall`
@@ -448,9 +452,9 @@
 
 > User notifications (in-app + push).
 
-| Column       | Type           | Constraints                  | Description                                      |
-| ------------ | -------------- | ---------------------------- | ------------------------------------------------ |
-| `id`         | `uuid`         | PK, auto-generated           | Notification identifier                          |
+| Column       | Type           | Constraints                     | Description                                      |
+| ------------ | -------------- | ------------------------------- | ------------------------------------------------ |
+| `id`         | `uuid`         | PK, auto-generated              | Notification identifier                          |
 | `profile`    | `uuid`         | FK → `gh_profiles.id`, NOT NULL | Recipient                                        |
 | `type`       | `varchar(30)`  | NOT NULL                        | See notification types below                     |
 | `title`      | `varchar(200)` | NOT NULL                        | Notification title                               |
@@ -474,9 +478,9 @@
 
 > Saved/bookmarked gigs and jobs.
 
-| Column        | Type          | Constraints                  | Description                     |
-| ------------- | ------------- | ---------------------------- | ------------------------------- |
-| `id`          | `uuid`        | PK, auto-generated           | Bookmark identifier             |
+| Column        | Type          | Constraints                     | Description                     |
+| ------------- | ------------- | ------------------------------- | ------------------------------- |
+| `id`          | `uuid`        | PK, auto-generated              | Bookmark identifier             |
 | `profile`     | `uuid`        | FK → `gh_profiles.id`, NOT NULL | Student who bookmarked          |
 | `entity_type` | `varchar(10)` | NOT NULL                        | Enum: `gig`, `job`              |
 | `entity_id`   | `uuid`        | NOT NULL                        | ID of the bookmarked gig or job |
@@ -492,9 +496,9 @@
 
 > Content reports/flags submitted by students.
 
-| Column        | Type          | Constraints                  | Description                                                   |
-| ------------- | ------------- | ---------------------------- | ------------------------------------------------------------- |
-| `id`          | `uuid`        | PK, auto-generated           | Report identifier                                             |
+| Column        | Type          | Constraints                     | Description                                                   |
+| ------------- | ------------- | ------------------------------- | ------------------------------------------------------------- |
+| `id`          | `uuid`        | PK, auto-generated              | Report identifier                                             |
 | `reporter`    | `uuid`        | FK → `gh_profiles.id`, NOT NULL | Reporting student                                             |
 | `entity_type` | `varchar(20)` | NOT NULL                        | Enum: `gig`, `job`, `profile`, `review`, `message`            |
 | `entity_id`   | `uuid`        | NOT NULL                        | ID of the reported entity                                     |
@@ -522,15 +526,16 @@
 
 **Default Config Values:**
 
-| Key                        | Default Value | Description                             |
-| -------------------------- | ------------- | --------------------------------------- |
-| `platform_fee_percent`     | `10`          | Platform fee as a percentage            |
-| `escrow_auto_release_days` | `7`           | Days after delivery before auto-release |
-| `min_withdrawal_amount`    | `500`         | Minimum withdrawal amount (BDT)         |
-| `max_gig_images`           | `5`           | Max gallery images per gig              |
-| `max_file_upload_mb`       | `25`          | Max file upload size in MB              |
-| `top_rated_min_rating`     | `4.5`         | Minimum avg rating for Top Rated badge  |
-| `top_rated_min_reviews`    | `10`          | Minimum reviews for Top Rated badge     |
+| Key                        | Default Value | Description                                       |
+| -------------------------- | ------------- | ------------------------------------------------- |
+| `platform_fee_percent`     | `5`           | Platform fee as a percentage (MVP fixed baseline) |
+| `platform_fee_cap_bdt`     | `500`         | Maximum fee per paid transaction (MVP)            |
+| `escrow_auto_release_days` | `7`           | Days after delivery before auto-release           |
+| `min_withdrawal_amount`    | `500`         | Minimum withdrawal amount (BDT)                   |
+| `max_gig_images`           | `5`           | Max gallery images per gig                        |
+| `max_file_upload_mb`       | `25`          | Max file upload size in MB                        |
+| `top_rated_min_rating`     | `4.5`         | Minimum avg rating for Top Rated badge            |
+| `top_rated_min_reviews`    | `10`          | Minimum reviews for Top Rated badge               |
 
 ---
 
@@ -555,10 +560,11 @@ gh_categories (1) ────< (N) gh_jobs
 
 gh_gigs (1) ──────────< (N) gh_gig_packages
 gh_gigs (1) ──────────< (N) gh_orders (source_type='gig')
-gh_gigs (1) ──────────< (N) gh_reviews
+gh_gigs (1) ──────────< (N) gh_reviews (order context)
 
 gh_jobs (1) ──────────< (N) gh_proposals
 gh_jobs (1) ──────────< (N) gh_orders (source_type='job')
+gh_jobs (1) ──────────< (N) gh_reviews (tuition context)
 
 gh_orders (1) ────────< (N) gh_order_milestones
 gh_orders (1) ────────< (N) gh_order_deliveries

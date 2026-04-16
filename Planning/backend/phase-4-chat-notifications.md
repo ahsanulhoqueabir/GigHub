@@ -10,6 +10,8 @@
 
 Implement real-time 1:1 chat messaging via Socket.IO, the notification system (in-app, push, email), and wire up all notification triggers from previous phases.
 
+This phase also covers the tuition-request acceptance chat handoff (accepted tuition request opens a linked chat without creating an order).
+
 ---
 
 ## Task Checklist
@@ -50,6 +52,10 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
   4. Create `gh_conversations` record
   5. If `initial_message` provided, create first `gh_messages` record
   6. Return conversation
+
+- [ ] **4.2.2a** Support tuition session context in conversations:
+  - Accept optional `job_id` when the source listing is `job_type=tuition`
+  - Ensure accepted tuition request opens/reuses linked chat channel
 
 - [ ] **4.2.3** Implement `GET /conversations` — List my conversations:
   - Return conversations where user is participant_1 or participant_2
@@ -249,6 +255,10 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] **4.6.4** Chat events:
   - `new_message` → notify recipient (if not in active chat): "New message from {sender}"
 
+- [ ] **4.6.4a** Tuition events:
+  - `tuition_request_accepted` → notify requester and open linked chat
+  - `tuition_request_rejected` → notify requester
+
 - [ ] **4.6.5** Review events:
   - `new_review` → notify reviewee: "{reviewer} left a review on #{order_number}"
 
@@ -346,6 +356,7 @@ Implement real-time 1:1 chat messaging via Socket.IO, the notification system (i
 - [ ] Real-time 1:1 chat fully working via Socket.IO
 - [ ] REST fallback for sending messages
 - [ ] Conversation auto-creation for orders
+- [ ] Conversation auto-creation for accepted tuition requests
 - [ ] File/image/voice sharing in chat
 - [ ] System messages for order events
 - [ ] Read receipts and typing indicators

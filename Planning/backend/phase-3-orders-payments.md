@@ -10,6 +10,8 @@
 
 Build the order management system, integrate SSLCommerz for payments, implement the escrow mechanism, and set up the withdrawal pipeline. This is the most critical phase for platform trust and reliability.
 
+Tuition listings are explicitly out of payment and escrow flow. They stay free and use chat-based session coordination only.
+
 ---
 
 ## Task Checklist
@@ -55,7 +57,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 - [ ] **3.3.2** Implement `POST /orders/gig` — Create order from gig:
   1. Validate `gig` and `package` — gig must be active
   2. Buyer cannot be the gig seller
-  3. Calculate: `amount` (from package), `platform_fee` (from config), `seller_earnings`
+  3. Calculate: `amount` (from package), `platform_fee` (MVP policy: 5% of paid transaction, capped at BDT 500), `seller_earnings`
   4. Calculate `delivery_deadline` (now + delivery_days)
   5. Generate order number
   6. Create `gh_orders` record with status `pending`
@@ -65,6 +67,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] **3.3.3** Implement `POST /orders/job` — Create order from accepted proposal:
   1. Validate: proposal is `accepted`, job exists, user is job poster
+     1a. Reject if source job has `job_type=tuition` (tuition uses no order/payment flow)
   2. Calculate amounts based on proposal's `quoted_price`
   3. Support optional milestones array
   4. Create `gh_orders` record
@@ -126,6 +129,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] **3.4.3** Implement `POST /payments/initiate`:
   1. Validate order exists and is `pending`
+     1a. Validate order source is paid transaction (not tuition flow)
   2. Build SSLCommerz session:
      - `total_amount`, `currency: BDT`
      - `tran_id`: unique transaction ID linking to order
@@ -203,8 +207,6 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   - Auto-release funds to seller
   - Create system notification
 
-
-
 ### 3.6 Withdrawals Module
 
 - [ ] **3.6.1** Create `WithdrawalModule` with:
@@ -229,6 +231,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.7 Platform Fee Calculator
 
 - [ ] **3.7.1** Create utility service for fee calculations:
+
   ```typescript
   calculateFees(amount: number) → {
     platform_fee: number,
@@ -237,8 +240,8 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   }
   ```
 
-  - Read `platform_fee_percent` from `gh_platform_config`
-  - Cache config value (TTL: 10 min)
+  - Enforce MVP baseline policy: fee = min(amount \* 0.05, 500)
+  - Keep configuration-extensibility for post-MVP fee experimentation without changing v1 behavior
 
 ### 3.8 Testing
 
@@ -307,6 +310,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] Gig-based order creation + payment initiation working
 - [ ] Job-based order creation (from accepted proposal) working
+- [ ] Tuition requests are blocked from order creation and payment endpoints
 - [ ] Full order lifecycle: pending → active → in_progress → delivered → completed
 - [ ] Revision flow working (with count enforcement)
 - [ ] Cancellation with proper refund handling
