@@ -50,17 +50,20 @@ export class AuthService {
     // 3. Create gh_profiles record in Directus
     let profile: Profile;
     try {
-      const { data } = await directusApi.post<{ data: Profile }>(`/items/${AuthService.COLLECTION}`, {
-        id: uuidv4(),
-        firebase_uid: firebaseUser.uid,
-        email: dto.email,
-        display_name: dto.display_name,
-        username: dto.username,
-        role: UserRole.STUDENT,
-        availability_status: 'available',
-        skills: [],
-        notification_prefs: {},
-      });
+      const { data } = await directusApi.post<{ data: Profile }>(
+        `/items/${AuthService.COLLECTION}`,
+        {
+          id: uuidv4(),
+          firebase_uid: firebaseUser.uid,
+          email: dto.email,
+          display_name: dto.display_name,
+          username: dto.username,
+          role: UserRole.STUDENT,
+          availability_status: 'available',
+          skills: [],
+          notification_prefs: {},
+        },
+      );
       profile = data.data;
     } catch (err) {
       // Rollback Firebase user if Directus write fails
@@ -83,11 +86,9 @@ export class AuthService {
       email = dto.email;
     } else if (dto.provider === 'google') {
       // Verify Firebase ID token via Admin SDK
-      const decoded = await this.firebase
-        .verifyIdToken(dto.firebase_id_token!)
-        .catch(() => {
-          throw new UnauthorizedException('Invalid Firebase ID token');
-        });
+      const decoded = await this.firebase.verifyIdToken(dto.firebase_id_token!).catch(() => {
+        throw new UnauthorizedException('Invalid Firebase ID token');
+      });
       firebaseUid = decoded.uid;
       email = decoded.email;
     } else {
@@ -126,13 +127,24 @@ export class AuthService {
     }
   }
 
+  async resetPassword(oobCode: string, newPassword: string): Promise<void> {
+    const apiKey = this.config.get<string>('firebase.apiKey');
+    const url = `https://identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=${apiKey}`;
+
+    try {
+      await axios.post(url, { oobCode, newPassword });
+    } catch {
+      throw new BadRequestException('Invalid or expired reset code');
+    }
+  }
+
   // ─── Private Helpers ─────────────────────────────────────────────────────
 
   private async authenticateWithPassword(
     email: string,
     password: string,
   ): Promise<{ localId: string }> {
-    const apiKey = this.config.get<string>('firebase.projectId');
+    const apiKey = this.config.get<string>('firebase.apiKey');
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
 
     try {
@@ -147,30 +159,24 @@ export class AuthService {
     }
   }
 
-  private async findOrCreateProfile(
-    firebaseUid: string,
-    email?: string,
-  ): Promise<Profile> {
+  private async findOrCreateProfile(firebaseUid: string, email?: string): Promise<Profile> {
     // Try to find existing profile
     const existing = await this.findProfileByFirebaseUid(firebaseUid);
     if (existing) return existing;
 
     // Auto-create profile for social login first-time users
     const username = `user_${uuidv4().split('-')[0]}`;
-    const { data } = await directusApi.post<{ data: Profile }>(
-      `/items/${AuthService.COLLECTION}`,
-      {
-        id: uuidv4(),
-        firebase_uid: firebaseUid,
-        email: email ?? '',
-        display_name: email?.split('@')[0] ?? 'New User',
-        username,
-        role: UserRole.STUDENT,
-        availability_status: 'available',
-        skills: [],
-        notification_prefs: {},
-      },
-    );
+    const { data } = await directusApi.post<{ data: Profile }>(`/items/${AuthService.COLLECTION}`, {
+      id: uuidv4(),
+      firebase_uid: firebaseUid,
+      email: email ?? '',
+      display_name: email?.split('@')[0] ?? 'New User',
+      username,
+      role: UserRole.STUDENT,
+      availability_status: 'available',
+      skills: [],
+      notification_prefs: {},
+    });
     return data.data;
   }
 

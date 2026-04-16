@@ -11,6 +11,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
+import { UploadService } from '@/modules/upload/upload.service';
+
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
@@ -19,7 +21,7 @@ import type { ProfileViewType } from '@/types/profile.types';
 
 @Controller('profiles')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(private readonly uploadService: UploadService) {}
 
   @Get('me')
   async getMe(@CurrentUser() user: JwtPayload) {
@@ -29,15 +31,18 @@ export class ProfileController {
   }
 
   @Patch('me')
-  async updateMe(
-    @CurrentUser() user: JwtPayload,
-    @Body() dto: UpdateProfileDto,
-  ) {
+  async updateMe(@CurrentUser() user: JwtPayload, @Body() dto: UpdateProfileDto) {
     switch (dto.type) {
       case 'basic_info': {
         if (dto.username) {
           const taken = await ProfileService.isUsernameTaken(dto.username, user.profile_id);
           if (taken) throw new ConflictException('Username already taken');
+
+          // Enforce 30-day username change limit
+          const canChange = await ProfileService.canChangeUsername(user.profile_id);
+          if (!canChange) {
+            throw new BadRequestException('Username can only be changed once every 30 days');
+          }
         }
 
         const result = await ProfileService.updateBasicInfo(user.profile_id, {
@@ -56,12 +61,31 @@ export class ProfileController {
         if (!dto.avatar_base64) {
           throw new BadRequestException('avatar_base64 is required for type avatar');
         }
-        // Decode and upload via UploadService is handled at the service layer
-        // Here we expect the controller to call UploadService; for now return placeholder
-        // Full integration is done in Phase 1.6.6
-        throw new BadRequestException(
-          'Avatar upload requires multipart; use POST /upload/image then PATCH /profiles/me with type: avatar',
+
+        // Get current avatar to delete old one
+        const current = await ProfileService.getProfileById(user.profile_id);
+        const oldAvatarKey = current.data?.avatar_key ?? null;
+
+        // Upload new avatar to R2
+        const upload = await this.uploadService.uploadBase64Image(dto.avatar_base64, 'avatars');
+        if (!upload.success) {
+          if (upload.status === 400) throw new BadRequestException(upload.error);
+          throw new InternalServerErrorException(upload.error);
+        }
+
+        // Delete old avatar if exists
+        if (oldAvatarKey) {
+          await this.uploadService.deleteFile(oldAvatarKey).catch(() => {});
+        }
+
+        // Update profile with new avatar URL and key
+        const result = await ProfileService.updateAvatar(
+          user.profile_id,
+          upload.data!.url,
+          upload.data!.key,
         );
+        if (!result.success) throw new InternalServerErrorException(result.error);
+        return result;
       }
 
       case 'fcm_token': {
@@ -94,8 +118,27 @@ export class ProfileController {
     @Param('username') username: string,
     @Query('type') type: ProfileViewType = 'profile',
   ) {
-    const result = await ProfileService.getPublicProfileByUsername(username);
-    if (!result.success || !result.data) throw new NotFoundException('Profile not found');
-    return result;
+    const profileResult = await ProfileService.getPublicProfileByUsername(username);
+    if (!profileResult.success || !profileResult.data) {
+      throw new NotFoundException('Profile not found');
+    }
+
+    if (type === 'profile') {
+      return profileResult;
+    }
+
+    // gigs, reviews, full — stub responses until Phase 2 collections are created
+    const base = profileResult.data;
+    if (type === 'gigs') {
+      return { success: true, data: { ...base, gigs: [] } };
+    }
+    if (type === 'reviews') {
+      return { success: true, data: { ...base, reviews: [] } };
+    }
+    if (type === 'full') {
+      return { success: true, data: { ...base, gigs: [], reviews: [] } };
+    }
+
+    return profileResult;
   }
 }

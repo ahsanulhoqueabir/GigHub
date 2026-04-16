@@ -1,9 +1,8 @@
-import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import directusApi from '@/utils/directus.api';
 import { successResponse, errorResponse } from '@/utils/service-response';
 import type { ServiceResponse } from '@/types/services/common.types';
 import type { Profile, PublicProfile } from '@/types/profile.types';
-import type { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class ProfileService {
@@ -59,12 +58,18 @@ export class ProfileService {
 
   static async updateBasicInfo(
     id: string,
-    dto: Partial<Pick<Profile, 'display_name' | 'username' | 'bio' | 'skills' | 'availability_status'>>,
+    dto: Partial<
+      Pick<Profile, 'display_name' | 'username' | 'bio' | 'skills' | 'availability_status'>
+    >,
   ): Promise<ServiceResponse<Profile>> {
     try {
+      const payload: Record<string, unknown> = { ...dto };
+      if (dto.username) {
+        payload['username_updated_at'] = new Date().toISOString();
+      }
       const { data } = await directusApi.patch<{ data: Profile }>(
         `/items/${ProfileService.COLLECTION}/${id}`,
-        dto,
+        payload,
       );
       return successResponse(data.data);
     } catch (error) {
@@ -75,11 +80,12 @@ export class ProfileService {
   static async updateAvatar(
     id: string,
     avatarUrl: string,
+    avatarKey: string,
   ): Promise<ServiceResponse<Profile>> {
     try {
       const { data } = await directusApi.patch<{ data: Profile }>(
         `/items/${ProfileService.COLLECTION}/${id}`,
-        { avatar: avatarUrl },
+        { avatar: avatarUrl, avatar_key: avatarKey },
       );
       return successResponse(data.data);
     } catch (error) {
@@ -87,10 +93,7 @@ export class ProfileService {
     }
   }
 
-  static async updateFcmToken(
-    id: string,
-    fcmToken: string,
-  ): Promise<ServiceResponse<Profile>> {
+  static async updateFcmToken(id: string, fcmToken: string): Promise<ServiceResponse<Profile>> {
     try {
       const { data } = await directusApi.patch<{ data: Profile }>(
         `/items/${ProfileService.COLLECTION}/${id}`,
@@ -114,6 +117,22 @@ export class ProfileService {
       return successResponse(data.data);
     } catch (error) {
       return errorResponse('Failed to update notification preferences', error);
+    }
+  }
+
+  static async canChangeUsername(id: string): Promise<boolean> {
+    try {
+      const { data } = await directusApi.get<{ data: Profile }>(
+        `/items/${ProfileService.COLLECTION}/${id}`,
+        { params: { fields: 'username_updated_at' } },
+      );
+      const lastChanged = data.data?.username_updated_at;
+      if (!lastChanged) return true;
+
+      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+      return Date.now() - new Date(lastChanged).getTime() >= THIRTY_DAYS_MS;
+    } catch {
+      return true; // Fail open: allow change if check fails
     }
   }
 

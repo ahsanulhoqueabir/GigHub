@@ -7,6 +7,7 @@ export interface Profile {
   username: string;
   email: string;
   avatar: string | null;
+  avatar_key: string | null;
   bio: string | null;
   skills: string[];
   availability_status: AvailabilityStatus;
@@ -17,6 +18,7 @@ export interface Profile {
   total_reviews: number;
   fcm_token: string | null;
   notification_prefs: Record<string, boolean>;
+  username_updated_at: string | null;
   created_at: string;
   updated_at: string;
 }

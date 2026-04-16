@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import {
@@ -12,10 +6,9 @@ import {
   LoginDto,
   RefreshTokenDto,
   ForgotPasswordDto,
+  ResetPasswordDto,
 } from './dto/auth.dto';
 import { Public } from '@/common/decorators/public.decorator';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import type { JwtPayload } from '@/types/auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -45,7 +38,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@CurrentUser() _user: JwtPayload) {
+  logout() {
     // Stateless JWT: client discards token.
     // Extend here to maintain a token blacklist if needed.
     return { success: true, message: 'Logged out successfully' };
@@ -58,6 +51,16 @@ export class AuthController {
     return this.authService.forgotPassword(dto.email).then(() => ({
       success: true,
       message: 'If that email exists, a reset link has been sent',
+    }));
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.oob_code, dto.new_password).then(() => ({
+      success: true,
+      message: 'Password reset successfully',
     }));
   }
 }
