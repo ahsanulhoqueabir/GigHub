@@ -20,7 +20,7 @@ import { UserRole } from '@/types/auth.types';
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  private static readonly COLLECTION = 'gh_profiles';
+  private readonly collection = 'gh_profiles';
 
   constructor(
     private readonly firebase: FirebaseService,
@@ -30,7 +30,7 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<AuthTokens> {
     // 1. Check username uniqueness
-    const existing = await this.findProfileByUsername(dto.username);
+    const existing = await this.findByUsername(dto.username);
     if (existing) {
       throw new ConflictException('Username already taken');
     }
@@ -50,20 +50,17 @@ export class AuthService {
     // 3. Create gh_profiles record in Directus
     let profile: Profile;
     try {
-      const { data } = await directusApi.post<{ data: Profile }>(
-        `/items/${AuthService.COLLECTION}`,
-        {
-          id: uuidv4(),
-          firebase_uid: firebaseUser.uid,
-          email: dto.email,
-          display_name: dto.display_name,
-          username: dto.username,
-          role: UserRole.STUDENT,
-          availability_status: 'available',
-          skills: [],
-          notification_prefs: {},
-        },
-      );
+      const { data } = await directusApi.post<{ data: Profile }>(`/items/${this.collection}`, {
+        id: uuidv4(),
+        firebase_uid: firebaseUser.uid,
+        email: dto.email,
+        display_name: dto.display_name,
+        username: dto.username,
+        role: UserRole.STUDENT,
+        availability_status: 'available',
+        skills: [],
+        notification_prefs: {},
+      });
       profile = data.data;
     } catch (err) {
       // Rollback Firebase user if Directus write fails
@@ -81,7 +78,7 @@ export class AuthService {
 
     if (dto.provider === 'password') {
       // Authenticate via Firebase Auth REST API
-      const result = await this.authenticateWithPassword(dto.email!, dto.password!);
+      const result = await this.authWithPassword(dto.email!, dto.password!);
       firebaseUid = result.localId;
       email = dto.email;
     } else if (dto.provider === 'google') {
@@ -96,7 +93,7 @@ export class AuthService {
     }
 
     // Find or create profile
-    const profile = await this.findOrCreateProfile(firebaseUid, email);
+    const profile = await this.findOrCreate(firebaseUid, email);
 
     return this.issueTokens(profile);
   }
@@ -111,7 +108,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    const profile = await this.findProfileById(payload.profile_id);
+    const profile = await this.findById(payload.profile_id);
     if (!profile) {
       throw new UnauthorizedException('Profile not found');
     }
@@ -140,10 +137,7 @@ export class AuthService {
 
   // ─── Private Helpers ─────────────────────────────────────────────────────
 
-  private async authenticateWithPassword(
-    email: string,
-    password: string,
-  ): Promise<{ localId: string }> {
+  private async authWithPassword(email: string, password: string): Promise<{ localId: string }> {
     const apiKey = this.config.get<string>('firebase.apiKey');
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
 
@@ -159,14 +153,14 @@ export class AuthService {
     }
   }
 
-  private async findOrCreateProfile(firebaseUid: string, email?: string): Promise<Profile> {
+  private async findOrCreate(firebaseUid: string, email?: string): Promise<Profile> {
     // Try to find existing profile
-    const existing = await this.findProfileByFirebaseUid(firebaseUid);
+    const existing = await this.findByUid(firebaseUid);
     if (existing) return existing;
 
     // Auto-create profile for social login first-time users
     const username = `user_${uuidv4().split('-')[0]}`;
-    const { data } = await directusApi.post<{ data: Profile }>(`/items/${AuthService.COLLECTION}`, {
+    const { data } = await directusApi.post<{ data: Profile }>(`/items/${this.collection}`, {
       id: uuidv4(),
       firebase_uid: firebaseUid,
       email: email ?? '',
@@ -180,35 +174,28 @@ export class AuthService {
     return data.data;
   }
 
-  private async findProfileByFirebaseUid(uid: string): Promise<Profile | null> {
+  private async query<T>(params: Record<string, unknown>): Promise<T | null> {
     try {
-      const { data } = await directusApi.get<{ data: Profile[] }>(
-        `/items/${AuthService.COLLECTION}`,
-        { params: { filter: { firebase_uid: { _eq: uid } }, limit: 1 } },
-      );
-      return data.data[0] ?? null;
+      const { data } = await directusApi.get<{ data: T[] }>(`/items/${this.collection}`, {
+        params: { ...params, limit: 1 },
+      });
+      return (data.data[0] as T) ?? null;
     } catch {
       return null;
     }
   }
 
-  private async findProfileByUsername(username: string): Promise<Profile | null> {
-    try {
-      const { data } = await directusApi.get<{ data: Profile[] }>(
-        `/items/${AuthService.COLLECTION}`,
-        { params: { filter: { username: { _eq: username } }, limit: 1 } },
-      );
-      return data.data[0] ?? null;
-    } catch {
-      return null;
-    }
+  private async findByUid(uid: string): Promise<Profile | null> {
+    return this.query<Profile>({ filter: { firebase_uid: { _eq: uid } } });
   }
 
-  private async findProfileById(id: string): Promise<Profile | null> {
+  private async findByUsername(username: string): Promise<Profile | null> {
+    return this.query<Profile>({ filter: { username: { _eq: username } } });
+  }
+
+  private async findById(id: string): Promise<Profile | null> {
     try {
-      const { data } = await directusApi.get<{ data: Profile }>(
-        `/items/${AuthService.COLLECTION}/${id}`,
-      );
+      const { data } = await directusApi.get<{ data: Profile }>(`/items/${this.collection}/${id}`);
       return data.data ?? null;
     } catch {
       return null;
