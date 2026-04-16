@@ -54,40 +54,77 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 
 To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
 
-1.  **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` -> `ProfileService`).
-2.  **Centralized API Client**: Use the centralized `directusApi` (axios instance) for all Directus communication. Do NOT manually create axios instances in services.
-3.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication.
-4.  **Standardized Returns**: EVERY service method MUST return a `ServiceResponse<T>` using `successResponse()` or `errorResponse()` helpers for consistent debugging and error handling.
-5.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
-6.  **Type Organization**: ALL types MUST be centralized in `src/types/` (e.g., `src/types/profile.types.ts`).
+1. **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` → `ProfileService`).
+2. **Centralized API Client**: Use the centralized `directusApi` (axios instance) for all Directus communication. Do NOT manually create axios instances in services.
+3. **Instance-Based Services**: Services are NestJS `@Injectable()` classes. Use `private readonly collection` (lowercase) and `async` instance methods. Controllers inject the service via constructor DI — never call static methods.
+4. **`fields()` Utility**: If a service queries the same field list in more than one method, define a `private fields(): string` method returning `[...].join(',')` and call it via `this.fields()`.
+5. **Shared Query Helper**: For repeated list-query patterns (e.g., filter + limit: 1), extract a `private async query<T>()` helper to eliminate duplicated try/catch blocks.
+6. **Patch Helper**: For services with multiple PATCH operations on the same collection, extract a `private async patch(id, payload, errMsg)` helper.
+7. **Standardized Returns**: EVERY service method MUST return a `ServiceResponse<T>` using `ok()` or `fail()` helpers from `@/utils/service-response`. Never throw inside a service method — always return a `fail()`.
+8. **Concise Method Names**: Use single-concept verbs. Prefer `get`, `find`, `list`, `update`, `set*`, `remove`, `create` over long compound names like `getProfileById` or `updateBasicInfo`.
+9. **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, inject `Service B` via NestJS DI and call its instance methods.
+10. **Type Organization**: ALL types MUST be centralized in `src/types/` (e.g., `src/types/profile.types.ts`).
 
 **Service Example (Standard Pattern):**
 
 ```typescript
+import { Injectable } from "@nestjs/common";
 import directusApi from "@/utils/directus.api";
-import { successResponse, errorResponse } from "@/utils/service-response";
+import { ok, fail } from "@/utils/service-response";
 import type { ServiceResponse } from "@/types/services/common.types";
 import type { Profile } from "@/types/profile.types";
 
+@Injectable()
 export class ProfileService {
-  private static collection = "tb_profiles"; // Standardized prefix
+  private readonly collection = "gh_profiles";
 
-  static async getProfileById(id: string): Promise<ServiceResponse<Profile>> {
+  private fields(): string {
+    return ["id", "display_name", "username", "avatar", "bio"].join(",");
+  }
+
+  private async patch(
+    id: string,
+    payload: Record<string, unknown>,
+    errMsg: string,
+  ): Promise<ServiceResponse<Profile>> {
     try {
-      const { data } = await directusApi.get(
+      const { data } = await directusApi.patch<{ data: Profile }>(
         `/items/${this.collection}/${id}`,
-        {
-          params: {
-            fields: ["id", "display_name", "username", "avatar"].join(","),
-          },
-        },
+        payload,
       );
-      return successResponse(data.data);
+      return ok(data.data);
     } catch (error) {
-      return errorResponse("Failed to fetch profile", error);
+      return fail(errMsg, error);
     }
   }
+
+  async get(id: string): Promise<ServiceResponse<Profile>> {
+    try {
+      const { data } = await directusApi.get<{ data: Profile }>(
+        `/items/${this.collection}/${id}`,
+        { params: { fields: this.fields() } },
+      );
+      return ok(data.data);
+    } catch (error) {
+      return fail("Failed to fetch profile", error);
+    }
+  }
+
+  async update(
+    id: string,
+    dto: Partial<Profile>,
+  ): Promise<ServiceResponse<Profile>> {
+    return this.patch(id, { ...dto }, "Failed to update profile");
+  }
 }
+```
+
+**Service Response Helpers (`src/utils/service-response.ts`):**
+
+```typescript
+ok(data, message?)      // → { success: true, data, message }
+fail(message, err?, status?) // → { success: false, error, details, status }
+paginated(data, pagination, message?) // → { success: true, data, pagination, message }
 ```
 
 - [ ] **1.1.3** Install core dependencies:
@@ -178,8 +215,8 @@ export class ProfileService {
 ### 1.5 Profile Module
 
 - [ ] **1.5.1** Create `ProfileModule` with:
-  - `ProfileService` — Static methods for `gh_profiles` CRUD
-  - `ProfileController` — REST endpoints
+  - `ProfileService` — instance methods for `gh_profiles` CRUD
+  - `ProfileController` — REST endpoints (injects `ProfileService` via constructor)
   - `src/types/profile.types.ts` — Profile interfaces and enums
   - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
 - [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
@@ -197,8 +234,8 @@ export class ProfileService {
 ### 1.6 Cloudflare R2 Upload Module
 
 - [ ] **1.6.1** Create `UploadModule` with:
-  - `UploadService` — R2 operations via AWS S3 SDK
-  - `UploadController` — REST endpoints
+  - `UploadService` — instance methods for R2 operations via AWS S3 SDK (`image()`, `file()`, `base64()`, `remove()`)
+  - `UploadController` — REST endpoints (injects `UploadService` via constructor)
 - [ ] **1.6.2** Configure S3 client for R2:
   ```typescript
   new S3Client({
@@ -235,8 +272,9 @@ export class ProfileService {
   - Response interceptor for detailed error logging (status, message, url, method).
   - Enhanced error messages for "Server not responding" or specific Directus errors.
 - [ ] **1.7.2** Implement **Service Response Helpers** (`src/utils/service-response.ts`):
-  - `successResponse<T>(data: T, message?: string)`: Returns `{ success: true, data, message }`.
-  - `errorResponse(message, err, status)`: Returns `{ success: false, error, details, status }`.
+  - `ok<T>(data: T, message?: string)`: Returns `{ success: true, data, message }`.
+  - `fail(message, err?, status?)`: Returns `{ success: false, error, details, status }`.
+  - `paginated<T>(data, pagination, message?)`: Returns paginated success response.
 - [ ] **1.7.3** Define **Service Types** (`src/types/services/common.types.ts`):
   - `ServiceResponse<T>`: Base interface for all service returns.
   - `ServicePagination`: `currentPage`, `totalPages`, `totalCount`, `hasNextPage`, `hasPrevPage`.

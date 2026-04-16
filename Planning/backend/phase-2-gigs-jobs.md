@@ -17,8 +17,8 @@ Build the core marketplace features: the Fiverr-style gig system (with packages,
 ### 2.1 Categories Module (Complete)
 
 - [ ] **2.1.1** Create `CategoryModule` with:
-  - `CategoryService` — Static methods for `gh_categories` CRUD
-  - `CategoryController` — REST endpoints
+  - `CategoryService` — instance methods for `gh_categories` CRUD (`list()`, `find(slug)`)
+  - `CategoryController` — REST endpoints (injects `CategoryService` via constructor)
   - `src/types/category.types.ts` — Category interfaces and enums
 - [ ] **2.1.2** Implement `GET /categories` — list all active categories (public, cached)
 - [ ] **2.1.3** Implement `POST /categories` — admin-only: create new category
@@ -49,8 +49,8 @@ Build the core marketplace features: the Fiverr-style gig system (with packages,
 ### 2.3 Gigs Module
 
 - [ ] **2.3.1** Create `GigModule` with:
-  - `GigService` — Static methods for `gh_gigs` and `gh_gig_packages` logic
-  - `GigController` — REST endpoints
+  - `GigService` — instance methods for `gh_gigs` and `gh_gig_packages` logic
+  - `GigController` — REST endpoints (injects `GigService` via constructor)
   - `src/types/gig.types.ts` — Gig, Package, and Image interfaces
   - DTOs: `CreateGigDto`, `UpdateGigDto`, `GigQueryDto`, `GigResponseDto`, `GigDetailResponseDto`
 
@@ -103,8 +103,8 @@ Build the core marketplace features: the Fiverr-style gig system (with packages,
 ### 2.4 Jobs Module
 
 - [ ] **2.4.1** Create `JobModule` with:
-  - `JobService` — Static methods for `gh_jobs` logic
-  - `JobController` — REST endpoints
+  - `JobService` — instance methods for `gh_jobs` logic
+  - `JobController` — REST endpoints (injects `JobService` via constructor)
   - `src/types/job.types.ts` — Job interfaces and enums
   - DTOs: `CreateJobDto`, `UpdateJobDto`, `JobQueryDto`, `JobResponseDto`
 
@@ -165,8 +165,8 @@ Build the core marketplace features: the Fiverr-style gig system (with packages,
 ### 2.5 Proposals Module
 
 - [ ] **2.5.1** Create `ProposalModule` with:
-  - `ProposalService` — Static methods for `gh_proposals` logic
-  - `ProposalController` — REST endpoints
+  - `ProposalService` — instance methods for `gh_proposals` logic
+  - `ProposalController` — REST endpoints (injects `ProposalService` via constructor)
   - `src/types/proposal.types.ts` — Proposal interfaces and enums
   - DTOs: `CreateProposalDto`, `ProposalResponseDto`
 

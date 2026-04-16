@@ -29,8 +29,8 @@ Complete the MVP by building the review system (including tuition-specific ratin
 ### 5.2 Reviews Module
 
 - [ ] **5.2.1** Create `ReviewModule` with:
-  - `ReviewService` — Static methods for `gh_reviews` logic
-  - `ReviewController` — REST endpoints
+  - `ReviewService` — instance methods for `gh_reviews` logic
+  - `ReviewController` — REST endpoints (injects `ReviewService` via constructor)
   - `src/types/review.types.ts` — Review interfaces and enums
   - DTOs: `CreateReviewDto`, `ReviewResponseDto`, `ReviewResponseReplyDto`
 
@@ -92,8 +92,8 @@ Complete the MVP by building the review system (including tuition-specific ratin
 ### 5.3 Bookmarks Module
 
 - [ ] **5.3.1** Create `BookmarkModule` with:
-  - `BookmarkService` — Static methods for `gh_bookmarks` logic
-  - `BookmarkController` — REST endpoints
+  - `BookmarkService` — instance methods for `gh_bookmarks` logic
+  - `BookmarkController` — REST endpoints (injects `BookmarkService` via constructor)
   - `src/types/bookmark.types.ts` — Bookmark interfaces and enums
 
 - [ ] **5.3.2** Implement `POST /bookmarks` — Add bookmark:
@@ -110,8 +110,8 @@ Complete the MVP by building the review system (including tuition-specific ratin
 ### 5.4 Reports Module
 
 - [ ] **5.4.1** Create `ReportModule` with:
-  - `ReportService` — Static methods for `gh_reports` logic
-  - `ReportController` — REST endpoints
+  - `ReportService` — instance methods for `gh_reports` logic
+  - `ReportController` — REST endpoints (injects `ReportService` via constructor)
   - `src/types/report.types.ts` — Report interfaces and enums
 
 - [ ] **5.4.2** Implement `POST /reports` — Submit report:
@@ -125,8 +125,8 @@ Complete the MVP by building the review system (including tuition-specific ratin
 ### 5.5 Admin Module
 
 - [ ] **5.5.1** Create `AdminModule` with:
-  - `AdminService` — Static methods for admin business logic
-  - `AdminController` — admin REST endpoints
+  - `AdminService` — instance methods for admin business logic
+  - `AdminController` — admin REST endpoints (injects `AdminService` via constructor)
   - `src/types/admin.types.ts` — Admin stats and management interfaces
   - Apply `RolesGuard('admin')` to all routes
 

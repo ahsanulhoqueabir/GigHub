@@ -34,9 +34,9 @@ This phase also covers the tuition-request acceptance chat handoff (accepted tui
 ### 4.2 Chat Module — REST Endpoints
 
 - [ ] **4.2.1** Create `ChatModule` with:
-  - `ConversationService` — Static methods for `gh_conversations` logic
-  - `MessageService` — Static methods for `gh_messages` logic
-  - `ChatController` — REST endpoints
+  - `ConversationService` — instance methods for `gh_conversations` logic
+  - `MessageService` — instance methods for `gh_messages` logic
+  - `ChatController` — REST endpoints (injects services via constructor)
   - `ChatGateway` — Socket.IO WebSocket gateway
   - `src/types/conversation.types.ts` — Conversation interfaces
   - `src/types/message.types.ts` — Message interfaces
@@ -156,10 +156,10 @@ This phase also covers the tuition-request acceptance chat handoff (accepted tui
 ### 4.5 Notification Module
 
 - [ ] **4.5.1** Create `NotificationModule` with:
-  - `NotificationService` — Static methods for `gh_notifications` logic
-  - `NotificationController` — REST endpoints
-  - `PushNotificationService` — FCM integration (static methods)
-  - `EmailNotificationService` — transactional emails (static methods)
+  - `NotificationService` — instance methods for `gh_notifications` logic
+  - `NotificationController` — REST endpoints (injects `NotificationService` via constructor)
+  - `PushNotificationService` — FCM integration (injectable NestJS service)
+  - `EmailNotificationService` — transactional emails (injectable NestJS service)
   - `src/types/notification.types.ts` — Notification interfaces and enums
 
 #### In-App Notifications

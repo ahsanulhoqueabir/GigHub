@@ -47,8 +47,8 @@ Tuition listings are explicitly out of payment and escrow flow. They stay free a
 ### 3.3 Orders Module
 
 - [ ] **3.3.1** Create `OrderModule` with:
-  - `OrderService` — Static methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
-  - `OrderController` — REST endpoints
+  - `OrderService` — instance methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
+  - `OrderController` — REST endpoints (injects `OrderService` via constructor)
   - `src/types/order.types.ts` — Order, Milestone, and Delivery interfaces
   - DTOs: `CreateGigOrderDto`, `CreateJobOrderDto`, `OrderQueryDto`, `DeliverDto`, `RevisionDto`
 
@@ -117,9 +117,9 @@ Tuition listings are explicitly out of payment and escrow flow. They stay free a
 ### 3.4 Payments Module (SSLCommerz)
 
 - [ ] **3.4.1** Create `PaymentModule` with:
-  - `PaymentService` — Static methods for `gh_transactions` and payment processing logic
-  - `PaymentController` — REST endpoints + webhooks
-  - `SslcommerzService` — SSLCommerz API wrapper (static methods)
+  - `PaymentService` — instance methods for `gh_transactions` and payment processing logic
+  - `PaymentController` — REST endpoints + webhooks (injects `PaymentService` via constructor)
+  - `SslcommerzService` — SSLCommerz API wrapper (injectable NestJS service)
   - `src/types/payment.types.ts` — Transaction and payment session interfaces
 
 - [ ] **3.4.2** Implement SSLCommerz integration:
@@ -179,7 +179,7 @@ Tuition listings are explicitly out of payment and escrow flow. They stay free a
 ### 3.5 Escrow Module
 
 - [ ] **3.5.1** Create `EscrowModule` with:
-  - `EscrowService` — Static methods for `gh_escrow` logic
+  - `EscrowService` — instance methods for `gh_escrow` logic
   - `src/types/escrow.types.ts` — Escrow status and interfaces
 
 - [ ] **3.5.2** Implement escrow hold:
@@ -210,8 +210,8 @@ Tuition listings are explicitly out of payment and escrow flow. They stay free a
 ### 3.6 Withdrawals Module
 
 - [ ] **3.6.1** Create `WithdrawalModule` with:
-  - `WithdrawalService` — Static methods for `gh_withdrawals` logic
-  - `WithdrawalController` — REST endpoints
+  - `WithdrawalService` — instance methods for `gh_withdrawals` logic
+  - `WithdrawalController` — REST endpoints (injects `WithdrawalService` via constructor)
   - `src/types/withdrawal.types.ts` — Withdrawal interfaces and enums
 
 - [ ] **3.6.2** Implement `POST /withdrawals` — Request withdrawal:
