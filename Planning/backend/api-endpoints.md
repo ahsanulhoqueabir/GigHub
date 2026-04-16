@@ -33,21 +33,20 @@
 ## Common Response Format
 
 ```json
-// Success
+// Success Response
 {
   "success": true,
   "data": { ... },
-  "meta": { "page": 1, "limit": 20, "total": 100, "totalPages": 5 }
+  "message": "Operation successful (optional)",
+  "meta": { "page": 1, "limit": 20, "total": 100, "totalPages": 5 } // For paginated lists
 }
 
-// Error
+// Error Response
 {
   "success": false,
-  "error": {
-    "code": "VALIDATION_ERROR",
-    "message": "Human-readable error message",
-    "details": [ ... ]
-  }
+  "error": "Error title or code",
+  "details": "Detailed error message or object",
+  "status": 400
 }
 ```
 
@@ -203,7 +202,6 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `GET`   | `/profiles/me`        | Protected | Get current user's profile         |
 | `PATCH` | `/profiles/me`        | Protected | Consolidated: Update profile/prefs |
 | `GET`   | `/profiles/:username` | Public    | Consolidated: Get profile + extras |
-| `PATCH` | `/profiles/me/avatar` | Protected | (Optional) direct upload           |
 
 > **Note:** `/profiles/me` PATCH now expects a `type` payload to handle specific updates (basic info, fcm-token, notification-prefs, etc.). Same logic for GET with `?type=...` query param.
 
@@ -247,11 +245,11 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
   }
 }
 
-// Type: avatar (Update avatar URL)
+// Type: avatar (Upload avatar via Base64)
 {
   "type": "avatar",
   "data": {
-    "avatar_url": "https://r2.gighub.app/avatars/uuid.jpg"
+    "file": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
   }
 }
 
@@ -443,7 +441,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
       "total_reviews": 12
     },
     "packages": [ ... ],
-    "images": [ { "id": "uuid", "image_url": "...", "sort_order": 0 } ],
+    "images": [ { "url": "...", "sort_order": 0 } ],
     "tags": ["logo", "branding"],
     "avg_rating": 4.90,
     "total_reviews": 8,

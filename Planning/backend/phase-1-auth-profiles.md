@@ -55,24 +55,31 @@ Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuanc
 To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
 
 1.  **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` -> `ProfileService`).
-2.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication via Directus REST API.
-3.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
-4.  **Auth Exception**: `AuthService` handles multi-provider logic (Firebase + JWT) and isn't tied to a single collection, but uses other services (like `ProfileService`) for DB operations.
-5.  **Type Organization**: ALL types MUST be centralized in `src/types/` as independent files (e.g., `src/types/profile.types.ts`). Services and controllers import from this central location. Types can be imported between type files if cross-domain definitions are needed.
+2.  **Centralized API Client**: Use the centralized `directusApi` (axios instance) for all Directus communication. Do NOT manually create axios instances in services.
+3.  **Static Logic Access**: Services use `private static collection` and `static async` methods for direct DB communication.
+4.  **Standardized Returns**: EVERY service method MUST return a `ServiceResponse<T>` using `successResponse()` or `errorResponse()` helpers for consistent debugging and error handling.
+5.  **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, it MUST import and call `Service B`'s static methods.
+6.  **Type Organization**: ALL types MUST be centralized in `src/types/` (e.g., `src/types/profile.types.ts`).
 
-**Service Example (REST API Pattern):**
+**Service Example (Standard Pattern):**
 ```typescript
-import axios from 'axios';
+import directusApi from '@/utils/directus.api';
+import { successResponse, errorResponse } from '@/utils/service-response';
+import type { ServiceResponse } from '@/types/services/common.types';
+import type { Profile } from '@/types/profile.types';
 
 export class ProfileService {
-  private static collection = "gh_profiles";
-  private static baseUrl = process.env.DIRECTUS_URL;
+  private static collection = "tb_profiles"; // Standardized prefix
 
-  static async getProfileById(id: string) {
-    const { data } = await axios.get(`${this.baseUrl}/items/${this.collection}/${id}`, {
-      params: { fields: ['id', 'display_name', 'username', 'avatar'].join(',') }
-    });
-    return data.data;
+  static async getProfileById(id: string): Promise<ServiceResponse<Profile>> {
+    try {
+      const { data } = await directusApi.get(`/items/${this.collection}/${id}`, {
+        params: { fields: ['id', 'display_name', 'username', 'avatar'].join(',') }
+      });
+      return successResponse(data.data);
+    } catch (error) {
+      return errorResponse("Failed to fetch profile", error);
+    }
   }
 }
 ```
@@ -86,7 +93,7 @@ export class ProfileService {
 - [ ] **1.1.4** Set up environment configuration module with validation:
   ```
   FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
-  DIRECTUS_URL, DIRECTUS_ADMIN_TOKEN
+  DIRECTUS_API_URL, DIRECTUS_TOKEN
   JWT_SECRET, JWT_EXPIRES_IN, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRES_IN
   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL
   SSLCOMMERZ_STORE_ID, SSLCOMMERZ_STORE_PASSWORD, SSLCOMMERZ_IS_SANDBOX
@@ -173,7 +180,7 @@ export class ProfileService {
 - [ ] **1.5.3** Implement `PATCH /profiles/me` — Consolidated update:
   - Expects `type` field in payload: `basic_info`, `avatar`, `fcm_token`, `notification_prefs`
   - Logic: Controller calls specific `ProfileService` function based on `type`
-  - Payload validation: DTO should validate `data` based on `type`
+  - Payload validation: DTO should validate `data` based on `type`. Specifically for `avatar`, accept Base64 string.
   - Username change (within `basic_info`): check uniqueness, limit frequency (once per 30 days)
 - [ ] **1.5.4** Implement `GET /profiles/:username` — Consolidated view:
   - Support `?type=...` query param: `profile` (default), `gigs`, `reviews`, `full`
@@ -210,28 +217,27 @@ export class ProfileService {
 - [ ] **1.6.5** Implement `DELETE /upload`:
   - Accept R2 key, delete from bucket
   - Verify the requesting user owns the resource (or is admin)
-- [ ] **1.6.6** Implement `PATCH /profiles/me/avatar`:
-  - Upload image to R2 under `avatars/` folder
+- [ ] **1.6.6** Implement Avatar upload integration in `PATCH /profiles/me` (type: avatar):
+  - Accept Base64 image payload (e.g., `data:image/png;base64,...`)
+  - Decode and upload to R2 under `avatars/` folder
   - Delete old avatar if exists
   - Update `gh_profiles.avatar` field in Directus
 
-### 1.7 Common Utilities
+### 1.7 Common Utilities & Infrastructure
 
-- [ ] **1.7.1** Create pagination utility:
-  ```typescript
-  // Input: page, limit from query
-  // Output: { offset, limit, buildMeta(total) }
-  ```
-- [ ] **1.7.2** Create slug generator utility:
-  ```typescript
-  // "I will design a logo" → "i-will-design-a-logo-abc123"
-  ```
-- [ ] **1.7.3** Create standard response wrapper interceptor:
-  ```typescript
-  { success: true, data: ..., meta: ... }
-  ```
-- [ ] **1.7.4** Create global exception filter with structured error responses
-- [ ] **1.7.5** Create Directus REST helper (URL builder for filter, sort, pagination)
+- [ ] **1.7.1** Implement **Directus API Client** (`src/utils/directus.api.ts`):
+  - Centralized axios instance with `baseURL` and `Authorization` headers.
+  - Response interceptor for detailed error logging (status, message, url, method).
+  - Enhanced error messages for "Server not responding" or specific Directus errors.
+- [ ] **1.7.2** Implement **Service Response Helpers** (`src/utils/service-response.ts`):
+  - `successResponse<T>(data: T, message?: string)`: Returns `{ success: true, data, message }`.
+  - `errorResponse(message, err, status)`: Returns `{ success: false, error, details, status }`.
+- [ ] **1.7.3** Define **Service Types** (`src/types/services/common.types.ts`):
+  - `ServiceResponse<T>`: Base interface for all service returns.
+  - `ServicePagination`: `currentPage`, `totalPages`, `totalCount`, `hasNextPage`, `hasPrevPage`.
+  - `PaginatedServiceResponse<T>`: Extends `ServiceResponse<T[]>` with `pagination` metadata.
+- [ ] **1.7.4** Create slug generator utility.
+- [ ] **1.7.5** Create global exception filter and response interceptor for NestJS.
 
 ### 1.8 Testing & Validation
 
@@ -258,7 +264,6 @@ export class ProfileService {
 | `GET`    | `/profiles/me`                    | 🔲     |
 | `PATCH`  | `/profiles/me`                    | 🔲     |
 | `GET`    | `/profiles/:username`             | 🔲     |
-| `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/image`                   | 🔲     |
 | `POST`   | `/upload/file`                    | 🔲     |
 | `DELETE` | `/upload`                         | 🔲     |
