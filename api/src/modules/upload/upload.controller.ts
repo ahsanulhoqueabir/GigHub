@@ -12,8 +12,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadService } from './upload.service';
-import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import type { JwtPayload } from '@/types/auth.types';
 import type { UploadFolder } from '@/types/upload.types';
 
 const ALLOWED_FOLDERS: UploadFolder[] = [
@@ -34,7 +32,6 @@ export class UploadController {
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
     @Query('folder') folder: UploadFolder = 'misc',
-    @CurrentUser() _user: JwtPayload,
   ) {
     if (!file) throw new BadRequestException('No file provided');
     if (!ALLOWED_FOLDERS.includes(folder)) {
@@ -54,7 +51,6 @@ export class UploadController {
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Query('folder') folder: UploadFolder = 'documents',
-    @CurrentUser() _user: JwtPayload,
   ) {
     if (!file) throw new BadRequestException('No file provided');
     if (!ALLOWED_FOLDERS.includes(folder)) {
@@ -70,7 +66,7 @@ export class UploadController {
   }
 
   @Delete()
-  async remove(@Body('key') key: string, @CurrentUser() _user: JwtPayload) {
+  async remove(@Body('key') key: string) {
     if (!key) throw new BadRequestException('key is required');
 
     const result = await this.uploadService.remove(key);
