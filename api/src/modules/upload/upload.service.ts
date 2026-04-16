@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
-import { successResponse, errorResponse } from '@/utils/service-response';
+import { ok, fail } from '@/utils/service-response';
 import type { ServiceResponse } from '@/types/services/common.types';
 import type { UploadResult, UploadFolder } from '@/types/upload.types';
 
@@ -39,14 +39,10 @@ export class UploadService {
     folder: UploadFolder,
   ): Promise<ServiceResponse<UploadResult>> {
     if (!this.allowedImageTypes.includes(file.mimetype)) {
-      return errorResponse(
-        'Invalid file type. Only JPG, PNG, and WebP are allowed.',
-        undefined,
-        400,
-      );
+      return fail('Invalid file type. Only JPG, PNG, and WebP are allowed.', undefined, 400);
     }
     if (file.size > this.maxImageSize) {
-      return errorResponse('File too large. Maximum size is 10MB.', undefined, 400);
+      return fail('File too large. Maximum size is 10MB.', undefined, 400);
     }
     return this.put(file.buffer, file.mimetype, folder, file.originalname);
   }
@@ -56,7 +52,7 @@ export class UploadService {
     folder: UploadFolder,
   ): Promise<ServiceResponse<UploadResult>> {
     if (file.size > this.maxFileSize) {
-      return errorResponse('File too large. Maximum size is 25MB.', undefined, 400);
+      return fail('File too large. Maximum size is 25MB.', undefined, 400);
     }
     return this.put(file.buffer, file.mimetype, folder, file.originalname);
   }
@@ -64,19 +60,19 @@ export class UploadService {
   async base64(base64Data: string, folder: UploadFolder): Promise<ServiceResponse<UploadResult>> {
     const match = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
     if (!match) {
-      return errorResponse('Invalid Base64 image format', undefined, 400);
+      return fail('Invalid Base64 image format', undefined, 400);
     }
 
     const mimeType = match[1];
     const base64 = match[2];
 
     if (!this.allowedImageTypes.includes(mimeType)) {
-      return errorResponse('Invalid image type', undefined, 400);
+      return fail('Invalid image type', undefined, 400);
     }
 
     const buffer = Buffer.from(base64, 'base64');
     if (buffer.length > this.maxImageSize) {
-      return errorResponse('Image too large. Maximum size is 10MB.', undefined, 400);
+      return fail('Image too large. Maximum size is 10MB.', undefined, 400);
     }
 
     const ext = mimeType.split('/')[1];
@@ -86,9 +82,9 @@ export class UploadService {
   async remove(key: string): Promise<ServiceResponse<void>> {
     try {
       await this.s3.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
-      return successResponse(undefined, 'File deleted successfully');
+      return ok(undefined, 'File deleted successfully');
     } catch (error) {
-      return errorResponse('Failed to delete file', error);
+      return fail('Failed to delete file', error);
     }
   }
 
@@ -112,9 +108,9 @@ export class UploadService {
       );
 
       const url = `${this.publicUrl}/${key}`;
-      return successResponse({ url, key });
+      return ok({ url, key });
     } catch (error) {
-      return errorResponse('Failed to upload file', error);
+      return fail('Failed to upload file', error);
     }
   }
 }

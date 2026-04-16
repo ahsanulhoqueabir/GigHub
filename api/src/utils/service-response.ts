@@ -1,15 +1,15 @@
 import { AxiosError } from 'axios';
-import type { ServiceResponse, PaginatedServiceResponse, ServicePagination } from '@/types/services/common.types';
+import type {
+  ServiceResponse,
+  PaginatedServiceResponse,
+  ServicePagination,
+} from '@/types/services/common.types';
 
-export function successResponse<T>(data: T, message?: string): ServiceResponse<T> {
+export function ok<T>(data: T, message?: string): ServiceResponse<T> {
   return { success: true, data, message };
 }
 
-export function errorResponse(
-  message: string,
-  err?: unknown,
-  status = 500,
-): ServiceResponse<never> {
+export function fail(message: string, err?: unknown, status = 500): ServiceResponse<never> {
   let details: unknown = undefined;
 
   if (err instanceof AxiosError) {
@@ -24,7 +24,7 @@ export function errorResponse(
   return { success: false, error: message, details, status };
 }
 
-export function paginatedResponse<T>(
+export function paginated<T>(
   data: T[],
   pagination: ServicePagination,
   message?: string,

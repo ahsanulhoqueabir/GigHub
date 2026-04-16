@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import directusApi from '@/utils/directus.api';
-import { successResponse, errorResponse } from '@/utils/service-response';
+import { ok, fail } from '@/utils/service-response';
 import type { ServiceResponse } from '@/types/services/common.types';
 import type { Category } from '@/types/category.types';
 
@@ -21,9 +21,9 @@ export class CategoryService {
           fields: this.fields(),
         },
       });
-      return successResponse(data.data);
+      return ok(data.data);
     } catch (error) {
-      return errorResponse('Failed to fetch categories', error);
+      return fail('Failed to fetch categories', error);
     }
   }
 
@@ -37,11 +37,11 @@ export class CategoryService {
         },
       });
       if (!data.data[0]) {
-        return errorResponse('Category not found', undefined, 404);
+        return fail('Category not found', undefined, 404);
       }
-      return successResponse(data.data[0]);
+      return ok(data.data[0]);
     } catch (error) {
-      return errorResponse('Failed to fetch category', error);
+      return fail('Failed to fetch category', error);
     }
   }
 }

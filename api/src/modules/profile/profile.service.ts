@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import directusApi from '@/utils/directus.api';
-import { successResponse, errorResponse } from '@/utils/service-response';
+import { ok, fail } from '@/utils/service-response';
 import type { ServiceResponse } from '@/types/services/common.types';
 import type { Profile, PublicProfile } from '@/types/profile.types';
 
@@ -34,18 +34,18 @@ export class ProfileService {
         `/items/${this.collection}/${id}`,
         payload,
       );
-      return successResponse(data.data);
+      return ok(data.data);
     } catch (error) {
-      return errorResponse(errMsg, error);
+      return fail(errMsg, error);
     }
   }
 
   async get(id: string): Promise<ServiceResponse<Profile>> {
     try {
       const { data } = await directusApi.get<{ data: Profile }>(`/items/${this.collection}/${id}`);
-      return successResponse(data.data);
+      return ok(data.data);
     } catch (error) {
-      return errorResponse('Failed to fetch profile', error);
+      return fail('Failed to fetch profile', error);
     }
   }
 
@@ -60,12 +60,12 @@ export class ProfileService {
       });
 
       if (!data.data[0]) {
-        return errorResponse('Profile not found', undefined, 404);
+        return fail('Profile not found', undefined, 404);
       }
 
-      return successResponse(data.data[0] as PublicProfile);
+      return ok(data.data[0] as PublicProfile);
     } catch (error) {
-      return errorResponse('Failed to fetch profile', error);
+      return fail('Failed to fetch profile', error);
     }
   }
 
