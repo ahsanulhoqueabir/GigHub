@@ -6,45 +6,58 @@ import type { Profile, PublicProfile } from '@/types/profile.types';
 
 @Injectable()
 export class ProfileService {
-  private static readonly COLLECTION = 'gh_profiles';
+  private readonly collection = 'gh_profiles';
 
-  static async getProfileById(id: string): Promise<ServiceResponse<Profile>> {
+  private fields(): string {
+    return [
+      'id',
+      'display_name',
+      'username',
+      'avatar',
+      'bio',
+      'skills',
+      'availability_status',
+      'is_verified',
+      'avg_rating',
+      'total_reviews',
+      'created_at',
+    ].join(',');
+  }
+
+  private async patch(
+    id: string,
+    payload: Record<string, unknown>,
+    errMsg: string,
+  ): Promise<ServiceResponse<Profile>> {
     try {
-      const { data } = await directusApi.get<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
+      const { data } = await directusApi.patch<{ data: Profile }>(
+        `/items/${this.collection}/${id}`,
+        payload,
       );
+      return successResponse(data.data);
+    } catch (error) {
+      return errorResponse(errMsg, error);
+    }
+  }
+
+  async get(id: string): Promise<ServiceResponse<Profile>> {
+    try {
+      const { data } = await directusApi.get<{ data: Profile }>(`/items/${this.collection}/${id}`);
       return successResponse(data.data);
     } catch (error) {
       return errorResponse('Failed to fetch profile', error);
     }
   }
 
-  static async getPublicProfileByUsername(
-    username: string,
-  ): Promise<ServiceResponse<PublicProfile>> {
+  async find(username: string): Promise<ServiceResponse<PublicProfile>> {
     try {
-      const { data } = await directusApi.get<{ data: Profile[] }>(
-        `/items/${ProfileService.COLLECTION}`,
-        {
-          params: {
-            filter: { username: { _eq: username } },
-            fields: [
-              'id',
-              'display_name',
-              'username',
-              'avatar',
-              'bio',
-              'skills',
-              'availability_status',
-              'is_verified',
-              'avg_rating',
-              'total_reviews',
-              'created_at',
-            ].join(','),
-            limit: 1,
-          },
+      const { data } = await directusApi.get<{ data: Profile[] }>(`/items/${this.collection}`, {
+        params: {
+          filter: { username: { _eq: username } },
+          fields: this.fields(),
+          limit: 1,
         },
-      );
+      });
 
       if (!data.data[0]) {
         return errorResponse('Profile not found', undefined, 404);
@@ -56,76 +69,44 @@ export class ProfileService {
     }
   }
 
-  static async updateBasicInfo(
+  async update(
     id: string,
     dto: Partial<
       Pick<Profile, 'display_name' | 'username' | 'bio' | 'skills' | 'availability_status'>
     >,
   ): Promise<ServiceResponse<Profile>> {
-    try {
-      const payload: Record<string, unknown> = { ...dto };
-      if (dto.username) {
-        payload['username_updated_at'] = new Date().toISOString();
-      }
-      const { data } = await directusApi.patch<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
-        payload,
-      );
-      return successResponse(data.data);
-    } catch (error) {
-      return errorResponse('Failed to update profile', error);
+    const payload: Record<string, unknown> = { ...dto };
+    if (dto.username) {
+      payload['username_updated_at'] = new Date().toISOString();
     }
+    return this.patch(id, payload, 'Failed to update profile');
   }
 
-  static async updateAvatar(
+  async setAvatar(
     id: string,
     avatarUrl: string,
     avatarKey: string,
   ): Promise<ServiceResponse<Profile>> {
-    try {
-      const { data } = await directusApi.patch<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
-        { avatar: avatarUrl, avatar_key: avatarKey },
-      );
-      return successResponse(data.data);
-    } catch (error) {
-      return errorResponse('Failed to update avatar', error);
-    }
+    return this.patch(id, { avatar: avatarUrl, avatar_key: avatarKey }, 'Failed to update avatar');
   }
 
-  static async updateFcmToken(id: string, fcmToken: string): Promise<ServiceResponse<Profile>> {
-    try {
-      const { data } = await directusApi.patch<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
-        { fcm_token: fcmToken },
-      );
-      return successResponse(data.data);
-    } catch (error) {
-      return errorResponse('Failed to update FCM token', error);
-    }
+  async setFcmToken(id: string, fcmToken: string): Promise<ServiceResponse<Profile>> {
+    return this.patch(id, { fcm_token: fcmToken }, 'Failed to update FCM token');
   }
 
-  static async updateNotificationPrefs(
-    id: string,
-    prefs: Record<string, boolean>,
-  ): Promise<ServiceResponse<Profile>> {
-    try {
-      const { data } = await directusApi.patch<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
-        { notification_prefs: prefs },
-      );
-      return successResponse(data.data);
-    } catch (error) {
-      return errorResponse('Failed to update notification preferences', error);
-    }
+  async setPrefs(id: string, prefs: Record<string, boolean>): Promise<ServiceResponse<Profile>> {
+    return this.patch(
+      id,
+      { notification_prefs: prefs },
+      'Failed to update notification preferences',
+    );
   }
 
-  static async canChangeUsername(id: string): Promise<boolean> {
+  async canRename(id: string): Promise<boolean> {
     try {
-      const { data } = await directusApi.get<{ data: Profile }>(
-        `/items/${ProfileService.COLLECTION}/${id}`,
-        { params: { fields: 'username_updated_at' } },
-      );
+      const { data } = await directusApi.get<{ data: Profile }>(`/items/${this.collection}/${id}`, {
+        params: { fields: 'username_updated_at' },
+      });
       const lastChanged = data.data?.username_updated_at;
       if (!lastChanged) return true;
 
@@ -136,16 +117,15 @@ export class ProfileService {
     }
   }
 
-  static async isUsernameTaken(username: string, excludeId?: string): Promise<boolean> {
+  async isTaken(username: string, excludeId?: string): Promise<boolean> {
     try {
       const filter: Record<string, unknown> = { username: { _eq: username } };
       if (excludeId) {
         filter['id'] = { _neq: excludeId };
       }
-      const { data } = await directusApi.get<{ data: Profile[] }>(
-        `/items/${ProfileService.COLLECTION}`,
-        { params: { filter, fields: 'id', limit: 1 } },
-      );
+      const { data } = await directusApi.get<{ data: Profile[] }>(`/items/${this.collection}`, {
+        params: { filter, fields: 'id', limit: 1 },
+      });
       return data.data.length > 0;
     } catch {
       return false;

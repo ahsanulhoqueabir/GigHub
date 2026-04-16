@@ -21,11 +21,14 @@ import type { ProfileViewType } from '@/types/profile.types';
 
 @Controller('profiles')
 export class ProfileController {
-  constructor(private readonly uploadService: UploadService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   @Get('me')
   async getMe(@CurrentUser() user: JwtPayload) {
-    const result = await ProfileService.getProfileById(user.profile_id);
+    const result = await this.profileService.get(user.profile_id);
     if (!result.success) throw new NotFoundException('Profile not found');
     return result;
   }
@@ -35,17 +38,17 @@ export class ProfileController {
     switch (dto.type) {
       case 'basic_info': {
         if (dto.username) {
-          const taken = await ProfileService.isUsernameTaken(dto.username, user.profile_id);
+          const taken = await this.profileService.isTaken(dto.username, user.profile_id);
           if (taken) throw new ConflictException('Username already taken');
 
           // Enforce 30-day username change limit
-          const canChange = await ProfileService.canChangeUsername(user.profile_id);
+          const canChange = await this.profileService.canRename(user.profile_id);
           if (!canChange) {
             throw new BadRequestException('Username can only be changed once every 30 days');
           }
         }
 
-        const result = await ProfileService.updateBasicInfo(user.profile_id, {
+        const result = await this.profileService.update(user.profile_id, {
           display_name: dto.display_name,
           username: dto.username,
           bio: dto.bio,
@@ -63,7 +66,7 @@ export class ProfileController {
         }
 
         // Get current avatar to delete old one
-        const current = await ProfileService.getProfileById(user.profile_id);
+        const current = await this.profileService.get(user.profile_id);
         const oldAvatarKey = current.data?.avatar_key ?? null;
 
         // Upload new avatar to R2
@@ -79,7 +82,7 @@ export class ProfileController {
         }
 
         // Update profile with new avatar URL and key
-        const result = await ProfileService.updateAvatar(
+        const result = await this.profileService.setAvatar(
           user.profile_id,
           upload.data!.url,
           upload.data!.key,
@@ -90,7 +93,7 @@ export class ProfileController {
 
       case 'fcm_token': {
         if (!dto.fcm_token) throw new BadRequestException('fcm_token is required');
-        const result = await ProfileService.updateFcmToken(user.profile_id, dto.fcm_token);
+        const result = await this.profileService.setFcmToken(user.profile_id, dto.fcm_token);
         if (!result.success) throw new InternalServerErrorException(result.error);
         return result;
       }
@@ -99,10 +102,7 @@ export class ProfileController {
         if (!dto.notification_prefs) {
           throw new BadRequestException('notification_prefs is required');
         }
-        const result = await ProfileService.updateNotificationPrefs(
-          user.profile_id,
-          dto.notification_prefs,
-        );
+        const result = await this.profileService.setPrefs(user.profile_id, dto.notification_prefs);
         if (!result.success) throw new InternalServerErrorException(result.error);
         return result;
       }
@@ -118,7 +118,7 @@ export class ProfileController {
     @Param('username') username: string,
     @Query('type') type: ProfileViewType = 'profile',
   ) {
-    const profileResult = await ProfileService.getPublicProfileByUsername(username);
+    const profileResult = await this.profileService.find(username);
     if (!profileResult.success || !profileResult.data) {
       throw new NotFoundException('Profile not found');
     }
