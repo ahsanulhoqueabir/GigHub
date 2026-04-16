@@ -21,12 +21,13 @@
 11. [Chat & Messaging](#11-chat--messaging)
 12. [Reviews](#12-reviews)
 13. [Notifications](#13-notifications)
-14. [Bookmarks](#14-bookmarks)
-15. [Reports](#15-reports)
-16. [Upload (R2)](#16-upload-r2)
-17. [Admin](#17-admin)
-18. [WebSocket Events](#18-websocket-events)
-19. [Common Patterns](#19-common-patterns)
+14. [Tuition Listings](#14-tuition-listings)
+15. [Bookmarks](#15-bookmarks)
+16. [Reports](#16-reports)
+17. [Upload (R2)](#17-upload-r2)
+18. [Admin](#18-admin)
+19. [WebSocket Events](#19-websocket-events)
+20. [Common Patterns](#20-common-patterns)
 
 ---
 
@@ -84,7 +85,7 @@
   "password": "securePassword123"
 }
 
-// Social provider (Google now, others later)
+// Social provider (Google)
 {
   "provider": "google",
   "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
@@ -97,9 +98,6 @@
 | ---------------- | ------------------- | ------------------------ |
 | `password`       | `email`, `password` | `firebase_id_token`      |
 | `google`         | `firebase_id_token` | `email`, `password`      |
-| `github`         | `firebase_id_token` | `email`, `password`      |
-| `microsoft`      | `firebase_id_token` | `email`, `password`      |
-| `apple`          | `firebase_id_token` | `email`, `password`      |
 
 If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
@@ -158,16 +156,6 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 // Request (Google)
 {
   "provider": "google",
-  "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
-}
-
-// Response 200 (same as above)
-```
-
-```json
-// Request (future third-party SSO example)
-{
-  "provider": "github",
   "firebase_id_token": "eyJhbGciOiJSUzI1NiIs..."
 }
 
@@ -233,6 +221,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ### PATCH `/profiles/me`
 
 **Payload Contract:**
+
 ```json
 // Type: basic_info (Update bio, display_name, etc.)
 {
@@ -275,7 +264,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 ### GET `/profiles/:username`
 
 **Query Parameters:**
-| Param  | Type   | Description                                                               |
+| Param | Type | Description |
 | ------ | ------ | ------------------------------------------------------------------------- |
 | `type` | string | `profile` (default), `gigs` (owner's gigs), `reviews` (received reviews), `full` |
 
@@ -286,7 +275,6 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
   "data": [ { "id": "uuid", "title": "Gig title", ... } ]
 }
 ```
-
 
 ---
 
@@ -328,18 +316,19 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ## 4. Gigs
 
-| Method   | Endpoint           | Auth              | Description                       |
-| -------- | ------------------ | ----------------- | --------------------------------- |
-| `GET`    | `/gigs`            | Public            | List/search gigs with filters     |
-| `GET`    | `/gigs/:slug`      | Public            | Get gig detail by slug            |
-| `POST`   | `/gigs`            | Protected         | Create new gig                    |
-| `PATCH`  | `/gigs/:id` | Protected (owner) | Consolidated: Update gig/status |
-| `DELETE` | `/gigs/:id` | Protected (owner) | Soft-delete gig                 |
-| `GET`    | `/gigs/me`  | Protected         | List current user's gigs        |
+| Method   | Endpoint      | Auth              | Description                     |
+| -------- | ------------- | ----------------- | ------------------------------- |
+| `GET`    | `/gigs`       | Public            | List/search gigs with filters   |
+| `GET`    | `/gigs/:slug` | Public            | Get gig detail by slug          |
+| `POST`   | `/gigs`       | Protected         | Create new gig                  |
+| `PATCH`  | `/gigs/:id`   | Protected (owner) | Consolidated: Update gig/status |
+| `DELETE` | `/gigs/:id`   | Protected (owner) | Soft-delete gig                 |
+| `GET`    | `/gigs/me`    | Protected         | List current user's gigs        |
 
 ### PATCH `/gigs/:id`
 
 **Payload Contract:**
+
 ```json
 // Type: edit (Standard update)
 {
@@ -470,7 +459,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | Param        | Type   | Description                                        |
 | ------------ | ------ | -------------------------------------------------- |
 | `category`   | string | Filter by category slug                            |
-| `job_type`   | string | Filter: paid, free, internship, volunteer, contest |
+| `job_type`   | string | Filter: paid, free, internship, volunteer, tuition |
 | `budget_min` | number | Minimum budget                                     |
 | `budget_max` | number | Maximum budget                                     |
 | `skills`     | string | Comma-separated required skills                    |
@@ -494,21 +483,24 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 }
 ```
 
+> Tuition Contract: create tuition listings using `job_type = tuition`. A tuition listing requires only `title` and `description`; budget/deadline are optional, and no payment/escrow flow is triggered.
+
 ---
 
 ## 6. Proposals
 
-| Method  | Endpoint                  | Auth                  | Description                 |
-| ------- | ------------------------- | --------------------- | --------------------------- |
-| `POST`  | `/jobs/:jobId/proposals`  | Protected             | Submit proposal for a job   |
-| `GET`   | `/jobs/:jobId/proposals`  | Protected (job owner) | List proposals for a job    |
-| `GET`   | `/proposals/me`           | Protected             | List my submitted proposals |
-| `GET`   | `/proposals/:id` | Protected             | Get proposal detail            |
-| `PATCH` | `/proposals/:id` | Protected (multiple)  | Consolidated: Action on proposal |
+| Method  | Endpoint                 | Auth                  | Description                      |
+| ------- | ------------------------ | --------------------- | -------------------------------- |
+| `POST`  | `/jobs/:jobId/proposals` | Protected             | Submit proposal for a job        |
+| `GET`   | `/jobs/:jobId/proposals` | Protected (job owner) | List proposals for a job         |
+| `GET`   | `/proposals/me`          | Protected             | List my submitted proposals      |
+| `GET`   | `/proposals/:id`         | Protected             | Get proposal detail              |
+| `PATCH` | `/proposals/:id`         | Protected (multiple)  | Consolidated: Action on proposal |
 
 ### PATCH `/proposals/:id`
 
 **Payload Contract:**
+
 ```json
 // Type: withdraw (Applicant)
 { "type": "withdraw" }
@@ -532,21 +524,24 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 }
 ```
 
+> Tuition Request Contract: for tuition listings, this endpoint acts as a session/contact request. Use `quoted_price = 0` or `null`.
+
 ---
 
 ## 7. Orders
 
-| Method  | Endpoint               | Auth                     | Description                         |
-| ------- | ---------------------- | ------------------------ | ----------------------------------- |
-| `POST`  | `/orders/gig`          | Protected                | Create order from gig package       |
-| `POST`  | `/orders/job`          | Protected                | Create order from accepted proposal |
-| `GET`   | `/orders`              | Protected                | List my orders (as buyer & seller)  |
-| `GET`   | `/orders/:id` | Protected (buyer/seller) | Get order detail             |
-| `PATCH` | `/orders/:id` | Protected (multiple)     | Consolidated: Action on order |
+| Method  | Endpoint      | Auth                     | Description                         |
+| ------- | ------------- | ------------------------ | ----------------------------------- |
+| `POST`  | `/orders/gig` | Protected                | Create order from gig package       |
+| `POST`  | `/orders/job` | Protected                | Create order from accepted proposal |
+| `GET`   | `/orders`     | Protected                | List my orders (as buyer & seller)  |
+| `GET`   | `/orders/:id` | Protected (buyer/seller) | Get order detail                    |
+| `PATCH` | `/orders/:id` | Protected (multiple)     | Consolidated: Action on order       |
 
 ### PATCH `/orders/:id`
 
 **Payload Contract:**
+
 ```json
 // Type: start (Seller)
 { "type": "start" }
@@ -660,6 +655,8 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ## 9. Payments & Escrow
 
+> Applies to paid transactions only. Tuition listings and tuition requests never enter payment or escrow flows.
+
 | Method | Endpoint                       | Auth             | Description                     |
 | ------ | ------------------------------ | ---------------- | ------------------------------- |
 | `POST` | `/payments/initiate`           | Protected        | Initiate payment via SSLCommerz |
@@ -689,6 +686,8 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
   }
 }
 ```
+
+> MVP fee policy: platform fee is fixed at 5% per paid transaction, capped at BDT 500.
 
 ### GET `/payments/transactions` — Query Parameters
 
@@ -732,13 +731,14 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 | `GET`   | `/conversations`              | Protected               | List my conversations                        |
 | `POST`  | `/conversations`              | Protected               | Start a new conversation (pre-order inquiry) |
 | `GET`   | `/conversations/:id`          | Protected (participant) | Get conversation with messages               |
-| `GET`   | `/conversations/:id/messages` | Protected (participant) | Paginated messages         |
-| `POST`  | `/conversations/:id/messages` | Protected (participant) | Send a message (REST fallback) |
-| `PATCH` | `/conversations/:id`          | Protected (participant) | Consolidated: Update convo     |
+| `GET`   | `/conversations/:id/messages` | Protected (participant) | Paginated messages                           |
+| `POST`  | `/conversations/:id/messages` | Protected (participant) | Send a message (REST fallback)               |
+| `PATCH` | `/conversations/:id`          | Protected (participant) | Consolidated: Update convo                   |
 
 ### PATCH `/conversations/:id`
 
 **Payload Contract:**
+
 ```json
 // Type: mark_read
 { "type": "mark_read" }
@@ -797,12 +797,13 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ## 12. Reviews
 
-| Method | Endpoint                   | Auth                 | Description                       |
-| ------ | -------------------------- | -------------------- | --------------------------------- |
-| `POST` | `/orders/:orderId/reviews` | Protected            | Submit review for completed order |
-| `GET`  | `/reviews/gig/:gigId`      | Public               | List reviews for a gig            |
-| `GET`  | `/reviews/user/:username`  | Public               | List reviews for a user           |
-| `POST` | `/reviews/:id/response`    | Protected (reviewee) | Respond to a review               |
+| Method | Endpoint                   | Auth                 | Description                                    |
+| ------ | -------------------------- | -------------------- | ---------------------------------------------- |
+| `POST` | `/orders/:orderId/reviews` | Protected            | Submit review for completed order              |
+| `POST` | `/tuition/:jobId/reviews`  | Protected            | Submit review for completed tuition engagement |
+| `GET`  | `/reviews/gig/:gigId`      | Public               | List reviews for a gig                         |
+| `GET`  | `/reviews/user/:username`  | Public               | List reviews for a user                        |
+| `POST` | `/reviews/:id/response`    | Protected (reviewee) | Respond to a review                            |
 
 ### POST `/orders/:orderId/reviews`
 
@@ -821,15 +822,16 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ## 13. Notifications
 
-| Method  | Endpoint                      | Auth      | Description                      |
-| ------- | ----------------------------- | --------- | -------------------------------- |
-| `GET`   | `/notifications`              | Protected | List my notifications            |
+| Method  | Endpoint                      | Auth      | Description                   |
+| ------- | ----------------------------- | --------- | ----------------------------- |
+| `GET`   | `/notifications`              | Protected | List my notifications         |
 | `GET`   | `/notifications/unread-count` | Protected | Get unread notification count |
-| `PATCH` | `/notifications`              | Protected | Consolidated: Read actions     |
+| `PATCH` | `/notifications`              | Protected | Consolidated: Read actions    |
 
 ### PATCH `/notifications`
 
 **Payload Contract:**
+
 ```json
 // Type: read_single
 { "type": "read_single", "id": "uuid" }
@@ -847,23 +849,38 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ---
 
-## 14. Bookmarks
+## 14. Tuition Listings
 
-| Method   | Endpoint           | Auth      | Description                   |
-| -------- | ------------------ | --------- | ----------------------------- |
-| `GET`    | `/bookmarks`     | Protected | Consolidated: List/Check bookmarks |
-| `POST`   | `/bookmarks`     | Protected | Add/Remove bookmark               |
+| Method  | Endpoint                   | Auth              | Description                             |
+| ------- | -------------------------- | ----------------- | --------------------------------------- |
+| `GET`   | `/tuition`                 | Public            | Browse/search tuition listings only     |
+| `GET`   | `/tuition/:slug`           | Public            | Get tuition listing detail              |
+| `POST`  | `/tuition/:jobId/requests` | Protected         | Send tuition contact/session request    |
+| `GET`   | `/tuition/:jobId/requests` | Protected (owner) | List tuition requests for listing owner |
+| `PATCH` | `/tuition/requests/:id`    | Protected (owner) | Accept/reject tuition request           |
+
+> These endpoints are aliases over the shared `jobs` + `proposals` model and are intentionally separated for product-level clarity.
+
+---
+
+## 15. Bookmarks
+
+| Method | Endpoint     | Auth      | Description                        |
+| ------ | ------------ | --------- | ---------------------------------- |
+| `GET`  | `/bookmarks` | Protected | Consolidated: List/Check bookmarks |
+| `POST` | `/bookmarks` | Protected | Add/Remove bookmark                |
 
 ### GET `/bookmarks`
 
 **Query Parameters:**
-| Param  | Type   | Description                                                     |
+| Param | Type | Description |
 | ------ | ------ | --------------------------------------------------------------- |
 | `type` | string | `list` (default), `check` (requires `entity_id` & `entity_type`) |
 
 ### POST `/bookmarks`
 
 **Payload Contract:**
+
 ```json
 // Type: add
 {
@@ -898,7 +915,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ---
 
-## 15. Reports
+## 16. Reports
 
 | Method | Endpoint      | Auth      | Description               |
 | ------ | ------------- | --------- | ------------------------- |
@@ -919,7 +936,7 @@ If `provider` is not in the allowlist, return `400 INVALID_PROVIDER`.
 
 ---
 
-## 16. Upload (R2)
+## 17. Upload (R2)
 
 | Method   | Endpoint        | Auth      | Description         |
 | -------- | --------------- | --------- | ------------------- |
@@ -951,7 +968,7 @@ folder: "avatars" | "gigs" | "chat" | "deliveries"
 
 ---
 
-## 17. Admin
+## 18. Admin
 
 > All admin endpoints require `role: admin` in JWT payload.
 
@@ -1006,7 +1023,7 @@ folder: "avatars" | "gigs" | "chat" | "deliveries"
 
 ---
 
-## 18. WebSocket Events
+## 19. WebSocket Events
 
 > **Namespace:** `/` (default)
 > **Auth:** Socket handshake includes `auth.token` (NestJS JWT)
@@ -1035,7 +1052,7 @@ folder: "avatars" | "gigs" | "chat" | "deliveries"
 
 ---
 
-## 19. Common Patterns
+## 20. Common Patterns
 
 ### Error Codes
 

@@ -1,14 +1,14 @@
-# Backend Phase 5 — Quality & Discovery: Reviews, Search, Admin & Polish
+# Backend Phase 5 — Quality & Discovery: Reviews, Tuition Trust, Search, Admin & Polish
 
 > **Duration Estimate:** 2 weeks
 > **Dependencies:** Phase 4 complete (all core features built)
-> **Outcomes:** Review system, advanced search, bookmarks, reports, admin panel, platform configuration
+> **Outcomes:** Review system (paid + tuition contexts), advanced search, bookmarks, reports, admin panel, platform configuration
 
 ---
 
 ## Phase Overview
 
-Complete the MVP by building the review system, optimizing search, adding bookmarks and reporting, implementing admin endpoints, and polishing the entire API for production readiness.
+Complete the MVP by building the review system (including tuition-specific rating separation), optimizing search, adding bookmarks and reporting, implementing admin endpoints, and polishing the entire API for production readiness.
 
 ---
 
@@ -29,8 +29,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.2 Reviews Module
 
 - [ ] **5.2.1** Create `ReviewModule` with:
-  - `ReviewService` — Static methods for `gh_reviews` logic
-  - `ReviewController` — REST endpoints
+  - `ReviewService` — instance methods for `gh_reviews` logic
+  - `ReviewController` — REST endpoints (injects `ReviewService` via constructor)
   - `src/types/review.types.ts` — Review interfaces and enums
   - DTOs: `CreateReviewDto`, `ReviewResponseDto`, `ReviewResponseReplyDto`
 
@@ -47,6 +47,13 @@ Complete the MVP by building the review system, optimizing search, adding bookma
      - Update `gh_profiles.avg_rating` and `total_reviews` for the reviewee
      - Update `gh_gigs.avg_rating` and `total_reviews` for the gig (if applicable)
   8. **Trigger notification** to reviewee
+
+- [ ] **5.2.2a** Implement `POST /tuition/:jobId/reviews` — Submit tuition review:
+  1. Validate listing exists and `job_type=tuition`
+  2. Validate requester and poster had an accepted tuition request/session
+  3. Enforce one review per party per tuition engagement
+  4. Store tuition review as a separate context from paid order reviews
+  5. Recalculate tuition-only aggregates on user profile fields dedicated to tuition trust
 
 - [ ] **5.2.3** Implement `GET /reviews/gig/:gigId` — List reviews for a gig:
   - Paginated, sorted by created_at desc
@@ -69,10 +76,12 @@ Complete the MVP by building the review system, optimizing search, adding bookma
   ```typescript
   async recalculateRatings(profile: string): Promise<void>
   async recalculateGigRatings(gig: string): Promise<void>
+  async recalculateTuitionRatings(profile: string): Promise<void>
   ```
 
-  - Calculate weighted average from all visible reviews
-  - Update profile and/or gig aggregate fields
+  - Calculate weighted average from all visible reviews by context
+  - Keep paid marketplace aggregates separate from tuition aggregates
+  - Update profile and/or gig aggregate fields accordingly
 
 - [ ] **5.2.7** Complete `GET /profiles/:username` (from Phase 1):
   - Now includes real avg_rating, total_reviews data
@@ -83,8 +92,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.3 Bookmarks Module
 
 - [ ] **5.3.1** Create `BookmarkModule` with:
-  - `BookmarkService` — Static methods for `gh_bookmarks` logic
-  - `BookmarkController` — REST endpoints
+  - `BookmarkService` — instance methods for `gh_bookmarks` logic
+  - `BookmarkController` — REST endpoints (injects `BookmarkService` via constructor)
   - `src/types/bookmark.types.ts` — Bookmark interfaces and enums
 
 - [ ] **5.3.2** Implement `POST /bookmarks` — Add bookmark:
@@ -101,8 +110,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.4 Reports Module
 
 - [ ] **5.4.1** Create `ReportModule` with:
-  - `ReportService` — Static methods for `gh_reports` logic
-  - `ReportController` — REST endpoints
+  - `ReportService` — instance methods for `gh_reports` logic
+  - `ReportController` — REST endpoints (injects `ReportService` via constructor)
   - `src/types/report.types.ts` — Report interfaces and enums
 
 - [ ] **5.4.2** Implement `POST /reports` — Submit report:
@@ -116,8 +125,8 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ### 5.5 Admin Module
 
 - [ ] **5.5.1** Create `AdminModule` with:
-  - `AdminService` — Static methods for admin business logic
-  - `AdminController` — admin REST endpoints
+  - `AdminService` — instance methods for admin business logic
+  - `AdminController` — admin REST endpoints (injects `AdminService` via constructor)
   - `src/types/admin.types.ts` — Admin stats and management interfaces
   - Apply `RolesGuard('admin')` to all routes
 
@@ -269,33 +278,34 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 
 ## Endpoints Delivered in This Phase
 
-| Method   | Endpoint                            | Status |
-| -------- | ----------------------------------- | ------ |
-| `POST`   | `/orders/:orderId/reviews`          | 🔲     |
-| `GET`    | `/reviews/gig/:gigId`               | 🔲     |
-| `GET`    | `/reviews/user/:username`           | 🔲     |
-| `POST`   | `/reviews/:id/response`             | 🔲     |
-| `GET`    | `/bookmarks`                        | 🔲     |
-| `POST`   | `/bookmarks`                        | 🔲     |
-| `POST`   | `/reports`                          | 🔲     |
-| `GET`    | `/reports/me`                       | 🔲     |
-| `GET`    | `/admin/users`                      | 🔲     |
-| `PATCH`  | `/admin/users/:id/verify`           | 🔲     |
-| `PATCH`  | `/admin/users/:id/suspend`          | 🔲     |
-| `PATCH`  | `/admin/users/:id/ban`              | 🔲     |
-| `GET`    | `/admin/disputes`                   | 🔲     |
-| `PATCH`  | `/admin/disputes/:orderId/resolve`  | 🔲     |
-| `GET`    | `/admin/reports`                    | 🔲     |
-| `PATCH`  | `/admin/reports/:id/resolve`        | 🔲     |
-| `GET`    | `/admin/withdrawals`                | 🔲     |
-| `PATCH`  | `/admin/withdrawals/:id/process`    | 🔲     |
-| `GET`    | `/admin/stats`                      | 🔲     |
-| `GET`    | `/admin/revenue`                    | 🔲     |
-| `GET`    | `/admin/config`                     | 🔲     |
-| `PATCH`  | `/admin/config/:key`                | 🔲     |
-| `GET`    | `/jobs/:id/recommended-freelancers` | 🔲     |
-| `GET`    | `/search/suggestions`               | 🔲     |
-| `GET`    | `/health`                           | 🔲     |
+| Method  | Endpoint                            | Status |
+| ------- | ----------------------------------- | ------ |
+| `POST`  | `/orders/:orderId/reviews`          | 🔲     |
+| `POST`  | `/tuition/:jobId/reviews`           | 🔲     |
+| `GET`   | `/reviews/gig/:gigId`               | 🔲     |
+| `GET`   | `/reviews/user/:username`           | 🔲     |
+| `POST`  | `/reviews/:id/response`             | 🔲     |
+| `GET`   | `/bookmarks`                        | 🔲     |
+| `POST`  | `/bookmarks`                        | 🔲     |
+| `POST`  | `/reports`                          | 🔲     |
+| `GET`   | `/reports/me`                       | 🔲     |
+| `GET`   | `/admin/users`                      | 🔲     |
+| `PATCH` | `/admin/users/:id/verify`           | 🔲     |
+| `PATCH` | `/admin/users/:id/suspend`          | 🔲     |
+| `PATCH` | `/admin/users/:id/ban`              | 🔲     |
+| `GET`   | `/admin/disputes`                   | 🔲     |
+| `PATCH` | `/admin/disputes/:orderId/resolve`  | 🔲     |
+| `GET`   | `/admin/reports`                    | 🔲     |
+| `PATCH` | `/admin/reports/:id/resolve`        | 🔲     |
+| `GET`   | `/admin/withdrawals`                | 🔲     |
+| `PATCH` | `/admin/withdrawals/:id/process`    | 🔲     |
+| `GET`   | `/admin/stats`                      | 🔲     |
+| `GET`   | `/admin/revenue`                    | 🔲     |
+| `GET`   | `/admin/config`                     | 🔲     |
+| `PATCH` | `/admin/config/:key`                | 🔲     |
+| `GET`   | `/jobs/:id/recommended-freelancers` | 🔲     |
+| `GET`   | `/search/suggestions`               | 🔲     |
+| `GET`   | `/health`                           | 🔲     |
 
 ---
 
@@ -312,6 +322,7 @@ Complete the MVP by building the review system, optimizing search, adding bookma
 ## Definition of Done
 
 - [ ] Mutual review system working (both parties review after order completion)
+- [ ] Tuition review system working with separate aggregate calculation
 - [ ] Rating aggregation accurate on profiles and gigs
 - [ ] Review response functionality working
 - [ ] Bookmarks CRUD working

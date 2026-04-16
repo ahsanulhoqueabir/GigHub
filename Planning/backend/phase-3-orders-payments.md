@@ -10,6 +10,8 @@
 
 Build the order management system, integrate SSLCommerz for payments, implement the escrow mechanism, and set up the withdrawal pipeline. This is the most critical phase for platform trust and reliability.
 
+Tuition listings are explicitly out of payment and escrow flow. They stay free and use chat-based session coordination only.
+
 ---
 
 ## Task Checklist
@@ -45,8 +47,8 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.3 Orders Module
 
 - [ ] **3.3.1** Create `OrderModule` with:
-  - `OrderService` — Static methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
-  - `OrderController` — REST endpoints
+  - `OrderService` — instance methods for `gh_orders`, `gh_order_milestones`, `gh_order_deliveries` logic
+  - `OrderController` — REST endpoints (injects `OrderService` via constructor)
   - `src/types/order.types.ts` — Order, Milestone, and Delivery interfaces
   - DTOs: `CreateGigOrderDto`, `CreateJobOrderDto`, `OrderQueryDto`, `DeliverDto`, `RevisionDto`
 
@@ -55,7 +57,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 - [ ] **3.3.2** Implement `POST /orders/gig` — Create order from gig:
   1. Validate `gig` and `package` — gig must be active
   2. Buyer cannot be the gig seller
-  3. Calculate: `amount` (from package), `platform_fee` (from config), `seller_earnings`
+  3. Calculate: `amount` (from package), `platform_fee` (MVP policy: 5% of paid transaction, capped at BDT 500), `seller_earnings`
   4. Calculate `delivery_deadline` (now + delivery_days)
   5. Generate order number
   6. Create `gh_orders` record with status `pending`
@@ -65,6 +67,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] **3.3.3** Implement `POST /orders/job` — Create order from accepted proposal:
   1. Validate: proposal is `accepted`, job exists, user is job poster
+     1a. Reject if source job has `job_type=tuition` (tuition uses no order/payment flow)
   2. Calculate amounts based on proposal's `quoted_price`
   3. Support optional milestones array
   4. Create `gh_orders` record
@@ -114,9 +117,9 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.4 Payments Module (SSLCommerz)
 
 - [ ] **3.4.1** Create `PaymentModule` with:
-  - `PaymentService` — Static methods for `gh_transactions` and payment processing logic
-  - `PaymentController` — REST endpoints + webhooks
-  - `SslcommerzService` — SSLCommerz API wrapper (static methods)
+  - `PaymentService` — instance methods for `gh_transactions` and payment processing logic
+  - `PaymentController` — REST endpoints + webhooks (injects `PaymentService` via constructor)
+  - `SslcommerzService` — SSLCommerz API wrapper (injectable NestJS service)
   - `src/types/payment.types.ts` — Transaction and payment session interfaces
 
 - [ ] **3.4.2** Implement SSLCommerz integration:
@@ -126,6 +129,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] **3.4.3** Implement `POST /payments/initiate`:
   1. Validate order exists and is `pending`
+     1a. Validate order source is paid transaction (not tuition flow)
   2. Build SSLCommerz session:
      - `total_amount`, `currency: BDT`
      - `tran_id`: unique transaction ID linking to order
@@ -175,7 +179,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.5 Escrow Module
 
 - [ ] **3.5.1** Create `EscrowModule` with:
-  - `EscrowService` — Static methods for `gh_escrow` logic
+  - `EscrowService` — instance methods for `gh_escrow` logic
   - `src/types/escrow.types.ts` — Escrow status and interfaces
 
 - [ ] **3.5.2** Implement escrow hold:
@@ -203,13 +207,11 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   - Auto-release funds to seller
   - Create system notification
 
-
-
 ### 3.6 Withdrawals Module
 
 - [ ] **3.6.1** Create `WithdrawalModule` with:
-  - `WithdrawalService` — Static methods for `gh_withdrawals` logic
-  - `WithdrawalController` — REST endpoints
+  - `WithdrawalService` — instance methods for `gh_withdrawals` logic
+  - `WithdrawalController` — REST endpoints (injects `WithdrawalService` via constructor)
   - `src/types/withdrawal.types.ts` — Withdrawal interfaces and enums
 
 - [ ] **3.6.2** Implement `POST /withdrawals` — Request withdrawal:
@@ -229,6 +231,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 ### 3.7 Platform Fee Calculator
 
 - [ ] **3.7.1** Create utility service for fee calculations:
+
   ```typescript
   calculateFees(amount: number) → {
     platform_fee: number,
@@ -237,8 +240,8 @@ Build the order management system, integrate SSLCommerz for payments, implement 
   }
   ```
 
-  - Read `platform_fee_percent` from `gh_platform_config`
-  - Cache config value (TTL: 10 min)
+  - Enforce MVP baseline policy: fee = min(amount \* 0.05, 500)
+  - Keep the implementation fixed to MVP fee policy for current release
 
 ### 3.8 Testing
 
@@ -307,6 +310,7 @@ Build the order management system, integrate SSLCommerz for payments, implement 
 
 - [ ] Gig-based order creation + payment initiation working
 - [ ] Job-based order creation (from accepted proposal) working
+- [ ] Tuition requests are blocked from order creation and payment endpoints
 - [ ] Full order lifecycle: pending → active → in_progress → delivered → completed
 - [ ] Revision flow working (with count enforcement)
 - [ ] Cancellation with proper refund handling

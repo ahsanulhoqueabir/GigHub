@@ -362,10 +362,6 @@ gighub-web/
   - On Google sign-in: send `{ provider: 'google', firebase_id_token }` to backend `/auth/login`
   - Handle new user flow vs returning user
 
-- [ ] **1.5.5b** Design social auth abstraction for future providers:
-  - Single helper: `loginWithProvider(provider: 'google' | 'github' | 'microsoft' | 'apple')`
-  - All providers must return Firebase ID token before backend `/auth/login` call
-
 - [ ] **1.5.6** Create `SocialLoginButton` component:
   - Google branded button with icon
   - Loading state

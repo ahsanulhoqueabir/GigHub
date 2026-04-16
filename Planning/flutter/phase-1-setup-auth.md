@@ -550,10 +550,6 @@ gighub_app/
   - On success: get Firebase ID token → send `{ provider: 'google', firebase_id_token }` to backend `/auth/login`
   - Handle both new and existing users
 
-- [ ] **1.8.4b** Prepare future third-party SSO flow:
-  - Use Firebase Auth provider-based sign-in for GitHub/Microsoft/Apple when enabled
-  - Keep same backend contract: send `{ provider, firebase_id_token }` to `/auth/login`
-
 - [ ] **1.8.5** Create `SocialLoginButton` widget:
   - Google branded button
   - Loading state
@@ -659,17 +655,17 @@ gighub_app/
 
 ## Backend Endpoints Consumed
 
-| Endpoint                     | Usage                                               |
-| ---------------------------- | --------------------------------------------------- |
-| `POST /auth/register`        | Register new account                                |
-| `POST /auth/login`           | Provider-based login (password, Google, future SSO) |
-| `POST /auth/refresh`         | Token refresh                                       |
-| `POST /auth/logout`          | Logout                                              |
-| `POST /auth/forgot-password` | Password reset                                      |
-| `GET /profiles/me`           | Get own profile                                     |
-| `PATCH /profiles/me`         | Update own profile                                  |
-| `GET /profiles/:username`    | Get public profile                                  |
-| `POST /upload/image`         | Avatar upload                                       |
+| Endpoint                     | Usage                                   |
+| ---------------------------- | --------------------------------------- |
+| `POST /auth/register`        | Register new account                    |
+| `POST /auth/login`           | Provider-based login (password, Google) |
+| `POST /auth/refresh`         | Token refresh                           |
+| `POST /auth/logout`          | Logout                                  |
+| `POST /auth/forgot-password` | Password reset                          |
+| `GET /profiles/me`           | Get own profile                         |
+| `PATCH /profiles/me`         | Update own profile                      |
+| `GET /profiles/:username`    | Get public profile                      |
+| `POST /upload/image`         | Avatar upload                           |
 
 ---
 
