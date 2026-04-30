@@ -1,6 +1,6 @@
 # Gighub Backend Implementation Flow
 
-এই ফাইলটি backend planning আর বর্তমান `/api` codebase মিলিয়ে modular implementation order ধরে কাজ করার জন্য।
+এই ফাইলটি backend planning(docs/) আর বর্তমান `/api` codebase মিলিয়ে modular implementation order ধরে কাজ করার জন্য।
 
 এটাকে execution checklist হিসেবে ধরো: একবারে একটাই module, আর নিচের order না ভেঙে আগানো।
 
@@ -18,10 +18,10 @@
 
 | Item                          | Status      |
 | ----------------------------- | ----------- |
-| Foundation / Runtime Contract | not started |
-| Auth                          | not started |
-| Profile                       | not started |
-| Upload                        | not started |
+| Foundation / Runtime Contract | ✅ Complete |
+| Auth                          | ✅ Complete |
+| Profile                       | ✅ Complete |
+| Upload                        | ✅ Complete |
 | Category                      | not started |
 | Gigs                          | not started |
 | Jobs                          | not started |
