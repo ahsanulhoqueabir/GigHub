@@ -30,7 +30,8 @@ Primary planning source: `/api/docs/` (এই repo-র backend planning document
 | Proposals                     | ✅ Complete |
 | Orders                        | ✅ Complete |
 | Payments                      | ✅ Complete |
-| Escrow                        | in progress |
+| Escrow                        | ✅ Complete |
+| Withdrawals                   | ✅ Complete |
 | Search / Performance          | not started |
 | Testing Sweep                 | not started |
 
