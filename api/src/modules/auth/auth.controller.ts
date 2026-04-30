@@ -39,28 +39,28 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   logout() {
-    // Stateless JWT: client discards token.
-    // Extend here to maintain a token blacklist if needed.
-    return { success: true, message: 'Logged out successfully' };
+    return this.authService.logout();
   }
 
   @Public()
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
-  forgotPassword(@Body() dto: ForgotPasswordDto) {
-    return this.authService.forgotPassword(dto.email).then(() => ({
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    await this.authService.forgotPassword(dto.email);
+    return {
       success: true,
       message: 'If that email exists, a reset link has been sent',
-    }));
+    };
   }
 
   @Public()
   @Post('reset-password')
   @HttpCode(HttpStatus.OK)
-  resetPassword(@Body() dto: ResetPasswordDto) {
-    return this.authService.resetPassword(dto.oob_code, dto.new_password).then(() => ({
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    await this.authService.resetPassword(dto.oob_code, dto.new_password);
+    return {
       success: true,
       message: 'Password reset successfully',
-    }));
+    };
   }
 }

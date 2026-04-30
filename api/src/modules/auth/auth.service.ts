@@ -116,6 +116,13 @@ export class AuthService {
     return this.issueTokens(profile);
   }
 
+  async logout(): Promise<{ success: true; message: string }> {
+    return {
+      success: true,
+      message: 'Logged out successfully',
+    };
+  }
+
   async forgotPassword(email: string): Promise<void> {
     try {
       await this.firebase.generatePasswordResetLink(email);
