@@ -14,6 +14,7 @@ import { UploadModule } from '@/modules/upload/upload.module';
 import { GigsModule } from '@/modules/gigs/gigs.module';
 import { OrdersModule } from '@/modules/orders/orders.module';
 import { PaymentsModule } from '@/modules/payments/payments.module';
+import { EscrowModule } from '@/modules/escrow/escrow.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PaymentsModule } from '@/modules/payments/payments.module';
     GigsModule,
     OrdersModule,
     PaymentsModule,
+    EscrowModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

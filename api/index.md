@@ -29,8 +29,9 @@ Primary planning source: `/api/docs/` (এই repo-র backend planning document
 | Jobs                          | ✅ Complete |
 | Proposals                     | ✅ Complete |
 | Orders                        | ✅ Complete |
-| Payments                      | in progress |
-| Search / Performance          | in progress |
+| Payments                      | ✅ Complete |
+| Escrow                        | in progress |
+| Search / Performance          | not started |
 | Testing Sweep                 | not started |
 
 ## Implementation Order
