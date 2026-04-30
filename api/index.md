@@ -28,6 +28,8 @@ Primary planning source: `/api/docs/` (এই repo-র backend planning document
 | Gigs                          | ✅ Complete |
 | Jobs                          | ✅ Complete |
 | Proposals                     | ✅ Complete |
+| Orders                        | ✅ Complete |
+| Payments                      | in progress |
 | Search / Performance          | in progress |
 | Testing Sweep                 | not started |
 
@@ -44,8 +46,9 @@ Primary planning source: `/api/docs/` (এই repo-র backend planning document
 5. Gigs
 6. Jobs
 7. Proposals
-8. Search/performance tuning
-9. Testing sweep
+8. Orders/payments
+9. Search/performance tuning
+10. Testing sweep
 
 ### 1. Foundation / Runtime Contract
 

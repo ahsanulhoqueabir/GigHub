@@ -12,6 +12,8 @@ import { ProfileModule } from '@/modules/profile/profile.module';
 import { CategoryModule } from '@/modules/category/category.module';
 import { UploadModule } from '@/modules/upload/upload.module';
 import { GigsModule } from '@/modules/gigs/gigs.module';
+import { OrdersModule } from '@/modules/orders/orders.module';
+import { PaymentsModule } from '@/modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -37,6 +39,8 @@ import { GigsModule } from '@/modules/gigs/gigs.module';
     CategoryModule,
     UploadModule,
     GigsModule,
+    OrdersModule,
+    PaymentsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },
