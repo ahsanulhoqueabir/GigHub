@@ -26,7 +26,7 @@ Primary planning source: `/api/docs/` (এই repo-র backend planning document
 | Upload                        | ✅ Complete |
 | Category                      | ✅ Complete |
 | Gigs                          | ✅ Complete |
-| Jobs                          | not started |
+| Jobs                          | ✅ Complete |
 | Proposals                     | not started |
 | Search / Performance          | not started |
 | Testing Sweep                 | not started |
