@@ -2,6 +2,8 @@
 
 এই ফাইলটি backend planning(docs/) আর বর্তমান `/api` codebase মিলিয়ে modular implementation order ধরে কাজ করার জন্য।
 
+Primary planning source: `/api/docs/` (এই repo-র backend planning documents সব এখানে maintained)।
+
 এটাকে execution checklist হিসেবে ধরো: একবারে একটাই module, আর নিচের order না ভেঙে আগানো।
 
 ## Current Baseline
@@ -22,7 +24,7 @@
 | Auth                          | ✅ Complete |
 | Profile                       | ✅ Complete |
 | Upload                        | ✅ Complete |
-| Category                      | not started |
+| Category                      | ✅ Complete |
 | Gigs                          | not started |
 | Jobs                          | not started |
 | Proposals                     | not started |
