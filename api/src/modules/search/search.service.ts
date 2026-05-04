@@ -3,6 +3,7 @@ import directusApi from '@/utils/directus.api';
 import { paginated, fail } from '@/utils/service-response';
 import type { PaginatedServiceResponse } from '@/types/services/common.types';
 import type { SearchQuery } from '@/types/search.types';
+import { JobType } from '@/types/job.types';
 
 const collectionMap: Record<string, string> = {
   gigs: 'gh_gigs',
@@ -19,6 +20,13 @@ export class SearchService {
     const collection = collectionMap[query.collection ?? 'gigs'] ?? 'gh_gigs';
 
     const filters: Record<string, unknown> = {};
+    const collectionQuery = query.collection?.toLowerCase();
+    if (collectionQuery === 'tuition') {
+      filters['job_type'] = { _eq: JobType.TUITION };
+    } else if (collectionQuery === 'jobs') {
+      filters['job_type'] = { _neq: JobType.TUITION };
+    }
+
     const skillsField =
       collection === 'gh_jobs' ? 'required_skills' : collection === 'gh_gigs' ? 'tags' : 'skills';
 

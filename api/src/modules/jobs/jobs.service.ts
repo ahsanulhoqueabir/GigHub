@@ -175,18 +175,19 @@ export class JobsService {
     const page = Number(query.page ?? 1);
     const limit = Number(query.limit ?? 20);
 
-    const filter: Record<string, unknown> = {
+    const filter: Record<string, any> = {
       status: { _eq: query.status ?? JobStatus.OPEN },
     };
 
-    if (query.listing_scope === 'tuition') {
+    if (query.listing_scope?.toLowerCase() === 'tuition' || query.job_type === JobType.TUITION) {
       filter['job_type'] = { _eq: JobType.TUITION };
-    } else if (query.listing_scope === 'jobs') {
+    } else if (query.listing_scope?.toLowerCase() === 'jobs') {
       filter['job_type'] = { _neq: JobType.TUITION };
+    } else if (query.job_type) {
+      filter['job_type'] = { _eq: query.job_type };
     }
 
     if (query.category) filter['category'] = { _eq: query.category };
-    if (query.job_type) filter['job_type'] = { _eq: query.job_type };
     if (query.budget_type) filter['budget_type'] = { _eq: query.budget_type };
     if (query.required_skills) filter['required_skills'] = { _contains: query.required_skills };
     if (query.search)
