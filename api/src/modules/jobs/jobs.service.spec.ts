@@ -47,4 +47,16 @@ describe('JobsService', () => {
     expect(res.success).toBe(true);
     expect(res.pagination).toBeDefined();
   });
+
+  it('updates a job', async () => {
+    const existingJob = { id: '1', poster: 'p1', status: 'open' };
+    mockedDirectus.get.mockResolvedValueOnce({ data: { data: existingJob } } as any);
+    mockedDirectus.patch.mockResolvedValueOnce({
+      data: { data: { ...existingJob, title: 'Updated' } },
+    } as any);
+
+    const res = await service.updateEdit('1', 'p1', { title: 'Updated' });
+    expect(res.success).toBe(true);
+    expect(res.data?.title).toBe('Updated');
+  });
 });

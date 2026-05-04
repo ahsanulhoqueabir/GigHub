@@ -38,7 +38,7 @@ directusApi.interceptors.response.use(
       status,
       url: config?.url,
       method: config?.method,
-      data,
+      data: JSON.stringify(data, null, 2),
     });
 
     return Promise.reject(error);

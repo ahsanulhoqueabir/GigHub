@@ -47,6 +47,11 @@ export class CreateJobDto {
 
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
+  attachments?: string[];
+
+  @IsOptional()
+  @IsArray()
   @ArrayMinSize(0)
   @ArrayMaxSize(20)
   @IsString({ each: true })
