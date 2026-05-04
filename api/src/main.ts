@@ -34,7 +34,7 @@ async function bootstrap() {
     }),
   );
 
-  const port = config.get<number>('port') ?? 3000;
+  const port = config.get<number>('port') ?? 4000;
   await app.listen(port);
   console.log(`GigHub API running on http://localhost:${port}/v1`);
 }
