@@ -178,6 +178,10 @@ export class GigsService {
       return owned as ServiceResponse<GigDetail>;
     }
 
+    if (owned.data.status === GigStatus.DELETED) {
+      return fail('Deleted gig cannot be modified', undefined, 400);
+    }
+
     if (dto.packages && dto.packages.length) {
       const packageValidation = this.ensureValidPackages(dto.packages);
       if (packageValidation) {
@@ -247,7 +251,7 @@ export class GigsService {
         return fail(
           packages.error ?? 'Failed to fetch gig packages',
           packages.details,
-          packages.status,
+          packages.status ?? 500,
         );
       }
 
@@ -256,6 +260,7 @@ export class GigsService {
       return fail('Failed to update gig', error);
     }
   }
+
 
   async updateStatus(
     gigId: string,
@@ -381,7 +386,7 @@ export class GigsService {
         return fail(
           packages.error ?? 'Failed to fetch gig packages',
           packages.details,
-          packages.status,
+          packages.status ?? 500,
         );
       }
 

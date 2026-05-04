@@ -1,17 +1,13 @@
 meta {
-  name: Unauthorized
+  name: Forbidden
   type: http
   seq: 3
 }
 
 patch {
-  url: {{base_url}}/gigs/:id
+  url: {{base_url}}/gigs/{{gig_id}}
   body: json
   auth: bearer
-}
-
-params:path {
-  id: 
 }
 
 auth:bearer {

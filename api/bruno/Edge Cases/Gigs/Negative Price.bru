@@ -17,9 +17,19 @@ auth:bearer {
 body:json {
   {
     "title": "Invalid Gig",
-    "description": "This should fail due to negative price.",
-    "price": -10,
+    "description": "This should fail due to negative price in one of the packages.",
     "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-    "tags": ["invalid"]
+    "tags": ["invalid"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic Package",
+        "description": "Invalid price package",
+        "price": -50,
+        "delivery_days": 3,
+        "revision_count": 1
+      }
+    ]
   }
 }
+

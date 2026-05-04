@@ -1,0 +1,22 @@
+meta {
+  name: Invalid Status
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "invalid-status"
+  }
+}
