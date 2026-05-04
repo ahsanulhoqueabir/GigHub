@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
-import type { Gig, GigDetail, GigPackage, GigQuery } from '@/types/gig.types';
 import { GigPackageTier, GigStatus } from '@/types/gig.types';
+import type { Gig, GigDetail, GigPackage, GigQuery } from '@/types/gig.types';
 import type { CreateGigDto, GigPackageDto } from './dto/create-gig.dto';
 import type { UpdateGigDto } from './dto/update-gig.dto';
 
@@ -129,8 +130,10 @@ export class GigsService {
 
     try {
       const slug = await this.ensureUniqueSlug(dto.title);
+      const gigId = uuid();
 
       const gigPayload = {
+        id: gigId,
         seller: sellerId,
         category: dto.category_id,
         title: dto.title,
@@ -147,7 +150,8 @@ export class GigsService {
       );
 
       const packagesPayload = dto.packages.map((item) => ({
-        gig: gigData.data.id,
+        id: uuid(),
+        gig: gigId,
         tier: item.tier,
         title: item.title,
         description: item.description,
@@ -167,6 +171,7 @@ export class GigsService {
       return fail('Failed to create gig', error);
     }
   }
+
 
   async updateEdit(
     gigId: string,
@@ -233,6 +238,7 @@ export class GigsService {
             );
           } else {
             await directusApi.post(`/items/${this.packagesCollection}`, {
+              id: uuid(),
               gig: gigId,
               tier: item.tier,
               title: item.title,

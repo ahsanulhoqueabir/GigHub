@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { ok, fail, paginated } from '@/utils/service-response';
 import type { ServiceResponse, PaginatedServiceResponse } from '@/types/services/common.types';
@@ -27,6 +28,7 @@ export class ProposalsService {
   async create(applicantId: string, dto: any): Promise<ServiceResponse<ProposalDetail>> {
     try {
       const payload = {
+        id: uuid(),
         job: dto.job_id,
         applicant: applicantId,
         cover_letter: dto.cover_letter,
@@ -45,6 +47,7 @@ export class ProposalsService {
       return fail('Failed to create proposal', error);
     }
   }
+
 
   async update(id: string, userId: string, dto: any): Promise<ServiceResponse<ProposalDetail>> {
     try {

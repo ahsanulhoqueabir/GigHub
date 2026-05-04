@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok } from '@/utils/service-response';
 import type { ServiceResponse } from '@/types/services/common.types';
@@ -72,7 +73,7 @@ export class EscrowService {
     }
 
     try {
-      const payload = {
+      const payload: any = {
         order: order.id,
         amount: order.amount,
         currency: order.currency || 'BDT',
@@ -95,6 +96,7 @@ export class EscrowService {
         return ok(data.data);
       }
 
+      payload.id = uuid();
       const { data } = await directusApi.post<{ data: Escrow }>(
         `/items/${this.escrowCollection}`,
         payload,
@@ -134,6 +136,7 @@ export class EscrowService {
       });
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
+        id: uuid(),
         profile: order.seller,
         order: order.id,
         tran_id: `ESCROW-RELEASE-${order.id}-${Date.now()}`,
@@ -183,6 +186,7 @@ export class EscrowService {
       });
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
+        id: uuid(),
         profile: order.buyer,
         order: order.id,
         tran_id: `ESCROW-REFUND-${order.id}-${Date.now()}`,
@@ -228,3 +232,4 @@ export class EscrowService {
     }
   }
 }
+
