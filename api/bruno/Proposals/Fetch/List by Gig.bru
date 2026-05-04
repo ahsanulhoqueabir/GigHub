@@ -1,0 +1,19 @@
+meta {
+  name: List by Gig
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/proposals/gig/:gigId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  gigId: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

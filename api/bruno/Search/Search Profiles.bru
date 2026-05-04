@@ -1,7 +1,7 @@
 meta {
-  name: Search Gigs
+  name: Search Profiles
   type: http
-  seq: 1
+  seq: 3
 }
 
 get {
@@ -11,8 +11,6 @@ get {
 }
 
 params:query {
-  collection: gigs
-  q: nestjs
-  ~category: 
-  ~skills: 
+  collection: profiles
+  q: developer
 }
