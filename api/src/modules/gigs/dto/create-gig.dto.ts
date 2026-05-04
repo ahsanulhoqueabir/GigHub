@@ -16,7 +16,7 @@ import {
 import { Type } from 'class-transformer';
 import { GigPackageTier } from '@/types/gig.types';
 
-class GigImageDto {
+export class GigImageDto {
   @IsString()
   url!: string;
 

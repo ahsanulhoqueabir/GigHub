@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString, IsNumber, IsInt, Min, Max, IsArray } from 'class-validator';
+import { IsEnum, IsOptional, IsString, IsNumber, IsInt, Min, Max, IsArray, MinLength, MaxLength } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ProposalStatus } from '@/types/proposal.types';
 
