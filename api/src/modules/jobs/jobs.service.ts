@@ -21,7 +21,7 @@ export class JobsService {
       'job_type',
       'budget_min',
       'budget_max',
-      'skills',
+      'required_skills',
       'attachments',
       'status',
       'total_proposals',
@@ -81,7 +81,7 @@ export class JobsService {
 
       if (dto.budget_min !== undefined) payload.budget_min = dto.budget_min;
       if (dto.budget_max !== undefined) payload.budget_max = dto.budget_max;
-      if (dto.skills?.length) payload.skills = dto.skills;
+      if (dto.required_skills?.length) payload.required_skills = dto.required_skills;
       if (dto.attachments?.length) payload.attachments = dto.attachments;
 
       const { data } = await directusApi.post<{ data: Job }>(`/items/${this.collection}`, payload);
@@ -112,7 +112,7 @@ export class JobsService {
       if (dto.job_type !== undefined) payload['job_type'] = dto.job_type;
       if (dto.budget_min !== undefined) payload['budget_min'] = dto.budget_min;
       if (dto.budget_max !== undefined) payload['budget_max'] = dto.budget_max;
-      if (dto.skills !== undefined) payload['skills'] = dto.skills;
+      if (dto.required_skills !== undefined) payload['required_skills'] = dto.required_skills;
       if (dto.attachments !== undefined) payload['attachments'] = dto.attachments;
 
       const { data } = await directusApi.patch<{ data: Job }>(
@@ -181,7 +181,7 @@ export class JobsService {
 
     if (query.category) filter['category'] = { _eq: query.category };
     if (query.job_type) filter['job_type'] = { _eq: query.job_type };
-    if (query.skills) filter['skills'] = { _contains: query.skills };
+    if (query.required_skills) filter['required_skills'] = { _contains: query.required_skills };
     if (query.search)
       filter['_or'] = [
         { title: { _icontains: query.search } },

@@ -25,7 +25,7 @@ export interface Job {
   job_type: JobType;
   budget_min?: number;
   budget_max?: number;
-  skills: string[];
+  required_skills: string[];
   attachments?: string[];
   status: JobStatus;
   total_proposals: number;
@@ -40,7 +40,7 @@ export interface JobQuery extends PaginationQuery {
   job_type?: JobType;
   budget_min?: number;
   budget_max?: number;
-  skills?: string;
+  required_skills?: string;
   status?: JobStatus;
   listing_scope?: 'jobs' | 'tuition';
 }

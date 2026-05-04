@@ -23,7 +23,7 @@ describe('JobsService', () => {
       job_type: 'paid',
       status: 'open',
       total_proposals: 0,
-      skills: [],
+      required_skills: [],
       created_at: '',
       updated_at: '',
     };

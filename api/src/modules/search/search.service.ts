@@ -19,14 +19,17 @@ export class SearchService {
     const collection = collectionMap[query.collection ?? 'gigs'] ?? 'gh_gigs';
 
     const filters: Record<string, unknown> = {};
+    const skillsField =
+      collection === 'gh_jobs' ? 'required_skills' : collection === 'gh_gigs' ? 'tags' : 'skills';
+
     if (query.q) {
       filters['_or'] = [
         { title: { _icontains: query.q } },
         { description: { _icontains: query.q } },
-        { skills: { _contains: query.q } },
+        { [skillsField]: { _contains: query.q } },
       ];
     }
-    if (query.skills) filters['skills'] = { _contains: query.skills };
+    if (query.skills) filters[skillsField] = { _contains: query.skills };
     if (query.category) filters['category'] = { _eq: query.category };
 
     try {

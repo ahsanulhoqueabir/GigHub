@@ -55,5 +55,5 @@ export class CreateJobDto {
   @ArrayMinSize(0)
   @ArrayMaxSize(20)
   @IsString({ each: true })
-  skills?: string[];
+  required_skills?: string[];
 }

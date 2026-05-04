@@ -58,7 +58,7 @@ export class UpdateJobDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  skills?: string[];
+  required_skills?: string[];
 
   @ValidateIf((o: UpdateJobDto) => o.type === 'edit')
   @IsOptional()
