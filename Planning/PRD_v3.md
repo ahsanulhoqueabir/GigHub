@@ -5,8 +5,6 @@
 **Source Baseline:** Planning/PRD.md v1.0
 **Methodology:** Agile — Scrum Framework
 
----
-
 ## Table of Contents
 
 1. [Document Purpose](#1-document-purpose)
@@ -24,8 +22,6 @@
 13. [Testability and Acceptance Strategy](#13-testability-and-acceptance-strategy)
 14. [Approval Note](#14-approval-note)
 
----
-
 ## 1. Document Purpose
 
 This document analyzes and structures GigHub product requirements using Agile software engineering practices so that Product, Design, Backend, Web, Mobile, QA, and DevOps teams share a common understanding.
@@ -41,8 +37,6 @@ This document includes:
 - 5-year economic forecast and break-even calculation
 - Phase-wise Agile Scrum sprint plan with epics and user stories
 
----
-
 ## 2. Product Overview
 
 GigHub is a campus-exclusive freelance marketplace for Jagannath University (JnU) students. Every student operates from a single account simultaneously as both buyer and seller — no role selection required.
@@ -54,16 +48,6 @@ GigHub is a campus-exclusive freelance marketplace for Jagannath University (JnU
 - Escrow-backed transaction safety for paid services
 - Real-time communication and review-based trust ratings
 - Free peer tutoring/tuition exchange with no platform fee
-
-**Out of Scope:**
-
-- Non-JnU public onboarding
-- Advanced AI job matching
-- Team/group bidding
-- Organization accounts
-- Campus leaderboard and skill badges
-
----
 
 ## 3. Stakeholder Analysis
 
@@ -91,11 +75,7 @@ GigHub is a campus-exclusive freelance marketplace for Jagannath University (JnU
 - QA/Security Team
 - DevOps/SRE
 
----
-
 ## 4. Scope Definition
-
-### 4.1 In-Scope
 
 - Secure authentication and student identity management
 - Profile creation and management
@@ -108,17 +88,6 @@ GigHub is a campus-exclusive freelance marketplace for Jagannath University (JnU
 - Mutual review and rating system
 - Unified student dashboard (buyer + seller views)
 - Admin moderation panel and dispute handling
-
-### 4.2 Out-of-Scope
-
-- Campus leaderboard and public ranking
-- Portfolio showcase pages
-- Skill badges and assessment contests
-- AI-based job or tutor matching
-- Recurring subscription orders
-- Non-JnU user onboarding
-
----
 
 ## 5. User Classes and Permissions
 
@@ -150,8 +119,6 @@ Every registered JnU student has full dual-sided and tutoring access from a sing
 | Platform Configuration | Set service fees, escrow timers, job categories      |
 | Analytics Visibility   | View platform revenue, user growth, order statistics |
 
----
-
 ## 6. Functional Requirements (Simplified)
 
 **Notation:**
@@ -178,8 +145,6 @@ Acceptance criteria (summary):
 - Financial actions are idempotent and auditable.
 - Public data exposure is restricted to allowed fields.
 
----
-
 ## 7. Non-Functional Requirements (NFR)
 
 ### 7. Non-Functional Requirements (Simplified)
@@ -193,8 +158,6 @@ Keep NFRs short and measurable.
 - Usability: mobile-first, bilingual-friendly, aim for WCAG 2.1 AA.
 - Maintainability: modular services, clear API versioning, replaceable components.
 - Observability: structured logs, key metrics, and alerting for errors/latency spikes.
-
----
 
 ## 8. External Integration Requirements
 
@@ -224,8 +187,6 @@ Keep NFRs short and measurable.
 - Real-time bidirectional messaging for chat and live event notifications
 - Mobile push notifications for key platform events (new message, order update, payment)
 
----
-
 ## 9. Constraints, Assumptions, and Risks
 
 ### 9.1 Constraints
@@ -252,8 +213,6 @@ Keep NFRs short and measurable.
 | Low early adoption             | Medium — revenue impact   | Campus ambassador program, social media push, zero-fee tutoring as hook |
 | Payment gateway downtime       | Medium — order disruption | Graceful degradation message, retry queue                               |
 
----
-
 ## 10. Feasibility Analysis
 
 ### 10.1 Technical Feasibility
@@ -275,8 +234,6 @@ Keep NFRs short and measurable.
 - Escrow integrity under concurrent payment callbacks requires careful idempotency design
 - WebSocket connection management at scale (1,000+ concurrent users) needs load-testing validation
 
----
-
 ### 10.2 Operational Feasibility
 
 **Assessment: Feasible with defined admin team**
@@ -286,8 +243,6 @@ Keep NFRs short and measurable.
 - Admin tooling via built-in CMS panel significantly reduces custom admin development cost
 - Campus-limited scope constrains moderation complexity compared to a public platform
 - Tutoring feature is self-moderated through peer ratings and has no financial dispute risk
-
----
 
 ### 10.3 Market Feasibility
 
@@ -301,8 +256,6 @@ Keep NFRs short and measurable.
 | Platform differentiator | Campus-only trust, zero-fee tutoring, dual-sided account, local language comfort |
 | Adoption lever          | Free tutoring exchange as a viral entry point with no financial barrier          |
 | Student income demand   | Rising cost of living in Dhaka increases student motivation to earn on platform  |
-
----
 
 ### 10.4 Financial Feasibility
 
@@ -350,8 +303,6 @@ Notes:
 - Break-even detail: occurs in Year 3; fraction = 785,661 / 1,794,140 = 0.44
 - Intangible benefits: faster campus trust cycle and better student retention; free tuition listings improve adoption funnel for paid services
 
----
-
 ## 11. Economic Analysis and Break-Even
 
 ### 11.1 Key Assumptions
@@ -365,8 +316,6 @@ Notes:
 | Average monthly paid transactions per active user | 2.0 (Year 1) → 3.0 (Year 5)                   |
 | Exchange rate reference                           | 1 USD ≈ BDT 110                               |
 
----
-
 ### 11.2 Initial Investment (Year 0 — Pre-Launch)
 
 | Item                                      | Estimated Cost (BDT)              |
@@ -377,8 +326,6 @@ Notes:
 | Infrastructure setup and domain           | 20,000                            |
 | Legal, registration, and administration   | 30,000                            |
 | **Total Initial Investment**              | **≈ BDT 10,75,000 (≈ USD 9,773)** |
-
----
 
 ### 11.3 Monthly Operating Cost Model
 
@@ -391,8 +338,6 @@ Notes:
 | **Monthly Total (BDT)**                      | **70,000**   | **90,000**    | **1,20,000**  | **1,50,000**  | **1,70,000**  |
 | **Annual Total (BDT)**                       | **8,40,000** | **10,80,000** | **14,40,000** | **18,00,000** | **20,40,000** |
 
----
-
 ### 11.4 User Adoption Projections
 
 | Year   | Active Users                          | % of JnU Students |
@@ -403,8 +348,6 @@ Notes:
 | Year 4 | ~7,000                                | 35%               |
 | Year 5 | ~10,000                               | 50%               |
 
----
-
 ### 11.5 Revenue Projections (Paid Transactions Only)
 
 | Year   | Avg Active Users | Avg Tx/User/Month | Avg Tx Value (BDT) | Annual GMV (BDT) | Platform Revenue @ 5% (BDT) |
@@ -414,8 +357,6 @@ Notes:
 | Year 3 | 4,400            | 2.5               | 580                | 7,65,60,000      | 38,28,000                   |
 | Year 4 | 7,000            | 2.8               | 630                | 14,81,76,000     | 74,08,800                   |
 | Year 5 | 10,000           | 3.0               | 690                | 24,84,00,000     | 1,24,20,000                 |
-
----
 
 ### 11.6 Annual Profit / Loss Summary
 
@@ -429,8 +370,6 @@ Notes:
 | Year 5         | 1,24,20,000   | 20,40,000            | +1,03,80,000     | +1,75,69,650                |
 
 > All values in BDT (Bangladeshi Taka). 1 USD ≈ BDT 110.
-
----
 
 ### 11.7 Break-Even Analysis
 
@@ -465,16 +404,12 @@ $$
 \text{ROI (5-year)} = \frac{1{,}74{,}69{,}650}{83{,}75{,}000} \times 100 \approx \textbf{209\%}
 $$
 
----
-
 ### 11.8 Key Economic Notes
 
 - **Tutoring is a strategic loss-leader:** Zero-fee tutoring generates no direct revenue but reduces onboarding friction, increases daily active users, and accelerates paid transaction adoption.
 - **Revenue is conservative:** Projections use only the 5% service fee (up to BDT 500 per paid transaction).
 - **Adoption risk is the primary variable:** If Year 1 adoption stays below 700 active users, monthly break-even shifts to Year 2 late-stage, and full break-even can move beyond Year 3.
 - **Cost model includes no full-time salaries in operations:** Post-launch maintenance assumes a lean part-time team. Scaling beyond Year 3 will require full-time hires, which are partially reflected in the rising Year 3–5 team costs.
-
----
 
 ## 12. Agile Scrum Sprint Plan
 
@@ -489,8 +424,6 @@ $$
 | Definition of Done      | Feature code merged, unit tested, reviewed, deployed to staging, QA-signed off    |
 | Backlog tool            | Linear / Jira                                                                     |
 
----
-
 ### 12.2 Epic and Phase Map
 
 | Phase                       | Sprints | Duration    | Core Epics                                         | FR Coverage      |
@@ -501,14 +434,10 @@ $$
 | Phase 4 — Communication     | 9–10    | Weeks 17–20 | Real-time Chat, Notifications, Push                | FR-G             |
 | Phase 5 — Trust and Quality | 11–13   | Weeks 21–26 | Reviews, Tutoring, Search Polish, Admin, Dashboard | FR-H, FR-I, FR-J |
 
----
-
 ### 12.3 Phase 1 — Foundation (Sprints 1–2, Weeks 1–4)
 
 - Sprint 1 — Authentication
 - Sprint 2 — Profiles
-
----
 
 ### 12.4 Phase 2 — Marketplace Core (Sprints 3–5, Weeks 5–10)
 
@@ -516,30 +445,22 @@ $$
 - Sprint 4 — Gig Discovery and Search
 - Sprint 5 — Job Board and Proposals
 
----
-
 ### 12.5 Phase 3 — Transactions (Sprints 6–8, Weeks 11–16)
 
 - Sprint 6 — Order Lifecycle
 - Sprint 7 — Delivery and Revision Flow
 - Sprint 8 — Payments and Escrow
 
----
-
 ### 12.6 Phase 4 — Communication (Sprints 9–10, Weeks 17–20)
 
 - Sprint 9 — Real-Time Chat
 - Sprint 10 — Notifications and Push
-
----
 
 ### 12.7 Phase 5 — Trust, Quality, and Tutoring (Sprints 11–13, Weeks 21–26)
 
 - Sprint 11 — Reviews and Trust System
 - Sprint 12 — Tuition Feature and Search Polish
 - Sprint 13 — Admin Tools, Dashboard, and UAT
-
----
 
 ### 12.8 Sprint Summary Table
 
@@ -559,8 +480,6 @@ $$
 | Sprint 12 | Phase 5 | Tutoring + Search Polish | 35           | Weeks 23–24  |
 | Sprint 13 | Phase 5 | Admin + Dashboard + UAT  | 38           | Weeks 25–26  |
 | **Total** |         |                          | **478 SP**   | **26 weeks** |
-
----
 
 ## 13. Testability and Acceptance Strategy
 
@@ -590,8 +509,6 @@ All of the following must pass before release:
 - Automated regression suite runs on every merge to main branch
 - Manual regression on all P0 flows before each sprint release to staging
 - Payment flow is manually verified in every release cycle due to financial sensitivity
-
----
 
 ## 14. Approval Note
 

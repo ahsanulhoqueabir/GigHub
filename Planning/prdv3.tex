@@ -1,0 +1,763 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, shapes.misc, fit, backgrounds}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{GigHub RAD v2.0}
+\lhead{April 15, 2026}
+\rfoot{\thepage}
+
+\title{\textbf{GigHub Requirements Analysis Document (RAD)}}
+\author{Product \& Engineering Team}
+\date{Version 2.0 -- April 15, 2026}
+
+\begin{document}
+
+\maketitle
+
+\section*{Table of Contents}
+\begin{enumerate}
+    \item Document Purpose
+    \item Product Overview
+    \item Stakeholder Analysis
+    \item Scope Definition
+    \item User Classes and Permissions
+    \item Functional Requirements Analysis
+    \item Non-Functional Requirements
+    \item External Integration Requirements
+    \item Constraints, Assumptions, and Risks
+    \item Feasibility Analysis
+    \item Economic Analysis and Break-Even
+    \item Agile Scrum Sprint Plan
+    \item Testability and Acceptance Strategy
+    \item Approval Note
+\end{enumerate}
+
+\newpage
+
+\section{Document Purpose}
+
+This document analyzes and structures GigHub product requirements using Agile software engineering practices so that Product, Design, Backend, Web, Mobile, QA, and DevOps teams share a common understanding.
+
+This document includes:
+\begin{itemize}
+    \item Product scope and boundaries
+    \item Stakeholder and user class definitions
+    \item Functional requirements (prioritized by MoSCoW)
+    \item Non-functional requirements (measurable and testable)
+    \item External integration requirements (product-level, no implementation detail)
+    \item Feasibility analysis across technical, operational, and economic dimensions
+    \item 5-year economic forecast and break-even calculation
+    \item Phase-wise Agile Scrum sprint plan with epics and user stories
+\end{itemize}
+
+\section{Product Overview}
+
+GigHub is a campus-exclusive freelance marketplace for Jagannath University (JnU) students. Every student operates from a single account simultaneously as both buyer and seller --- no role selection required.
+
+\subsection{Core Value Proposition}
+\begin{itemize}
+    \item Trusted campus-only network with verified student identity
+    \item Gig marketplace + job board + peer tutoring in a single platform
+    \item Escrow-backed transaction safety for paid services
+    \item Real-time communication and review-based trust ratings
+    \item Free peer tutoring/tuition exchange with no platform fee
+\end{itemize}
+
+\section{Stakeholder Analysis}
+
+\subsection{Primary Stakeholders}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Stakeholder} & \textbf{Role} & \textbf{Interaction} \\
+\hline
+Students (Buyers) & Service consumers & Browse, order, pay, review \\
+Students (Sellers) & Service providers & Post gigs/jobs, deliver, earn \\
+Students (Tutors/Learners) & Tutoring participants & Post/accept tutoring (free) \\
+Admin/Moderator Team & Platform operators & Manage users, disputes, config \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Secondary Stakeholders}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Stakeholder} & \textbf{Role} \\
+\hline
+Payment Partners (SSLCommerz, bKash) & Payment gateway providers \\
+JnU Community & Trust ecosystem and growth \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Scope Definition}
+
+\begin{itemize}
+    \item Secure authentication and student identity management
+    \item Profile creation and management
+    \item Gig marketplace with tiered packages
+    \item Job posting and proposal flow
+    \item Peer tutoring/tuition exchange (free, no platform fee)
+    \item Order lifecycle with delivery, revision, and completion
+    \item Escrow-backed payment and withdrawal
+    \item Real-time messaging and push notifications
+    \item Mutual review and rating system
+    \item Unified student dashboard (buyer + seller views)
+    \item Admin moderation panel and dispute handling
+\end{itemize}
+
+\section{User Classes and Permissions}
+
+\subsection{Student User}
+
+Every registered JnU student has full dual-sided and tutoring access from a single account:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Capability} & \textbf{Description} \\
+\hline
+Create Gigs & List paid services with package tiers \\
+Browse and Order Gigs & Purchase services from peers \\
+Post Jobs & Post task requests with budget and deadline \\
+Submit Proposals & Apply to peer job postings \\
+Post Tutoring Sessions & Offer tutoring/lessons free of charge \\
+Request Tutoring & Browse and request available tutors \\
+Chat & 1-to-1 messaging for inquiries and active orders \\
+Manage Orders & Track orders as buyer and seller \\
+Leave Reviews & Rate and review completed transactions \\
+Receive Payments & Withdraw earnings to bKash or bank \\
+Make Payments & Pay via local payment gateway \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Admin User}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Capability} & \textbf{Description} \\
+\hline
+User Management & View, verify, suspend, and ban accounts \\
+Content Moderation & Review flags on gigs, jobs, tutoring posts, reviews \\
+Dispute Resolution & Handle order disputes and process refunds \\
+Platform Configuration & Set service fees, escrow timers, job categories \\
+Analytics Visibility & View platform revenue, user growth, order stats \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Functional Requirements}
+
+\textbf{Notation:} P0 = Must Have, P1 = Should Have
+
+\begin{description}
+    \item[\textbf{FR-A}] \textbf{Authentication \& Identity:} Email/password + Google OAuth, secure session tokens, server-side verification, and automatic profile creation.
+    \item[\textbf{FR-B}] \textbf{Profile Management:} View/edit profile, avatar upload, skills, public profile, verification badge.
+    \item[\textbf{FR-C}] \textbf{Gig Marketplace:} Create/edit gigs with package tiers, images, listings, and basic search/filters.
+    \item[\textbf{FR-D}] \textbf{Job Board \& Proposals:} Post jobs, submit/accept proposals; accepted proposals create orders.
+    \item[\textbf{FR-E}] \textbf{Orders \& Delivery:} Order lifecycle (pending → in-progress → delivered → completed/disputed), deliveries, revisions, approvals.
+    \item[\textbf{FR-F}] \textbf{Payments \& Escrow:} Escrow on payment, release on approval, platform fee (5\% up to BDT 500), payment gateway integration, withdrawals, transaction history.
+    \item[\textbf{FR-G}] \textbf{Messaging \& Notifications:} Real-time 1:1 chat, order-linked channels, attachments, in-app notifications and push.
+    \item[\textbf{FR-H}] \textbf{Reviews \& Trust:} Mutual reviews and ratings, text feedback, aggregated scores on profiles and listings.
+    \item[\textbf{FR-I}] \textbf{Dashboard \& Admin:} Unified user dashboard, earnings and transactions, admin moderation and dispute queue.
+    \item[\textbf{FR-J}] \textbf{Tuition Listings:} Free-form tuition listings (title + description), request/accept flow opens chat, no payments involved.
+\end{description}
+
+\subsection{Acceptance Criteria}
+\begin{itemize}
+    \item Core P0 flows (auth, order lifecycle, payments, chat, reviews) work end-to-end and are testable
+    \item Financial actions are idempotent and auditable
+    \item Public data exposure is restricted to allowed fields
+\end{itemize}
+
+\section{Non-Functional Requirements}
+
+\begin{itemize}
+    \item \textbf{Performance:} p95 read latency <200ms, chat latency <1s, search <500ms
+    \item \textbf{Scalability:} Design for horizontal scaling to support 5,000+ concurrent users
+    \item \textbf{Availability:} Target 99.5\% uptime with graceful degradation of non-core features
+    \item \textbf{Security:} OWASP controls, token-based auth, input validation, TLS for all traffic
+    \item \textbf{Usability:} Mobile-first, bilingual-friendly, aim for WCAG 2.1 AA
+    \item \textbf{Maintainability:} Modular services, clear API versioning, replaceable components
+    \item \textbf{Observability:} Structured logs, key metrics, and alerting for errors/latency spikes
+\end{itemize}
+
+\section{External Integration Requirements}
+
+\subsection{Identity Provider}
+\begin{itemize}
+    \item Support email/password and Google OAuth through a managed identity provider
+    \item Server-side token verification on every protected API call
+\end{itemize}
+
+\subsection{Content and Data Management}
+\begin{itemize}
+    \item Admin and content operations managed through a CMS-backed admin panel
+    \item Permission model aligned with platform role definitions
+\end{itemize}
+
+\subsection{File and Media Storage}
+\begin{itemize}
+    \item All user-uploaded content stored in a dedicated cloud object store
+    \item File size limit: 25 MB per upload
+    \item Signed or access-controlled URLs for sensitive delivery files
+\end{itemize}
+
+\subsection{Payment Gateways}
+\begin{itemize}
+    \item SSLCommerz as primary payment gateway with secure callback handling
+    \item All payment callbacks must be validated before triggering financial state changes
+\end{itemize}
+
+\subsection{Real-Time Communication}
+\begin{itemize}
+    \item Real-time bidirectional messaging for chat and live event notifications
+    \item Mobile push notifications for key platform events
+\end{itemize}
+
+\section{Constraints, Assumptions, and Risks}
+
+\subsection{Constraints}
+\begin{itemize}
+    \item Platform is campus-exclusive: only JnU students can register
+    \item Payments are subject to Bangladesh payment gateway regulations
+    \item Platform fee policy: 5\% charge for paid transactions up to BDT 500 (no per-gig override)
+\end{itemize}
+
+\subsection{Assumptions}
+\begin{itemize}
+    \item Students primarily access the platform via Android smartphones
+    \item An available admin moderation team from project launch
+    \item Payment gateway uptime remains at acceptable commercial levels
+    \item JnU student enrollment base provides sufficient initial addressable market
+\end{itemize}
+
+\subsection{Risks and Mitigation}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|p{5cm}|}
+\hline
+\textbf{Risk} & \textbf{Impact} & \textbf{Mitigation} \\
+\hline
+Payment callback inconsistency & High & Idempotent handlers, reconciliation job, audit alerts \\
+Chat or job spam and abuse & Medium & Report flow, moderation queue, rate limits \\
+Dispute volume overload & Medium & Explicit dispute policy, SLA tiers, admin queue tooling \\
+Student identity misuse & High & Verification flag, strict auth checks, moderation enforcement \\
+Low early adoption & Medium & Campus ambassador program, social media push, zero-fee tutoring \\
+Payment gateway downtime & Medium & Graceful degradation message, retry queue \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Feasibility Analysis}
+
+\subsection{Technical Feasibility}
+\textbf{Assessment: Feasible with manageable complexity}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Dimension} & \textbf{Assessment} \\
+\hline
+Backend API & Mature, well-documented stack with established patterns \\
+Authentication & Managed identity provider reduces custom auth complexity \\
+Real-time Chat & Socket.IO is proven at the target scale \\
+Payment Integration & SSLCommerz provides documented Bangladesh-specific API \\
+Mobile & Flutter enables single codebase for Android and iOS \\
+File Storage & Object storage is commodity infrastructure \\
+Escrow Logic & Well-understood; primary complexity lies in edge-case handling \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Operational Feasibility}
+\textbf{Assessment: Feasible with defined admin team}
+
+\begin{itemize}
+    \item Platform requires at least 2 part-time admins for moderation and dispute resolution at launch
+    \item Dispute volume expected to remain low in Year 1 (limited user base)
+    \item Admin tooling via built-in CMS panel significantly reduces custom admin development
+    \item Campus-limited scope constrains moderation complexity
+    \item Tutoring feature is self-moderated through peer ratings with no financial dispute risk
+\end{itemize}
+
+\subsection{Market Feasibility}
+\textbf{Assessment: Strong --- underserved high-need segment}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Factor} & \textbf{Detail} \\
+\hline
+Target market size & $\sim$20,000 enrolled students at Jagannath University \\
+Existing competition & None on-campus; Fiverr/Upwork do not serve local campus micro-transactions \\
+Local payment readiness & bKash penetration in Bangladesh student population exceeds 85\% \\
+Platform differentiator & Campus-only trust, zero-fee tutoring, dual-sided account \\
+Adoption lever & Free tutoring exchange as viral entry point \\
+Student income demand & Rising cost of living in Dhaka increases motivation to earn \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Financial Feasibility}
+\textbf{Assessment: Break-even achievable within Year 3}
+
+\begin{itemize}
+    \item Initial investment is modest relative to potential Year 2 revenue
+    \item Revenue model is simple: 5\% platform fee on paid transactions up to BDT 500
+    \item Tutoring is free and zero-revenue --- growth and retention driver
+    \item Monthly operational costs covered in Year 2 (monthly break-even at $\sim$1,400 active transacting users)
+    \item Full investment recovery (cumulative break-even) projected during Year 3
+\end{itemize}
+
+\section{Economic Analysis and Break-Even}
+
+\subsection{Key Assumptions}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+JnU total student enrollment & $\sim$20,000 students \\
+Platform service fee (paid gigs/jobs) & 5\% of transaction value up to BDT 500 \\
+Tutoring platform fee & 0\% (permanently free) \\
+Average paid transaction value & BDT 500 (Y1) → BDT 700 (Y5) \\
+Avg monthly paid tx per active user & 2.0 (Y1) → 3.0 (Y5) \\
+Exchange rate reference & 1 USD $\approx$ BDT 110 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Initial Investment (Year 0)}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|r|}
+\hline
+\textbf{Item} & \textbf{Estimated Cost (BDT)} \\
+\hline
+Development team (5 members × 6–8 months) & 8,40,000 \\
+UI/UX design and QA & 1,25,000 \\
+Launch marketing and campus promotion & 60,000 \\
+Infrastructure setup and domain & 20,000 \\
+Legal, registration, and administration & 30,000 \\
+\hline
+\textbf{Total Initial Investment} & \textbf{10,75,000} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{User Adoption Projections}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Year} & \textbf{Active Users} & \textbf{\% of JnU Students} \\
+\hline
+Year 1 & $\sim$800 (avg, ramping from 100) & 4\% \\
+Year 2 & $\sim$2,400 (avg, ramping to 2,800 by end) & 12--14\% \\
+Year 3 & $\sim$4,400 & 22\% \\
+Year 4 & $\sim$7,000 & 35\% \\
+Year 5 & $\sim$10,000 & 50\% \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Revenue Projections}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\textbf{Year} & \textbf{Active Users} & \textbf{Tx/User/Mo} & \textbf{Tx Value (BDT)} & \textbf{GMV (BDT)} & \textbf{Revenue (BDT)} \\
+\hline
+Year 1 & 800 & 2.0 & 500 & 96,00,000 & 4,80,000 \\
+Year 2 & 2,400 & 2.2 & 540 & 3,41,57,000 & 17,07,850 \\
+Year 3 & 4,400 & 2.5 & 580 & 7,65,60,000 & 38,28,000 \\
+Year 4 & 7,000 & 2.8 & 630 & 14,81,76,000 & 74,08,800 \\
+Year 5 & 10,000 & 3.0 & 690 & 24,84,00,000 & 1,24,20,000 \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Break-Even Analysis}
+
+\textbf{Monthly Operational Break-Even:}
+
+\[
+\text{Transactions needed/month} = \frac{\text{Monthly operating cost}}{\text{Revenue per transaction}} = \frac{70,000}{500 \times 5\%} = \frac{70,000}{25} = 2,800 \text{ transactions}
+\]
+
+\[
+\text{Active users needed} = \frac{2,800 \text{ tx/month}}{2 \text{ tx/user/month}} = 1,400 \text{ users}
+\]
+
+\begin{itemize}
+    \item \textbf{Monthly operational break-even:} Approximately Month 13--14 after launch
+    \item \textbf{Full investment recovery (cumulative break-even):} Approximately Month 30--32 (roughly mid Year 3)
+\end{itemize}
+
+\textbf{5-Year ROI:}
+
+\[
+\text{Total Revenue (Y1--Y5)} = \text{BDT } 2,58,44,650
+\]
+
+\[
+\text{Total Cost (Y0--Y5)} = \text{BDT } 83,75,000
+\]
+
+\[
+\text{Net 5-Year Profit} = \text{BDT } 1,74,69,650 \approx \text{USD } 1,58,815
+\]
+
+\[
+\text{ROI (5-year)} = \frac{1,74,69,650}{83,75,000} \times 100 \approx \textbf{209\%}
+\]
+
+\subsection{Key Economic Notes}
+
+\begin{itemize}
+    \item \textbf{Tutoring is a strategic loss-leader:} Zero-fee tutoring generates no direct revenue but reduces onboarding friction
+    \item \textbf{Revenue is conservative:} Projections use only the 5\% service fee
+    \item \textbf{Adoption risk is the primary variable:} If Year 1 adoption stays below 700 users, monthly break-even shifts
+    \item \textbf{Cost model includes no full-time salaries in operations:} Post-launch maintenance assumes lean part-time team
+\end{itemize}
+
+\section{Agile Scrum Sprint Plan}
+
+\subsection{Scrum Framework Configuration}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Sprint duration & 2 weeks \\
+Team size & 5 members (1 backend, 1 web frontend, 1 mobile, 1 lead/full-stack, 1 QA + design) \\
+Estimated team velocity & 35--40 story points per sprint \\
+Sprint ceremonies & Planning, Daily standup (15 min), Review + Retrospective \\
+Definition of Done & Feature code merged, unit tested, reviewed, deployed to staging, QA-signed off \\
+Backlog tool & Linear / Jira \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Epic and Phase Map}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Phase} & \textbf{Sprints} & \textbf{Duration} & \textbf{Core Epics} & \textbf{FR Coverage} \\
+\hline
+Phase 1 -- Foundation & 1--2 & Weeks 1--4 & Auth, Profiles, Security & FR-A, FR-B \\
+Phase 2 -- Marketplace & 3--5 & Weeks 5--10 & Gig CRUD, Job Board, Proposals & FR-C, FR-D \\
+Phase 3 -- Transactions & 6--8 & Weeks 11--16 & Orders, Delivery, Payments, Escrow & FR-E, FR-F \\
+Phase 4 -- Communication & 9--10 & Weeks 17--20 & Real-time Chat, Notifications, Push & FR-G \\
+Phase 5 -- Trust \& Quality & 11--13 & Weeks 21--26 & Reviews, Tutoring, Search, Admin & FR-H, FR-I, FR-J \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Sprint Summary Table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Sprint} & \textbf{Phase} & \textbf{Focus} & \textbf{Story Points} & \textbf{Duration} \\
+\hline
+Sprint 1 & Phase 1 & Authentication & 38 & Weeks 1--2 \\
+Sprint 2 & Phase 1 & Profiles & 36 & Weeks 3--4 \\
+Sprint 3 & Phase 2 & Gig CRUD + Packages & 40 & Weeks 5--6 \\
+Sprint 4 & Phase 2 & Gig Search + Discovery & 35 & Weeks 7--8 \\
+Sprint 5 & Phase 2 & Job Board + Proposals & 38 & Weeks 9--10 \\
+Sprint 6 & Phase 3 & Order Lifecycle & 40 & Weeks 11--12 \\
+Sprint 7 & Phase 3 & Delivery + Revision & 38 & Weeks 13--14 \\
+Sprint 8 & Phase 3 & Payments + Escrow & 42 & Weeks 15--16 \\
+Sprint 9 & Phase 4 & Real-Time Chat & 40 & Weeks 17--18 \\
+Sprint 10 & Phase 4 & Notifications + Push & 36 & Weeks 19--20 \\
+Sprint 11 & Phase 5 & Reviews + Trust & 32 & Weeks 21--22 \\
+Sprint 12 & Phase 5 & Tutoring + Search Polish & 35 & Weeks 23--24 \\
+Sprint 13 & Phase 5 & Admin + Dashboard + UAT & 38 & Weeks 25--26 \\
+\hline
+\textbf{Total} & & & \textbf{478 SP} & \textbf{26 weeks} \\
+\hline
+\end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{Agile Scrum Product Lifecycle Workflow}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=2.2cm and 2.5cm,
+    >=Stealth,
+    every node/.style={font=\small},
+    
+    planning/.style={
+        rectangle, rounded corners,
+        draw=blue!70!black, thick,
+        fill=blue!15,
+        minimum width=3.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    
+    development/.style={
+        rectangle, rounded corners,
+        draw=green!60!black, thick,
+        fill=green!15,
+        minimum width=3.2cm,
+        minimum height=1cm,
+        align=center
+    },
+    
+    review/.style={
+        rectangle, rounded corners,
+        draw=orange!80!black, thick,
+        fill=yellow!25,
+        minimum width=3.2cm,
+        minimum height=1cm,
+        align=center
+    },
+    
+    release/.style={
+        rectangle, rounded corners,
+        draw=red!70!black, thick,
+        fill=red!15,
+        minimum width=3.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    
+    artifact/.style={
+        rectangle, rounded corners,
+        draw=purple!70!black, thick,
+        fill=purple!15,
+        minimum width=3.4cm,
+        minimum height=1cm,
+        align=center
+    },
+    
+    decision/.style={
+        diamond,
+        draw=red!70!black,
+        thick,
+        fill=red!10,
+        aspect=2,
+        align=center,
+        inner sep=1pt
+    },
+    
+    role/.style={
+        ellipse,
+        draw=black!70,
+        dashed,
+        fill=gray!10,
+        minimum width=2.8cm,
+        minimum height=0.8cm,
+        align=center
+    }
+]
+
+% Main Planning Phase
+\node[planning] (vision) {Product Vision\\Business Requirements\\Stakeholders + Product Owner};
+
+\node[artifact, below=of vision] (backlog) {Product Backlog\\Central Scrum Artifact};
+
+\node[planning, below left=2cm and 3cm of backlog] (refine) {Backlog Refinement\\Prioritization};
+
+\node[planning, below=of backlog] (planning) {Sprint Planning\\Scrum Team};
+
+\node[artifact, below right=2cm and 3cm of backlog] (sprintbacklog) {Sprint Backlog};
+
+% Sprint Cycle Circle
+\node[development, right=4cm of planning] (design) {Design};
+
+\node[development, below=of design] (develop) {Development};
+
+\node[development, below=of develop] (test) {Testing};
+
+\node[development, left=of develop] (daily) {Daily Scrum\\(Daily Loop)};
+
+% Review
+\node[review, below=3cm of planning] (review) {Sprint Review\\Stakeholders};
+
+\node[review, right=of review] (retro) {Sprint Retrospective};
+
+\node[artifact, right=of retro] (increment) {Product Increment\\Deliverable};
+
+% Release
+\node[decision, right=of increment] (decision) {Release\\Decision};
+
+\node[release, above right=1.8cm and 2.8cm of decision] (release) {Final Product Release};
+
+\node[release, below right=1.8cm and 2.8cm of decision] (maintenance) {Maintenance\\Continuous Improvement};
+
+% Roles
+\node[role, left=2cm of backlog] (po) {Product Owner};
+
+\node[role, below=1.3cm of daily] (sm) {Scrum Master};
+
+\node[role, right=2cm of design] (devteam) {Development Team};
+
+\node[role, above=1.3cm of release] (stakeholders) {Stakeholders};
+
+% Main Flow
+\draw[->, thick] (vision) -- (backlog);
+\draw[->, thick] (backlog) -- (planning);
+\draw[->, thick] (backlog) -- (refine);
+\draw[->, thick] (refine) -- (planning);
+\draw[->, thick] (planning) -- (sprintbacklog);
+\draw[->, thick] (sprintbacklog) -- (design);
+
+% Sprint Circular Loop
+\draw[->, thick] (design) -- (develop);
+\draw[->, thick] (develop) -- (test);
+\draw[->, thick] (test) -- (daily);
+\draw[->, thick] (daily) -- (design);
+
+% Sprint Completion
+\draw[->, thick] (test) |- (review);
+\draw[->, thick] (review) -- (retro);
+\draw[->, thick] (retro) -- (increment);
+\draw[->, thick] (increment) -- (decision);
+
+% Decision Branches
+\draw[->, thick, red] (decision) |- node[pos=0.25, above] {Complete} (release);
+\draw[->, thick, blue] (decision) |- node[pos=0.25, below] {Incomplete} (maintenance);
+
+% Feedback Loops
+\draw[->, thick, dashed, blue!70] (maintenance.west) to[out=180,in=-90] (backlog.south);
+\draw[->, thick, dashed, blue!70] (release.north) to[out=180,in=45] (stakeholders.east);
+
+% Background Sprint Cycle Highlight
+\begin{scope}[on background layer]
+\node[
+    draw=green!50!black,
+    rounded corners,
+    thick,
+    dashed,
+    inner sep=0.6cm,
+    fit=(design)(develop)(test)(daily),
+    label=above:{\textbf{Sprint Execution Cycle}}
+] {};
+\end{scope}
+
+% Legend
+\node[draw=black, rounded corners, align=left, anchor=north west, font=\footnotesize] at (-1,-10) {
+\textbf{Legend:} \\
+\textcolor{blue!70!black}{Planning Phase} \\
+\textcolor{green!60!black}{Development Phase} \\
+\textcolor{orange!80!black}{Review Phase} \\
+\textcolor{red!70!black}{Release Phase} \\
+\textcolor{purple!70!black}{Scrum Artifacts}
+};
+
+\end{tikzpicture}
+\caption{GigHub Agile Scrum Product Lifecycle}
+\end{figure}
+
+\subsection{Phase Details}
+
+\subsubsection{Phase 1 --- Foundation (Sprints 1--2, Weeks 1--4)}
+\begin{itemize}
+    \item Sprint 1: Authentication (Email/password, Google OAuth, session tokens)
+    \item Sprint 2: Profiles (User info, avatar, skills, public profile, verification badge)
+\end{itemize}
+
+\subsubsection{Phase 2 --- Marketplace Core (Sprints 3--5, Weeks 5--10)}
+\begin{itemize}
+    \item Sprint 3: Gig Creation and Management (Packages, tiered pricing)
+    \item Sprint 4: Gig Discovery and Search (Browse, filter, search)
+    \item Sprint 5: Job Board and Proposals (Post jobs, submit proposals, accept proposals)
+\end{itemize}
+
+\subsubsection{Phase 3 --- Transactions (Sprints 6--8, Weeks 11--16)}
+\begin{itemize}
+    \item Sprint 6: Order Lifecycle (State management, pending → in-progress → delivered)
+    \item Sprint 7: Delivery and Revision Flow (Deliverables, revisions, approvals)
+    \item Sprint 8: Payments and Escrow (SSLCommerz integration, escrow logic, withdrawals)
+\end{itemize}
+
+\subsubsection{Phase 4 --- Communication (Sprints 9--10, Weeks 17--20)}
+\begin{itemize}
+    \item Sprint 9: Real-Time Chat (WebSocket, 1-to-1 messaging, order-linked channels)
+    \item Sprint 10: Notifications and Push (In-app notifications, mobile push, event triggers)
+\end{itemize}
+
+\subsubsection{Phase 5 --- Trust, Quality, and Tutoring (Sprints 11--13, Weeks 21--26)}
+\begin{itemize}
+    \item Sprint 11: Reviews and Trust System (Mutual reviews, ratings, aggregated scores)
+    \item Sprint 12: Tuition Feature and Search Polish (Free tutoring listings, search optimization)
+    \item Sprint 13: Admin Tools, Dashboard, and UAT (Moderation panel, dispute queue, user dashboard)
+\end{itemize}
+
+\section{Testability and Acceptance Strategy}
+
+\subsection{Test Layers}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|p{9cm}|}
+\hline
+\textbf{Layer} & \textbf{Scope} \\
+\hline
+Unit Testing & Individual functions, validators, DTOs, service methods \\
+Integration Testing & API endpoints, database integration, payment gateway mocks \\
+End-to-End Testing & User journeys (auth → gig creation → order → payment → review) \\
+Performance Testing & Load testing (1,000+ concurrent users), latency thresholds \\
+Security Testing & OWASP top 10, SQL injection, XSS, token validation \\
+User Acceptance Testing & Stakeholder sign-off on core flows and admin tooling \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{Approval Note}
+
+This Requirements Analysis Document (RAD) represents a comprehensive analysis of the GigHub platform requirements using Agile software engineering best practices. Approval from Product, Engineering, and Finance stakeholders is required to proceed with implementation.
+
+\vspace{2cm}
+
+\noindent
+\begin{tabular}{p{5cm}p{5cm}p{5cm}}
+Product Owner: & Engineering Lead: & Finance Lead: \\
+\line(1,0){50} & \line(1,0){50} & \line(1,0){50} \\
+Date: & Date: & Date:
+\end{tabular}
+
+\end{document}
