@@ -10,7 +10,7 @@ import {
   Min,
   IsArray,
 } from 'class-validator';
-import { JobStatus, JobType } from '@/types/job.types';
+import { BudgetType, JobStatus, JobType } from '@/types/job.types';
 
 export class UpdateJobDto {
   @IsEnum(['edit', 'status'] as any)
@@ -53,6 +53,16 @@ export class UpdateJobDto {
   @IsNumber()
   @Min(0)
   budget_max?: number;
+
+  @ValidateIf((o: UpdateJobDto) => o.type === 'edit')
+  @IsOptional()
+  @IsEnum(BudgetType)
+  budget_type?: BudgetType;
+
+  @ValidateIf((o: UpdateJobDto) => o.type === 'edit')
+  @IsOptional()
+  @IsString()
+  deadline?: string;
 
   @ValidateIf((o: UpdateJobDto) => o.type === 'edit')
   @IsOptional()

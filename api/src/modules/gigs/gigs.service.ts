@@ -41,7 +41,8 @@ export class GigsService {
       'description',
       'price',
       'delivery_days',
-      'revisions',
+      'revision_count',
+      'features',
     ].join(',');
   }
 
@@ -152,7 +153,8 @@ export class GigsService {
         description: item.description,
         price: item.price,
         delivery_days: item.delivery_days,
-        revisions: item.revisions,
+        revision_count: item.revision_count,
+        features: item.features ?? [],
       }));
 
       const { data: packageData } = await directusApi.post<{ data: GigPackage[] }>(
@@ -221,7 +223,8 @@ export class GigsService {
                 description: item.description,
                 price: item.price,
                 delivery_days: item.delivery_days,
-                revisions: item.revisions,
+                revision_count: item.revision_count,
+                features: item.features ?? [],
               },
             );
           } else {
@@ -232,7 +235,8 @@ export class GigsService {
               description: item.description,
               price: item.price,
               delivery_days: item.delivery_days,
-              revisions: item.revisions,
+              revision_count: item.revision_count,
+              features: item.features ?? [],
             });
           }
         }

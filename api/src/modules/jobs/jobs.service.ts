@@ -21,6 +21,8 @@ export class JobsService {
       'job_type',
       'budget_min',
       'budget_max',
+      'budget_type',
+      'deadline',
       'required_skills',
       'attachments',
       'status',
@@ -81,6 +83,8 @@ export class JobsService {
 
       if (dto.budget_min !== undefined) payload.budget_min = dto.budget_min;
       if (dto.budget_max !== undefined) payload.budget_max = dto.budget_max;
+      if (dto.budget_type !== undefined) payload.budget_type = dto.budget_type;
+      if (dto.deadline !== undefined) payload.deadline = dto.deadline;
       if (dto.required_skills?.length) payload.required_skills = dto.required_skills;
       if (dto.attachments?.length) payload.attachments = dto.attachments;
 
@@ -112,6 +116,8 @@ export class JobsService {
       if (dto.job_type !== undefined) payload['job_type'] = dto.job_type;
       if (dto.budget_min !== undefined) payload['budget_min'] = dto.budget_min;
       if (dto.budget_max !== undefined) payload['budget_max'] = dto.budget_max;
+      if (dto.budget_type !== undefined) payload['budget_type'] = dto.budget_type;
+      if (dto.deadline !== undefined) payload['deadline'] = dto.deadline;
       if (dto.required_skills !== undefined) payload['required_skills'] = dto.required_skills;
       if (dto.attachments !== undefined) payload['attachments'] = dto.attachments;
 
@@ -181,6 +187,7 @@ export class JobsService {
 
     if (query.category) filter['category'] = { _eq: query.category };
     if (query.job_type) filter['job_type'] = { _eq: query.job_type };
+    if (query.budget_type) filter['budget_type'] = { _eq: query.budget_type };
     if (query.required_skills) filter['required_skills'] = { _contains: query.required_skills };
     if (query.search)
       filter['_or'] = [

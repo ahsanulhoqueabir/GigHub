@@ -1,5 +1,5 @@
 export enum ProposalStatus {
-  SUBMITTED = 'submitted',
+  PENDING = 'pending',
   ACCEPTED = 'accepted',
   REJECTED = 'rejected',
   WITHDRAWN = 'withdrawn',
@@ -7,10 +7,12 @@ export enum ProposalStatus {
 
 export interface Proposal {
   id: string;
-  gig: string;
-  proposer: string;
-  cover_letter?: string;
-  amount?: number;
+  job: string;
+  applicant: string;
+  cover_letter: string;
+  quoted_price?: number;
+  estimated_days?: number;
+  attachments?: string[];
   status: ProposalStatus;
   created_at: string;
   updated_at: string;

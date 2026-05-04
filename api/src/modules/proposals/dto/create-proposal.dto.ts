@@ -1,16 +1,30 @@
-import { IsNumber, IsOptional, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsNumber, IsOptional, IsString, MinLength, MaxLength, IsInt, Min, Max, IsArray } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateProposalDto {
   @IsString()
-  gig_id!: string;
+  job_id!: string;
 
-  @IsOptional()
   @IsString()
   @MinLength(10)
   @MaxLength(5000)
-  cover_letter?: string;
+  cover_letter!: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
-  amount?: number;
+  @Min(1)
+  quoted_price?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  estimated_days?: number;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  attachments?: string[];
 }

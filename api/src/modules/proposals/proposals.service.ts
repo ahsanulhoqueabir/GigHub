@@ -12,24 +12,28 @@ export class ProposalsService {
   private fields() {
     return [
       'id',
-      'gig',
-      'proposer',
+      'job',
+      'applicant',
       'cover_letter',
-      'amount',
+      'quoted_price',
+      'estimated_days',
+      'attachments',
       'status',
       'created_at',
       'updated_at',
     ].join(',');
   }
 
-  async create(proposerId: string, dto: any): Promise<ServiceResponse<ProposalDetail>> {
+  async create(applicantId: string, dto: any): Promise<ServiceResponse<ProposalDetail>> {
     try {
       const payload = {
-        gig: dto.gig_id,
-        proposer: proposerId,
-        cover_letter: dto.cover_letter ?? null,
-        amount: dto.amount ?? null,
-        status: ProposalStatus.SUBMITTED,
+        job: dto.job_id,
+        applicant: applicantId,
+        cover_letter: dto.cover_letter,
+        quoted_price: dto.quoted_price ?? null,
+        estimated_days: dto.estimated_days ?? null,
+        attachments: dto.attachments ?? [],
+        status: ProposalStatus.PENDING,
       };
 
       const { data } = await directusApi.post<{ data: Proposal }>(
@@ -48,11 +52,13 @@ export class ProposalsService {
         `/items/${this.collection}/${id}`,
       );
       if (!existing.data) return fail('Proposal not found', undefined, 404);
-      if (existing.data.proposer !== userId) return fail('Not allowed', undefined, 403);
+      if (existing.data.applicant !== userId) return fail('Not allowed', undefined, 403);
 
       const payload: Record<string, unknown> = {};
       if (dto.cover_letter !== undefined) payload['cover_letter'] = dto.cover_letter;
-      if (dto.amount !== undefined) payload['amount'] = dto.amount;
+      if (dto.quoted_price !== undefined) payload['quoted_price'] = dto.quoted_price;
+      if (dto.estimated_days !== undefined) payload['estimated_days'] = dto.estimated_days;
+      if (dto.attachments !== undefined) payload['attachments'] = dto.attachments;
       if (dto.status !== undefined) payload['status'] = dto.status;
 
       const { data } = await directusApi.patch<{ data: Proposal }>(
@@ -71,7 +77,7 @@ export class ProposalsService {
         `/items/${this.collection}/${id}`,
       );
       if (!existing.data) return fail('Proposal not found', undefined, 404);
-      if (existing.data.proposer !== userId) return fail('Not allowed', undefined, 403);
+      if (existing.data.applicant !== userId) return fail('Not allowed', undefined, 403);
 
       const { data } = await directusApi.patch<{ data: Proposal }>(
         `/items/${this.collection}/${id}`,
@@ -83,8 +89,8 @@ export class ProposalsService {
     }
   }
 
-  async listByGig(
-    gigId: string,
+  async listByJob(
+    jobId: string,
     page = 1,
     limit = 20,
   ): Promise<PaginatedServiceResponse<Proposal>> {
@@ -94,7 +100,7 @@ export class ProposalsService {
         meta?: { filter_count?: number };
       }>(`/items/${this.collection}`, {
         params: {
-          filter: { gig: { _eq: gigId } },
+          filter: { job: { _eq: jobId } },
           fields: this.fields(),
           page,
           limit,
@@ -119,7 +125,7 @@ export class ProposalsService {
   }
 
   async mine(
-    proposerId: string,
+    applicantId: string,
     page = 1,
     limit = 20,
   ): Promise<PaginatedServiceResponse<Proposal>> {
@@ -129,7 +135,7 @@ export class ProposalsService {
         meta?: { filter_count?: number };
       }>(`/items/${this.collection}`, {
         params: {
-          filter: { proposer: { _eq: proposerId } },
+          filter: { applicant: { _eq: applicantId } },
           fields: this.fields(),
           page,
           limit,

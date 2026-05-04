@@ -1,17 +1,17 @@
 meta {
-  name: List by Gig
+  name: List by Job
   type: http
   seq: 1
 }
 
 get {
-  url: {{base_url}}/proposals/gig/:gigId
+  url: {{base_url}}/proposals/job/:jobId
   body: none
   auth: bearer
 }
 
 params:path {
-  gigId: 
+  jobId: 
 }
 
 auth:bearer {

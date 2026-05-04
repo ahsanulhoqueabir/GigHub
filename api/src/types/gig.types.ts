@@ -28,7 +28,8 @@ export interface GigPackage {
   description: string;
   price: number;
   delivery_days: number;
-  revisions: number;
+  revision_count: number;
+  features: string[];
 }
 
 export interface Gig {
