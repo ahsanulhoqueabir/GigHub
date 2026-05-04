@@ -1,0 +1,27 @@
+meta {
+  name: Edit Job
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{base_url}}/jobs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "edit",
+    "title": "Updated: Need a Senior React Developer",
+    "description": "Updated description with more specific requirements for a senior developer."
+  }
+}

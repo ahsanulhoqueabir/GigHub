@@ -1,0 +1,25 @@
+meta {
+  name: Tuition Job
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/jobs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Math Tutor for Class 10",
+    "description": "In-person math tutoring for a class 10 student twice a week.",
+    "category_id": "8c2deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "job_type": "tuition",
+    "skills": ["math", "teaching"]
+  }
+}
