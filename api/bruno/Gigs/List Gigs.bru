@@ -1,11 +1,21 @@
 meta {
   name: List Gigs
   type: http
-  seq: 2
+  seq: 6
 }
 
 get {
-  url: {{base_url}}/gigs?page=1&limit=10
+  url: {{base_url}}/gigs
   body: none
   auth: none
+}
+
+params:query {
+  page: 1
+  limit: 10
+  ~sort: price_asc
+  ~search: nestjs
+  ~category: 
+  ~min_rating: 4
+  ~tags: 
 }

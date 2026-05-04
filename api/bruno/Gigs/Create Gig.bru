@@ -16,10 +16,33 @@ auth:bearer {
 
 body:json {
   {
-    "title": "I will build a professional NestJS API",
-    "description": "Comprehensive backend development with clean architecture.",
-    "price": 50,
+    "title": "I will create a high performance NestJS backend",
+    "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
     "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
-    "tags": ["api", "backend", "nestjs"]
+    "tags": ["nestjs", "backend", "api", "typescript"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic API Setup",
+        "description": "Basic setup with 3 endpoints and database integration.",
+        "price": 50,
+        "delivery_days": 3,
+        "revisions": 1
+      },
+      {
+        "tier": "standard",
+        "title": "Standard API Development",
+        "description": "Standard setup with 10 endpoints, auth, and database integration.",
+        "price": 150,
+        "delivery_days": 7,
+        "revisions": 3
+      }
+    ],
+    "images": [
+      {
+        "url": "https://example.com/image1.jpg",
+        "sort_order": 0
+      }
+    ]
   }
 }

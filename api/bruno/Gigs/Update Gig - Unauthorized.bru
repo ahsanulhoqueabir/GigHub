@@ -1,0 +1,26 @@
+meta {
+  name: Update Gig - Unauthorized
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{base_url}}/gigs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "active"
+  }
+}
