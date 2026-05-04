@@ -116,7 +116,9 @@ describe('ProfileService', () => {
         availability_status: AvailabilityStatus.BUSY,
       };
 
-      mockedDirectusApi.patch.mockResolvedValueOnce({ data: { data: { ...profile, ...updateDto } } });
+      mockedDirectusApi.patch.mockResolvedValueOnce({
+        data: { data: { ...profile, ...updateDto } },
+      });
 
       const result = await service.update('profile-id', updateDto);
 
@@ -136,7 +138,9 @@ describe('ProfileService', () => {
         bio: 'New bio',
       };
 
-      mockedDirectusApi.patch.mockResolvedValueOnce({ data: { data: { ...profile, ...updateDto } } });
+      mockedDirectusApi.patch.mockResolvedValueOnce({
+        data: { data: { ...profile, ...updateDto } },
+      });
 
       const result = await service.update('profile-id', updateDto);
 
@@ -187,11 +191,7 @@ describe('ProfileService', () => {
     it('returns error on avatar update failure', async () => {
       mockedDirectusApi.patch.mockRejectedValueOnce(new Error('Upload error'));
 
-      const result = await service.setAvatar(
-        'profile-id',
-        'https://example.com/avatar.jpg',
-        'key',
-      );
+      const result = await service.setAvatar('profile-id', 'https://example.com/avatar.jpg', 'key');
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Failed to update avatar');

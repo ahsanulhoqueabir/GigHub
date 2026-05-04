@@ -222,12 +222,12 @@ export class AuthService {
 
     const access_token = this.jwtService.sign(payload, {
       secret: this.config.get<string>('jwt.secret'),
-      expiresIn,
+      expiresIn: expiresIn as any,
     });
 
     const refresh_token = this.jwtService.sign(payload, {
       secret: this.config.get<string>('jwt.refreshSecret'),
-      expiresIn: refreshExpiresIn,
+      expiresIn: refreshExpiresIn as any,
     });
 
     return { access_token, refresh_token, expires_in: expiresIn };

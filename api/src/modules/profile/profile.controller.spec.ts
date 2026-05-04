@@ -233,7 +233,10 @@ describe('ProfileController', () => {
       });
 
       it('throws InternalServerErrorException when update fails', async () => {
-        profileService.setFcmToken.mockResolvedValueOnce({ success: false, error: 'Update failed' });
+        profileService.setFcmToken.mockResolvedValueOnce({
+          success: false,
+          error: 'Update failed',
+        });
 
         const dto = { type: 'fcm_token' as const, fcm_token: 'token' };
 
