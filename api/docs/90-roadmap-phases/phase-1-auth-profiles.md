@@ -1,0 +1,339 @@
+# Backend Phase 1 — Foundation: Auth, Profiles & Infrastructure
+
+> **Duration Estimate:** 2–3 weeks
+> **Dependencies:** None (starting point)
+> **Outcomes:** Working auth flow, profile management, R2 uploads, project structure
+
+---
+
+## Phase Overview
+
+Set up the NestJS project, integrate Firebase Auth, implement custom JWT issuance, create `gh_profiles` in Directus, and build the file upload pipeline to Cloudflare R2.
+
+---
+
+## Task Checklist
+
+### 1.1 Project Setup & Configuration
+
+- [ ] **1.1.1** Initialize NestJS project with TypeScript strict mode
+  ```bash
+  nest new gighub-api --strict
+  ```
+- [ ] **1.1.2** Set up project structure:
+  ```
+  src/
+  ├── common/                 # Shared utilities, decorators, filters, etc.
+  ├── config/                 # Environment and application configuration
+  ├── modules/
+  │   ├── auth/               # Special Module: Firebase + JWT logic
+  │   │   ├── auth.controller.ts
+  │   │   ├── auth.module.ts
+  │   │   └── auth.service.ts
+  │   ├── profile/            # Domain: gh_profiles
+  │   │   ├── profile.controller.ts
+  │   │   ├── profile.module.ts
+  │   │   └── profile.service.ts
+  │   ├── category/           # Domain: gh_categories
+  │   │   ├── category.controller.ts
+  │   │   ├── category.module.ts
+  │   │   └── category.service.ts
+  │   └── upload/             # Domain: Infrastructure (R2)
+  │       ├── upload.controller.ts
+  │       ├── upload.module.ts
+  │       └── upload.service.ts
+  ├── types/                  # Centralized Types (Independent files)
+  │   ├── auth.types.ts
+  │   ├── profile.types.ts
+  │   ├── category.types.ts
+  │   └── upload.types.ts
+  └── main.ts
+  ```
+
+### 1.1.2b Service & Type Architecture Pattern
+
+To maintain a clean, collection-centric codebase, all modules MUST follow these rules:
+
+1. **Collection-Centric Services**: Each database collection has its own dedicated service file (e.g., `gh_profiles` → `ProfileService`).
+2. **Centralized API Client**: Use the centralized `directusApi` (axios instance) for all Directus communication. Do NOT manually create axios instances in services.
+3. **Instance-Based Services**: Services are NestJS `@Injectable()` classes. Use `private readonly collection` (lowercase) and `async` instance methods. Controllers inject the service via constructor DI — never call static methods.
+4. **`fields()` Utility**: If a service queries the same field list in more than one method, define a `private fields(): string` method returning `[...].join(',')` and call it via `this.fields()`.
+5. **Shared Query Helper**: For repeated list-query patterns (e.g., filter + limit: 1), extract a `private async query<T>()` helper to eliminate duplicated try/catch blocks.
+6. **Patch Helper**: For services with multiple PATCH operations on the same collection, extract a `private async patch(id, payload, errMsg)` helper.
+7. **Standardized Returns**: EVERY service method MUST return a `ServiceResponse<T>` using `ok()` or `fail()` helpers from `@/utils/service-response`. Never throw inside a service method — always return a `fail()`.
+8. **Concise Method Names**: Use single-concept verbs. Prefer `get`, `find`, `list`, `update`, `set*`, `remove`, `create` over long compound names like `getProfileById` or `updateBasicInfo`.
+9. **Cross-Service Dependency**: If `Service A` needs data from `Collection B`, inject `Service B` via NestJS DI and call its instance methods.
+10. **Type Organization**: ALL types MUST be centralized in `src/types/` (e.g., `src/types/profile.types.ts`).
+
+**Service Example (Standard Pattern):**
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import directusApi from "@/utils/directus.api";
+import { ok, fail } from "@/utils/service-response";
+import type { ServiceResponse } from "@/types/services/common.types";
+import type { Profile } from "@/types/profile.types";
+
+@Injectable()
+export class ProfileService {
+  private readonly collection = "gh_profiles";
+
+  private fields(): string {
+    return ["id", "display_name", "username", "avatar", "bio"].join(",");
+  }
+
+  private async patch(
+    id: string,
+    payload: Record<string, unknown>,
+    errMsg: string,
+  ): Promise<ServiceResponse<Profile>> {
+    try {
+      const { data } = await directusApi.patch<{ data: Profile }>(
+        `/items/${this.collection}/${id}`,
+        payload,
+      );
+      return ok(data.data);
+    } catch (error) {
+      return fail(errMsg, error);
+    }
+  }
+
+  async get(id: string): Promise<ServiceResponse<Profile>> {
+    try {
+      const { data } = await directusApi.get<{ data: Profile }>(
+        `/items/${this.collection}/${id}`,
+        { params: { fields: this.fields() } },
+      );
+      return ok(data.data);
+    } catch (error) {
+      return fail("Failed to fetch profile", error);
+    }
+  }
+
+  async update(
+    id: string,
+    dto: Partial<Profile>,
+  ): Promise<ServiceResponse<Profile>> {
+    return this.patch(id, { ...dto }, "Failed to update profile");
+  }
+}
+```
+
+**Service Response Helpers (`src/utils/service-response.ts`):**
+
+```typescript
+ok(data, message?)      // → { success: true, data, message }
+fail(message, err?, status?) // → { success: false, error, details, status }
+paginated(data, pagination, message?) // → { success: true, data, pagination, message }
+```
+
+- [ ] **1.1.3** Install core dependencies:
+  ```
+  @nestjs/config, @nestjs/jwt, @nestjs/passport
+  passport, passport-jwt, class-validator, class-transformer
+  firebase-admin, axios
+  @aws-sdk/client-s3 (for R2), helmet, @nestjs/throttler
+  ```
+- [ ] **1.1.4** Set up environment configuration module with validation:
+  ```
+  FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+  DIRECTUS_API_URL, DIRECTUS_TOKEN
+  JWT_SECRET, JWT_EXPIRES_IN, JWT_REFRESH_SECRET, JWT_REFRESH_EXPIRES_IN
+  R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL
+  SSLCOMMERZ_STORE_ID, SSLCOMMERZ_STORE_PASSWORD, SSLCOMMERZ_IS_SANDBOX
+  PORT, NODE_ENV
+  ```
+- [ ] **1.1.5** Set up global validation pipe, exception filter, response interceptor
+- [ ] **1.1.6** Set up Helmet security middleware
+- [ ] **1.1.7** Set up rate limiting with `@nestjs/throttler`
+- [ ] **1.1.8** Set up CORS configuration for Next.js and Flutter origins
+
+### 1.2 Directus Setup
+
+- [ ] **1.2.1** Deploy Directus instance (Docker or cloud)
+- [ ] **1.2.2** Create `gh_profiles` collection with all fields as per DB schema
+- [ ] **1.2.3** Create `gh_categories` collection with all fields
+- [ ] **1.2.4** Seed `gh_categories` with default data:
+  - Design, Development, Writing, Video & Animation, Marketing, Data & Analytics, Music & Audio, Translation, Business, Tutoring
+- [ ] **1.2.5** Create `gh_platform_config` collection with default values
+- [ ] **1.2.6** Set up Directus roles & permissions:
+  - **API Role** (used by NestJS): full CRUD on all `gh_*` collections
+  - **Public Role**: read-only on `gh_categories`, `gh_platform_config`
+- [ ] **1.2.7** Create Directus service module in NestJS (REST client wrapper with auth headers)
+
+### 1.3 Firebase Auth Integration
+
+- [ ] **1.3.1** Create Firebase project and configure:
+  - Enable email/password sign-up
+  - Enable Google OAuth provider
+  - Disable email confirmation (handle verification at platform level)
+  - Set redirect URLs for web and mobile
+- [ ] **1.3.2** Create `AuthModule` in NestJS with:
+  - `AuthService` — business logic
+  - `AuthController` — REST endpoints
+  - `FirebaseService` — Firebase Admin SDK wrapper
+- [ ] **1.3.2b** Define shared DTO contract for `POST /auth/login`:
+  - `provider=password` requires: `email`, `password`
+  - social provider (`google`) requires: `firebase_id_token`
+  - validate provider allowlist and conditional required fields
+  - enforce validation matrix:
+    - `password` => allow only `email`, `password`
+    - social provider => allow only `firebase_id_token`
+    - unknown provider => `400 INVALID_PROVIDER`
+- [ ] **1.3.3** Implement `POST /auth/register`:
+  1. Validate input (email, password, display_name, username)
+  2. Check username uniqueness against `gh_profiles`
+  3. Create Firebase user via `firebase-admin` Auth API
+  4. Create `gh_profiles` record in Directus with `firebase_uid`
+  5. Sign and return NestJS JWT + refresh token
+- [ ] **1.3.4** Implement `POST /auth/login`:
+  1. Accept a single payload contract: `provider` + provider-specific credentials/token
+  2. If `provider=password`, authenticate via Firebase Auth REST API (email/password)
+  3. If social provider (`google`), verify Firebase ID token via Firebase Admin SDK (`verifyIdToken`)
+  4. Enforce allowlist of supported providers
+  5. Check/create `gh_profiles` by `firebase_uid`
+  6. Sign and return NestJS JWT + refresh token
+- [ ] **1.3.6** Implement `POST /auth/refresh`:
+  1. Verify refresh token
+  2. Issue new access + refresh token pair
+- [ ] **1.3.7** Implement `POST /auth/logout`:
+  1. Invalidate refresh token (store in blacklist or rotation)
+- [ ] **1.3.8** Implement `POST /auth/forgot-password` and `POST /auth/reset-password`
+
+### 1.4 JWT Strategy & Guards
+
+- [ ] **1.4.1** Create JWT strategy (`JwtStrategy` extending `PassportStrategy`):
+  - Extract token from Authorization header
+  - Validate and decode payload: `{ profile_id, username, is_verified, role }`
+- [ ] **1.4.2** Create `JwtAuthGuard` (used globally or per-route)
+- [ ] **1.4.3** Create `RolesGuard` for admin-only routes
+- [ ] **1.4.4** Create `@CurrentUser()` decorator to extract user from request
+- [ ] **1.4.5** Create `@Roles('admin')` decorator
+- [ ] **1.4.6** Create `@Public()` decorator to skip auth on specific routes
+- [ ] **1.4.7** Set up global guard with `APP_GUARD` — all routes protected by default
+
+### 1.5 Profile Module
+
+- [ ] **1.5.1** Create `ProfileModule` with:
+  - `ProfileService` — instance methods for `gh_profiles` CRUD
+  - `ProfileController` — REST endpoints (injects `ProfileService` via constructor)
+  - `src/types/profile.types.ts` — Profile interfaces and enums
+  - DTOs: `UpdateProfileDto`, `ProfileResponseDto`
+- [ ] **1.5.2** Implement `GET /profiles/me` — return current user's full profile
+- [ ] **1.5.3** Implement `PATCH /profiles/me` — Consolidated update:
+  - Expects `type` field in payload: `basic_info`, `avatar`, `fcm_token`, `notification_prefs`
+  - Logic: Controller calls specific `ProfileService` function based on `type`
+  - Payload validation: DTO should validate `data` based on `type`. Specifically for `avatar`, accept Base64 string.
+  - Username change (within `basic_info`): check uniqueness, limit frequency (once per 30 days)
+- [ ] **1.5.4** Implement `GET /profiles/:username` — Consolidated view:
+  - Support `?type=...` query param: `profile` (default), `gigs`, `reviews`, `full`
+  - Logic: Controller calls appropriate service methods based on `type`
+  - Return: display_name, username, avatar, bio, skills, availability_status, avg_rating, total_reviews, created_at
+  - Exclude: email, firebase_uid, fcm_token, notification_prefs
+
+### 1.6 Cloudflare R2 Upload Module
+
+- [ ] **1.6.1** Create `UploadModule` with:
+  - `UploadService` — instance methods for R2 operations via AWS S3 SDK (`image()`, `file()`, `base64()`, `remove()`)
+  - `UploadController` — REST endpoints (injects `UploadService` via constructor)
+- [ ] **1.6.2** Configure S3 client for R2:
+  ```typescript
+  new S3Client({
+    region: "auto",
+    endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId: R2_ACCESS_KEY_ID,
+      secretAccessKey: R2_SECRET_ACCESS_KEY,
+    },
+  });
+  ```
+- [ ] **1.6.3** Implement `POST /upload/image`:
+  - Accept `multipart/form-data` with `file` and `folder` fields
+  - Validate file type (JPG, PNG, WebP) and size (max 10MB)
+  - Generate unique key: `{folder}/{uuid}.{ext}`
+  - Upload to R2 bucket
+  - Return public URL
+- [ ] **1.6.4** Implement `POST /upload/file`:
+  - Accept any file type, max 25MB
+  - Same flow as image upload
+- [ ] **1.6.5** Implement `DELETE /upload`:
+  - Accept R2 key, delete from bucket
+  - Verify the requesting user owns the resource (or is admin)
+- [ ] **1.6.6** Implement Avatar upload integration in `PATCH /profiles/me` (type: avatar):
+  - Accept Base64 image payload (e.g., `data:image/png;base64,...`)
+  - Decode and upload to R2 under `avatars/` folder
+  - Delete old avatar if exists
+  - Update `gh_profiles.avatar` field in Directus
+
+### 1.7 Common Utilities & Infrastructure
+
+- [ ] **1.7.1** Implement **Directus API Client** (`src/utils/directus.api.ts`):
+  - Centralized axios instance with `baseURL` and `Authorization` headers.
+  - Response interceptor for detailed error logging (status, message, url, method).
+  - Enhanced error messages for "Server not responding" or specific Directus errors.
+- [ ] **1.7.2** Implement **Service Response Helpers** (`src/utils/service-response.ts`):
+  - `ok<T>(data: T, message?: string)`: Returns `{ success: true, data, message }`.
+  - `fail(message, err?, status?)`: Returns `{ success: false, error, details, status }`.
+  - `paginated<T>(data, pagination, message?)`: Returns paginated success response.
+- [ ] **1.7.3** Define **Service Types** (`src/types/services/common.types.ts`):
+  - `ServiceResponse<T>`: Base interface for all service returns.
+  - `ServicePagination`: `currentPage`, `totalPages`, `totalCount`, `hasNextPage`, `hasPrevPage`.
+  - `PaginatedServiceResponse<T>`: Extends `ServiceResponse<T[]>` with `pagination` metadata.
+- [ ] **1.7.4** Create slug generator utility.
+- [ ] **1.7.5** Create global exception filter and response interceptor for NestJS.
+
+### 1.8 Testing & Validation
+
+- [ ] **1.8.1** Write unit tests for AuthService (register, login, JWT signing)
+- [ ] **1.8.2** Write unit tests for ProfilesService (CRUD operations)
+- [ ] **1.8.3** Write unit tests for UploadService (R2 operations)
+- [ ] **1.8.4** Write e2e tests for auth flow (register → login → access protected route)
+- [ ] **1.8.5** Write e2e tests for profile endpoints
+- [ ] **1.8.6** Test Google OAuth flow end-to-end
+- [ ] **1.8.7** Verify rate limiting on auth endpoints (5 req/min)
+
+---
+
+## Endpoints Delivered in This Phase
+
+| Method   | Endpoint                | Status |
+| -------- | ----------------------- | ------ |
+| `POST`   | `/auth/register`        | 🔲     |
+| `POST`   | `/auth/login`           | 🔲     |
+| `POST`   | `/auth/refresh`         | 🔲     |
+| `POST`   | `/auth/logout`          | 🔲     |
+| `POST`   | `/auth/forgot-password` | 🔲     |
+| `POST`   | `/auth/reset-password`  | 🔲     |
+| `GET`    | `/profiles/me`          | 🔲     |
+| `PATCH`  | `/profiles/me`          | 🔲     |
+| `GET`    | `/profiles/:username`   | 🔲     |
+| `POST`   | `/upload/image`         | 🔲     |
+| `POST`   | `/upload/file`          | 🔲     |
+| `DELETE` | `/upload`               | 🔲     |
+| `GET`    | `/categories`           | 🔲     |
+
+---
+
+## Directus Collections Created
+
+| Collection           | Status |
+| -------------------- | ------ |
+| `gh_profiles`        | 🔲     |
+| `gh_categories`      | 🔲     |
+| `gh_platform_config` | 🔲     |
+
+---
+
+## Definition of Done
+
+- [ ] All auth endpoints working (register, login, Google, refresh, logout)
+- [ ] JWT tokens correctly issued with profile_id, username, is_verified, role
+- [ ] Profile CRUD fully functional
+- [ ] Avatar upload to R2 working
+- [ ] Generic file/image upload to R2 working
+- [ ] Categories seeded and listable
+- [ ] Rate limiting active on auth endpoints
+- [ ] Global auth guard protecting all non-public routes
+- [ ] Unit tests passing
+- [ ] E2E tests passing
+- [ ] API documentation matches implementation
