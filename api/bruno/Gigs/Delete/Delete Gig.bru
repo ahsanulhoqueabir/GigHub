@@ -1,12 +1,12 @@
 meta {
-  name: Update Gig - Status
+  name: Delete Gig
   type: http
-  seq: 5
+  seq: 1
 }
 
-patch {
+delete {
   url: {{base_url}}/gigs/:id
-  body: json
+  body: none
   auth: bearer
 }
 
@@ -16,11 +16,4 @@ params:path {
 
 auth:bearer {
   token: {{access_token}}
-}
-
-body:json {
-  {
-    "type": "status",
-    "status": "active"
-  }
 }
