@@ -1,0 +1,23 @@
+meta {
+  name: Request Withdrawal
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/withdrawals
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "amount": 100,
+    "method": "bkash",
+    "account_info": "017xxxxxxxx"
+  }
+}

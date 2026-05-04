@@ -1,0 +1,23 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/orders
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "gig_id": "paste-gig-uuid-here",
+    "total_amount": 50,
+    "requirements": "I need a standard REST API..."
+  }
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Initiate Payment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/payments/initiate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "order_id": "paste-order-uuid-here",
+    "payment_method": "sslcommerz"
+  }
+}

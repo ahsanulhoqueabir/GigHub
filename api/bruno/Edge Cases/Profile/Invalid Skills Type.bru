@@ -1,0 +1,21 @@
+meta {
+  name: Invalid Skills Type
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{base_url}}/profiles/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "skills": "not-an-array"
+  }
+}

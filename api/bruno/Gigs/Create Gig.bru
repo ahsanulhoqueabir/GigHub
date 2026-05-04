@@ -1,0 +1,25 @@
+meta {
+  name: Create Gig
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "I will build a professional NestJS API",
+    "description": "Comprehensive backend development with clean architecture.",
+    "price": 50,
+    "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "tags": ["api", "backend", "nestjs"]
+  }
+}

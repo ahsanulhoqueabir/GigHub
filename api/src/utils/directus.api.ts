@@ -1,12 +1,24 @@
 import axios, { AxiosError } from 'axios';
+import configuration from '@/config/configuration';
 
 const directusApi = axios.create({
-  baseURL: process.env.DIRECTUS_API_URL,
-  headers: {
-    Authorization: `Bearer ${process.env.DIRECTUS_TOKEN}`,
-    'Content-Type': 'application/json',
-  },
   timeout: 10000,
+});
+
+directusApi.interceptors.request.use((config) => {
+  const { directus } = configuration();
+
+  config.baseURL = config.baseURL || directus.apiUrl;
+
+  if (!config.headers.Authorization && directus.token) {
+    config.headers.Authorization = `Bearer ${directus.token}`;
+  }
+
+  if (!config.headers['Content-Type']) {
+    config.headers['Content-Type'] = 'application/json';
+  }
+
+  return config;
 });
 
 directusApi.interceptors.response.use(

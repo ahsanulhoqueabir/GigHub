@@ -1,0 +1,11 @@
+meta {
+  name: Search Gigs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/gigs?search=api&min_price=10&max_price=100
+  body: none
+  auth: none
+}

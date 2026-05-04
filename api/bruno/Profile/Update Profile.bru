@@ -1,0 +1,23 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/profiles/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "bio": "I am a professional developer",
+    "skills": ["Node.js", "TypeScript", "NestJS"],
+    "country": "Bangladesh"
+  }
+}

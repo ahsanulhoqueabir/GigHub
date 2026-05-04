@@ -1,0 +1,11 @@
+meta {
+  name: List Gigs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/gigs?page=1&limit=10
+  body: none
+  auth: none
+}
