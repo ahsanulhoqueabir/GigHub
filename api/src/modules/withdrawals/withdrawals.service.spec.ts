@@ -21,7 +21,6 @@ describe('WithdrawalsService', () => {
           id: 'w1',
           profile: 'p1',
           amount: 1000,
-          currency: 'BDT',
           method: 'bkash',
           account_details: { phone: '01712345678' },
           status: 'pending',

@@ -1,0 +1,11 @@
+meta {
+  name: Unauthorized Balance
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{base_url}}/payments?type=balance
+  body: none
+  auth: none
+}

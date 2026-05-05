@@ -1,24 +1,19 @@
 meta {
-  name: Create Order
+  name: Unauthorized Create Order
   type: http
-  seq: 1
+  seq: 8
 }
 
 post {
   url: {{base_url}}/orders
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{access_token}}
+  auth: none
 }
 
 body:json {
   {
     "gig_id": "paste-gig-uuid-here",
     "gig_package_id": "paste-gig-package-uuid-here",
-    "amount": 50,
-    "proposal_id": null
+    "amount": 50
   }
 }

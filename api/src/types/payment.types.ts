@@ -40,9 +40,13 @@ export interface Transaction {
   profile: string;
   order?: string | null;
   tran_id: string;
+  type?: string | null;
   direction: TransactionDirection;
   amount: number;
-  currency: string;
+  balance_after?: number | null;
+  description?: string | null;
+  payment_method?: string | null;
+  payment_reference?: string | null;
   status: TransactionStatus;
   created_at: string;
   updated_at: string;
@@ -53,7 +57,7 @@ export interface EscrowRecord {
   order: string;
   status: 'held' | 'released' | 'refunded';
   amount: number;
-  currency: string;
+  platform_fee?: number | null;
   created_at: string;
   updated_at: string;
 }

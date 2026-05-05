@@ -1,0 +1,18 @@
+meta {
+  name: SSLCommerz Fail
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{base_url}}/payments/sslcommerz/fail
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tran_id": "{{tran_id}}",
+    "order_id": "{{order_id}}"
+  }
+}

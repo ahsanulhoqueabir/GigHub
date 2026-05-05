@@ -1,17 +1,13 @@
 meta {
-  name: Initiate Payment
+  name: Initiate Payment Unauthorized
   type: http
-  seq: 1
+  seq: 8
 }
 
 post {
   url: {{base_url}}/payments/initiate
   body: json
-  auth: bearer
-}
-
-auth:bearer {
-  token: {{access_token}}
+  auth: none
 }
 
 body:json {

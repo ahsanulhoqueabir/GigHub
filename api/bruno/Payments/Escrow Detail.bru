@@ -1,0 +1,20 @@
+meta {
+  name: Escrow Detail
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/payments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  type: escrow
+  order_id: 
+}

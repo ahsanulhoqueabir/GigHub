@@ -1,0 +1,26 @@
+meta {
+  name: Update Order Cancel
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{base_url}}/orders/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "status": "cancelled",
+    "cancellation_reason": "Buyer requested cancellation"
+  }
+}

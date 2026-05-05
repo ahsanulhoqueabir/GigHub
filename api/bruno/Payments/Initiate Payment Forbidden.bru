@@ -1,7 +1,7 @@
 meta {
-  name: Initiate Payment
+  name: Initiate Payment Forbidden
   type: http
-  seq: 1
+  seq: 10
 }
 
 post {
@@ -16,6 +16,6 @@ auth:bearer {
 
 body:json {
   {
-    "order_id": "paste-order-uuid-here"
+    "order_id": "{{order_id}}"
   }
 }

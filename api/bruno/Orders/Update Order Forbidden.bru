@@ -1,11 +1,11 @@
 meta {
-  name: Initiate Payment
+  name: Update Order Forbidden
   type: http
-  seq: 1
+  seq: 7
 }
 
-post {
-  url: {{base_url}}/payments/initiate
+patch {
+  url: {{base_url}}/orders/{{order_id}}
   body: json
   auth: bearer
 }
@@ -16,6 +16,6 @@ auth:bearer {
 
 body:json {
   {
-    "order_id": "paste-order-uuid-here"
+    "status": "processing"
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, InternalServerErrorException, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Post,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { JwtPayload } from '@/types/auth.types';
@@ -52,7 +60,7 @@ export class PaymentsController {
 
     if (type === PaymentQueryType.ESCROW) {
       if (!query.order_id) {
-        throw new InternalServerErrorException('order_id is required for escrow queries');
+        throw new BadRequestException('order_id is required for escrow queries');
       }
       return this.paymentsService.escrow(query.order_id);
     }

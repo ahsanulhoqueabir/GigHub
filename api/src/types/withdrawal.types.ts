@@ -16,7 +16,6 @@ export interface Withdrawal {
   id: string;
   profile: string;
   amount: number;
-  currency: string;
   method: WithdrawalMethod;
   account_details: Record<string, unknown>;
   status: WithdrawalStatus;

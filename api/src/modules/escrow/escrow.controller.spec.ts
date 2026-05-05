@@ -31,7 +31,7 @@ describe('EscrowController', () => {
         id: 'e1',
         order: 'o1',
         amount: 1000,
-        currency: 'BDT',
+        platform_fee: 50,
         status: 'held',
         created_at: '',
         updated_at: '',

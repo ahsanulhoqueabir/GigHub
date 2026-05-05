@@ -1,5 +1,5 @@
-import { IsEnum, IsOptional, IsNumber } from 'class-validator';
-import { OrderStatus, PaymentStatus } from '@/types/order.types';
+import { IsEnum, IsOptional, IsNumber, IsString } from 'class-validator';
+import { OrderStatus } from '@/types/order.types';
 
 export class UpdateOrderDto {
   @IsOptional()
@@ -7,10 +7,10 @@ export class UpdateOrderDto {
   status?: OrderStatus;
 
   @IsOptional()
-  @IsEnum(PaymentStatus)
-  payment_status?: PaymentStatus;
-
-  @IsOptional()
   @IsNumber()
   amount?: number;
+
+  @IsOptional()
+  @IsString()
+  cancellation_reason?: string;
 }

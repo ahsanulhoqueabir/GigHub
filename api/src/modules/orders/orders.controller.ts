@@ -8,11 +8,14 @@ import {
   Patch,
   Post,
   Query,
+  ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { JwtPayload } from '@/types/auth.types';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { UpdateOrderDto } from './dto/update-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -26,9 +29,15 @@ export class OrdersController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @CurrentUser() user: JwtPayload, @Body() dto: any) {
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: UpdateOrderDto,
+  ) {
     const res = await this.ordersService.update(id, user.profile_id, dto);
     if (!res.success) {
+      if (res.status === 400) throw new BadRequestException(res.error);
+      if (res.status === 403) throw new ForbiddenException(res.error);
       if (res.status === 404) throw new NotFoundException(res.error);
       throw new InternalServerErrorException(res.error);
     }
