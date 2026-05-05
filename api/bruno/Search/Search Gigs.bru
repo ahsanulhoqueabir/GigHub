@@ -1,0 +1,18 @@
+meta {
+  name: Search Gigs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/search
+  body: none
+  auth: none
+}
+
+params:query {
+  collection: gigs
+  q: nestjs
+  ~category: 
+  ~skills: 
+}

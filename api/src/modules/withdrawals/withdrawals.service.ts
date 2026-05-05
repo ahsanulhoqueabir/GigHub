@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
@@ -57,7 +58,9 @@ export class WithdrawalsService {
     }
 
     try {
+      const withdrawalId = uuid();
       const payload = {
+        id: withdrawalId,
         profile: profileId,
         amount: dto.amount,
         currency: 'BDT',
@@ -72,8 +75,9 @@ export class WithdrawalsService {
       );
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
+        id: uuid(),
         profile: profileId,
-        tran_id: `WITHDRAWAL-${data.data.id}-${Date.now()}`,
+        tran_id: `WITHDRAWAL-${withdrawalId}-${Date.now()}`,
         direction: TransactionDirection.DEBIT,
         amount: dto.amount,
         currency: 'BDT',
@@ -85,6 +89,7 @@ export class WithdrawalsService {
       return fail('Failed to create withdrawal request', error);
     }
   }
+
 
   async getById(id: string): Promise<ServiceResponse<WithdrawalDetail>> {
     try {
@@ -152,6 +157,7 @@ export class WithdrawalsService {
       );
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
+        id: uuid(),
         profile: profileId,
         tran_id: `WITHDRAWAL-CANCEL-${id}-${Date.now()}`,
         direction: TransactionDirection.CREDIT,

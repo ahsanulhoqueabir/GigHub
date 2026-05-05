@@ -1,0 +1,19 @@
+meta {
+  name: Withdraw Proposal
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{base_url}}/proposals/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

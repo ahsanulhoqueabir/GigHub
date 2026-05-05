@@ -1,0 +1,27 @@
+meta {
+  name: Login Success
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "provider": "password",
+    "email": "test@example.com",
+    "password": "Password123!"
+  }
+}
+
+vars:pre-request {
+  base_url: http://localhost:4000/v1
+}
+
+vars:post-response {
+  access_token: res.body.access_token
+}

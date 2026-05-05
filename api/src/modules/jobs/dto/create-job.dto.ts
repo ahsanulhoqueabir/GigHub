@@ -12,7 +12,7 @@ import {
   MinLength,
   ValidateIf,
 } from 'class-validator';
-import { JobType } from '@/types/job.types';
+import { BudgetType, JobType } from '@/types/job.types';
 
 export class CreateJobDto {
   @IsString()
@@ -44,11 +44,24 @@ export class CreateJobDto {
   @IsNumber()
   @Min(0)
   budget_max?: number;
+  
+  @IsEnum(BudgetType)
+  @IsOptional()
+  budget_type?: BudgetType;
+
+  @IsOptional()
+  @IsString()
+  deadline?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  attachments?: string[];
 
   @IsOptional()
   @IsArray()
   @ArrayMinSize(0)
   @ArrayMaxSize(20)
   @IsString({ each: true })
-  skills?: string[];
+  required_skills?: string[];
 }

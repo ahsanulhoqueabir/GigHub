@@ -15,6 +15,11 @@ export enum JobStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum BudgetType {
+  FIXED = 'fixed',
+  HOURLY = 'hourly',
+}
+
 export interface Job {
   id: string;
   poster: string;
@@ -23,9 +28,11 @@ export interface Job {
   slug: string;
   description: string;
   job_type: JobType;
+  budget_type: BudgetType;
   budget_min?: number;
   budget_max?: number;
-  skills: string[];
+  deadline?: string;
+  required_skills: string[];
   attachments?: string[];
   status: JobStatus;
   total_proposals: number;
@@ -38,9 +45,10 @@ export interface JobDetail extends Job {}
 export interface JobQuery extends PaginationQuery {
   category?: string;
   job_type?: JobType;
+  budget_type?: BudgetType;
   budget_min?: number;
   budget_max?: number;
-  skills?: string;
+  required_skills?: string;
   status?: JobStatus;
   listing_scope?: 'jobs' | 'tuition';
 }

@@ -1,0 +1,26 @@
+meta {
+  name: Update Proposal
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{base_url}}/proposals/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "cover_letter": "Updated cover letter with more details.",
+    "amount": 180
+  }
+}

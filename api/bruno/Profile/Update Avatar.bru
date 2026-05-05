@@ -1,0 +1,22 @@
+meta {
+  name: Update Avatar
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/profiles/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "avatar",
+    "avatar_base64": "data:image/png;base64,..."
+  }
+}

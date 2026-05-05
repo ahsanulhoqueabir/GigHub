@@ -1,0 +1,37 @@
+meta {
+  name: Edit Gig
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{base_url}}/gigs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "edit",
+    "title": "Updated: I will create a high performance NestJS backend",
+    "description": "Updated description with more details about the service.",
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic API Setup (Updated)",
+        "description": "Updated basic description.",
+        "price": 60,
+        "delivery_days": 2,
+        "revisions": 2
+      }
+    ]
+  }
+}

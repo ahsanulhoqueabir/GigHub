@@ -16,7 +16,7 @@ import {
 import { Type } from 'class-transformer';
 import { GigPackageTier } from '@/types/gig.types';
 
-class GigImageDto {
+export class GigImageDto {
   @IsString()
   url!: string;
 
@@ -54,7 +54,12 @@ export class GigPackageDto {
   @IsInt()
   @Min(0)
   @Max(20)
-  revisions!: number;
+  revision_count!: number;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  features?: string[];
 }
 
 export class CreateGigDto {

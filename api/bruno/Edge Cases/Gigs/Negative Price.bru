@@ -1,0 +1,35 @@
+meta {
+  name: Negative Price
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Invalid Gig",
+    "description": "This should fail due to negative price in one of the packages.",
+    "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "tags": ["invalid"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic Package",
+        "description": "Invalid price package",
+        "price": -50,
+        "delivery_days": 3,
+        "revision_count": 1
+      }
+    ]
+  }
+}
+

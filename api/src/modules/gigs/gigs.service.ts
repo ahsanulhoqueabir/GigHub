@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
-import type { Gig, GigDetail, GigPackage, GigQuery } from '@/types/gig.types';
 import { GigPackageTier, GigStatus } from '@/types/gig.types';
+import type { Gig, GigDetail, GigPackage, GigQuery } from '@/types/gig.types';
 import type { CreateGigDto, GigPackageDto } from './dto/create-gig.dto';
 import type { UpdateGigDto } from './dto/update-gig.dto';
 
@@ -41,7 +42,8 @@ export class GigsService {
       'description',
       'price',
       'delivery_days',
-      'revisions',
+      'revision_count',
+      'features',
     ].join(',');
   }
 
@@ -128,8 +130,10 @@ export class GigsService {
 
     try {
       const slug = await this.ensureUniqueSlug(dto.title);
+      const gigId = uuid();
 
       const gigPayload = {
+        id: gigId,
         seller: sellerId,
         category: dto.category_id,
         title: dto.title,
@@ -146,13 +150,15 @@ export class GigsService {
       );
 
       const packagesPayload = dto.packages.map((item) => ({
-        gig: gigData.data.id,
+        id: uuid(),
+        gig: gigId,
         tier: item.tier,
         title: item.title,
         description: item.description,
         price: item.price,
         delivery_days: item.delivery_days,
-        revisions: item.revisions,
+        revision_count: item.revision_count,
+        features: item.features ?? [],
       }));
 
       const { data: packageData } = await directusApi.post<{ data: GigPackage[] }>(
@@ -166,6 +172,7 @@ export class GigsService {
     }
   }
 
+
   async updateEdit(
     gigId: string,
     sellerId: string,
@@ -174,6 +181,10 @@ export class GigsService {
     const owned = await this.getOwnedGig(gigId, sellerId);
     if (!owned.success || !owned.data) {
       return owned as ServiceResponse<GigDetail>;
+    }
+
+    if (owned.data.status === GigStatus.DELETED) {
+      return fail('Deleted gig cannot be modified', undefined, 400);
     }
 
     if (dto.packages && dto.packages.length) {
@@ -221,18 +232,21 @@ export class GigsService {
                 description: item.description,
                 price: item.price,
                 delivery_days: item.delivery_days,
-                revisions: item.revisions,
+                revision_count: item.revision_count,
+                features: item.features ?? [],
               },
             );
           } else {
             await directusApi.post(`/items/${this.packagesCollection}`, {
+              id: uuid(),
               gig: gigId,
               tier: item.tier,
               title: item.title,
               description: item.description,
               price: item.price,
               delivery_days: item.delivery_days,
-              revisions: item.revisions,
+              revision_count: item.revision_count,
+              features: item.features ?? [],
             });
           }
         }
@@ -243,7 +257,7 @@ export class GigsService {
         return fail(
           packages.error ?? 'Failed to fetch gig packages',
           packages.details,
-          packages.status,
+          packages.status ?? 500,
         );
       }
 
@@ -252,6 +266,7 @@ export class GigsService {
       return fail('Failed to update gig', error);
     }
   }
+
 
   async updateStatus(
     gigId: string,
@@ -377,7 +392,7 @@ export class GigsService {
         return fail(
           packages.error ?? 'Failed to fetch gig packages',
           packages.details,
-          packages.status,
+          packages.status ?? 500,
         );
       }
 

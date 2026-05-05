@@ -1,0 +1,16 @@
+meta {
+  name: Search Profiles
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/search
+  body: none
+  auth: none
+}
+
+params:query {
+  collection: profiles
+  q: developer
+}

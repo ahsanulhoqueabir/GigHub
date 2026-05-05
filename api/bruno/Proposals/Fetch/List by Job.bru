@@ -1,0 +1,19 @@
+meta {
+  name: List by Job
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/proposals/job/:jobId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  jobId: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

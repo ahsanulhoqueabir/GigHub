@@ -1,0 +1,42 @@
+meta {
+  name: Error Duplicate Tiers
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Duplicate Tier Gig",
+    "description": "This gig will fail because it has duplicate tiers.",
+    "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "tags": ["fail"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic 1",
+        "description": "Basic tier description.",
+        "price": 50,
+        "delivery_days": 3,
+        "revisions": 1
+      },
+      {
+        "tier": "basic",
+        "title": "Basic 2",
+        "description": "Duplicate basic tier.",
+        "price": 50,
+        "delivery_days": 3,
+        "revisions": 1
+      }
+    ]
+  }
+}

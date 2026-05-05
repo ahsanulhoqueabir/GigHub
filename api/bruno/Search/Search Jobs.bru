@@ -1,0 +1,17 @@
+meta {
+  name: Search Jobs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/search
+  body: none
+  auth: none
+}
+
+params:query {
+  collection: jobs
+  q: react
+  ~category: 
+}

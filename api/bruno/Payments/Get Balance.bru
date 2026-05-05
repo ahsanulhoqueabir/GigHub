@@ -1,0 +1,15 @@
+meta {
+  name: Get Balance
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/payments?type=balance
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}

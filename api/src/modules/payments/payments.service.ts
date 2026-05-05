@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
@@ -74,6 +75,7 @@ export class PaymentsService {
 
     try {
       await directusApi.post(`/items/${this.transactionsCollection}`, {
+        id: uuid(),
         profile: profileId,
         order: order.id,
         tran_id: tranId,

@@ -1,0 +1,21 @@
+meta {
+  name: List Jobs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/jobs
+  body: none
+  auth: none
+}
+
+params:query {
+  ~page: 1
+  ~limit: 20
+  ~search: react
+  ~category: 
+  ~job_type: paid
+  ~listing_scope: jobs
+  ~status: open
+}

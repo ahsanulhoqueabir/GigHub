@@ -54,13 +54,13 @@ export class ProposalsController {
     return res;
   }
 
-  @Get('gig/:gigId')
-  async listByGig(
-    @Param('gigId') gigId: string,
+  @Get('job/:jobId')
+  async listByJob(
+    @Param('jobId') jobId: string,
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ) {
-    const res = await this.proposalsService.listByGig(gigId, Number(page), Number(limit));
+    const res = await this.proposalsService.listByJob(jobId, Number(page), Number(limit));
     if (!res.success) throw new InternalServerErrorException(res.error);
     return res;
   }

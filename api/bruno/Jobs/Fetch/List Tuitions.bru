@@ -1,0 +1,20 @@
+meta {
+  name: List Tuitions
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/jobs?page=1&listing_scope=tuition
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  listing_scope: tuition
+  ~limit: 20
+  ~search: math
+  ~category: 
+  ~status: open
+}
