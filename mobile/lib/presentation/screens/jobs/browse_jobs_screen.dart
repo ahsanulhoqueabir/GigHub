@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/job_model.dart';
-import 'package:gig_hub/data/providers/category_provider.dart';
-import 'package:gig_hub/data/providers/job_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/category_chips_row.dart';
-import 'package:gig_hub/presentation/widgets/common/filter_bottom_sheet.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_shimmer.dart';
-import 'package:gig_hub/presentation/widgets/jobs/job_card.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/job_model.dart';
+import 'package:gighub/data/providers/category_provider.dart';
+import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/presentation/widgets/common/category_chips_row.dart';
+import 'package:gighub/presentation/widgets/common/filter_bottom_sheet.dart';
+import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/presentation/widgets/jobs/job_card.dart';
 
 /// Browse all jobs with filters.
 class BrowseJobsScreen extends ConsumerStatefulWidget {

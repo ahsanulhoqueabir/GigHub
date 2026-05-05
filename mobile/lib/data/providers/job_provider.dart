@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/data/models/job_model.dart';
-import 'package:gig_hub/data/models/pagination_model.dart';
-import 'package:gig_hub/data/repositories/job_repository.dart';
+import 'package:gighub/data/models/job_model.dart';
+import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/repositories/job_repository.dart';
 
 /// Repository provider.
 final jobRepositoryProvider = Provider<JobRepository>((ref) => JobRepository());

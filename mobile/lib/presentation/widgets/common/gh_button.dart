@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
 
 /// Reusable primary/secondary/outlined/text button widget.
 class GhButton extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
-import 'package:gig_hub/data/providers/auth_provider.dart';
-import 'package:gig_hub/data/repositories/profile_repository.dart';
+import 'package:gighub/data/models/profile_model.dart';
+import 'package:gighub/data/providers/auth_provider.dart';
+import 'package:gighub/data/repositories/profile_repository.dart';
 
 /// [ProfileRepository] — depends on [ApiClient].
 final profileRepositoryProvider = Provider<ProfileRepository>((ref) {

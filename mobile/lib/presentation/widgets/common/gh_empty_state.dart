@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
 
 /// Empty state placeholder with illustration icon, message, and optional CTA.
 class GhEmptyState extends StatelessWidget {

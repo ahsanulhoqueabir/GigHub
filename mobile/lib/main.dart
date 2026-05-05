@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/app.dart';
-import 'package:gig_hub/core/config/app_config.dart';
+import 'package:gighub/app.dart';
+import 'package:gighub/core/config/app_config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

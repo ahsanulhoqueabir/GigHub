@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/providers/job_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
 
 /// Client's job management screen.
 class MyJobsScreen extends ConsumerWidget {

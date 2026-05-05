@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:gig_hub/data/models/category_model.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
+import 'package:gighub/data/models/category_model.dart';
+import 'package:gighub/data/models/profile_model.dart';
 
 part 'gig_model.freezed.dart';
 part 'gig_model.g.dart';

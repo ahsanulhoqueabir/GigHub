@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import 'package:gig_hub/core/config/app_config.dart';
-import 'package:gig_hub/core/network/api_exceptions.dart';
-import 'package:gig_hub/core/network/api_response.dart';
-import 'package:gig_hub/core/network/auth_interceptor.dart';
+import 'package:gighub/core/config/app_config.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
+import 'package:gighub/core/network/api_response.dart';
+import 'package:gighub/core/network/auth_interceptor.dart';
 
 /// Singleton Dio HTTP client configured for the GigHub API.
 ///

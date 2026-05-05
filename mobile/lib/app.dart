@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/config/app_router.dart';
-import 'package:gig_hub/data/providers/auth_provider.dart';
-import 'package:gig_hub/core/storage/local_storage.dart';
-import 'package:gig_hub/presentation/theme/app_theme_data.dart';
+import 'package:gighub/core/config/app_router.dart';
+import 'package:gighub/data/providers/auth_provider.dart';
+import 'package:gighub/core/storage/local_storage.dart';
+import 'package:gighub/presentation/theme/app_theme_data.dart';
 
 /// Root widget of the GigHub application.
 ///

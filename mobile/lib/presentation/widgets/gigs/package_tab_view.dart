@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/gig_model.dart';
 
 /// Tab-based package comparison view (Basic / Standard / Premium).
 class PackageTabView extends StatelessWidget {

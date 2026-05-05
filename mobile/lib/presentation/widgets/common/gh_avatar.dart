@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_colors.dart';
-import 'package:gig_hub/core/utils/extensions.dart';
+import 'package:gighub/core/constants/app_colors.dart';
+import 'package:gighub/core/utils/extensions.dart';
 
 /// Circular avatar with network image, fallback initials, and optional badge.
 class GhAvatar extends StatelessWidget {

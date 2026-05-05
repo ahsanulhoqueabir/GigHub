@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
-import 'package:gig_hub/data/providers/gig_provider.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/data/providers/gig_provider.dart';
 
 /// Edit an existing gig.
 ///

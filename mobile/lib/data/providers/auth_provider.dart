@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/core/network/api_client.dart';
-import 'package:gig_hub/core/storage/secure_storage.dart';
-import 'package:gig_hub/data/models/auth_model.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
-import 'package:gig_hub/data/repositories/auth_repository.dart';
+import 'package:gighub/core/network/api_client.dart';
+import 'package:gighub/core/storage/secure_storage.dart';
+import 'package:gighub/data/models/auth_model.dart';
+import 'package:gighub/data/models/profile_model.dart';
+import 'package:gighub/data/repositories/auth_repository.dart';
 
 /// Possible authentication states.
 enum AuthStatus { loading, authenticated, unauthenticated }

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
-import 'package:gig_hub/core/network/api_exceptions.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 
 /// Interceptor that attaches the JWT access token to outgoing requests
 /// and handles automatic token refresh on 401 responses.

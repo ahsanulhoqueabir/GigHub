@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/providers/proposal_provider.dart';
-import 'package:gig_hub/presentation/widgets/proposals/proposal_card.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/providers/proposal_provider.dart';
+import 'package:gighub/presentation/widgets/proposals/proposal_card.dart';
 
 /// List proposals submitted by the current user.
 class MyProposalsScreen extends ConsumerWidget {

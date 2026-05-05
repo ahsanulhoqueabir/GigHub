@@ -1,6 +1,6 @@
-import 'package:gig_hub/core/constants/api_constants.dart';
-import 'package:gig_hub/core/network/api_client.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
+import 'package:gighub/core/constants/api_constants.dart';
+import 'package:gighub/core/network/api_client.dart';
+import 'package:gighub/data/models/profile_model.dart';
 
 /// Repository for profile-related operations.
 class ProfileRepository {

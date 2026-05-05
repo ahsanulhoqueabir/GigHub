@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.gighub" "\0"
-            VALUE "FileDescription", "gig_hub" "\0"
+            VALUE "FileDescription", "GigHub" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "gig_hub" "\0"
+            VALUE "InternalName", "gighub" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.gighub. All rights reserved." "\0"
-            VALUE "OriginalFilename", "gig_hub.exe" "\0"
-            VALUE "ProductName", "gig_hub" "\0"
+            VALUE "OriginalFilename", "gighub.exe" "\0"
+            VALUE "ProductName", "GigHub" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

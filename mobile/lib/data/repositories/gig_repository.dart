@@ -1,6 +1,6 @@
-import 'package:gig_hub/data/models/gig_model.dart';
-import 'package:gig_hub/data/models/pagination_model.dart';
-import 'package:gig_hub/data/services/mock_data_service.dart';
+import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/services/mock_data_service.dart';
 
 /// Mock gig repository — reads from [MockDataService].
 ///

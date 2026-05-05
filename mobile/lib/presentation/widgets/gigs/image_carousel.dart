@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
 
 /// Swipeable image carousel with dot indicators.
 class ImageCarousel extends StatefulWidget {

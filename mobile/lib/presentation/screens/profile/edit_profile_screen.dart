@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/core/constants/app_strings.dart';
-import 'package:gig_hub/core/utils/extensions.dart';
-import 'package:gig_hub/core/utils/validators.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
-import 'package:gig_hub/data/providers/profile_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_button.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_loading.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_text_field.dart';
-import 'package:gig_hub/presentation/widgets/profile/avatar_picker.dart';
-import 'package:gig_hub/presentation/widgets/profile/skills_input.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/utils/extensions.dart';
+import 'package:gighub/core/utils/validators.dart';
+import 'package:gighub/data/models/profile_model.dart';
+import 'package:gighub/data/providers/profile_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_button.dart';
+import 'package:gighub/presentation/widgets/common/gh_loading.dart';
+import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/profile/avatar_picker.dart';
+import 'package:gighub/presentation/widgets/profile/skills_input.dart';
 
 /// Screen for editing the current user's profile.
 class EditProfileScreen extends ConsumerStatefulWidget {

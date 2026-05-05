@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 /// A Google-branded social login button.

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/gig_model.dart';
 
 /// A responsive gig card for grid display.
 ///

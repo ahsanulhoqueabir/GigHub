@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
-import 'package:gig_hub/data/models/pagination_model.dart';
-import 'package:gig_hub/data/repositories/gig_repository.dart';
+import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/repositories/gig_repository.dart';
 
 /// Repository provider.
 final gigRepositoryProvider = Provider<GigRepository>((ref) => GigRepository());

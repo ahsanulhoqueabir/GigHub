@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/providers/profile_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_avatar.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_error_state.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_loading.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_rating_stars.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/providers/profile_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_avatar.dart';
+import 'package:gighub/presentation/widgets/common/gh_error_state.dart';
+import 'package:gighub/presentation/widgets/common/gh_loading.dart';
+import 'package:gighub/presentation/widgets/common/gh_rating_stars.dart';
 
 /// Displays a public profile for any user by username.
 class PublicProfileScreen extends ConsumerWidget {

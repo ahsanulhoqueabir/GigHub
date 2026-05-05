@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_colors.dart';
+import 'package:gighub/core/constants/app_colors.dart';
 
 /// Light and dark color schemes for the GigHub Material 3 theme.
 class AppColorScheme {

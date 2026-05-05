@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/job_model.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/job_model.dart';
 
 /// A job listing card for the job board.
 class JobCard extends StatelessWidget {

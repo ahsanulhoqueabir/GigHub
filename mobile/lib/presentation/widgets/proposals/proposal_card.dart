@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/proposal_model.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/proposal_model.dart';
 
 /// A proposal card showing freelancer info, price, and cover letter.
 class ProposalCard extends StatelessWidget {

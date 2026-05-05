@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="gig_hub"
+        android:label="GigHub"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

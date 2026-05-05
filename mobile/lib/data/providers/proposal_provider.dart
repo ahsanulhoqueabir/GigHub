@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/data/models/pagination_model.dart';
-import 'package:gig_hub/data/models/proposal_model.dart';
-import 'package:gig_hub/data/repositories/proposal_repository.dart';
+import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/models/proposal_model.dart';
+import 'package:gighub/data/repositories/proposal_repository.dart';
 
 /// Repository provider.
 final proposalRepositoryProvider = Provider<ProposalRepository>(

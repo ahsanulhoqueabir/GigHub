@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/category_model.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/category_model.dart';
 
 /// Horizontal scroll of category chips for filtering.
 class CategoryChipsRow extends StatelessWidget {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
-import 'package:gig_hub/data/providers/gig_provider.dart';
-import 'package:gig_hub/data/models/job_model.dart';
-import 'package:gig_hub/data/providers/job_provider.dart';
-import 'package:gig_hub/presentation/widgets/gigs/gig_card.dart';
-import 'package:gig_hub/presentation/widgets/jobs/job_card.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/data/providers/gig_provider.dart';
+import 'package:gighub/data/models/job_model.dart';
+import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/presentation/widgets/gigs/gig_card.dart';
+import 'package:gighub/presentation/widgets/jobs/job_card.dart';
 
 /// Main dashboard / home tab of the app.
 class DashboardScreen extends ConsumerWidget {

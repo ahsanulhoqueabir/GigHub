@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:gig_hub/core/constants/app_colors.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_avatar.dart';
+import 'package:gighub/core/constants/app_colors.dart';
+import 'package:gighub/presentation/widgets/common/gh_avatar.dart';
 
 /// Avatar picker widget with camera/gallery bottom sheet.
 ///

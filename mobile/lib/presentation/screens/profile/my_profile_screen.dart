@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/core/utils/formatters.dart';
-import 'package:gig_hub/data/providers/profile_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_avatar.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_error_state.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_loading.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/formatters.dart';
+import 'package:gighub/data/providers/profile_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_avatar.dart';
+import 'package:gighub/presentation/widgets/common/gh_error_state.dart';
+import 'package:gighub/presentation/widgets/common/gh_loading.dart';
 
 /// Displays the current user's own profile with stats and actions.
 class MyProfileScreen extends ConsumerWidget {

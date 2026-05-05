@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/providers/gig_provider.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_shimmer.dart';
-import 'package:gig_hub/presentation/widgets/gigs/image_carousel.dart';
-import 'package:gig_hub/presentation/widgets/gigs/package_tab_view.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/providers/gig_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/presentation/widgets/gigs/image_carousel.dart';
+import 'package:gighub/presentation/widgets/gigs/package_tab_view.dart';
 
 /// Full gig detail screen with images, seller info, packages, and description.
 class GigDetailScreen extends ConsumerWidget {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/core/constants/app_strings.dart';
-import 'package:gig_hub/core/utils/validators.dart';
-import 'package:gig_hub/data/providers/auth_provider.dart';
-import 'package:gig_hub/presentation/widgets/auth/social_login_button.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_button.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/utils/validators.dart';
+import 'package:gighub/data/providers/auth_provider.dart';
+import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
+import 'package:gighub/presentation/widgets/common/gh_button.dart';
+import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
 
 /// Login screen with email/password and social login options.
 class LoginScreen extends ConsumerStatefulWidget {

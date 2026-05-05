@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = gig_hub
+PRODUCT_NAME = GigHub
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.gighub.gigHub
+PRODUCT_BUNDLE_IDENTIFIER = com.gighub.gighub
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2026 com.gighub. All rights reserved.

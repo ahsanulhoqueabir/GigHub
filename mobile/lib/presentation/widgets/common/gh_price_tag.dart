@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/utils/formatters.dart';
+import 'package:gighub/core/utils/formatters.dart';
 
 /// Price display widget showing ৳-formatted values.
 class GhPriceTag extends StatelessWidget {

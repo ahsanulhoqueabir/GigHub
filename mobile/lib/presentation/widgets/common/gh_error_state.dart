@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
 
 /// Error state with message and retry button.
 class GhErrorState extends StatelessWidget {

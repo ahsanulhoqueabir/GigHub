@@ -1,6 +1,6 @@
-import 'package:gig_hub/data/models/pagination_model.dart';
-import 'package:gig_hub/data/models/proposal_model.dart';
-import 'package:gig_hub/data/services/mock_data_service.dart';
+import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/models/proposal_model.dart';
+import 'package:gighub/data/services/mock_data_service.dart';
 
 /// Mock proposal repository — reads from [MockDataService].
 class ProposalRepository {

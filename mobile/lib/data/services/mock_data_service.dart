@@ -1,8 +1,8 @@
-import 'package:gig_hub/data/models/category_model.dart';
-import 'package:gig_hub/data/models/gig_model.dart';
-import 'package:gig_hub/data/models/job_model.dart';
-import 'package:gig_hub/data/models/profile_model.dart';
-import 'package:gig_hub/data/models/proposal_model.dart';
+import 'package:gighub/data/models/category_model.dart';
+import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/data/models/job_model.dart';
+import 'package:gighub/data/models/profile_model.dart';
+import 'package:gighub/data/models/proposal_model.dart';
 
 /// Pure in-memory mock data service.
 ///

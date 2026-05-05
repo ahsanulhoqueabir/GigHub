@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gig_hub/presentation/theme/color_scheme.dart';
-import 'package:gig_hub/presentation/theme/text_styles.dart';
+import 'package:gighub/presentation/theme/color_scheme.dart';
+import 'package:gighub/presentation/theme/text_styles.dart';
 
 /// Complete light and dark ThemeData for the GigHub app.
 class AppThemeData {

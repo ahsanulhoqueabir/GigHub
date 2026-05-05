@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/data/providers/auth_provider.dart';
+import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/data/providers/auth_provider.dart';
 
 /// App settings screen with theme toggle, notification preferences, and logout.
 class SettingsScreen extends ConsumerStatefulWidget {
