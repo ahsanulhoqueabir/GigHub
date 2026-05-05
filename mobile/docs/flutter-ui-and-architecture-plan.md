@@ -1,6 +1,6 @@
 # GigHub Flutter Implementation Plan
 
-This document outlines a premium architecture and UI/UX roadmap for the GigHub mobile application, tailored to the existing API structure found in `api/bruno`.
+This document outlines a premium architecture and UI/UX roadmap for the GigHub mobile application, tailored to the existing API structure.
 
 ## 1. UI/UX Design Vision
 
