@@ -25,11 +25,12 @@ export interface GigPackage {
   gig: string;
   tier: GigPackageTier;
   title: string;
-  description: string;
+  description: string | null;
   price: number;
   delivery_days: number;
   revision_count: number;
-  features: string[];
+  features: string[] | null;
+  created_at: string;
 }
 
 export interface Gig {
@@ -41,8 +42,6 @@ export interface Gig {
   description: string;
   tags: string[];
   images: GigImage[];
-  price_from?: number;
-  delivery_days_min?: number;
   status: GigStatus;
   avg_rating: number;
   total_reviews: number;
@@ -61,7 +60,4 @@ export interface GigQuery extends PaginationQuery {
   seller_id?: string;
   min_rating?: number;
   tags?: string;
-  min_price?: number;
-  max_price?: number;
-  max_delivery?: number;
 }

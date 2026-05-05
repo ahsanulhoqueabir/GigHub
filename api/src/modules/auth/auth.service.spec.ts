@@ -42,7 +42,6 @@ describe('AuthService', () => {
     username: 'janedoe',
     email: 'jane@example.com',
     avatar: null,
-    avatar_key: null,
     bio: null,
     skills: [],
     availability_status: 'available',
@@ -53,7 +52,6 @@ describe('AuthService', () => {
     total_reviews: 0,
     fcm_token: null,
     notification_prefs: {},
-    username_updated_at: null,
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
   };

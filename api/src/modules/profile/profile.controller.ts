@@ -65,10 +65,6 @@ export class ProfileController {
           throw new BadRequestException('avatar_base64 is required for type avatar');
         }
 
-        // Get current avatar to delete old one
-        const current = await this.profileService.get(user.profile_id);
-        const oldAvatarKey = current.data?.avatar_key ?? null;
-
         // Upload new avatar to R2
         const upload = await this.uploadService.base64(dto.avatar_base64, 'avatars');
         if (!upload.success) {
@@ -76,17 +72,8 @@ export class ProfileController {
           throw new InternalServerErrorException(upload.error);
         }
 
-        // Delete old avatar if exists
-        if (oldAvatarKey) {
-          await this.uploadService.remove(oldAvatarKey).catch(() => {});
-        }
-
-        // Update profile with new avatar URL and key
-        const result = await this.profileService.setAvatar(
-          user.profile_id,
-          upload.data!.url,
-          upload.data!.key,
-        );
+        // Update profile with new avatar URL
+        const result = await this.profileService.setAvatar(user.profile_id, upload.data!.url);
         if (!result.success) throw new InternalServerErrorException(result.error);
         return result;
       }

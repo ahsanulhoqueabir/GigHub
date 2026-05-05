@@ -39,19 +39,4 @@ export class GigQueryDto {
   @IsOptional()
   @IsString()
   tags?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  min_price?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  max_price?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  max_delivery?: number;
 }

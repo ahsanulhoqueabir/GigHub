@@ -77,6 +77,8 @@ export class EscrowService {
     try {
       const payload: any = {
         order: order.id,
+        buyer: order.buyer,
+        seller: order.seller,
         amount: order.amount,
         platform_fee: fees.platform_fee,
         status: EscrowStatus.HELD,
@@ -140,10 +142,10 @@ export class EscrowService {
         id: uuid(),
         profile: order.seller,
         order: order.id,
-        tran_id: `ESCROW-RELEASE-${order.id}-${Date.now()}`,
         type: 'escrow_release',
         direction: TransactionDirection.CREDIT,
         amount: fees.seller_earnings,
+        payment_reference: `ESCROW-RELEASE-${order.id}-${Date.now()}`,
         description: `Escrow released for order ${order.id}`,
         status: TransactionStatus.COMPLETED,
       } satisfies Partial<Transaction>);
@@ -190,10 +192,10 @@ export class EscrowService {
         id: uuid(),
         profile: order.buyer,
         order: order.id,
-        tran_id: `ESCROW-REFUND-${order.id}-${Date.now()}`,
         type: 'escrow_refund',
         direction: TransactionDirection.CREDIT,
         amount: order.amount,
+        payment_reference: `ESCROW-REFUND-${order.id}-${Date.now()}`,
         description: `Escrow refunded for order ${order.id}`,
         status: TransactionStatus.REFUNDED,
       } satisfies Partial<Transaction>);

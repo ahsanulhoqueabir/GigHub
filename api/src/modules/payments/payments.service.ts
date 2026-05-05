@@ -98,11 +98,11 @@ export class PaymentsService {
         id: uuid(),
         profile: profileId,
         order: order.id,
-        tran_id: tranId,
         type: 'payment',
         direction: TransactionDirection.DEBIT,
         amount: order.amount,
         payment_method: 'sslcommerz',
+        payment_reference: tranId,
         description: `Payment initiated for order ${order.id}`,
         status: TransactionStatus.PENDING,
       });
@@ -129,7 +129,6 @@ export class PaymentsService {
             'id',
             'profile',
             'order',
-            'tran_id',
             'type',
             'direction',
             'amount',
@@ -139,7 +138,6 @@ export class PaymentsService {
             'payment_reference',
             'status',
             'created_at',
-            'updated_at',
           ].join(','),
           page,
           limit,
@@ -234,7 +232,7 @@ export class PaymentsService {
       );
 
       await directusApi.patch(`/items/${this.transactionsCollection}`, {
-        filter: { tran_id: { _eq: tranId } },
+        filter: { payment_reference: { _eq: tranId } },
         status: transactionStatus,
       });
 

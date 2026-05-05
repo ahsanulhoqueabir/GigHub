@@ -76,10 +76,10 @@ export class WithdrawalsService {
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: profileId,
-        tran_id: `WITHDRAWAL-${withdrawalId}-${Date.now()}`,
         type: 'withdrawal',
         direction: TransactionDirection.DEBIT,
         amount: dto.amount,
+        payment_reference: `WITHDRAWAL-${withdrawalId}-${Date.now()}`,
         description: `Withdrawal request ${withdrawalId}`,
         status: TransactionStatus.PENDING,
       } satisfies Partial<Transaction>);
@@ -158,10 +158,10 @@ export class WithdrawalsService {
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: profileId,
-        tran_id: `WITHDRAWAL-CANCEL-${id}-${Date.now()}`,
         type: 'withdrawal_cancel',
         direction: TransactionDirection.CREDIT,
         amount: existing.data.amount,
+        payment_reference: `WITHDRAWAL-CANCEL-${id}-${Date.now()}`,
         description: `Withdrawal cancelled ${id}`,
         status: TransactionStatus.COMPLETED,
       } satisfies Partial<Transaction>);
