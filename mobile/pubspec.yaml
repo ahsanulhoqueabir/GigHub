@@ -64,6 +64,10 @@ dev_dependencies:
 
   flutter_lints: ^5.0.0
 
+  # App branding
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.4
+
   # Code Generation
   build_runner: ^2.4.15
   json_serializable: ^6.9.4
@@ -77,9 +81,37 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/splashlogo.png
     - assets/images/
     - assets/icons/
     - assets/fonts/
+
+flutter_launcher_icons:
+  image_path: assets/images/logo.png
+  android: true
+  ios: true
+  web:
+    generate: true
+    image_path: assets/images/logo.png
+  windows:
+    generate: true
+    image_path: assets/images/logo.png
+  macos:
+    generate: true
+    image_path: assets/images/logo.png
+  linux:
+    generate: true
+    image_path: assets/images/logo.png
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/splashlogo.png
+  android: true
+  ios: true
+  web: true
+  android_12:
+    color: "#FFFFFF"
+    image: assets/splashlogo.png
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
