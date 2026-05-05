@@ -68,6 +68,11 @@ class GigDetailScreen extends ConsumerWidget {
                       children: [
                         Chip(
                           label: Text(gig.category.name),
+                          labelStyle: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSecondaryContainer,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          backgroundColor: theme.colorScheme.secondaryContainer,
                           visualDensity: VisualDensity.compact,
                         ),
                         const Spacer(),
@@ -95,6 +100,12 @@ class GigDetailScreen extends ConsumerWidget {
                           .map(
                             (t) => Chip(
                               label: Text(t),
+                              labelStyle: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSecondaryContainer,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              backgroundColor:
+                                  theme.colorScheme.secondaryContainer,
                               visualDensity: VisualDensity.compact,
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,

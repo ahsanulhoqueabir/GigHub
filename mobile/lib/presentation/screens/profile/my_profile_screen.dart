@@ -144,9 +144,10 @@ class MyProfileScreen extends ConsumerWidget {
               children: (profile.skills as List).map<Widget>((skill) {
                 return Chip(
                   label: Text(skill.toString()),
-                  backgroundColor: theme.colorScheme.primaryContainer,
-                  labelStyle: TextStyle(
-                    color: theme.colorScheme.onPrimaryContainer,
+                  backgroundColor: theme.colorScheme.secondaryContainer,
+                  labelStyle: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSecondaryContainer,
+                    fontWeight: FontWeight.w600,
                   ),
                 );
               }).toList(),
