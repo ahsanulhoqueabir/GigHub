@@ -1,0 +1,121 @@
+{
+  "categories": [
+    {
+      "id": "cat_1",
+      "name": "Graphics & Design",
+      "slug": "graphics-design",
+      "icon": "palette"
+    },
+    {
+      "id": "cat_2",
+      "name": "Digital Marketing",
+      "slug": "digital-marketing",
+      "icon": "trending_up"
+    },
+    {
+      "id": "cat_3",
+      "name": "Writing & Translation",
+      "slug": "writing-translation",
+      "icon": "description"
+    },
+    {
+      "id": "cat_4",
+      "name": "Video & Animation",
+      "slug": "video-animation",
+      "icon": "movie"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "u_1",
+      "name": "Ahsanul Hoque",
+      "username": "ahsanul",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul",
+      "role": "seller",
+      "rating": 4.9,
+      "totalReviews": 120,
+      "isOnline": true
+    },
+    {
+      "id": "u_2",
+      "name": "John Doe",
+      "username": "johndoe",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe",
+      "role": "buyer",
+      "rating": 4.5,
+      "totalReviews": 15,
+      "isOnline": false
+    }
+  ],
+  "gigs": [
+    {
+      "id": "gig_1",
+      "title": "I will design a modern minimalist logo for your business",
+      "slug": "design-minimalist-logo",
+      "category": {
+        "id": "cat_1",
+        "name": "Graphics & Design"
+      },
+      "seller": {
+        "id": "u_1",
+        "name": "Ahsanul Hoque",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul"
+      },
+      "thumbnail": "https://images.unsplash.com/photo-1572044162444-ad60f128bde3?w=500",
+      "startingPrice": 1500.0,
+      "avgRating": 4.8,
+      "totalReviews": 85,
+      "status": "active"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_1",
+      "title": "Need a Flutter developer for a food delivery app",
+      "slug": "flutter-food-app",
+      "description": "I am looking for an experienced Flutter developer to help me build a high-performance food delivery application with real-time tracking.",
+      "category": {
+        "id": "cat_1",
+        "name": "Graphics & Design"
+      },
+      "client": {
+        "id": "u_2",
+        "name": "John Doe"
+      },
+      "type": "fixed",
+      "budgetMin": 50000.0,
+      "budgetMax": 100000.0,
+      "status": "open",
+      "totalProposals": 12,
+      "createdAt": "2026-05-01T10:00:00Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord_1",
+      "orderNumber": "GH-2026-001",
+      "gig": {
+        "id": "gig_1",
+        "title": "I will design a modern minimalist logo"
+      },
+      "status": "active",
+      "amount": 2000.0,
+      "deadline": "2026-05-15T18:00:00Z"
+    }
+  ],
+  "conversations": [
+    {
+      "id": "conv_1",
+      "participant": {
+        "id": "u_1",
+        "name": "Ahsanul Hoque",
+        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul"
+      },
+      "lastMessage": {
+        "content": "Sure, I can help with that!",
+        "createdAt": "2026-05-05T15:30:00Z"
+      },
+      "unreadCount": 2
+    }
+  ]
+}

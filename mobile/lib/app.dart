@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gig_hub/core/config/app_router.dart';
+import 'package:gig_hub/data/providers/auth_provider.dart';
 import 'package:gig_hub/core/storage/local_storage.dart';
 import 'package:gig_hub/presentation/theme/app_theme_data.dart';
 
@@ -17,10 +19,12 @@ class GigHubApp extends ConsumerStatefulWidget {
 class _GigHubAppState extends ConsumerState<GigHubApp> {
   ThemeMode _themeMode = ThemeMode.system;
   final _localStorage = const LocalStorage();
+  late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
+    _router = createRouter(ref);
     _loadThemeMode();
   }
 
@@ -51,7 +55,9 @@ class _GigHubAppState extends ConsumerState<GigHubApp> {
 
   @override
   Widget build(BuildContext context) {
-    final router = createRouter(ref);
+    ref.listen<AuthState>(authProvider, (_, __) {
+      _router.refresh();
+    });
 
     return MaterialApp.router(
       title: 'GigHub',
@@ -59,7 +65,7 @@ class _GigHubAppState extends ConsumerState<GigHubApp> {
       theme: AppThemeData.light,
       darkTheme: AppThemeData.dark,
       themeMode: _themeMode,
-      routerConfig: router,
+      routerConfig: _router,
     );
   }
 }

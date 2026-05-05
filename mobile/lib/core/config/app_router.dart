@@ -19,16 +19,14 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Creates the [GoRouter] with auth-aware redirect.
 ///
-/// Redirects unauthenticated users to `/auth/login` and authenticated users
+/// Allows unauthenticated access to the app and redirects authenticated users
 /// away from auth screens to `/home`.
 GoRouter createRouter(WidgetRef ref) {
-  final authState = ref.watch(authProvider);
-
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
-    refreshListenable: _AuthStateListenable(ref),
     redirect: (context, state) {
+      final authState = ref.read(authProvider);
       final isAuth = authState.isAuthenticated;
       final location = state.matchedLocation;
 
@@ -37,8 +35,6 @@ GoRouter createRouter(WidgetRef ref) {
 
       // Auth routes — redirect to home if already authenticated
       final isAuthRoute = location.startsWith('/auth');
-
-      if (!isAuth && !isAuthRoute && !isAuth) return '/auth/login';
       if (isAuth && isAuthRoute) return '/home';
 
       return null;
@@ -126,15 +122,6 @@ GoRouter createRouter(WidgetRef ref) {
       ),
     ],
   );
-}
-
-/// A [Listenable] that notifies GoRouter when auth state changes.
-class _AuthStateListenable extends ChangeNotifier {
-  final WidgetRef _ref;
-
-  _AuthStateListenable(this._ref) {
-    _ref.listen(authProvider, (_, __) => notifyListeners());
-  }
 }
 
 /// Temporary placeholder screen for routes not yet built.
