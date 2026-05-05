@@ -11,6 +11,7 @@ class ProposalRepository {
     String jobId,
     CreateProposalInput input,
   ) async {
+    await _mock.ensureLoaded();
     await _delay(500);
     return Proposal(
       id: 'prop_${_mock.proposals.length + 1}',
@@ -29,6 +30,7 @@ class ProposalRepository {
     String jobId, {
     int page = 1,
   }) async {
+    await _mock.ensureLoaded();
     await _delay();
     final list = _mock.proposals.where((p) => p.jobId == jobId).toList();
     return PaginatedResponse(
@@ -44,6 +46,7 @@ class ProposalRepository {
 
   /// Get proposals submitted by the current user (hardcoded to u_1).
   Future<PaginatedResponse<Proposal>> getMyProposals({int page = 1}) async {
+    await _mock.ensureLoaded();
     await _delay();
     final list = _mock.proposals
         .where((p) => p.freelancer.id == 'u_1')
@@ -61,16 +64,19 @@ class ProposalRepository {
 
   /// Withdraw a proposal (mock).
   Future<void> withdrawProposal(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 
   /// Accept a proposal (mock).
   Future<void> acceptProposal(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 
   /// Reject a proposal (mock).
   Future<void> rejectProposal(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 

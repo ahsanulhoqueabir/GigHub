@@ -86,6 +86,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/fonts/
+    - docs/mock_data.json
 
 flutter_launcher_icons:
   image_path: assets/images/logo.png

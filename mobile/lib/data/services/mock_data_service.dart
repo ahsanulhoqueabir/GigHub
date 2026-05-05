@@ -1,797 +1,212 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:gighub/data/models/category_model.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/models/job_model.dart';
 import 'package:gighub/data/models/profile_model.dart';
 import 'package:gighub/data/models/proposal_model.dart';
 
-/// Pure in-memory mock data service.
+/// Mock data service backed by a JSON asset.
 ///
-/// Provides all mock data directly as typed Dart objects. No API calls, no JSON
-/// parsing at runtime. Swap this out for real repository implementations when
-/// the backend is ready.
+/// All mock data lives in docs/mock_data.json and is parsed at runtime.
 class MockDataService {
   MockDataService._();
 
   static final MockDataService _instance = MockDataService._();
   static MockDataService get instance => _instance;
 
-  // ── Profiles ──────────────────────────────────────────────
+  bool _loaded = false;
 
-  late final List<PublicProfile> profiles = [
-    PublicProfile(
-      id: 'u_1',
-      displayName: 'Ahsanul Hoque',
-      username: 'ahsanul',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul',
-      avgRating: 4.9,
-      totalReviews: 120,
-      completedOrders: 210,
-      memberSince: _parseDateTime('2020-01-15T00:00:00Z'),
-      skills: ['Flutter', 'React', 'Node.js', 'UI/UX Design'],
-      bio: 'Full-stack developer & designer with 7+ years of experience',
-    ),
-    PublicProfile(
-      id: 'u_2',
-      displayName: 'John Doe',
-      username: 'johndoe',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe',
-      avgRating: 4.5,
-      totalReviews: 15,
-      completedOrders: 3,
-      memberSince: _parseDateTime('2023-06-01T00:00:00Z'),
-      bio: 'Entrepreneur & startup founder',
-    ),
-    PublicProfile(
-      id: 'u_3',
-      displayName: 'Sarah Khan',
-      username: 'sarahkhan',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=sarahkhan',
-      avgRating: 4.7,
-      totalReviews: 89,
-      completedOrders: 156,
-      memberSince: _parseDateTime('2021-03-10T00:00:00Z'),
-      skills: ['Photoshop', 'Illustrator', 'Figma'],
-      bio: 'Professional graphic designer & illustrator',
-    ),
-    PublicProfile(
-      id: 'u_4',
-      displayName: 'Rakib Hasan',
-      username: 'rakibhasan',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=rakibhasan',
-      avgRating: 4.6,
-      totalReviews: 54,
-      completedOrders: 89,
-      memberSince: _parseDateTime('2022-01-20T00:00:00Z'),
-      skills: ['Premiere Pro', 'After Effects', 'DaVinci Resolve'],
-      bio: 'Video editor & motion graphics artist',
-    ),
-    PublicProfile(
-      id: 'u_5',
-      displayName: 'Fatima Ahmed',
-      username: 'fatimaahmed',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=fatimaahmed',
-      avgRating: 5.0,
-      totalReviews: 200,
-      completedOrders: 340,
-      memberSince: _parseDateTime('2020-07-05T00:00:00Z'),
-      skills: ['Copywriting', 'SEO', 'Blog Writing'],
-      bio: 'Content writer & SEO specialist',
-    ),
-    PublicProfile(
-      id: 'u_6',
-      displayName: 'Tanvir Rahman',
-      username: 'tanvirrahman',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tanvirrahman',
-      avgRating: 4.3,
-      totalReviews: 32,
-      completedOrders: 45,
-      memberSince: _parseDateTime('2023-02-14T00:00:00Z'),
-      skills: ['Flutter', 'Android', 'Kotlin', 'Firebase'],
-      bio: 'Flutter & Android developer',
-    ),
-  ];
+  late List<PublicProfile> profiles;
+  late List<Category> categories;
+  late List<GigDetail> gigs;
+  late List<Job> jobs;
+  late List<Proposal> proposals;
 
-  // ── Categories ────────────────────────────────────────────
+  final Map<String, List<String>> _relatedGigSlugs = {};
 
-  late final List<Category> categories = [
-    const Category(
-      id: 'cat_1',
-      name: 'Graphics & Design',
-      slug: 'graphics-design',
-      icon: 'palette',
-      description: 'Logo, Branding, Illustration & more',
-      gigCount: 1240,
-    ),
-    const Category(
-      id: 'cat_2',
-      name: 'Digital Marketing',
-      slug: 'digital-marketing',
-      icon: 'trending_up',
-      description: 'SEO, Social Media, PPC & more',
-      gigCount: 890,
-    ),
-    const Category(
-      id: 'cat_3',
-      name: 'Writing & Translation',
-      slug: 'writing-translation',
-      icon: 'description',
-      description: 'Articles, Translation, Proofreading & more',
-      gigCount: 1560,
-    ),
-    const Category(
-      id: 'cat_4',
-      name: 'Video & Animation',
-      slug: 'video-animation',
-      icon: 'movie',
-      description: 'Editing, Motion Graphics, 3D & more',
-      gigCount: 720,
-    ),
-    const Category(
-      id: 'cat_5',
-      name: 'Programming & Tech',
-      slug: 'programming-tech',
-      icon: 'code',
-      description: 'Web, Mobile, AI, DevOps & more',
-      gigCount: 2100,
-    ),
-    const Category(
-      id: 'cat_6',
-      name: 'Music & Audio',
-      slug: 'music-audio',
-      icon: 'music_note',
-      description: 'Voice Over, Mixing, Production & more',
-      gigCount: 480,
-    ),
-    const Category(
-      id: 'cat_7',
-      name: 'Business',
-      slug: 'business',
-      icon: 'business',
-      description: 'Virtual Assistant, Consulting, Finance & more',
-      gigCount: 650,
-    ),
-    const Category(
-      id: 'cat_8',
-      name: 'Lifestyle',
-      slug: 'lifestyle',
-      icon: 'spa',
-      description: 'Fitness, Wellness, Travel & more',
-      gigCount: 320,
-    ),
-  ];
+  /// Load and parse mock data from JSON once.
+  Future<void> ensureLoaded() async {
+    if (_loaded) return;
 
-  // ── Gigs ──────────────────────────────────────────────────
+    final raw = await rootBundle.loadString('docs/mock_data.json');
+    final data = jsonDecode(raw) as Map<String, dynamic>;
 
-  late final List<GigDetail> gigs = [
-    GigDetail(
-      id: 'gig_1',
-      title: 'I will design a modern minimalist logo for your business',
-      slug: 'design-minimalist-logo',
-      category: _cat('cat_1'),
-      seller: _profile('u_1'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1572044162444-ad60f128bde3?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1572044162444-ad60f128bde3?w=800',
-        'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=800',
-        'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800',
-      ],
-      description:
-          'I will design a professional, modern minimalist logo that perfectly represents your brand identity. With over 7 years of design experience, I create unique logos that stand out.\n\nWhat you will get:\n\u2022 High-resolution files (PNG, JPG, SVG, PDF)\n\u2022 Source files (AI, PSD)\n\u2022 Unlimited revisions until satisfied\n\u2022 3D mockup presentation\n\u2022 Brand color palette',
-      startingPrice: 1500.0,
-      avgRating: 4.8,
-      totalReviews: 85,
-      totalOrders: 210,
-      status: 'active',
-      tags: ['logo', 'minimalist', 'branding', 'corporate'],
-      packages: _logoPackages(),
-      deliveryDaysMin: 2,
-    ),
-    GigDetail(
-      id: 'gig_2',
-      title: 'I will build a fully responsive Flutter mobile app for you',
-      slug: 'flutter-mobile-app',
-      category: _cat('cat_5'),
-      seller: _profile('u_1'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800',
-        'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800',
-      ],
-      description:
-          'I will build a beautiful, high-performance Flutter mobile app for both iOS and Android. From concept to deployment, I handle everything.\n\nServices include:\n\u2022 Custom UI/UX design\n\u2022 Firebase backend integration\n\u2022 REST API integration\n\u2022 Push notifications\n\u2022 In-app purchases\n\u2022 App Store & Play Store deployment',
-      startingPrice: 15000.0,
-      avgRating: 4.9,
-      totalReviews: 42,
-      totalOrders: 65,
-      status: 'active',
-      tags: ['flutter', 'mobile app', 'firebase', 'ios', 'android'],
-      packages: [
-        const GigPackage(
-          id: 'pkg_basic_2',
-          tier: 'basic',
-          title: 'Basic App',
-          description: 'Simple 3-screen app with Firebase',
-          price: 15000.0,
-          deliveryDays: 7,
-          revisions: 2,
-          features: ['Up to 3 screens', 'Firebase backend', 'Basic UI'],
-        ),
-        const GigPackage(
-          id: 'pkg_standard_2',
-          tier: 'standard',
-          title: 'Standard App',
-          description: 'Full-featured app up to 8 screens',
-          price: 35000.0,
-          deliveryDays: 14,
-          revisions: 4,
-          features: [
-            'Up to 8 screens',
-            'Custom UI design',
-            'REST API integration',
-            'Push notifications',
-            'App Store submission',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_premium_2',
-          tier: 'premium',
-          title: 'Premium App',
-          description: 'Complex app with all features',
-          price: 70000.0,
-          deliveryDays: 30,
-          revisions: 999,
-          features: [
-            'Unlimited screens',
-            'All Standard features',
-            'Real-time features',
-            'Payment integration',
-            'Admin dashboard',
-            '6 months support',
-          ],
-        ),
-      ],
-      deliveryDaysMin: 7,
-    ),
-    GigDetail(
-      id: 'gig_3',
-      title: 'I will write SEO optimized blog posts for your website',
-      slug: 'seo-blog-posts',
-      category: _cat('cat_3'),
-      seller: _profile('u_5'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1499750310107-5fef28a66643?w=800',
-        'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800',
-      ],
-      description:
-          'I will write engaging, SEO-optimized blog posts that drive traffic and convert readers. Every post is thoroughly researched and crafted to rank well on Google.',
-      startingPrice: 500.0,
-      avgRating: 5.0,
-      totalReviews: 200,
-      totalOrders: 340,
-      status: 'active',
-      tags: ['blog writing', 'SEO', 'content writing', 'copywriting'],
-      packages: [
-        const GigPackage(
-          id: 'pkg_basic_3',
-          tier: 'basic',
-          title: 'Basic Post',
-          description: '500-word SEO blog post',
-          price: 500.0,
-          deliveryDays: 1,
-          revisions: 1,
-          features: [
-            '500 words',
-            'SEO optimized',
-            '1 revision',
-            'Meta description',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_standard_3',
-          tier: 'standard',
-          title: 'Standard Post',
-          description: '1000-word in-depth article',
-          price: 1200.0,
-          deliveryDays: 2,
-          revisions: 3,
-          features: [
-            '1000 words',
-            'Advanced SEO',
-            'Keyword research',
-            '3 revisions',
-            'Featured image suggestion',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_premium_3',
-          tier: 'premium',
-          title: 'Premium Post',
-          description: '2000-word pillar content',
-          price: 2500.0,
-          deliveryDays: 4,
-          revisions: 999,
-          features: [
-            '2000 words',
-            'Advanced SEO + internal linking',
-            'Competitor analysis',
-            'Unlimited revisions',
-            'Social media snippets',
-          ],
-        ),
-      ],
-      deliveryDaysMin: 1,
-    ),
-    GigDetail(
-      id: 'gig_4',
-      title: 'I will create an animated explainer video for your product',
-      slug: 'animated-explainer-video',
-      category: _cat('cat_4'),
-      seller: _profile('u_4'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1536240478700-b869070f9279?w=800',
-        'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=800',
-      ],
-      description:
-          'I create stunning animated explainer videos that communicate your product value in seconds. Perfect for landing pages, social media, and pitch decks.',
-      startingPrice: 3000.0,
-      avgRating: 4.6,
-      totalReviews: 54,
-      totalOrders: 89,
-      status: 'active',
-      tags: [
-        'animation',
-        'explainer video',
-        'motion graphics',
-        'after effects',
-      ],
-      packages: [
-        const GigPackage(
-          id: 'pkg_basic_4',
-          tier: 'basic',
-          title: 'Basic Animation',
-          description: '30-second 2D animation',
-          price: 3000.0,
-          deliveryDays: 3,
-          revisions: 2,
-          features: [
-            '30 seconds',
-            '2D animation',
-            'Background music',
-            'HD (1080p)',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_standard_4',
-          tier: 'standard',
-          title: 'Standard Animation',
-          description: '60-second animated video + voiceover',
-          price: 6000.0,
-          deliveryDays: 5,
-          revisions: 4,
-          features: [
-            '60 seconds',
-            'Professional voiceover',
-            'Sound effects',
-            'Storyboard included',
-            '4K resolution',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_premium_4',
-          tier: 'premium',
-          title: 'Premium Animation',
-          description: '90-second premium video + social cuts',
-          price: 12000.0,
-          deliveryDays: 10,
-          revisions: 999,
-          features: [
-            '90 seconds',
-            'All Standard features',
-            'Character animation',
-            '3 social media cuts',
-            'Source files',
-            'Priority delivery',
-          ],
-        ),
-      ],
-      deliveryDaysMin: 3,
-    ),
-    GigDetail(
-      id: 'gig_5',
-      title: 'I will design a stunning UI/UX for your mobile app',
-      slug: 'ui-ux-mobile-design',
-      category: _cat('cat_1'),
-      seller: _profile('u_3'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800',
-        'https://images.unsplash.com/photo-1581291518633-83b4eef6d30c?w=800',
-      ],
-      description:
-          'I design beautiful, user-friendly mobile app interfaces in Figma. From wireframes to high-fidelity prototypes, I will bring your app idea to life.',
-      startingPrice: 5000.0,
-      avgRating: 4.7,
-      totalReviews: 89,
-      totalOrders: 156,
-      status: 'active',
-      tags: ['ui design', 'ux', 'figma', 'mobile app', 'prototype'],
-      packages: [
-        const GigPackage(
-          id: 'pkg_basic_5',
-          tier: 'basic',
-          title: 'Basic UI',
-          description: '5-screen mobile UI design',
-          price: 5000.0,
-          deliveryDays: 3,
-          revisions: 2,
-          features: [
-            '5 screens',
-            'Figma file',
-            'Basic prototype',
-            'iOS or Android',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_standard_5',
-          tier: 'standard',
-          title: 'Standard UI/UX',
-          description: 'Full app design up to 15 screens',
-          price: 12000.0,
-          deliveryDays: 7,
-          revisions: 4,
-          features: [
-            'Up to 15 screens',
-            'Wireframes',
-            'Interactive prototype',
-            'Design system',
-            'iOS & Android',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_premium_5',
-          tier: 'premium',
-          title: 'Premium UX',
-          description: 'Complete UX research + design',
-          price: 25000.0,
-          deliveryDays: 14,
-          revisions: 999,
-          features: [
-            'Unlimited screens',
-            'User research',
-            'User flows',
-            'All Standard features',
-            'Developer handoff',
-            '2 months support',
-          ],
-        ),
-      ],
-      deliveryDaysMin: 3,
-    ),
-    GigDetail(
-      id: 'gig_6',
-      title: 'I will manage your social media marketing for 30 days',
-      slug: 'social-media-marketing',
-      category: _cat('cat_2'),
-      seller: _profile('u_3'),
-      thumbnail:
-          'https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=500',
-      images: [
-        'https://images.unsplash.com/photo-1611926653458-09294b3142bf?w=800',
-      ],
-      description:
-          'I will manage your social media accounts for 30 days. Includes content creation, scheduling, engagement, and monthly analytics report.',
-      startingPrice: 8000.0,
-      avgRating: 4.7,
-      totalReviews: 34,
-      totalOrders: 52,
-      status: 'active',
-      tags: ['social media', 'marketing', 'instagram', 'facebook', 'content'],
-      packages: [
-        const GigPackage(
-          id: 'pkg_basic_6',
-          tier: 'basic',
-          title: 'Starter',
-          description: '2 platforms, 12 posts/month',
-          price: 8000.0,
-          deliveryDays: 30,
-          revisions: 2,
-          features: [
-            '2 platforms',
-            '12 posts',
-            'Basic graphics',
-            'Hashtag research',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_standard_6',
-          tier: 'standard',
-          title: 'Growth',
-          description: '3 platforms, 20 posts/month',
-          price: 15000.0,
-          deliveryDays: 30,
-          revisions: 4,
-          features: [
-            '3 platforms',
-            '20 posts',
-            'Custom graphics',
-            'Story posts',
-            'Monthly report',
-          ],
-        ),
-        const GigPackage(
-          id: 'pkg_premium_6',
-          tier: 'premium',
-          title: 'Agency',
-          description: 'All platforms, daily posting + ads',
-          price: 30000.0,
-          deliveryDays: 30,
-          revisions: 999,
-          features: [
-            'All platforms',
-            'Daily posts',
-            'Reels/TikToks',
-            'Ad management',
-            'Weekly analytics',
-            'Competitor analysis',
-          ],
-        ),
-      ],
-      deliveryDaysMin: 30,
-    ),
-  ];
+    categories = _parseCategories(data['categories']);
+    profiles = _parseProfiles(data['profiles']);
 
-  // ── Jobs ──────────────────────────────────────────────────
+    final categoryById = {for (final c in categories) c.id: c};
+    final profileById = {for (final p in profiles) p.id: p};
 
-  late final List<Job> jobs = [
-    Job(
-      id: 'job_1',
-      title: 'Need a Flutter developer for a food delivery app',
-      slug: 'flutter-food-app',
-      description:
-          'Looking for an experienced Flutter developer to build a food delivery app with real-time order tracking, payment integration, and admin dashboard.',
-      category: _cat('cat_5'),
-      client: _profile('u_2'),
-      type: 'fixed',
-      budgetMin: 50000.0,
-      budgetMax: 100000.0,
-      deadline: '2026-06-15T00:00:00Z',
-      skillsRequired: ['Flutter', 'Dart', 'Firebase', 'Node.js'],
-      experienceLevel: 'intermediate',
-      status: 'open',
-      totalProposals: 12,
-      createdAt: _parseDateTime('2026-05-01T10:00:00Z'),
-    ),
-    Job(
-      id: 'job_2',
-      title: 'Logo designer needed for tech startup rebranding',
-      slug: 'tech-startup-logo',
-      description:
-          'SaaS startup looking to rebrand. Need a modern, tech-forward logo that reflects innovation and trust.',
-      category: _cat('cat_1'),
-      client: _profile('u_2'),
-      type: 'fixed',
-      budgetMin: 3000.0,
-      budgetMax: 8000.0,
-      deadline: '2026-05-20T00:00:00Z',
-      skillsRequired: ['Logo Design', 'Branding', 'Adobe Illustrator', 'Figma'],
-      experienceLevel: 'expert',
-      status: 'open',
-      totalProposals: 8,
-      createdAt: _parseDateTime('2026-05-02T14:00:00Z'),
-    ),
-    Job(
-      id: 'job_3',
-      title: 'Write 10 SEO blog posts for e-commerce site',
-      slug: 'seo-blog-ecommerce',
-      description:
-          'Need a content writer for 10 SEO-optimized blog posts, 1000-1500 words each with proper keyword integration.',
-      category: _cat('cat_3'),
-      client: _profile('u_2'),
-      type: 'fixed',
-      budgetMin: 5000.0,
-      budgetMax: 10000.0,
-      deadline: '2026-05-30T00:00:00Z',
-      skillsRequired: [
-        'Content Writing',
-        'SEO',
-        'Blog Writing',
-        'Keyword Research',
-      ],
-      experienceLevel: 'intermediate',
-      status: 'open',
-      totalProposals: 20,
-      createdAt: _parseDateTime('2026-05-03T09:00:00Z'),
-    ),
-    Job(
-      id: 'job_4',
-      title: 'Edit 5 YouTube videos (vlog style) per week',
-      slug: 'youtube-video-editing',
-      description:
-          'Looking for a reliable video editor to edit 5 vlog-style videos per week. Videos are 10-15 minutes long.',
-      category: _cat('cat_4'),
-      client: _profile('u_2'),
-      type: 'hourly',
-      budgetMin: 500.0,
-      budgetMax: 1000.0,
-      deadline: null,
-      skillsRequired: [
-        'Video Editing',
-        'Premiere Pro',
-        'After Effects',
-        'Color Grading',
-      ],
-      experienceLevel: 'intermediate',
-      status: 'open',
-      totalProposals: 15,
-      createdAt: _parseDateTime('2026-05-04T16:00:00Z'),
-    ),
-    Job(
-      id: 'job_5',
-      title: 'Build REST API with Node.js and PostgreSQL',
-      slug: 'nodejs-rest-api',
-      description:
-          'Need a backend developer to build a RESTful API with Node.js, Express, PostgreSQL, and JWT authentication.',
-      category: _cat('cat_5'),
-      client: _profile('u_2'),
-      type: 'fixed',
-      budgetMin: 30000.0,
-      budgetMax: 60000.0,
-      deadline: '2026-06-30T00:00:00Z',
-      skillsRequired: ['Node.js', 'Express', 'PostgreSQL', 'JWT', 'Swagger'],
-      experienceLevel: 'expert',
-      status: 'open',
-      totalProposals: 6,
-      createdAt: _parseDateTime('2026-05-05T08:00:00Z'),
-    ),
-    Job(
-      id: 'job_6',
-      title: 'Create Facebook & Instagram ad campaigns',
-      slug: 'social-media-ads',
-      description:
-          'Need a digital marketing expert to set up and manage Facebook and Instagram ad campaigns for product launch.',
-      category: _cat('cat_2'),
-      client: _profile('u_2'),
-      type: 'fixed',
-      budgetMin: 10000.0,
-      budgetMax: 20000.0,
-      deadline: '2026-05-25T00:00:00Z',
-      skillsRequired: [
-        'Facebook Ads',
-        'Instagram Ads',
-        'Meta Business Suite',
-        'Analytics',
-      ],
-      experienceLevel: 'expert',
-      status: 'open',
-      totalProposals: 9,
-      createdAt: _parseDateTime('2026-05-05T12:00:00Z'),
-    ),
-  ];
+    gigs = _parseGigs(data['gigs'], categoryById, profileById);
+    jobs = _parseJobs(data['jobs'], categoryById, profileById);
+    proposals = _parseProposals(data['proposals'], profileById);
 
-  // ── Proposals ─────────────────────────────────────────────
+    _loaded = true;
+  }
 
-  late final List<Proposal> proposals = [
-    Proposal(
-      id: 'prop_1',
-      jobId: 'job_1',
-      freelancer: _profile('u_1'),
-      coverLetter:
-          'I have extensive experience building food delivery apps with Flutter. I have built similar apps with real-time tracking using Firebase and Google Maps. I can deliver a high-quality app within your budget and timeline.',
-      proposedPrice: 75000.0,
-      estimatedDays: 30,
-      status: 'pending',
-      createdAt: _parseDateTime('2026-05-02T10:00:00Z'),
-    ),
-    Proposal(
-      id: 'prop_2',
-      jobId: 'job_1',
-      freelancer: _profile('u_6'),
-      coverLetter:
-          'I am a Flutter developer with 3 years of experience. I have built several delivery apps and am confident I can deliver your food delivery app.',
-      proposedPrice: 60000.0,
-      estimatedDays: 25,
-      status: 'pending',
-      createdAt: _parseDateTime('2026-05-03T15:00:00Z'),
-    ),
-    Proposal(
-      id: 'prop_3',
-      jobId: 'job_2',
-      freelancer: _profile('u_3'),
-      coverLetter:
-          'I would love to design your tech startup new logo! I have experience with SaaS branding and can create a modern, memorable logo.',
-      proposedPrice: 5000.0,
-      estimatedDays: 5,
-      status: 'pending',
-      createdAt: _parseDateTime('2026-05-03T11:00:00Z'),
-    ),
-    Proposal(
-      id: 'prop_4',
-      jobId: 'job_3',
-      freelancer: _profile('u_5'),
-      coverLetter:
-          'I have 5+ years of experience writing SEO content for e-commerce sites. I can deliver all 10 posts within your timeline with thorough keyword research.',
-      proposedPrice: 8000.0,
-      estimatedDays: 14,
-      status: 'accepted',
-      createdAt: _parseDateTime('2026-05-04T08:00:00Z'),
-    ),
-    Proposal(
-      id: 'prop_5',
-      jobId: 'job_5',
-      freelancer: _profile('u_1'),
-      coverLetter:
-          'I have built multiple REST APIs with Node.js and PostgreSQL for marketplace platforms. I can deliver a well-documented, scalable API.',
-      proposedPrice: 45000.0,
-      estimatedDays: 21,
-      status: 'pending',
-      createdAt: _parseDateTime('2026-05-05T14:00:00Z'),
-    ),
-  ];
+  List<String> relatedGigSlugs(String slug) {
+    return List<String>.unmodifiable(_relatedGigSlugs[slug] ?? const []);
+  }
 
-  // ── Helper methods ────────────────────────────────────────
+  List<Category> _parseCategories(dynamic raw) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (c) => Category(
+            id: c['id'] as String,
+            name: c['name'] as String,
+            slug: c['slug'] as String,
+            icon: c['icon'] as String?,
+            description: c['description'] as String?,
+            gigCount: _toInt(c['gigCount']),
+          ),
+        )
+        .toList();
+  }
 
-  Category _cat(String id) => categories.firstWhere((c) => c.id == id);
-  PublicProfile _profile(String id) => profiles.firstWhere((p) => p.id == id);
+  List<PublicProfile> _parseProfiles(dynamic raw) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (p) => PublicProfile(
+            id: p['id'] as String,
+            displayName: p['displayName'] as String,
+            username: p['username'] as String,
+            avatar: p['avatar'] as String?,
+            bio: p['bio'] as String?,
+            skills: _stringList(p['skills']),
+            avgRating: _toDouble(p['avgRating'] ?? p['rating']),
+            totalReviews: _toInt(p['totalReviews']),
+            completedOrders: _toInt(p['completedOrders']),
+            memberSince: DateTime.parse(p['memberSince'] as String),
+          ),
+        )
+        .toList();
+  }
 
-  static DateTime _parseDateTime(String s) => DateTime.parse(s);
+  List<GigDetail> _parseGigs(
+    dynamic raw,
+    Map<String, Category> categories,
+    Map<String, PublicProfile> profiles,
+  ) {
+    final list = raw is List ? raw : const [];
+    final result = <GigDetail>[];
 
-  List<GigPackage> _logoPackages() => const [
-    GigPackage(
-      id: 'pkg_basic_1',
-      tier: 'basic',
-      title: 'Basic Logo',
-      description: 'One logo concept with source files',
-      price: 1500.0,
-      deliveryDays: 2,
-      revisions: 3,
-      features: [
-        '1 logo concept',
-        'High-resolution files',
-        'Source file (AI)',
-        'PNG & JPG formats',
-      ],
-    ),
-    GigPackage(
-      id: 'pkg_standard_1',
-      tier: 'standard',
-      title: 'Standard Logo',
-      description: 'Two concepts with branding kit',
-      price: 3000.0,
-      deliveryDays: 4,
-      revisions: 5,
-      features: [
-        '2 logo concepts',
-        'All Basic features',
-        'Social media kit',
-        'Brand color palette',
-        '3D mockup',
-        'Business card design',
-      ],
-    ),
-    GigPackage(
-      id: 'pkg_premium_1',
-      tier: 'premium',
-      title: 'Premium Logo',
-      description: 'Full brand identity package',
-      price: 6000.0,
-      deliveryDays: 7,
-      revisions: 999,
-      features: [
-        '3 logo concepts',
-        'All Standard features',
-        'Brand guidelines PDF',
-        'Stationery design',
-        'Favicon & app icon',
-        'Unlimited revisions',
-        'Priority support',
-      ],
-    ),
-  ];
+    for (final item in list.whereType<Map<String, dynamic>>()) {
+      final categoryId = item['categoryId'] as String;
+      final sellerId = item['sellerId'] as String;
+      final slug = item['slug'] as String;
+
+      final packages = _parsePackages(item['packages']);
+      final related = _stringList(item['relatedGigSlugs']);
+      _relatedGigSlugs[slug] = related;
+
+      result.add(
+        GigDetail(
+          id: item['id'] as String,
+          title: item['title'] as String,
+          slug: slug,
+          category: categories[categoryId]!,
+          seller: profiles[sellerId]!,
+          thumbnail: item['thumbnail'] as String?,
+          images: _stringList(item['images']),
+          description: item['description'] as String,
+          startingPrice: _toDouble(item['startingPrice']),
+          avgRating: _toDouble(item['avgRating']),
+          totalReviews: _toInt(item['totalReviews']),
+          totalOrders: _toInt(item['totalOrders']),
+          status: item['status'] as String,
+          tags: _stringList(item['tags']),
+          packages: packages,
+          deliveryDaysMin: _toInt(item['deliveryDaysMin']),
+        ),
+      );
+    }
+
+    return result;
+  }
+
+  List<Job> _parseJobs(
+    dynamic raw,
+    Map<String, Category> categories,
+    Map<String, PublicProfile> profiles,
+  ) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (j) => Job(
+            id: j['id'] as String,
+            title: j['title'] as String,
+            slug: j['slug'] as String,
+            description: j['description'] as String,
+            category: categories[j['categoryId'] as String]!,
+            client: profiles[j['clientId'] as String]!,
+            type: j['type'] as String,
+            budgetMin: _toDouble(j['budgetMin']),
+            budgetMax: _toDouble(j['budgetMax']),
+            deadline: j['deadline'] as String?,
+            skillsRequired: _stringList(j['skillsRequired']),
+            experienceLevel: j['experienceLevel'] as String,
+            status: j['status'] as String,
+            totalProposals: _toInt(j['totalProposals']),
+            createdAt: DateTime.parse(j['createdAt'] as String),
+          ),
+        )
+        .toList();
+  }
+
+  List<Proposal> _parseProposals(
+    dynamic raw,
+    Map<String, PublicProfile> profiles,
+  ) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (p) => Proposal(
+            id: p['id'] as String,
+            jobId: p['jobId'] as String,
+            freelancer: profiles[p['freelancerId'] as String]!,
+            coverLetter: p['coverLetter'] as String,
+            proposedPrice: _toDouble(p['proposedPrice']),
+            estimatedDays: _toInt(p['estimatedDays']),
+            status: p['status'] as String,
+            createdAt: DateTime.parse(p['createdAt'] as String),
+          ),
+        )
+        .toList();
+  }
+
+  List<GigPackage> _parsePackages(dynamic raw) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (p) => GigPackage(
+            id: p['id'] as String,
+            tier: p['tier'] as String,
+            title: p['title'] as String,
+            description: p['description'] as String,
+            price: _toDouble(p['price']),
+            deliveryDays: _toInt(p['deliveryDays']),
+            revisions: _toInt(p['revisions']),
+            features: _stringList(p['features']),
+          ),
+        )
+        .toList();
+  }
+
+  List<String> _stringList(dynamic raw) {
+    final list = raw is List ? raw : const [];
+    return list.map((e) => e.toString()).toList();
+  }
+
+  double _toDouble(dynamic raw) => (raw as num?)?.toDouble() ?? 0.0;
+
+  int _toInt(dynamic raw) => (raw as num?)?.toInt() ?? 0;
 }

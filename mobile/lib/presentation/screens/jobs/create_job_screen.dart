@@ -96,11 +96,28 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
               const SizedBox(height: AppSizes.space16),
               catsAsync.when(
                 data: (cats) => DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppSizes.space16,
+                      vertical: AppSizes.space12,
+                    ),
+                  ),
+                  isExpanded: true,
                   items: cats
                       .map(
-                        (c) =>
-                            DropdownMenuItem(value: c.id, child: Text(c.name)),
+                        (c) => DropdownMenuItem(
+                          value: c.id,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSizes.space4,
+                            ),
+                            child: Text(
+                              c.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
                       )
                       .toList(),
                   onChanged: (v) => _categoryId = v,
@@ -120,13 +137,27 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
                     (v?.length ?? 0) < 50 ? 'At least 50 characters' : null,
               ),
               const SizedBox(height: AppSizes.space16),
-              SegmentedButton<String>(
-                segments: const [
-                  ButtonSegment(value: 'fixed', label: Text('Fixed Price')),
-                  ButtonSegment(value: 'hourly', label: Text('Hourly')),
+              // Full-width price type selector
+              Row(
+                children: [
+                  Expanded(
+                    child: _PriceTypeChip(
+                      label: 'Fixed Price',
+                      icon: Icons.attach_money,
+                      selected: _type == 'fixed',
+                      onTap: () => setState(() => _type = 'fixed'),
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.space12),
+                  Expanded(
+                    child: _PriceTypeChip(
+                      label: 'Hourly',
+                      icon: Icons.timer_outlined,
+                      selected: _type == 'hourly',
+                      onTap: () => setState(() => _type = 'hourly'),
+                    ),
+                  ),
                 ],
-                selected: {_type},
-                onSelectionChanged: (v) => setState(() => _type = v.first),
               ),
               const SizedBox(height: AppSizes.space16),
               Row(
@@ -153,13 +184,49 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
                 ],
               ),
               const SizedBox(height: AppSizes.space16),
+              // Date picker for deadline
               TextFormField(
                 controller: _deadlineCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Deadline (YYYY-MM-DD)',
-                  hintText: 'Optional',
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Deadline',
+                  hintText: 'Optional — tap to pick',
+                  suffixIcon: Icon(
+                    Icons.calendar_today,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: AppSizes.space16,
+                    vertical: AppSizes.space12,
+                  ),
                 ),
-                keyboardType: TextInputType.datetime,
+                onTap: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: now.add(const Duration(days: 7)),
+                    firstDate: now,
+                    lastDate: now.add(const Duration(days: 365)),
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          datePickerTheme: DatePickerThemeData(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppSizes.radiusMd,
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (picked != null) {
+                    _deadlineCtrl.text =
+                        '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+                  }
+                },
               ),
               const SizedBox(height: AppSizes.space16),
               DropdownButtonFormField<String>(
@@ -195,6 +262,57 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Full-width price type selection chip.
+class _PriceTypeChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _PriceTypeChip({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = selected
+        ? theme.colorScheme.primary
+        : theme.colorScheme.outline.withValues(alpha: 0.5);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: AppSizes.space12,
+          horizontal: AppSizes.space16,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(color: color, width: selected ? 2 : 1),
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          color: selected ? color.withValues(alpha: 0.08) : null,
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: AppSizes.space4),
+            Text(
+              label,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: color,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
         ),
       ),
     );

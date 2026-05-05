@@ -25,6 +25,15 @@ final gigDetailProvider = FutureProvider.family<GigDetail, String>((
   return repo.getGigBySlug(slug);
 });
 
+/// Fetches related gigs (same category, excluding current gig).
+final relatedGigsProvider = FutureProvider.family<List<GigSummary>, String>((
+  ref,
+  slug,
+) async {
+  final repo = ref.watch(gigRepositoryProvider);
+  return repo.getRelatedGigs(slug);
+});
+
 /// Fetches gigs belonging to the current user.
 final myGigsProvider =
     FutureProvider.family<PaginatedResponse<GigSummary>, int>((

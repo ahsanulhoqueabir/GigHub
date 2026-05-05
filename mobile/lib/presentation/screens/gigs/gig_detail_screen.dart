@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
-import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/presentation/widgets/gigs/gig_card.dart';
 import 'package:gighub/presentation/widgets/gigs/image_carousel.dart';
 import 'package:gighub/presentation/widgets/gigs/package_tab_view.dart';
 
@@ -17,6 +17,7 @@ class GigDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final gigAsync = ref.watch(gigDetailProvider(slug));
+    final relatedAsync = ref.watch(relatedGigsProvider(slug));
 
     return Scaffold(
       body: gigAsync.when(
@@ -26,6 +27,12 @@ class GigDetailScreen extends ConsumerWidget {
             SliverAppBar(
               expandedHeight: 280,
               pinned: true,
+              title: Text(
+                gig.title,
+                style: theme.textTheme.titleSmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
               flexibleSpace: FlexibleSpaceBar(
                 background: ImageCarousel(
                   images: gig.images.isNotEmpty
@@ -127,7 +134,7 @@ class GigDetailScreen extends ConsumerWidget {
                     const SizedBox(height: AppSizes.space8),
                     Text(gig.description, style: theme.textTheme.bodyMedium),
                     const SizedBox(height: AppSizes.space24),
-                    // Related gigs placeholder
+                    // Related gigs
                     Text(
                       'Related Gigs',
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -135,15 +142,38 @@ class GigDetailScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: AppSizes.space8),
-                    SizedBox(
-                      height: 120,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 3,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(width: AppSizes.space12),
-                        itemBuilder: (_, __) => GhShimmer.card(height: 120),
+                    relatedAsync.when(
+                      data: (related) => SizedBox(
+                        height: 230,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: related.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: AppSizes.space12),
+                          itemBuilder: (_, i) => SizedBox(
+                            width: 180,
+                            child: GigCard(
+                              gig: related[i],
+                              onTap: () =>
+                                  context.push('/gigs/${related[i].slug}'),
+                            ),
+                          ),
+                        ),
                       ),
+                      loading: () => SizedBox(
+                        height: 230,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 3,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: AppSizes.space12),
+                          itemBuilder: (_, __) => const SizedBox(
+                            width: 180,
+                            child: _RelatedShimmer(),
+                          ),
+                        ),
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
                     ),
                     const SizedBox(height: 80),
                   ],
@@ -201,6 +231,21 @@ class GigDetailScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _RelatedShimmer extends StatelessWidget {
+  const _RelatedShimmer();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[800] : Colors.grey[300],
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       ),
     );
   }

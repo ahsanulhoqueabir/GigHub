@@ -11,6 +11,7 @@ class GigRepository {
 
   /// Fetch paginated gigs with optional filtering.
   Future<PaginatedResponse<GigSummary>> getGigs(GigQueryParams params) async {
+    await _mock.ensureLoaded();
     await _delay();
 
     var gigs = _mock.gigs.map(_toSummary).toList();
@@ -68,6 +69,7 @@ class GigRepository {
 
   /// Fetch a single gig by its slug.
   Future<GigDetail> getGigBySlug(String slug) async {
+    await _mock.ensureLoaded();
     await _delay();
     return _mock.gigs.firstWhere(
       (g) => g.slug == slug,
@@ -75,8 +77,48 @@ class GigRepository {
     );
   }
 
+  /// Fetch related gigs in the same category (excluding current gig).
+  Future<List<GigSummary>> getRelatedGigs(String slug) async {
+    await _mock.ensureLoaded();
+    await _delay(200);
+    final relatedSlugs = _mock.relatedGigSlugs(slug);
+    if (relatedSlugs.isNotEmpty) {
+      return relatedSlugs
+          .map(
+            (s) => _mock.gigs.firstWhere(
+              (g) => g.slug == s,
+              orElse: () => throw Exception('Related gig not found'),
+            ),
+          )
+          .map(_toSummary)
+          .toList();
+    }
+    final currentGig = _mock.gigs.firstWhere(
+      (g) => g.slug == slug,
+      orElse: () => throw Exception('Gig not found'),
+    );
+    final related = _mock.gigs
+        .where((g) => g.category.id == currentGig.category.id && g.slug != slug)
+        .take(5)
+        .map(_toSummary)
+        .toList();
+    // If not enough in same category, add other gigs
+    if (related.length < 3) {
+      final others = _mock.gigs
+          .where(
+            (g) => g.slug != slug && g.category.id != currentGig.category.id,
+          )
+          .take(5 - related.length)
+          .map(_toSummary)
+          .toList();
+      related.addAll(others);
+    }
+    return related;
+  }
+
   /// Fetch gigs belonging to the current user (hardcoded to u_1).
   Future<PaginatedResponse<GigSummary>> getMyGigs({int page = 1}) async {
+    await _mock.ensureLoaded();
     await _delay();
     final myGigs = _mock.gigs
         .where((g) => g.seller.id == 'u_1')
@@ -95,6 +137,7 @@ class GigRepository {
 
   /// Create a new gig (mock — returns a dummy gig).
   Future<GigDetail> createGig(CreateGigInput input) async {
+    await _mock.ensureLoaded();
     await _delay(600);
     final detail = GigDetail(
       id: 'gig_${_mock.gigs.length + 1}',
@@ -129,11 +172,14 @@ class GigRepository {
                 .reduce((a, b) => a < b ? a : b)
           : 1,
     );
+    // Add to local mock list so it appears in the UI
+    _mock.gigs.add(detail);
     return detail;
   }
 
   /// Update a gig (mock).
   Future<GigDetail> updateGig(String id, UpdateGigInput input) async {
+    await _mock.ensureLoaded();
     await _delay(400);
     final idx = _mock.gigs.indexWhere((g) => g.id == id);
     if (idx == -1) throw Exception('Gig not found');
@@ -142,11 +188,13 @@ class GigRepository {
 
   /// Delete a gig (mock).
   Future<void> deleteGig(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 
   /// Toggle gig status (mock).
   Future<void> toggleGigStatus(String id, String status) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 

@@ -8,6 +8,7 @@ class JobRepository {
 
   /// Fetch paginated jobs with optional filtering.
   Future<PaginatedResponse<Job>> getJobs(JobQueryParams params) async {
+    await _mock.ensureLoaded();
     await _delay();
 
     var jobs = List<Job>.from(_mock.jobs);
@@ -89,6 +90,7 @@ class JobRepository {
 
   /// Fetch a single job by slug.
   Future<Job> getJobBySlug(String slug) async {
+    await _mock.ensureLoaded();
     await _delay();
     return _mock.jobs.firstWhere(
       (j) => j.slug == slug,
@@ -98,6 +100,7 @@ class JobRepository {
 
   /// Fetch jobs posted by the current user (hardcoded to u_1).
   Future<PaginatedResponse<Job>> getMyJobs({int page = 1}) async {
+    await _mock.ensureLoaded();
     await _delay();
     final myJobs = _mock.jobs.where((j) => j.client.id == 'u_1').toList();
     return PaginatedResponse(
@@ -113,6 +116,7 @@ class JobRepository {
 
   /// Create a job (mock).
   Future<Job> createJob(CreateJobInput input) async {
+    await _mock.ensureLoaded();
     await _delay(600);
     return Job(
       id: 'job_${_mock.jobs.length + 1}',
@@ -134,6 +138,7 @@ class JobRepository {
   }
 
   Future<Job> updateJob(String id, UpdateJobInput input) async {
+    await _mock.ensureLoaded();
     await _delay(400);
     final idx = _mock.jobs.indexWhere((j) => j.id == id);
     if (idx == -1) throw Exception('Job not found');
@@ -141,10 +146,12 @@ class JobRepository {
   }
 
   Future<void> deleteJob(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 
   Future<void> closeJob(String id) async {
+    await _mock.ensureLoaded();
     await _delay(300);
   }
 

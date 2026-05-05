@@ -81,6 +81,16 @@ architecture and uses Riverpod for state management with GoRouter for navigation
 - Mock data is used to drive UI before backend integration.
 - Use `flutter pub run build_runner build` for code generation.
 
+## Demo Login Credentials
+
+Use the following credentials to log in during development:
+
+| Email           | Password |
+| --------------- | -------- |
+| demo@gighub.com | demo1234 |
+
+The mock login simulates a real sign-in experience with session persistence. After login, the session is saved and restored on app restart.
+
 ## Resources
 
 - [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)

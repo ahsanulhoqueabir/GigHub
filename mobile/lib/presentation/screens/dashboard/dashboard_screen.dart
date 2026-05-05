@@ -82,7 +82,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSizes.space12),
           SizedBox(
-            height: 220,
+            height: 280,
             child: gigsAsync.when(
               data: (response) => ListView.separated(
                 scrollDirection: Axis.horizontal,

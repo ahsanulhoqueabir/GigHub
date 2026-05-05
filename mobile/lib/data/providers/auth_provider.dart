@@ -65,6 +65,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
+      // Check if this is a mock session (starts with 'mock_')
+      if (accessToken.startsWith('mock_')) {
+        // Restore mock session — create a mock profile
+        state = AuthState.authenticated(
+          profile: Profile(
+            id: 'u_1',
+            displayName: 'Ahsanul Hoque',
+            username: 'ahsanul',
+            email: 'demo@gighub.com',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul',
+            bio: 'Full-stack developer & designer with 7+ years of experience',
+            skills: ['Flutter', 'React', 'Node.js', 'UI/UX Design'],
+            avgRating: 4.9,
+            totalReviews: 120,
+            role: 'seller',
+            createdAt: DateTime(2020, 1, 15),
+          ),
+        );
+        return;
+      }
+
       // Try to refresh the token to validate the session
       final pair = await _authRepository.refreshToken(refreshTokenVal);
       await _secureStorage.saveTokens(
