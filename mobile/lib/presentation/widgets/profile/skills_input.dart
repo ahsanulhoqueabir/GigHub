@@ -155,12 +155,17 @@ class _SkillsInputState extends State<SkillsInput> {
           children: List.generate(widget.skills.length, (index) {
             return Chip(
               label: Text(widget.skills[index]),
-              deleteIcon: const Icon(Icons.close, size: 16),
+              deleteIcon: Icon(
+                Icons.close,
+                size: 16,
+                color: theme.colorScheme.onSecondaryContainer,
+              ),
               onDeleted: () => _removeSkill(index),
-              backgroundColor: theme.colorScheme.primaryContainer,
+              backgroundColor: theme.colorScheme.secondaryContainer,
               labelStyle: TextStyle(
-                color: theme.colorScheme.onPrimaryContainer,
+                color: theme.colorScheme.onSecondaryContainer,
                 fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             );
           }),

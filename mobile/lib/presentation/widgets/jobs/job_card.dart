@@ -118,7 +118,14 @@ class JobCard extends StatelessWidget {
                   runSpacing: AppSizes.space4,
                   children: job.skillsRequired.take(4).map((skill) {
                     return Chip(
-                      label: Text(skill, style: theme.textTheme.labelSmall),
+                      label: Text(
+                        skill,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      backgroundColor: theme.colorScheme.secondaryContainer,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
