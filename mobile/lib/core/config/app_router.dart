@@ -6,11 +6,23 @@ import 'package:gig_hub/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:gig_hub/presentation/screens/auth/login_screen.dart';
 import 'package:gig_hub/presentation/screens/auth/register_screen.dart';
 import 'package:gig_hub/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:gig_hub/presentation/screens/gigs/browse_gigs_screen.dart';
+import 'package:gig_hub/presentation/screens/gigs/create_gig_screen.dart';
+import 'package:gig_hub/presentation/screens/gigs/edit_gig_screen.dart';
+import 'package:gig_hub/presentation/screens/gigs/gig_detail_screen.dart';
+import 'package:gig_hub/presentation/screens/gigs/my_gigs_screen.dart';
 import 'package:gig_hub/presentation/screens/home/home_screen.dart';
+import 'package:gig_hub/presentation/screens/jobs/browse_jobs_screen.dart';
+import 'package:gig_hub/presentation/screens/jobs/create_job_screen.dart';
+import 'package:gig_hub/presentation/screens/jobs/job_detail_screen.dart';
+import 'package:gig_hub/presentation/screens/jobs/job_proposals_screen.dart';
+import 'package:gig_hub/presentation/screens/jobs/my_jobs_screen.dart';
 import 'package:gig_hub/presentation/screens/profile/edit_profile_screen.dart';
 import 'package:gig_hub/presentation/screens/profile/my_profile_screen.dart';
 import 'package:gig_hub/presentation/screens/profile/public_profile_screen.dart';
 import 'package:gig_hub/presentation/screens/profile/settings_screen.dart';
+import 'package:gig_hub/presentation/screens/proposals/my_proposals_screen.dart';
+import 'package:gig_hub/presentation/screens/search/search_screen.dart';
 import 'package:gig_hub/presentation/screens/splash/splash_screen.dart';
 
 /// Global navigator key for accessing the router from anywhere.
@@ -83,12 +95,12 @@ GoRouter createRouter(WidgetRef ref) {
           GoRoute(
             path: '/gigs',
             name: 'gigs',
-            builder: (_, __) => const _PlaceholderScreen(title: 'Gigs'),
+            builder: (_, __) => const BrowseGigsScreen(),
           ),
           GoRoute(
             path: '/jobs',
             name: 'jobs',
-            builder: (_, __) => const _PlaceholderScreen(title: 'Jobs'),
+            builder: (_, __) => const BrowseJobsScreen(),
           ),
           GoRoute(
             path: '/orders',
@@ -104,6 +116,60 @@ GoRouter createRouter(WidgetRef ref) {
       ),
 
       // ── Full-screen routes (no bottom nav) ───────
+      GoRoute(
+        path: '/gigs/create',
+        name: 'createGig',
+        builder: (_, __) => const CreateGigScreen(),
+      ),
+      GoRoute(
+        path: '/gigs/:slug',
+        name: 'gigDetail',
+        builder: (_, state) =>
+            GigDetailScreen(slug: state.pathParameters['slug']!),
+      ),
+      GoRoute(
+        path: '/gigs/:id/edit',
+        name: 'editGig',
+        builder: (_, state) =>
+            EditGigScreen(gigId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/gigs/me',
+        name: 'myGigs',
+        builder: (_, __) => const MyGigsScreen(),
+      ),
+      GoRoute(
+        path: '/jobs/create',
+        name: 'createJob',
+        builder: (_, __) => const CreateJobScreen(),
+      ),
+      GoRoute(
+        path: '/jobs/:slug',
+        name: 'jobDetail',
+        builder: (_, state) =>
+            JobDetailScreen(slug: state.pathParameters['slug']!),
+      ),
+      GoRoute(
+        path: '/jobs/:id/proposals',
+        name: 'jobProposals',
+        builder: (_, state) =>
+            JobProposalsScreen(jobId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/jobs/me',
+        name: 'myJobs',
+        builder: (_, __) => const MyJobsScreen(),
+      ),
+      GoRoute(
+        path: '/proposals/me',
+        name: 'myProposals',
+        builder: (_, __) => const MyProposalsScreen(),
+      ),
+      GoRoute(
+        path: '/search',
+        name: 'search',
+        builder: (_, __) => const SearchScreen(),
+      ),
       GoRoute(
         path: '/profile/edit',
         name: 'editProfile',

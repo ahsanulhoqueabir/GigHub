@@ -4,118 +4,151 @@
       "id": "cat_1",
       "name": "Graphics & Design",
       "slug": "graphics-design",
-      "icon": "palette"
+      "icon": "palette",
+      "description": "Logo, Branding, Illustration & more",
+      "gigCount": 1240
     },
     {
       "id": "cat_2",
       "name": "Digital Marketing",
       "slug": "digital-marketing",
-      "icon": "trending_up"
+      "icon": "trending_up",
+      "description": "SEO, Social Media, PPC & more",
+      "gigCount": 890
     },
     {
       "id": "cat_3",
       "name": "Writing & Translation",
       "slug": "writing-translation",
-      "icon": "description"
+      "icon": "description",
+      "description": "Articles, Translation, Proofreading & more",
+      "gigCount": 1560
     },
     {
       "id": "cat_4",
       "name": "Video & Animation",
       "slug": "video-animation",
-      "icon": "movie"
+      "icon": "movie",
+      "description": "Editing, Motion Graphics, 3D & more",
+      "gigCount": 720
+    },
+    {
+      "id": "cat_5",
+      "name": "Programming & Tech",
+      "slug": "programming-tech",
+      "icon": "code",
+      "description": "Web, Mobile, AI, DevOps & more",
+      "gigCount": 2100
+    },
+    {
+      "id": "cat_6",
+      "name": "Music & Audio",
+      "slug": "music-audio",
+      "icon": "music_note",
+      "description": "Voice Over, Mixing, Production & more",
+      "gigCount": 480
+    },
+    {
+      "id": "cat_7",
+      "name": "Business",
+      "slug": "business",
+      "icon": "business",
+      "description": "Virtual Assistant, Consulting, Finance & more",
+      "gigCount": 650
+    },
+    {
+      "id": "cat_8",
+      "name": "Lifestyle",
+      "slug": "lifestyle",
+      "icon": "spa",
+      "description": "Fitness, Wellness, Travel & more",
+      "gigCount": 320
     }
   ],
   "profiles": [
     {
       "id": "u_1",
-      "name": "Ahsanul Hoque",
+      "displayName": "Ahsanul Hoque",
       "username": "ahsanul",
       "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul",
       "role": "seller",
       "rating": 4.9,
       "totalReviews": 120,
-      "isOnline": true
+      "isOnline": true,
+      "bio": "Full-stack developer & designer with 7+ years of experience",
+      "skills": ["Flutter", "React", "Node.js", "UI/UX Design"],
+      "completedOrders": 210,
+      "memberSince": "2020-01-15T00:00:00Z"
     },
     {
       "id": "u_2",
-      "name": "John Doe",
+      "displayName": "John Doe",
       "username": "johndoe",
       "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=johndoe",
       "role": "buyer",
       "rating": 4.5,
       "totalReviews": 15,
-      "isOnline": false
-    }
-  ],
-  "gigs": [
+      "isOnline": false,
+      "bio": "Entrepreneur & startup founder",
+      "skills": [],
+      "completedOrders": 3,
+      "memberSince": "2023-06-01T00:00:00Z"
+    },
     {
-      "id": "gig_1",
-      "title": "I will design a modern minimalist logo for your business",
-      "slug": "design-minimalist-logo",
-      "category": {
-        "id": "cat_1",
-        "name": "Graphics & Design"
-      },
-      "seller": {
-        "id": "u_1",
-        "name": "Ahsanul Hoque",
-        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul"
-      },
-      "thumbnail": "https://images.unsplash.com/photo-1572044162444-ad60f128bde3?w=500",
-      "startingPrice": 1500.0,
-      "avgRating": 4.8,
-      "totalReviews": 85,
-      "status": "active"
-    }
-  ],
-  "jobs": [
+      "id": "u_3",
+      "displayName": "Sarah Khan",
+      "username": "sarahkhan",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=sarahkhan",
+      "role": "seller",
+      "rating": 4.7,
+      "totalReviews": 89,
+      "isOnline": true,
+      "bio": "Professional graphic designer & illustrator",
+      "skills": ["Photoshop", "Illustrator", "Figma"],
+      "completedOrders": 156,
+      "memberSince": "2021-03-10T00:00:00Z"
+    },
     {
-      "id": "job_1",
-      "title": "Need a Flutter developer for a food delivery app",
-      "slug": "flutter-food-app",
-      "description": "I am looking for an experienced Flutter developer to help me build a high-performance food delivery application with real-time tracking.",
-      "category": {
-        "id": "cat_1",
-        "name": "Graphics & Design"
-      },
-      "client": {
-        "id": "u_2",
-        "name": "John Doe"
-      },
-      "type": "fixed",
-      "budgetMin": 50000.0,
-      "budgetMax": 100000.0,
-      "status": "open",
-      "totalProposals": 12,
-      "createdAt": "2026-05-01T10:00:00Z"
-    }
-  ],
-  "orders": [
+      "id": "u_4",
+      "displayName": "Rakib Hasan",
+      "username": "rakibhasan",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=rakibhasan",
+      "role": "seller",
+      "rating": 4.6,
+      "totalReviews": 54,
+      "isOnline": false,
+      "bio": "Video editor & motion graphics artist",
+      "skills": ["Premiere Pro", "After Effects", "DaVinci Resolve"],
+      "completedOrders": 89,
+      "memberSince": "2022-01-20T00:00:00Z"
+    },
     {
-      "id": "ord_1",
-      "orderNumber": "GH-2026-001",
-      "gig": {
-        "id": "gig_1",
-        "title": "I will design a modern minimalist logo"
-      },
-      "status": "active",
-      "amount": 2000.0,
-      "deadline": "2026-05-15T18:00:00Z"
-    }
-  ],
-  "conversations": [
+      "id": "u_5",
+      "displayName": "Fatima Ahmed",
+      "username": "fatimaahmed",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=fatimaahmed",
+      "role": "seller",
+      "rating": 5.0,
+      "totalReviews": 200,
+      "isOnline": true,
+      "bio": "Content writer & SEO specialist",
+      "skills": ["Copywriting", "SEO", "Blog Writing"],
+      "completedOrders": 340,
+      "memberSince": "2020-07-05T00:00:00Z"
+    },
     {
-      "id": "conv_1",
-      "participant": {
-        "id": "u_1",
-        "name": "Ahsanul Hoque",
-        "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul"
-      },
-      "lastMessage": {
-        "content": "Sure, I can help with that!",
-        "createdAt": "2026-05-05T15:30:00Z"
-      },
-      "unreadCount": 2
+      "id": "u_6",
+      "displayName": "Tanvir Rahman",
+      "username": "tanvirrahman",
+      "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=tanvirrahman",
+      "role": "seller",
+      "rating": 4.3,
+      "totalReviews": 32,
+      "isOnline": true,
+      "bio": "Flutter & Android developer",
+      "skills": ["Flutter", "Android", "Kotlin", "Firebase"],
+      "completedOrders": 45,
+      "memberSince": "2023-02-14T00:00:00Z"
     }
   ]
 }

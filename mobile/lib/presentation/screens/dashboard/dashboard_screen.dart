@@ -1,28 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gig_hub/core/constants/app_sizes.dart';
-import 'package:gig_hub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gig_hub/data/models/gig_model.dart';
+import 'package:gig_hub/data/providers/gig_provider.dart';
+import 'package:gig_hub/data/models/job_model.dart';
+import 'package:gig_hub/data/providers/job_provider.dart';
+import 'package:gig_hub/presentation/widgets/gigs/gig_card.dart';
+import 'package:gig_hub/presentation/widgets/jobs/job_card.dart';
 
 /// Main dashboard / home tab of the app.
-///
-/// Shows a welcome message and (in future phases) featured gigs, recent
-/// activity, and personalized recommendations.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final gigsAsync = ref.watch(
+      gigsListProvider(const GigQueryParams(limit: 4)),
+    );
+    final jobsAsync = ref.watch(
+      jobsListProvider(const JobQueryParams(limit: 3)),
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('GigHub'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => context.push('/search'),
+          ),
+          IconButton(
             icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              // TODO: Phase 4 — notifications screen
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -45,7 +56,7 @@ class DashboardScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome to GigHub! 👋',
+                  'Welcome to GigHub! \u{1F44B}',
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -63,24 +74,71 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: AppSizes.space24),
 
-          // Placeholder sections
-          _SectionHeader(title: 'Trending Gigs', theme: theme),
+          // Trending Gigs
+          _SectionHeader(
+            title: 'Trending Gigs',
+            theme: theme,
+            onSeeAll: () => context.go('/gigs'),
+          ),
           const SizedBox(height: AppSizes.space12),
           SizedBox(
-            height: 180,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: 3,
-              separatorBuilder: (_, __) =>
-                  const SizedBox(width: AppSizes.space12),
-              itemBuilder: (_, __) => GhShimmer.card(height: 180),
+            height: 220,
+            child: gigsAsync.when(
+              data: (response) => ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: response.data.length,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(width: AppSizes.space12),
+                itemBuilder: (_, i) => SizedBox(
+                  width: 180,
+                  child: GigCard(
+                    gig: response.data[i],
+                    onTap: () => context.push('/gigs/${response.data[i].slug}'),
+                  ),
+                ),
+              ),
+              loading: () => ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                separatorBuilder: (_, __) =>
+                    const SizedBox(width: AppSizes.space12),
+                itemBuilder: (_, __) =>
+                    const SizedBox(width: 180, child: _ShimmerCard()),
+              ),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ),
           const SizedBox(height: AppSizes.space24),
 
-          _SectionHeader(title: 'Latest Jobs', theme: theme),
+          // Latest Jobs
+          _SectionHeader(
+            title: 'Latest Jobs',
+            theme: theme,
+            onSeeAll: () => context.go('/jobs'),
+          ),
           const SizedBox(height: AppSizes.space12),
-          ...List.generate(3, (_) => GhShimmer.listTile()),
+          jobsAsync.when(
+            data: (response) => Column(
+              children: response.data
+                  .map(
+                    (j) => JobCard(
+                      job: j,
+                      onTap: () => context.push('/jobs/${j.slug}'),
+                    ),
+                  )
+                  .toList(),
+            ),
+            loading: () => Column(
+              children: List.generate(
+                3,
+                (_) => const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  child: _ShimmerCard(height: 160),
+                ),
+              ),
+            ),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
         ],
       ),
     );
@@ -90,8 +148,13 @@ class DashboardScreen extends ConsumerWidget {
 class _SectionHeader extends StatelessWidget {
   final String title;
   final ThemeData theme;
+  final VoidCallback onSeeAll;
 
-  const _SectionHeader({required this.title, required this.theme});
+  const _SectionHeader({
+    required this.title,
+    required this.theme,
+    required this.onSeeAll,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +167,25 @@ class _SectionHeader extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        TextButton(onPressed: () {}, child: const Text('See All')),
+        TextButton(onPressed: onSeeAll, child: const Text('See All')),
       ],
+    );
+  }
+}
+
+class _ShimmerCard extends StatelessWidget {
+  final double height;
+  const _ShimmerCard({this.height = 180});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey[800] : Colors.grey[300],
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      ),
     );
   }
 }
