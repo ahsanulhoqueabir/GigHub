@@ -41,6 +41,8 @@ export interface Gig {
   description: string;
   tags: string[];
   images: GigImage[];
+  price_from?: number;
+  delivery_days_min?: number;
   status: GigStatus;
   avg_rating: number;
   total_reviews: number;

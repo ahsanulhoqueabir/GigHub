@@ -23,6 +23,8 @@ export class GigsService {
       'description',
       'tags',
       'images',
+      'price_from',
+      'delivery_days_min',
       'status',
       'avg_rating',
       'total_reviews',
@@ -172,7 +174,6 @@ export class GigsService {
     }
   }
 
-
   async updateEdit(
     gigId: string,
     sellerId: string,
@@ -267,7 +268,6 @@ export class GigsService {
     }
   }
 
-
   async updateStatus(
     gigId: string,
     sellerId: string,
@@ -326,6 +326,19 @@ export class GigsService {
     }
     if (query.tags) {
       filter['tags'] = { _contains: query.tags };
+    }
+    if (query.min_price !== undefined || query.max_price !== undefined) {
+      const priceFilter: Record<string, number> = {};
+      if (query.min_price !== undefined) {
+        priceFilter['_gte'] = query.min_price;
+      }
+      if (query.max_price !== undefined) {
+        priceFilter['_lte'] = query.max_price;
+      }
+      filter['price_from'] = priceFilter;
+    }
+    if (query.max_delivery !== undefined) {
+      filter['delivery_days_min'] = { _lte: query.max_delivery };
     }
     if (query.search) {
       filter['_or'] = [
