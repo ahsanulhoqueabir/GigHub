@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:gig_hub/data/providers/auth_provider.dart';
 
 /// Shell widget that wraps all main-app routes with a BottomNavigationBar.
 class HomeScreen extends ConsumerWidget {
@@ -8,7 +9,7 @@ class HomeScreen extends ConsumerWidget {
 
   const HomeScreen({super.key, required this.child});
 
-  int _currentIndex(BuildContext context) {
+  int _currentIndex(BuildContext context, {required bool isAuth}) {
     final location = GoRouterState.of(context).matchedLocation;
     switch (location) {
       case '/home':
@@ -20,13 +21,13 @@ class HomeScreen extends ConsumerWidget {
       case '/chat':
         return 3;
       case '/profile':
-        return 4;
+        return isAuth ? 4 : 0;
       default:
         return 0;
     }
   }
 
-  void _onTabTap(BuildContext context, int index) {
+  void _onTabTap(BuildContext context, int index, {required bool isAuth}) {
     switch (index) {
       case 0:
         context.go('/home');
@@ -41,20 +42,36 @@ class HomeScreen extends ConsumerWidget {
         context.go('/chat');
         break;
       case 4:
-        context.go('/profile');
+        if (isAuth) {
+          context.go('/profile');
+        } else {
+          context.go('/auth/login');
+        }
         break;
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = _currentIndex(context);
+    final isAuth = ref.watch(authProvider).isAuthenticated;
+    final currentIndex = _currentIndex(context, isAuth: isAuth);
+    final profileItem = isAuth
+        ? const BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            activeIcon: Icon(Icons.person),
+            label: 'Profile',
+          )
+        : const BottomNavigationBarItem(
+            icon: Icon(Icons.login),
+            activeIcon: Icon(Icons.login),
+            label: 'Sign In',
+          );
 
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: (index) => _onTabTap(context, index),
+        onTap: (index) => _onTabTap(context, index, isAuth: isAuth),
         items: [
           BottomNavigationBarItem(
             icon: Badge(
@@ -88,11 +105,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             label: 'Chat',
           ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          profileItem,
         ],
       ),
     );
