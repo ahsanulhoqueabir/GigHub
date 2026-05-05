@@ -161,6 +161,11 @@ class JobDetailScreen extends ConsumerWidget {
                     .map(
                       (s) => Chip(
                         label: Text(s),
+                        labelStyle: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSecondaryContainer,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        backgroundColor: theme.colorScheme.secondaryContainer,
                         visualDensity: VisualDensity.compact,
                       ),
                     )
