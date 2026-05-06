@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/network/api_client.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 import 'package:gighub/core/network/auth_interceptor.dart';
 import 'package:gighub/core/storage/secure_storage.dart';
 import 'package:gighub/data/models/auth_model.dart';
@@ -23,7 +24,7 @@ class AuthState {
       profile = null,
       error = null;
 
-  const AuthState.authenticated({required Profile profile})
+  const AuthState.authenticated({Profile? profile})
     : status = AuthStatus.authenticated,
       profile = profile,
       error = null;
@@ -86,11 +87,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
         refreshToken: refreshTokenVal,
       );
 
-      final profile = await _profileRepository.getMyProfile();
-      state = AuthState.authenticated(profile: profile);
-    } catch (_) {
-      await _secureStorage.clearTokens();
-      _authInterceptor.clearTokens();
+      try {
+        final profile = await _profileRepository.getMyProfile();
+        state = AuthState.authenticated(profile: profile);
+      } catch (e) {
+        if (e is UnauthorizedException) {
+          await _secureStorage.clearTokens();
+          _authInterceptor.clearTokens();
+          state = const AuthState.unauthenticated();
+        } else {
+          state = const AuthState.authenticated(profile: null);
+        }
+      }
+    } catch (e) {
+      if (e is UnauthorizedException) {
+        await _secureStorage.clearTokens();
+        _authInterceptor.clearTokens();
+      }
       state = const AuthState.unauthenticated();
     }
   }
