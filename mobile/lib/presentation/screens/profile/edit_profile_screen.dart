@@ -191,7 +191,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
             // Availability Status
             DropdownButtonFormField<String>(
-              value: _availabilityStatus,
+              initialValue: _availabilityStatus,
               decoration: const InputDecoration(
                 labelText: 'Availability Status',
                 prefixIcon: Icon(Icons.circle),

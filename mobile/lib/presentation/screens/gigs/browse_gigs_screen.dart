@@ -196,16 +196,18 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
               data: (response) {
                 if (_page == 1) _gigs.clear();
                 for (final g in response.data) {
-                  if (!_gigs.any((existing) => existing.id == g.id))
+                  if (!_gigs.any((existing) => existing.id == g.id)) {
                     _gigs.add(g);
+                  }
                 }
-                if (_gigs.isEmpty)
+                if (_gigs.isEmpty) {
                   return Center(
                     child: Text(
                       'No gigs found',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   );
+                }
                 return GridView.builder(
                   padding: const EdgeInsets.all(AppSizes.space8),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

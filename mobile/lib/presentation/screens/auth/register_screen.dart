@@ -71,11 +71,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   String _formatError(String error) {
-    if (error.contains('already exists'))
+    if (error.contains('already exists')) {
       return 'An account with that email already exists';
+    }
     if (error.contains('username')) return 'That username is already taken';
-    if (error.contains('NetworkException'))
+    if (error.contains('NetworkException')) {
       return 'Network error — please try again';
+    }
     return 'Registration failed — please try again';
   }
 

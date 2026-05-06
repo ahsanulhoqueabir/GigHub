@@ -57,10 +57,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   String _formatError(String error) {
-    if (error.contains('invalid email or password'))
+    if (error.contains('invalid email or password')) {
       return 'Invalid email or password';
-    if (error.contains('NetworkException'))
+    }
+    if (error.contains('NetworkException')) {
       return 'Network error — please try again';
+    }
     return 'Login failed — please try again';
   }
 

@@ -169,13 +169,14 @@ class _BrowseJobsScreenState extends ConsumerState<BrowseJobsScreen> {
                 for (final j in response.data) {
                   if (!_jobs.any((e) => e.id == j.id)) _jobs.add(j);
                 }
-                if (_jobs.isEmpty)
+                if (_jobs.isEmpty) {
                   return Center(
                     child: Text(
                       'No jobs found',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   );
+                }
                 return ListView.builder(
                   itemCount: _jobs.length + (response.hasMore ? 1 : 0),
                   itemBuilder: (_, i) {
