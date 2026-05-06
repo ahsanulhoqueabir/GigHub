@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 import 'package:gighub/core/utils/validators.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
@@ -46,7 +47,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_formatError(e.toString())),
+            content: Text(_formatError(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -56,11 +57,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  String _formatError(String error) {
-    if (error.contains('invalid email or password')) {
-      return 'Invalid email or password';
+  String _formatError(Object error) {
+    if (error is ApiException) {
+      return error.message;
     }
-    if (error.contains('NetworkException')) {
+    final message = error.toString();
+    if (message.contains('NetworkException')) {
       return 'Network error — please try again';
     }
     return 'Login failed — please try again';

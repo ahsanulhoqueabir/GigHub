@@ -16,7 +16,7 @@ class AuthResponse with _$AuthResponse {
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
-      _$AuthResponseFromJson(json);
+      _$AuthResponseFromJson(_normalizeAuthJson(json));
 }
 
 // ── Token Pair (for refresh) ──────────────────────────
@@ -29,7 +29,7 @@ class TokenPair with _$TokenPair {
   }) = _TokenPair;
 
   factory TokenPair.fromJson(Map<String, dynamic> json) =>
-      _$TokenPairFromJson(json);
+      _$TokenPairFromJson(_normalizeAuthJson(json));
 }
 
 // ── Login Input ───────────────────────────────────────
@@ -92,4 +92,17 @@ class ForgotPasswordInput with _$ForgotPasswordInput {
       _$ForgotPasswordInputFromJson(json);
 
   const ForgotPasswordInput._();
+}
+
+Map<String, dynamic> _normalizeAuthJson(Map<String, dynamic> json) {
+  final accessToken = json['accessToken'] ?? json['access_token'];
+  final refreshToken = json['refreshToken'] ?? json['refresh_token'];
+  final expiresIn = json['expiresIn'] ?? json['expires_in'];
+
+  return {
+    'accessToken': accessToken,
+    'refreshToken': refreshToken,
+    if (expiresIn != null) 'expiresIn': expiresIn,
+    if (json['profile'] != null) 'profile': json['profile'],
+  };
 }

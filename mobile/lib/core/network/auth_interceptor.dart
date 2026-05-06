@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:gighub/core/config/app_config.dart';
+import 'package:gighub/core/constants/api_constants.dart';
 import 'package:gighub/core/network/api_exceptions.dart';
 
 /// Interceptor that attaches the JWT access token to outgoing requests
@@ -9,6 +11,8 @@ import 'package:gighub/core/network/api_exceptions.dart';
 /// During a refresh, concurrent requests are queued and retried once
 /// the new token is obtained.
 class AuthInterceptor extends Interceptor {
+  AuthInterceptor({this.onTokensUpdated, this.onSessionExpired});
+
   String? _accessToken;
   String? _refreshToken;
 
@@ -17,7 +21,9 @@ class AuthInterceptor extends Interceptor {
 
   /// Callback invoked when the refresh token is expired / invalid.
   /// Typically this navigates to the login screen.
-  void Function()? onSessionExpired;
+  Future<void> Function(String accessToken, String refreshToken)?
+  onTokensUpdated;
+  Future<void> Function()? onSessionExpired;
 
   /// Update stored tokens (called after login or refresh).
   void updateTokens({
@@ -39,6 +45,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    optionsForCurrentRequest = options;
     if (_accessToken != null) {
       options.headers['Authorization'] = 'Bearer $_accessToken';
     }
@@ -52,9 +59,9 @@ class AuthInterceptor extends Interceptor {
     }
 
     // Do not attempt refresh for the refresh endpoint itself
-    if (err.requestOptions.path.contains('/auth/refresh')) {
+    if (err.requestOptions.path.contains(ApiConstants.refreshToken)) {
       clearTokens();
-      onSessionExpired?.call();
+      await onSessionExpired?.call();
       return handler.next(err);
     }
 
@@ -98,7 +105,7 @@ class AuthInterceptor extends Interceptor {
         completer.completeError(e);
       }
       _pendingRequests.clear();
-      onSessionExpired?.call();
+      await onSessionExpired?.call();
       handler.next(err);
     } finally {
       _isRefreshing = false;
@@ -117,23 +124,39 @@ class AuthInterceptor extends Interceptor {
       throw UnauthorizedException(message: 'No refresh token available');
     }
 
+    var baseUrl = optionsForCurrentRequest?.baseUrl ?? '';
+    if (baseUrl.isEmpty) {
+      baseUrl = AppConfig.current.apiUrl;
+    }
+
     final dio = Dio(
       BaseOptions(
-        baseUrl: optionsForCurrentRequest?.baseUrl ?? '',
+        baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 10),
       ),
     );
 
     final response = await dio.post(
-      '/auth/refresh-token',
-      data: {'refreshToken': _refreshToken},
+      ApiConstants.refreshToken,
+      data: {'refresh_token': _refreshToken},
     );
 
-    final data = response.data;
-    return {
-      'accessToken': data['accessToken'] as String,
-      'refreshToken': data['refreshToken'] as String,
-    };
+    final raw = response.data;
+    final data = raw is Map<String, dynamic> && raw['data'] is Map
+        ? Map<String, dynamic>.from(raw['data'] as Map)
+        : (raw as Map<String, dynamic>);
+
+    final accessToken =
+        data['access_token'] as String? ?? data['accessToken'] as String?;
+    final refreshToken =
+        data['refresh_token'] as String? ?? data['refreshToken'] as String?;
+
+    if (accessToken == null || refreshToken == null) {
+      throw UnauthorizedException(message: 'Invalid refresh response');
+    }
+
+    await onTokensUpdated?.call(accessToken, refreshToken);
+    return {'accessToken': accessToken, 'refreshToken': refreshToken};
   }
 
   /// Reference to the current request's options for building the refresh URL.

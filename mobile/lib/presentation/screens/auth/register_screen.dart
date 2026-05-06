@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 import 'package:gighub/core/utils/validators.dart';
 import 'package:gighub/data/models/auth_model.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
@@ -60,7 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_formatError(e.toString())),
+            content: Text(_formatError(e)),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -70,12 +71,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  String _formatError(String error) {
-    if (error.contains('already exists')) {
-      return 'An account with that email already exists';
+  String _formatError(Object error) {
+    if (error is ApiException) {
+      return error.message;
     }
-    if (error.contains('username')) return 'That username is already taken';
-    if (error.contains('NetworkException')) {
+    final message = error.toString();
+    if (message.contains('NetworkException')) {
       return 'Network error — please try again';
     }
     return 'Registration failed — please try again';

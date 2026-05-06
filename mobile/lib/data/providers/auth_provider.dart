@@ -1,9 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/network/api_client.dart';
+import 'package:gighub/core/network/auth_interceptor.dart';
 import 'package:gighub/core/storage/secure_storage.dart';
 import 'package:gighub/data/models/auth_model.dart';
 import 'package:gighub/data/models/profile_model.dart';
 import 'package:gighub/data/repositories/auth_repository.dart';
+import 'package:gighub/data/repositories/profile_repository.dart';
 
 /// Possible authentication states.
 enum AuthStatus { loading, authenticated, unauthenticated }
@@ -47,9 +49,23 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
   final SecureStorage _secureStorage;
+  final AuthInterceptor _authInterceptor;
+  final ProfileRepository _profileRepository;
 
-  AuthNotifier(this._authRepository, this._secureStorage)
-    : super(const AuthState.loading());
+  AuthNotifier(
+    this._authRepository,
+    this._secureStorage,
+    this._authInterceptor,
+    this._profileRepository,
+  ) : super(const AuthState.loading()) {
+    _authInterceptor.onSessionExpired = _handleSessionExpired;
+  }
+
+  Future<void> _handleSessionExpired() async {
+    await _secureStorage.clearTokens();
+    _authInterceptor.clearTokens();
+    state = const AuthState.unauthenticated();
+  }
 
   /// Check stored tokens on app start and restore session if valid.
   Future<void> initialize() async {
@@ -65,44 +81,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      // Check if this is a mock session (starts with 'mock_')
-      if (accessToken.startsWith('mock_')) {
-        // Restore mock session — create a mock profile
-        state = AuthState.authenticated(
-          profile: Profile(
-            id: 'u_1',
-            displayName: 'Ahsanul Hoque',
-            username: 'ahsanul',
-            email: 'demo@gighub.com',
-            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahsanul',
-            bio: 'Full-stack developer & designer with 7+ years of experience',
-            skills: ['Flutter', 'React', 'Node.js', 'UI/UX Design'],
-            avgRating: 4.9,
-            totalReviews: 120,
-            role: 'seller',
-            createdAt: DateTime(2020, 1, 15),
-          ),
-        );
-        return;
-      }
-
-      // Try to refresh the token to validate the session
-      final pair = await _authRepository.refreshToken(refreshTokenVal);
-      await _secureStorage.saveTokens(
-        accessToken: pair.accessToken,
-        refreshToken: pair.refreshToken,
+      _authInterceptor.updateTokens(
+        accessToken: accessToken,
+        refreshToken: refreshTokenVal,
       );
 
-      // We need the profile — a simple token validation isn't enough
-      // The profile will be loaded via ProfileNotifier after auth is confirmed.
-      // For now mark as authenticated with a temporary profile.
-      // In a real flow, the auth response includes the profile.
-      // We'll get the profile via ProfileNotifier separately.
-      state = const AuthState.unauthenticated(
-        error: 'Session expired — please login again',
-      );
+      final profile = await _profileRepository.getMyProfile();
+      state = AuthState.authenticated(profile: profile);
     } catch (_) {
       await _secureStorage.clearTokens();
+      _authInterceptor.clearTokens();
       state = const AuthState.unauthenticated();
     }
   }
@@ -114,6 +102,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final response = await _authRepository.loginWithPassword(email, password);
       await _secureStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
+      _authInterceptor.updateTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
@@ -140,6 +132,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
+      _authInterceptor.updateTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
       state = AuthState.authenticated(profile: response.profile);
     } catch (e) {
       state = AuthState.unauthenticated(error: e.toString());
@@ -154,6 +150,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       final response = await _authRepository.register(input);
       await _secureStorage.saveTokens(
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+      );
+      _authInterceptor.updateTokens(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
@@ -172,6 +172,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Proceed with local logout even if server call fails
     }
     await _secureStorage.clearTokens();
+    _authInterceptor.clearTokens();
     state = const AuthState.unauthenticated();
   }
 
@@ -185,8 +186,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 // ── Providers ─────────────────────────────────────────
 
+/// Shared auth interceptor (keeps tokens in sync and refreshes on 401).
+final authInterceptorProvider = Provider<AuthInterceptor>((ref) {
+  final secureStorage = ref.watch(secureStorageProvider);
+  return AuthInterceptor(
+    onTokensUpdated: (accessToken, refreshToken) => secureStorage.saveTokens(
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    ),
+  );
+});
+
 /// Raw [ApiClient] — created once and reused.
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
+final apiClientProvider = Provider<ApiClient>((ref) {
+  return ApiClient(authInterceptor: ref.watch(authInterceptorProvider));
+});
 
 /// [SecureStorage] instance provider.
 final secureStorageProvider = Provider<SecureStorage>(
@@ -200,8 +214,13 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 /// Global [AuthNotifier] provider — the single source of truth for auth state.
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final profileRepository = ProfileRepository(
+    client: ref.watch(apiClientProvider),
+  );
   return AuthNotifier(
     ref.watch(authRepositoryProvider),
     ref.watch(secureStorageProvider),
+    ref.watch(authInterceptorProvider),
+    profileRepository,
   );
 });

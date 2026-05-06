@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Environment configuration for the GigHub app.
 ///
 /// Switch between development and production by changing [AppConfig.current].
@@ -35,17 +37,21 @@ class AppEnvironment {
 
   bool get isProduction => name == 'production';
 
-  /// Development environment pointing to local backend.
-  static const development = AppEnvironment(
-    name: 'development',
-    apiUrl: 'http://10.0.2.2:3000/api', // Android emulator -> host
-    wsUrl: 'ws://10.0.2.2:3000',
-  );
+  factory AppEnvironment.fromEnv() {
+    final envName = dotenv.env['ENV_NAME']?.trim();
+    final apiUrl = dotenv.env['API_URL']?.trim();
+    final wsUrl = dotenv.env['WS_URL']?.trim();
 
-  /// Production environment.
-  static const production = AppEnvironment(
-    name: 'production',
-    apiUrl: 'https://api.gighub.app/api',
-    wsUrl: 'wss://api.gighub.app',
-  );
+    if (envName == null || envName.isEmpty) {
+      throw StateError('ENV_NAME is required in .env');
+    }
+    if (apiUrl == null || apiUrl.isEmpty) {
+      throw StateError('API_URL is required in .env');
+    }
+    if (wsUrl == null || wsUrl.isEmpty) {
+      throw StateError('WS_URL is required in .env');
+    }
+
+    return AppEnvironment(name: envName, apiUrl: apiUrl, wsUrl: wsUrl);
+  }
 }

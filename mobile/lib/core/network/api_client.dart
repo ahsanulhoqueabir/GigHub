@@ -10,8 +10,10 @@ import 'package:gighub/core/network/auth_interceptor.dart';
 /// Automatically attaches JWT tokens via [AuthInterceptor].
 class ApiClient {
   late final Dio _dio;
+  final AuthInterceptor _authInterceptor;
 
-  ApiClient() {
+  ApiClient({required AuthInterceptor authInterceptor})
+    : _authInterceptor = authInterceptor {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.current.apiUrl,
@@ -26,7 +28,7 @@ class ApiClient {
     );
 
     _dio.interceptors.addAll([
-      AuthInterceptor(),
+      _authInterceptor,
       LogInterceptor(
         requestBody: !AppConfig.current.isProduction,
         responseBody: !AppConfig.current.isProduction,
@@ -146,66 +148,80 @@ class ApiClient {
     final data = e.response?.data;
 
     if (data is Map<String, dynamic>) {
+      final details = data['details'];
       final message =
-          data['message'] as String? ?? 'An unexpected error occurred';
-      final code = data['code'] as String? ?? 'UNKNOWN';
+          data['error'] as String? ??
+          data['message'] as String? ??
+          'An unexpected error occurred';
+      final status = data['status'] as int? ?? statusCode;
+      final code =
+          data['code'] as String? ??
+          (status != null ? 'HTTP_$status' : 'UNKNOWN');
 
-      switch (statusCode) {
+      switch (status) {
         case 401:
           return UnauthorizedException(
             code: code,
             message: message,
-            statusCode: statusCode,
+            statusCode: status,
+            details: details,
           );
         case 403:
           return ForbiddenException(
             code: code,
             message: message,
-            statusCode: statusCode,
+            statusCode: status,
+            details: details,
           );
         case 404:
           return NotFoundException(
             code: code,
             message: message,
-            statusCode: statusCode,
+            statusCode: status,
+            details: details,
           );
         case 409:
           return ConflictException(
             code: code,
             message: message,
-            statusCode: statusCode,
-          );
-        case 422:
-          return ValidationException(
-            code: code,
-            message: message,
-            statusCode: statusCode,
-            errors: data['errors'] is Map
-                ? Map<String, List<String>>.from(
-                    (data['errors'] as Map).map(
-                      (k, v) => MapEntry(k.toString(), List<String>.from(v)),
-                    ),
-                  )
-                : null,
+            statusCode: status,
+            details: details,
           );
         case 429:
           return RateLimitException(
             code: code,
             message: message,
-            statusCode: statusCode,
+            statusCode: status,
+            details: details,
+          );
+        case 400:
+          return ValidationException(
+            code: code,
+            message: message,
+            statusCode: status,
+            details: details,
+            errors: details is Map
+                ? Map<String, List<String>>.from(
+                    details.map(
+                      (k, v) => MapEntry(k.toString(), List<String>.from(v)),
+                    ),
+                  )
+                : null,
           );
         default:
-          if (statusCode != null && statusCode >= 500) {
+          if (status != null && status >= 500) {
             return ServerException(
               code: code,
               message: message,
-              statusCode: statusCode,
+              statusCode: status,
+              details: details,
             );
           }
           return ApiException(
             code: code,
             message: message,
-            statusCode: statusCode,
+            statusCode: status,
+            details: details,
           );
       }
     }

@@ -3,11 +3,13 @@ class ApiException implements Exception {
   final String code;
   final String message;
   final int? statusCode;
+  final dynamic details;
 
   const ApiException({
     this.code = 'UNKNOWN',
     required this.message,
     this.statusCode,
+    this.details,
   });
 
   @override
@@ -20,6 +22,7 @@ class UnauthorizedException extends ApiException {
     super.code = 'UNAUTHORIZED',
     required super.message,
     super.statusCode = 401,
+    super.details,
   });
 }
 
@@ -29,6 +32,7 @@ class ForbiddenException extends ApiException {
     super.code = 'FORBIDDEN',
     required super.message,
     super.statusCode = 403,
+    super.details,
   });
 }
 
@@ -38,6 +42,7 @@ class NotFoundException extends ApiException {
     super.code = 'NOT_FOUND',
     required super.message,
     super.statusCode = 404,
+    super.details,
   });
 }
 
@@ -47,6 +52,7 @@ class ConflictException extends ApiException {
     super.code = 'CONFLICT',
     required super.message,
     super.statusCode = 409,
+    super.details,
   });
 }
 
@@ -54,12 +60,14 @@ class ConflictException extends ApiException {
 /// due to semantic errors (validation).
 class ValidationException extends ApiException {
   final Map<String, List<String>>? errors;
+  final dynamic details;
 
   const ValidationException({
     super.code = 'VALIDATION_ERROR',
     required super.message,
-    super.statusCode = 422,
+    super.statusCode = 400,
     this.errors,
+    this.details,
   });
 }
 
@@ -69,6 +77,7 @@ class RateLimitException extends ApiException {
     super.code = 'RATE_LIMITED',
     required super.message,
     super.statusCode = 429,
+    super.details,
   });
 }
 
@@ -78,6 +87,7 @@ class ServerException extends ApiException {
     super.code = 'SERVER_ERROR',
     required super.message,
     super.statusCode,
+    super.details,
   });
 }
 
@@ -87,5 +97,6 @@ class NetworkException extends ApiException {
     super.code = 'NETWORK_ERROR',
     required super.message,
     super.statusCode,
+    super.details,
   });
 }
