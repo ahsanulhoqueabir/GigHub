@@ -7,6 +7,7 @@ import 'package:gighub/data/providers/profile_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_avatar.dart';
 import 'package:gighub/presentation/widgets/common/gh_error_state.dart';
 import 'package:gighub/presentation/widgets/common/gh_loading.dart';
+import 'package:gighub/presentation/widgets/auth/auth_gate.dart';
 
 /// Displays the current user's own profile with stats and actions.
 class MyProfileScreen extends ConsumerWidget {
@@ -14,41 +15,54 @@ class MyProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(myProfileProvider);
-    final theme = Theme.of(context);
-
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        title: const Text('My Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push('/profile/settings'),
+    return AuthGate(
+      unauthenticatedBuilder: (context, ref) {
+        return Scaffold(
+          appBar: AppBar(title: const Text('My Profile')),
+          body: GhErrorState(
+            message: 'Please sign in to view your profile',
+            onRetry: () => context.go('/auth/login'),
           ),
-        ],
-      ),
-      body: profileAsync.when(
-        loading: () => const GhLoading(message: 'Loading profile...'),
-        error: (err, _) => GhErrorState(
-          message: 'Failed to load profile',
-          onRetry: () => ref.invalidate(myProfileProvider),
-        ),
-        data: (profile) {
-          if (profile == null) {
-            return const GhErrorState(message: 'Profile not found');
-          }
-          return _buildProfile(context, profile, theme);
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/profile/edit'),
-        icon: const Icon(Icons.edit_outlined),
-        label: const Text('Edit Profile'),
-      ),
+        );
+      },
+      builder: (context, ref) {
+        final profileAsync = ref.watch(myProfileProvider);
+        final theme = Theme.of(context);
+
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            title: const Text('My Profile'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings_outlined),
+                onPressed: () => context.push('/profile/settings'),
+              ),
+            ],
+          ),
+          body: profileAsync.when(
+            loading: () => const GhLoading(message: 'Loading profile...'),
+            error: (err, _) => GhErrorState(
+              message: 'Failed to load profile',
+              onRetry: () => ref.invalidate(myProfileProvider),
+            ),
+            data: (profile) {
+              if (profile == null) {
+                return const GhErrorState(message: 'Profile not found');
+              }
+              return _buildProfile(context, profile, theme);
+            },
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () => context.push('/profile/edit'),
+            icon: const Icon(Icons.edit_outlined),
+            label: const Text('Edit Profile'),
+          ),
+        );
+      },
     );
   }
 

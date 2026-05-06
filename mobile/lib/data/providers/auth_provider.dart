@@ -52,6 +52,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final SecureStorage _secureStorage;
   final AuthInterceptor _authInterceptor;
   final ProfileRepository _profileRepository;
+  bool _initialized = false;
 
   AuthNotifier(
     this._authRepository,
@@ -70,6 +71,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Check stored tokens on app start and restore session if valid.
   Future<void> initialize() async {
+    if (_initialized) return;
+    _initialized = true;
     state = const AuthState.loading();
 
     try {
@@ -242,4 +245,9 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     ref.watch(authInterceptorProvider),
     profileRepository,
   );
+});
+
+/// One-time auth initialization for gating protected UI.
+final authInitProvider = FutureProvider<void>((ref) async {
+  await ref.read(authProvider.notifier).initialize();
 });
