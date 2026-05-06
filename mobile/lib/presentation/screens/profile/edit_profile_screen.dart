@@ -31,11 +31,30 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   String _availabilityStatus = 'available';
   String? _avatarPath;
   bool _isSaving = false;
+  bool _didPopulate = false;
+  String? _loadedProfileId;
 
   @override
   void initState() {
     super.initState();
     _loadProfile();
+    ref.listen<AsyncValue<Profile?>>(myProfileProvider, (prev, next) {
+      next.whenOrNull(
+        data: (profile) {
+          if (profile == null) return;
+          if (_didPopulate && _loadedProfileId == profile.id) return;
+          setState(() {
+            _displayNameController.text = profile.displayName;
+            _usernameController.text = profile.username;
+            _bioController.text = profile.bio ?? '';
+            _skills = List<String>.from(profile.skills);
+            _availabilityStatus = profile.availabilityStatus;
+            _didPopulate = true;
+            _loadedProfileId = profile.id;
+          });
+        },
+      );
+    });
   }
 
   void _loadProfile() {
@@ -43,11 +62,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     profileAsync.whenOrNull(
       data: (profile) {
         if (profile == null) return;
+        if (_didPopulate && _loadedProfileId == profile.id) return;
         _displayNameController.text = profile.displayName;
         _usernameController.text = profile.username;
         _bioController.text = profile.bio ?? '';
         _skills = List<String>.from(profile.skills);
         _availabilityStatus = profile.availabilityStatus;
+        _didPopulate = true;
+        _loadedProfileId = profile.id;
       },
     );
   }
