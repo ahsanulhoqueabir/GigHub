@@ -26,7 +26,7 @@ class Profile with _$Profile {
   }) = _Profile;
 
   factory Profile.fromJson(Map<String, dynamic> json) =>
-      _$ProfileFromJson(json);
+      _$ProfileFromJson(_normalizeProfileJson(json));
 
   const Profile._();
 }
@@ -52,7 +52,7 @@ class PublicProfile with _$PublicProfile {
   }) = _PublicProfile;
 
   factory PublicProfile.fromJson(Map<String, dynamic> json) =>
-      _$PublicProfileFromJson(json);
+      _$PublicProfileFromJson(_normalizeProfileJson(json));
 
   const PublicProfile._();
 }
@@ -74,4 +74,36 @@ class UpdateProfileInput with _$UpdateProfileInput {
       _$UpdateProfileInputFromJson(json);
 
   const UpdateProfileInput._();
+}
+
+Map<String, dynamic> _normalizeProfileJson(Map<String, dynamic> json) {
+  final raw = json['data'] is Map
+      ? Map<String, dynamic>.from(json['data'] as Map)
+      : json;
+
+  return {
+    ...raw,
+    'total_earnings': _parseNum(raw['total_earnings']),
+    'avg_rating': _parseNum(raw['avg_rating']),
+    'total_reviews': _parseInt(raw['total_reviews']),
+    'completed_orders': _parseInt(raw['completed_orders']),
+  };
+}
+
+num? _parseNum(dynamic value) {
+  if (value == null) return null;
+  if (value is num) return value;
+  if (value is String) return num.tryParse(value);
+  return null;
+}
+
+int? _parseInt(dynamic value) {
+  if (value == null) return null;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) {
+    final parsed = num.tryParse(value);
+    return parsed?.toInt();
+  }
+  return null;
 }
