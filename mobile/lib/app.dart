@@ -48,11 +48,6 @@ class _GigHubAppState extends ConsumerState<GigHubApp> {
     }
   }
 
-  void _setThemeMode(ThemeMode mode) {
-    setState(() => _themeMode = mode);
-    _localStorage.setThemeMode(mode.name);
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.listen<AuthState>(authProvider, (_, __) {
