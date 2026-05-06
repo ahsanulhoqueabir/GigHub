@@ -11,8 +11,8 @@ class AuthResponse with _$AuthResponse {
   const factory AuthResponse({
     required String accessToken,
     required String refreshToken,
-    required int expiresIn,
-    required Profile profile,
+    String? expiresIn,
+    Profile? profile,
   }) = _AuthResponse;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) =>
@@ -95,14 +95,18 @@ class ForgotPasswordInput with _$ForgotPasswordInput {
 }
 
 Map<String, dynamic> _normalizeAuthJson(Map<String, dynamic> json) {
-  final accessToken = json['accessToken'] ?? json['access_token'];
-  final refreshToken = json['refreshToken'] ?? json['refresh_token'];
-  final expiresIn = json['expiresIn'] ?? json['expires_in'];
+  final raw = json['data'] is Map
+      ? Map<String, dynamic>.from(json['data'] as Map)
+      : json;
+  final accessToken = raw['accessToken'] ?? raw['access_token'];
+  final refreshToken = raw['refreshToken'] ?? raw['refresh_token'];
+  final expiresIn = raw['expiresIn'] ?? raw['expires_in'];
+  final expiresInValue = expiresIn == null ? null : expiresIn.toString();
 
   return {
     'accessToken': accessToken,
     'refreshToken': refreshToken,
-    if (expiresIn != null) 'expiresIn': expiresIn,
-    if (json['profile'] != null) 'profile': json['profile'],
+    if (expiresInValue != null) 'expiresIn': expiresInValue,
+    if (raw['profile'] != null) 'profile': raw['profile'],
   };
 }

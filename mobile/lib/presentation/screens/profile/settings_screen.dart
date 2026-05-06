@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// App settings screen with theme toggle, notification preferences, and logout.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -84,8 +85,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     // TODO: Implement change password flow
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Coming soon')),
+                    GhToast.show(
+                      context,
+                      message: 'Coming soon',
+                      type: GhToastType.info,
                     );
                   },
                 ),

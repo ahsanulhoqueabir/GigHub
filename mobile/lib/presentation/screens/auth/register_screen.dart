@@ -10,6 +10,7 @@ import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Registration screen for creating a new account.
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -59,11 +60,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_formatError(e)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        GhToast.show(
+          context,
+          message: _formatError(e),
+          type: GhToastType.error,
         );
       }
     } finally {
@@ -238,11 +238,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (mounted) context.go('/home');
                       } catch (e) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google sign up failed'),
-                              backgroundColor: theme.colorScheme.error,
-                            ),
+                          GhToast.show(
+                            context,
+                            message: 'Google sign up failed',
+                            type: GhToastType.error,
                           );
                         }
                       } finally {
@@ -250,11 +249,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       }
                     },
                     onError: (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(error),
-                          backgroundColor: theme.colorScheme.error,
-                        ),
+                      GhToast.show(
+                        context,
+                        message: error,
+                        type: GhToastType.error,
                       );
                     },
                   ),

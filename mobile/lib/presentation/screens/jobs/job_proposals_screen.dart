@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/proposal_provider.dart';
 import 'package:gighub/presentation/widgets/proposals/proposal_card.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// View all proposals for a specific job (for job owner).
 class JobProposalsScreen extends ConsumerWidget {
@@ -46,22 +47,20 @@ class JobProposalsScreen extends ConsumerWidget {
                 showActions: prop.status == 'pending',
                 onAccept: () {
                   actionNotifier.acceptProposal(prop.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
+                  GhToast.show(
+                    context,
+                    message:
                         'Accepted proposal from ${prop.freelancer.displayName} (UI only)',
-                      ),
-                    ),
+                    type: GhToastType.success,
                   );
                 },
                 onReject: () {
                   actionNotifier.rejectProposal(prop.id);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
+                  GhToast.show(
+                    context,
+                    message:
                         'Rejected proposal from ${prop.freelancer.displayName} (UI only)',
-                      ),
-                    ),
+                    type: GhToastType.warning,
                   );
                 },
               );

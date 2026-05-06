@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/job_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Client's job management screen.
 class MyJobsScreen extends ConsumerWidget {
@@ -63,12 +64,10 @@ class MyJobsScreen extends ConsumerWidget {
                       if (action == 'proposals') {
                         context.push('/jobs/${job.id}/proposals');
                       } else if (action == 'close') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Job "${job.title}" closed (UI only)',
-                            ),
-                          ),
+                        GhToast.show(
+                          context,
+                          message: 'Job "${job.title}" closed (UI only)',
+                          type: GhToastType.info,
                         );
                       }
                     },

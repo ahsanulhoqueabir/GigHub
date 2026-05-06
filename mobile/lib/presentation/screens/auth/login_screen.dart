@@ -9,6 +9,7 @@ import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Login screen with email/password and social login options.
 class LoginScreen extends ConsumerStatefulWidget {
@@ -45,11 +46,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_formatError(e)),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        GhToast.show(
+          context,
+          message: _formatError(e),
+          type: GhToastType.error,
         );
       }
     } finally {
@@ -180,11 +180,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         if (mounted) context.go('/home');
                       } catch (e) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google login failed'),
-                              backgroundColor: theme.colorScheme.error,
-                            ),
+                          GhToast.show(
+                            context,
+                            message: 'Google login failed',
+                            type: GhToastType.error,
                           );
                         }
                       } finally {
@@ -192,11 +191,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       }
                     },
                     onError: (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(error),
-                          backgroundColor: theme.colorScheme.error,
-                        ),
+                      GhToast.show(
+                        context,
+                        message: error,
+                        type: GhToastType.error,
                       );
                     },
                   ),

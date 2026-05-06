@@ -10,6 +10,7 @@ import 'package:gighub/data/providers/profile_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_loading.dart';
 import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 import 'package:gighub/presentation/widgets/profile/avatar_picker.dart';
 import 'package:gighub/presentation/widgets/profile/skills_input.dart';
 
@@ -73,17 +74,18 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
       if (mounted) {
         context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
+        GhToast.show(
+          context,
+          message: 'Profile updated successfully',
+          type: GhToastType.success,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to update profile: ${e.toString()}'),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        GhToast.show(
+          context,
+          message: 'Failed to update profile: ${e.toString()}',
+          type: GhToastType.error,
         );
       }
     } finally {

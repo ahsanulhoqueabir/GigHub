@@ -109,7 +109,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
-      state = AuthState.authenticated(profile: response.profile);
+      final profile =
+          response.profile ?? await _profileRepository.getMyProfile();
+      state = AuthState.authenticated(profile: profile);
     } catch (e) {
       state = AuthState.unauthenticated(error: e.toString());
       rethrow;
@@ -136,7 +138,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
-      state = AuthState.authenticated(profile: response.profile);
+      final profile =
+          response.profile ?? await _profileRepository.getMyProfile();
+      state = AuthState.authenticated(profile: profile);
     } catch (e) {
       state = AuthState.unauthenticated(error: e.toString());
       rethrow;
@@ -157,7 +161,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
-      state = AuthState.authenticated(profile: response.profile);
+      final profile =
+          response.profile ?? await _profileRepository.getMyProfile();
+      state = AuthState.authenticated(profile: profile);
     } catch (e) {
       state = AuthState.unauthenticated(error: e.toString());
       rethrow;
