@@ -63,7 +63,6 @@ export class WithdrawalsService {
         id: withdrawalId,
         profile: profileId,
         amount: dto.amount,
-        currency: 'BDT',
         method: dto.method,
         account_details: dto.account_details,
         status: WithdrawalStatus.PENDING,
@@ -77,10 +76,11 @@ export class WithdrawalsService {
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: profileId,
-        tran_id: `WITHDRAWAL-${withdrawalId}-${Date.now()}`,
+        type: 'withdrawal',
         direction: TransactionDirection.DEBIT,
         amount: dto.amount,
-        currency: 'BDT',
+        payment_reference: `WITHDRAWAL-${withdrawalId}-${Date.now()}`,
+        description: `Withdrawal request ${withdrawalId}`,
         status: TransactionStatus.PENDING,
       } satisfies Partial<Transaction>);
 
@@ -89,7 +89,6 @@ export class WithdrawalsService {
       return fail('Failed to create withdrawal request', error);
     }
   }
-
 
   async getById(id: string): Promise<ServiceResponse<WithdrawalDetail>> {
     try {
@@ -159,10 +158,11 @@ export class WithdrawalsService {
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: profileId,
-        tran_id: `WITHDRAWAL-CANCEL-${id}-${Date.now()}`,
+        type: 'withdrawal_cancel',
         direction: TransactionDirection.CREDIT,
         amount: existing.data.amount,
-        currency: 'BDT',
+        payment_reference: `WITHDRAWAL-CANCEL-${id}-${Date.now()}`,
+        description: `Withdrawal cancelled ${id}`,
         status: TransactionStatus.COMPLETED,
       } satisfies Partial<Transaction>);
 

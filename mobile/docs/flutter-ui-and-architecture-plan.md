@@ -1,6 +1,6 @@
 # GigHub Flutter Implementation Plan
 
-This document outlines a premium architecture and UI/UX roadmap for the GigHub mobile application, tailored to the existing API structure.
+This document outlines a premium architecture and UI/UX roadmap for the GigHub mobile application, tailored to the existing API structure found in `api/bruno`.
 
 ## 1. UI/UX Design Vision
 
@@ -64,7 +64,7 @@ Since the backend integration is deferred, we will use a **Mock Data Layer** to 
 
 ### Mock Data Strategy
 
-- **Source**: `assets/data/mock_data.json` (Ref: [mock_data.json](file:///d:/planning/gighub/mobile/docs/mock_data.json))
+- **Source**: `assets/data/mock_data.json` (Ref: [mock_data.json](file:///d:/planning/gighub/Planning/flutter/mock_data.json))
 - **Implementation**:
   - Create a `MockApiService` that loads the JSON using `rootBundle.loadString()`.
   - Repositories will switch between `MockApiService` and `DioClient` based on a global `isMockMode` flag.
@@ -91,7 +91,7 @@ Since the backend integration is deferred, we will use a **Mock Data Layer** to 
 
 ### Phase 1: Foundation & Authentication
 
-_See [Detailed Phase 1 Plan](file:///d:/planning/gighub/mobile/docs/phase-1-setup-auth.md) for step-by-step implementation and testing._
+_See [Detailed Phase 1 Plan](file:///d:/planning/gighub/Planning/flutter/phase-1-setup-auth.md) for step-by-step implementation and testing._
 
 - [ ] **Step 1: Project Setup**: Initialize Flutter, add dependencies (`dio`, `flutter_riverpod`, `flutter_secure_storage`, `freezed`).
 - [ ] **Step 2: Core Design System**: Define `AppTheme`, colors, and reusable UI components (Buttons, TextFields).
@@ -100,7 +100,7 @@ _See [Detailed Phase 1 Plan](file:///d:/planning/gighub/mobile/docs/phase-1-setu
 
 ### Phase 2: Gig & Job Marketplace
 
-_See [Detailed Phase 2 Plan](file:///d:/planning/gighub/mobile/docs/phase-2-gigs-jobs.md) for step-by-step implementation and testing._
+_See [Detailed Phase 2 Plan](file:///d:/planning/gighub/Planning/flutter/phase-2-gigs-jobs.md) for step-by-step implementation and testing._
 
 - [ ] **Step 1: Models & Data**: Generate models for `Gig`, `Category`, and `User`.
 - [ ] **Step 2: Home Feed**: Implement category filtering and search functionality.
@@ -109,7 +109,7 @@ _See [Detailed Phase 2 Plan](file:///d:/planning/gighub/mobile/docs/phase-2-gigs
 
 ### Phase 3: Orders, Payments & Escrow
 
-_See [Detailed Phase 3 Plan](file:///d:/planning/gighub/mobile/docs/phase-3-orders-payments.md) for step-by-step implementation and testing._
+_See [Detailed Phase 3 Plan](file:///d:/planning/gighub/Planning/flutter/phase-3-orders-payments.md) for step-by-step implementation and testing._
 
 - [ ] **Step 1: Order Flow**: Implement "Hire" logic and order tracking UI.
 - [ ] **Step 2: Payment Integration**: Setup UI for payment selection (Stripe/Paypal logic placeholders).
@@ -118,7 +118,7 @@ _See [Detailed Phase 3 Plan](file:///d:/planning/gighub/mobile/docs/phase-3-orde
 
 ### Phase 4: Social, Notifications & Polish
 
-_See [Detailed Phase 4 Plan](file:///d:/planning/gighub/mobile/docs/phase-4-chat-notifications-polish.md) for step-by-step implementation and testing._
+_See [Detailed Phase 4 Plan](file:///d:/planning/gighub/Planning/flutter/phase-4-chat-notifications-polish.md) for step-by-step implementation and testing._
 
 - [ ] **Step 1: Real-time Chat**: UI for messaging between buyer and seller.
 - [ ] **Step 2: Notifications**: Integration with Firebase Cloud Messaging (FCM) or local polling.

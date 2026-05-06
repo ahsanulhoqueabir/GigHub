@@ -1,0 +1,21 @@
+meta {
+  name: Transactions
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/payments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  type: transactions
+  page: 1
+  limit: 20
+}

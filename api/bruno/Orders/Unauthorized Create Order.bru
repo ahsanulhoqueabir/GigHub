@@ -1,0 +1,19 @@
+meta {
+  name: Unauthorized Create Order
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/orders
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "gig_id": "paste-gig-uuid-here",
+    "gig_package_id": "paste-gig-package-uuid-here",
+    "amount": 50
+  }
+}

@@ -7,8 +7,10 @@ export enum EscrowStatus {
 export interface Escrow {
   id: string;
   order: string;
+  buyer: string;
+  seller: string;
   amount: number;
-  currency: string;
+  platform_fee: number;
   status: EscrowStatus;
   auto_release_at?: string | null;
   released_at?: string | null;

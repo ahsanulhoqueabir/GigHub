@@ -1,0 +1,11 @@
+meta {
+  name: Unauthorized Transactions
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base_url}}/payments?type=transactions
+  body: none
+  auth: none
+}

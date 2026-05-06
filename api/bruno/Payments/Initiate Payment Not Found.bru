@@ -1,0 +1,21 @@
+meta {
+  name: Initiate Payment Not Found
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{base_url}}/payments/initiate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "order_id": "00000000-0000-0000-0000-000000000000"
+  }
+}

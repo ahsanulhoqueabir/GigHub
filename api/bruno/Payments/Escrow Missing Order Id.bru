@@ -1,0 +1,19 @@
+meta {
+  name: Escrow Missing Order Id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/payments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  type: escrow
+}

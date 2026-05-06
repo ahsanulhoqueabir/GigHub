@@ -1,0 +1,11 @@
+meta {
+  name: Unauthorized
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: none
+  auth: none
+}

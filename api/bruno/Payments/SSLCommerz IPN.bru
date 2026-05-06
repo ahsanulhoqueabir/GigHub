@@ -1,0 +1,18 @@
+meta {
+  name: SSLCommerz IPN
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{base_url}}/payments/sslcommerz/ipn
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tran_id": "{{tran_id}}",
+    "order_id": "{{order_id}}"
+  }
+}

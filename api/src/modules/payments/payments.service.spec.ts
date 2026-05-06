@@ -19,19 +19,20 @@ describe('PaymentsService', () => {
       data: {
         data: {
           id: 'o1',
+          order_number: 'ORD-20250101-1234',
           buyer: 'p1',
           seller: 'p2',
+          source_type: 'gig',
           gig: 'g1',
           proposal: null,
           amount: 1000,
-          currency: 'BDT',
           status: 'pending',
-          payment_status: 'pending',
           created_at: '',
           updated_at: '',
         },
       },
     } as any);
+    mockedDirectus.get.mockResolvedValueOnce({ data: { data: [] } } as any);
     mockedDirectus.post.mockResolvedValueOnce({ data: { data: { id: 't1' } } } as any);
 
     const res = await service.initiate('p1', { order_id: 'o1' });

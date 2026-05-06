@@ -1,0 +1,21 @@
+meta {
+  name: Initiate Payment Forbidden
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{base_url}}/payments/initiate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "order_id": "{{order_id}}"
+  }
+}

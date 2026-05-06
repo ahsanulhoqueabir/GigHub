@@ -1,0 +1,18 @@
+meta {
+  name: SSLCommerz Success
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base_url}}/payments/sslcommerz/success
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "tran_id": "{{tran_id}}",
+    "order_id": "{{order_id}}"
+  }
+}

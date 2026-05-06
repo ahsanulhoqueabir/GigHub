@@ -1,0 +1,17 @@
+meta {
+  name: Initiate Payment Unauthorized
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/payments/initiate
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "order_id": "paste-order-uuid-here"
+  }
+}

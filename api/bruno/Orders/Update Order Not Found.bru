@@ -1,0 +1,21 @@
+meta {
+  name: Update Order Not Found
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{base_url}}/orders/00000000-0000-0000-0000-000000000000
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "status": "processing"
+  }
+}

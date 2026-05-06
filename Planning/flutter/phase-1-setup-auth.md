@@ -15,7 +15,7 @@ Set up the Flutter project with clean architecture, implement authentication (em
 ## Project Structure
 
 ```
-gighub_app/
+mobile/
 ├── lib/
 │   ├── main.dart                      # App entry point
 │   ├── app.dart                       # MaterialApp configuration
@@ -151,7 +151,7 @@ gighub_app/
 
 - [ ] **1.1.1** Create Flutter project:
   ```bash
-  flutter create --org com.gighub gighub_app
+  flutter create --org com.gighub mobile
   ```
 - [ ] **1.1.2** Configure `pubspec.yaml` — add dependencies:
 

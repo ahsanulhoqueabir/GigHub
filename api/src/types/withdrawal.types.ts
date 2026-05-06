@@ -16,10 +16,11 @@ export interface Withdrawal {
   id: string;
   profile: string;
   amount: number;
-  currency: string;
   method: WithdrawalMethod;
   account_details: Record<string, unknown>;
   status: WithdrawalStatus;
+  admin_note?: string | null;
+  processed_at?: string | null;
   created_at: string;
   updated_at: string;
 }

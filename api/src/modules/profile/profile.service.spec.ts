@@ -23,7 +23,6 @@ describe('ProfileService', () => {
     username: 'janedoe',
     email: 'jane@example.com',
     avatar: 'https://example.com/avatar.jpg',
-    avatar_key: 'avatars/profile-id.jpg',
     bio: 'I love working on cool projects',
     skills: ['typescript', 'nestjs'],
     availability_status: AvailabilityStatus.AVAILABLE,
@@ -34,7 +33,6 @@ describe('ProfileService', () => {
     total_reviews: 0,
     fcm_token: 'fcm-token-123',
     notification_prefs: { email: true, sms: false },
-    username_updated_at: '2025-12-01T00:00:00.000Z',
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
   };
@@ -107,7 +105,7 @@ describe('ProfileService', () => {
   });
 
   describe('update', () => {
-    it('updates basic info and sets username_updated_at', async () => {
+    it('updates basic info', async () => {
       const updateDto = {
         display_name: 'Jane Smith',
         username: 'janesmith',
@@ -127,12 +125,11 @@ describe('ProfileService', () => {
         '/items/gh_profiles/profile-id',
         expect.objectContaining({
           display_name: 'Jane Smith',
-          username_updated_at: expect.any(String),
         }),
       );
     });
 
-    it('updates without username_updated_at when username not changed', async () => {
+    it('updates when username not changed', async () => {
       const updateDto = {
         display_name: 'Jane Smith',
         bio: 'New bio',
@@ -147,8 +144,8 @@ describe('ProfileService', () => {
       expect(result.success).toBe(true);
       expect(mockedDirectusApi.patch).toHaveBeenCalledWith(
         '/items/gh_profiles/profile-id',
-        expect.not.objectContaining({
-          username_updated_at: expect.anything(),
+        expect.objectContaining({
+          display_name: 'Jane Smith',
         }),
       );
     });
@@ -164,34 +161,28 @@ describe('ProfileService', () => {
   });
 
   describe('setAvatar', () => {
-    it('updates avatar and avatar_key', async () => {
+    it('updates avatar', async () => {
       mockedDirectusApi.patch.mockResolvedValueOnce({
         data: {
           data: {
             ...profile,
             avatar: 'https://example.com/new-avatar.jpg',
-            avatar_key: 'avatars/new-key.jpg',
           },
         },
       });
 
-      const result = await service.setAvatar(
-        'profile-id',
-        'https://example.com/new-avatar.jpg',
-        'avatars/new-key.jpg',
-      );
+      const result = await service.setAvatar('profile-id', 'https://example.com/new-avatar.jpg');
 
       expect(result.success).toBe(true);
       expect(mockedDirectusApi.patch).toHaveBeenCalledWith('/items/gh_profiles/profile-id', {
         avatar: 'https://example.com/new-avatar.jpg',
-        avatar_key: 'avatars/new-key.jpg',
       });
     });
 
     it('returns error on avatar update failure', async () => {
       mockedDirectusApi.patch.mockRejectedValueOnce(new Error('Upload error'));
 
-      const result = await service.setAvatar('profile-id', 'https://example.com/avatar.jpg', 'key');
+      const result = await service.setAvatar('profile-id', 'https://example.com/avatar.jpg');
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('Failed to update avatar');
@@ -248,41 +239,7 @@ describe('ProfileService', () => {
   });
 
   describe('canRename', () => {
-    it('returns true if username was never changed', async () => {
-      mockedDirectusApi.get.mockResolvedValueOnce({
-        data: { data: { ...profile, username_updated_at: null } },
-      });
-
-      const result = await service.canRename('profile-id');
-
-      expect(result).toBe(true);
-    });
-
-    it('returns true if 30 days have passed since last username change', async () => {
-      const thirtyDaysAgo = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
-      mockedDirectusApi.get.mockResolvedValueOnce({
-        data: { data: { ...profile, username_updated_at: thirtyDaysAgo } },
-      });
-
-      const result = await service.canRename('profile-id');
-
-      expect(result).toBe(true);
-    });
-
-    it('returns false if less than 30 days have passed', async () => {
-      const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
-      mockedDirectusApi.get.mockResolvedValueOnce({
-        data: { data: { ...profile, username_updated_at: tenDaysAgo } },
-      });
-
-      const result = await service.canRename('profile-id');
-
-      expect(result).toBe(false);
-    });
-
-    it('returns true on query failure (fail-open)', async () => {
-      mockedDirectusApi.get.mockRejectedValueOnce(new Error('Query error'));
-
+    it('returns true when username updates are not tracked', async () => {
       const result = await service.canRename('profile-id');
 
       expect(result).toBe(true);

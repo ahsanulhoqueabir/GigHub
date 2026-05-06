@@ -9,7 +9,7 @@ import type { InitiatePaymentDto } from './dto/initiate-payment.dto';
 import { PaymentFeeService } from './payment-fee.service';
 import { SslcommerzService } from './sslcommerz.service';
 import type { Order } from '@/types/order.types';
-import { OrderStatus, PaymentStatus } from '@/types/order.types';
+import { OrderStatus } from '@/types/order.types';
 
 @Injectable()
 export class PaymentsService {
@@ -56,15 +56,35 @@ export class PaymentsService {
       return fail('You are not allowed to pay for this order', undefined, 403);
     if (order.status !== OrderStatus.PENDING)
       return fail('Only pending orders can be paid', undefined, 400);
-    if (order.payment_status !== PaymentStatus.PENDING)
-      return fail('Payment has already been initiated', undefined, 400);
+
+    try {
+      const { data: existingTransactions } = await directusApi.get<{ data: Transaction[] }>(
+        `/items/${this.transactionsCollection}`,
+        {
+          params: {
+            filter: {
+              order: { _eq: order.id },
+              status: { _eq: TransactionStatus.PENDING },
+            },
+            fields: 'id',
+            limit: 1,
+          },
+        },
+      );
+
+      if (existingTransactions.data[0]) {
+        return fail('Payment has already been initiated', undefined, 400);
+      }
+    } catch (error) {
+      return fail('Failed to validate payment status', error);
+    }
 
     const fees = this.feeService.calculateFees(order.amount);
     const tranId = this.tranId(order.id);
 
     const session = this.sslcommerzService.createSession({
       amount: order.amount,
-      currency: order.currency || 'BDT',
+      currency: 'BDT',
       tranId,
       productName: `Order ${order.id}`,
       successUrl: `${this.baseUrl()}/payments/sslcommerz/success`,
@@ -78,10 +98,12 @@ export class PaymentsService {
         id: uuid(),
         profile: profileId,
         order: order.id,
-        tran_id: tranId,
+        type: 'payment',
         direction: TransactionDirection.DEBIT,
         amount: order.amount,
-        currency: order.currency || 'BDT',
+        payment_method: 'sslcommerz',
+        payment_reference: tranId,
+        description: `Payment initiated for order ${order.id}`,
         status: TransactionStatus.PENDING,
       });
     } catch (error) {
@@ -107,13 +129,15 @@ export class PaymentsService {
             'id',
             'profile',
             'order',
-            'tran_id',
+            'type',
             'direction',
             'amount',
-            'currency',
+            'balance_after',
+            'description',
+            'payment_method',
+            'payment_reference',
             'status',
             'created_at',
-            'updated_at',
           ].join(','),
           page,
           limit,
@@ -196,7 +220,6 @@ export class PaymentsService {
     const order = orderResponse.data;
 
     try {
-      const updatedStatus = status === 'completed' ? PaymentStatus.PAID : PaymentStatus.FAILED;
       const nextOrderStatus = status === 'completed' ? OrderStatus.PROCESSING : order.status;
       const transactionStatus =
         status === 'completed' ? TransactionStatus.COMPLETED : TransactionStatus.FAILED;
@@ -204,13 +227,12 @@ export class PaymentsService {
       const { data } = await directusApi.patch<{ data: Order }>(
         `/items/${this.ordersCollection}/${orderId}`,
         {
-          payment_status: updatedStatus,
           status: nextOrderStatus,
         },
       );
 
       await directusApi.patch(`/items/${this.transactionsCollection}`, {
-        filter: { tran_id: { _eq: tranId } },
+        filter: { payment_reference: { _eq: tranId } },
         status: transactionStatus,
       });
 

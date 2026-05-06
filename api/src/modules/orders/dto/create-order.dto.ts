@@ -1,8 +1,12 @@
-import { IsNumber, IsOptional, IsString, MinLength, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateOrderDto {
   @IsString()
   gig_id!: string;
+
+  @IsOptional()
+  @IsString()
+  gig_package_id?: string;
 
   @IsOptional()
   @IsString()
@@ -11,8 +15,4 @@ export class CreateOrderDto {
   @IsNumber()
   @Min(0)
   amount!: number;
-
-  @IsString()
-  @MinLength(3)
-  currency!: string;
 }

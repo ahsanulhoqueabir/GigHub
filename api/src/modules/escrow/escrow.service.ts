@@ -6,7 +6,7 @@ import type { ServiceResponse } from '@/types/services/common.types';
 import type { Escrow, EscrowDetail } from '@/types/escrow.types';
 import { EscrowStatus } from '@/types/escrow.types';
 import type { Order } from '@/types/order.types';
-import { OrderStatus, PaymentStatus } from '@/types/order.types';
+import { OrderStatus } from '@/types/order.types';
 import type { Transaction } from '@/types/payment.types';
 import { TransactionDirection, TransactionStatus } from '@/types/payment.types';
 
@@ -68,15 +68,19 @@ export class EscrowService {
     if (!orderResponse.success || !orderResponse.data) return orderResponse as ServiceResponse<any>;
 
     const order = orderResponse.data;
-    if (order.payment_status !== PaymentStatus.PAID) {
+    if (![OrderStatus.PROCESSING, OrderStatus.COMPLETED].includes(order.status)) {
       return fail('Escrow can only be held after payment is completed', undefined, 400);
     }
+
+    const fees = this.calculateFees(order.amount);
 
     try {
       const payload: any = {
         order: order.id,
+        buyer: order.buyer,
+        seller: order.seller,
         amount: order.amount,
-        currency: order.currency || 'BDT',
+        platform_fee: fees.platform_fee,
         status: EscrowStatus.HELD,
         auto_release_at: autoReleaseAt ?? this.addDaysIso(3),
       };
@@ -132,17 +136,17 @@ export class EscrowService {
 
       await directusApi.patch(`/items/${this.ordersCollection}/${order.id}`, {
         status: OrderStatus.COMPLETED,
-        payment_status: PaymentStatus.PAID,
       });
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: order.seller,
         order: order.id,
-        tran_id: `ESCROW-RELEASE-${order.id}-${Date.now()}`,
+        type: 'escrow_release',
         direction: TransactionDirection.CREDIT,
         amount: fees.seller_earnings,
-        currency: order.currency || 'BDT',
+        payment_reference: `ESCROW-RELEASE-${order.id}-${Date.now()}`,
+        description: `Escrow released for order ${order.id}`,
         status: TransactionStatus.COMPLETED,
       } satisfies Partial<Transaction>);
 
@@ -182,17 +186,17 @@ export class EscrowService {
 
       await directusApi.patch(`/items/${this.ordersCollection}/${order.id}`, {
         status: OrderStatus.REFUNDED,
-        payment_status: PaymentStatus.REFUNDED,
       });
 
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
         profile: order.buyer,
         order: order.id,
-        tran_id: `ESCROW-REFUND-${order.id}-${Date.now()}`,
+        type: 'escrow_refund',
         direction: TransactionDirection.CREDIT,
         amount: order.amount,
-        currency: order.currency || 'BDT',
+        payment_reference: `ESCROW-REFUND-${order.id}-${Date.now()}`,
+        description: `Escrow refunded for order ${order.id}`,
         status: TransactionStatus.REFUNDED,
       } satisfies Partial<Transaction>);
 
@@ -232,4 +236,3 @@ export class EscrowService {
     }
   }
 }
-

@@ -22,7 +22,6 @@ describe('ProfileController', () => {
     username: 'janedoe',
     email: 'jane@example.com',
     avatar: 'https://example.com/avatar.jpg',
-    avatar_key: 'avatars/profile-id.jpg',
     bio: 'I love working on cool projects',
     skills: ['typescript', 'nestjs'],
     availability_status: AvailabilityStatus.AVAILABLE,
@@ -33,7 +32,6 @@ describe('ProfileController', () => {
     total_reviews: 0,
     fcm_token: 'fcm-token-123',
     notification_prefs: { email: true, sms: false },
-    username_updated_at: null,
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
   };
@@ -142,7 +140,6 @@ describe('ProfileController', () => {
 
     describe('avatar', () => {
       it('uploads avatar and updates profile', async () => {
-        profileService.get.mockResolvedValueOnce({ success: true, data: profile });
         uploadService.base64.mockResolvedValueOnce({
           success: true,
           data: { url: 'https://example.com/new-avatar.jpg', key: 'avatars/new-key.jpg' },
@@ -155,11 +152,9 @@ describe('ProfileController', () => {
 
         expect(result.success).toBe(true);
         expect(uploadService.base64).toHaveBeenCalledWith(dto.avatar_base64, 'avatars');
-        expect(uploadService.remove).toHaveBeenCalledWith('avatars/profile-id.jpg');
         expect(profileService.setAvatar).toHaveBeenCalledWith(
           'profile-id',
           'https://example.com/new-avatar.jpg',
-          'avatars/new-key.jpg',
         );
       });
 
@@ -170,7 +165,6 @@ describe('ProfileController', () => {
       });
 
       it('throws BadRequestException when upload fails with 400', async () => {
-        profileService.get.mockResolvedValueOnce({ success: true, data: profile });
         uploadService.base64.mockResolvedValueOnce({
           success: false,
           status: 400,
@@ -183,7 +177,6 @@ describe('ProfileController', () => {
       });
 
       it('throws InternalServerErrorException when upload fails with 500', async () => {
-        profileService.get.mockResolvedValueOnce({ success: true, data: profile });
         uploadService.base64.mockResolvedValueOnce({
           success: false,
           status: 500,
@@ -197,13 +190,11 @@ describe('ProfileController', () => {
         );
       });
 
-      it('does not fail if deleting old avatar throws', async () => {
-        profileService.get.mockResolvedValueOnce({ success: true, data: profile });
+      it('uploads avatar without deleting old data', async () => {
         uploadService.base64.mockResolvedValueOnce({
           success: true,
           data: { url: 'https://example.com/new-avatar.jpg', key: 'avatars/new-key.jpg' },
         });
-        uploadService.remove.mockRejectedValueOnce(new Error('Delete failed'));
         profileService.setAvatar.mockResolvedValueOnce({ success: true, data: profile });
 
         const dto = { type: 'avatar' as const, avatar_base64: 'data:image/png;base64,abc123' };
@@ -211,6 +202,7 @@ describe('ProfileController', () => {
         const result = await controller.updateMe(currentUser, dto);
 
         expect(result.success).toBe(true);
+        expect(uploadService.remove).not.toHaveBeenCalled();
       });
     });
 

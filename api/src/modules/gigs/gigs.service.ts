@@ -44,6 +44,7 @@ export class GigsService {
       'delivery_days',
       'revision_count',
       'features',
+      'created_at',
     ].join(',');
   }
 
@@ -172,7 +173,6 @@ export class GigsService {
     }
   }
 
-
   async updateEdit(
     gigId: string,
     sellerId: string,
@@ -267,7 +267,6 @@ export class GigsService {
     }
   }
 
-
   async updateStatus(
     gigId: string,
     sellerId: string,
@@ -335,8 +334,6 @@ export class GigsService {
     }
 
     const sortMap: Record<string, string[]> = {
-      price_asc: ['price_from'],
-      price_desc: ['-price_from'],
       rating: ['-avg_rating'],
       orders: ['-total_orders'],
     };
