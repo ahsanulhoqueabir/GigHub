@@ -112,4 +112,32 @@ class JobQueryParams {
     'page': page,
     'limit': limit,
   };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JobQueryParams &&
+          runtimeType == other.runtimeType &&
+          categorySlug == other.categorySlug &&
+          search == other.search &&
+          type == other.type &&
+          budgetMin == other.budgetMin &&
+          budgetMax == other.budgetMax &&
+          experienceLevel == other.experienceLevel &&
+          sortBy == other.sortBy &&
+          page == other.page &&
+          limit == other.limit;
+
+  @override
+  int get hashCode => Object.hash(
+    categorySlug,
+    search,
+    type,
+    budgetMin,
+    budgetMax,
+    experienceLevel,
+    sortBy,
+    page,
+    limit,
+  );
 }

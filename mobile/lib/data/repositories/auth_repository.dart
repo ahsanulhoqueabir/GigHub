@@ -12,7 +12,7 @@ class AuthRepository {
 
   /// Dummy credentials for mock login during development.
   static const String mockEmail = 'demo@gighub.com';
-  static const String mockPassword = 'demo1234';
+  static const String mockPassword = '@Demo1234';
 
   const AuthRepository({required ApiClient client}) : _client = client;
 
@@ -44,7 +44,7 @@ class AuthRepository {
     } catch (e) {
       // If API is unavailable, provide a helpful mock error
       throw Exception(
-        'Login failed. Use demo@gighub.com / demo1234 for mock login.',
+        'Login failed. Use demo@gighub.com / @Demo1234 for mock login.',
       );
     }
   }

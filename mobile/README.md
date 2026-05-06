@@ -85,9 +85,9 @@ architecture and uses Riverpod for state management with GoRouter for navigation
 
 Use the following credentials to log in during development:
 
-| Email           | Password |
-| --------------- | -------- |
-| demo@gighub.com | demo1234 |
+| Email           | Password  |
+| --------------- | --------- |
+| demo@gighub.com | @Demo1234 |
 
 The mock login simulates a real sign-in experience with session persistence. After login, the session is saved and restored on app restart.
 

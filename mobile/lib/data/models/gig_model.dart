@@ -167,4 +167,28 @@ class GigQueryParams {
     'page': page,
     'limit': limit,
   };
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GigQueryParams &&
+          runtimeType == other.runtimeType &&
+          categorySlug == other.categorySlug &&
+          search == other.search &&
+          minPrice == other.minPrice &&
+          maxPrice == other.maxPrice &&
+          sortBy == other.sortBy &&
+          page == other.page &&
+          limit == other.limit;
+
+  @override
+  int get hashCode => Object.hash(
+    categorySlug,
+    search,
+    minPrice,
+    maxPrice,
+    sortBy,
+    page,
+    limit,
+  );
 }

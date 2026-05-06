@@ -90,4 +90,17 @@ class NotificationQueryParams {
     this.page = 1,
     this.limit = 20,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotificationQueryParams &&
+          runtimeType == other.runtimeType &&
+          unreadOnly == other.unreadOnly &&
+          type == other.type &&
+          page == other.page &&
+          limit == other.limit;
+
+  @override
+  int get hashCode => Object.hash(unreadOnly, type, page, limit);
 }
