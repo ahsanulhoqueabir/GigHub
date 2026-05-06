@@ -779,5 +779,117 @@
       "status": "pending",
       "createdAt": "2026-05-05T14:00:00Z"
     }
+  ],
+  "notifications": [
+    {
+      "id": "notif_1",
+      "type": "order_update",
+      "title": "Order in progress",
+      "message": "Ahsanul has started working on your logo design order.",
+      "actorId": "u_1",
+      "referenceId": "gig_1",
+      "referenceType": "gig",
+      "isRead": false,
+      "createdAt": "2026-05-06T09:30:00Z"
+    },
+    {
+      "id": "notif_2",
+      "type": "proposal_received",
+      "title": "New proposal received",
+      "message": "Sarah Khan sent you a proposal for 'Tech startup logo design'.",
+      "actorId": "u_3",
+      "referenceId": "job_2",
+      "referenceType": "job",
+      "isRead": false,
+      "createdAt": "2026-05-06T08:45:00Z"
+    },
+    {
+      "id": "notif_3",
+      "type": "proposal_accepted",
+      "title": "Proposal accepted! 🎉",
+      "message": "Your proposal for 'Write 10 SEO blog posts' has been accepted. Start working now!",
+      "actorId": "u_2",
+      "referenceId": "job_3",
+      "referenceType": "job",
+      "isRead": false,
+      "createdAt": "2026-05-06T07:20:00Z"
+    },
+    {
+      "id": "notif_4",
+      "type": "new_message",
+      "title": "New message",
+      "message": "John Doe sent you a message about the Flutter app project.",
+      "actorId": "u_2",
+      "referenceId": "job_1",
+      "referenceType": "job",
+      "isRead": false,
+      "createdAt": "2026-05-06T06:15:00Z"
+    },
+    {
+      "id": "notif_5",
+      "type": "review_received",
+      "title": "New review received",
+      "message": "Fatima Ahmed left you a 5-star review! \"Amazing work, highly recommended!\"",
+      "actorId": "u_5",
+      "referenceId": "gig_3",
+      "referenceType": "gig",
+      "isRead": false,
+      "createdAt": "2026-05-05T18:00:00Z"
+    },
+    {
+      "id": "notif_6",
+      "type": "payment_released",
+      "title": "Payment released",
+      "message": "A payment of BDT 8,000 has been released to your account for 'SEO Blog Posts'.",
+      "actorId": "u_5",
+      "referenceId": "prop_4",
+      "referenceType": "proposal",
+      "isRead": false,
+      "createdAt": "2026-05-05T14:30:00Z"
+    },
+    {
+      "id": "notif_7",
+      "type": "gig_milestone",
+      "title": "Milestone completed",
+      "message": "Rakib Hasan has completed the storyboard for your explainer video.",
+      "actorId": "u_4",
+      "referenceId": "gig_4",
+      "referenceType": "gig",
+      "isRead": true,
+      "createdAt": "2026-05-04T11:00:00Z"
+    },
+    {
+      "id": "notif_8",
+      "type": "new_follower",
+      "title": "New follower",
+      "message": "Tanvir Rahman started following you.",
+      "actorId": "u_6",
+      "referenceId": null,
+      "referenceType": null,
+      "isRead": true,
+      "createdAt": "2026-05-04T09:00:00Z"
+    },
+    {
+      "id": "notif_9",
+      "type": "system",
+      "title": "Profile boosted!",
+      "message": "Your profile visibility has been increased. You appear in 3x more searches this week.",
+      "actorId": null,
+      "referenceId": null,
+      "referenceType": null,
+      "isRead": true,
+      "createdAt": "2026-05-03T12:00:00Z"
+    },
+    {
+      "id": "notif_10",
+      "type": "order_completed",
+      "title": "Order completed",
+      "message": "Your order 'Animated Explainer Video' has been marked as complete. Please leave a review!",
+      "actorId": "u_4",
+      "referenceId": "gig_4",
+      "referenceType": "gig",
+      "isRead": true,
+      "createdAt": "2026-05-02T16:00:00Z"
+    }
   ]
 }

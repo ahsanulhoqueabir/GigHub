@@ -12,6 +12,7 @@ import 'package:gighub/presentation/screens/gigs/edit_gig_screen.dart';
 import 'package:gighub/presentation/screens/gigs/gig_detail_screen.dart';
 import 'package:gighub/presentation/screens/gigs/my_gigs_screen.dart';
 import 'package:gighub/presentation/screens/home/home_screen.dart';
+import 'package:gighub/presentation/screens/notifications/notifications_screen.dart';
 import 'package:gighub/presentation/screens/jobs/browse_jobs_screen.dart';
 import 'package:gighub/presentation/screens/jobs/create_job_screen.dart';
 import 'package:gighub/presentation/screens/jobs/job_detail_screen.dart';
@@ -169,6 +170,11 @@ GoRouter createRouter(WidgetRef ref) {
         path: '/search',
         name: 'search',
         builder: (_, __) => const SearchScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (_, __) => const NotificationsScreen(),
       ),
       GoRoute(
         path: '/profile/edit',

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:gighub/data/models/category_model.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/models/job_model.dart';
+import 'package:gighub/data/models/notification_model.dart';
 import 'package:gighub/data/models/profile_model.dart';
 import 'package:gighub/data/models/proposal_model.dart';
 
@@ -23,6 +24,7 @@ class MockDataService {
   late List<GigDetail> gigs;
   late List<Job> jobs;
   late List<Proposal> proposals;
+  late List<AppNotification> notifications;
 
   final Map<String, List<String>> _relatedGigSlugs = {};
 
@@ -42,6 +44,7 @@ class MockDataService {
     gigs = _parseGigs(data['gigs'], categoryById, profileById);
     jobs = _parseJobs(data['jobs'], categoryById, profileById);
     proposals = _parseProposals(data['proposals'], profileById);
+    notifications = _parseNotifications(data['notifications']);
 
     _loaded = true;
   }
@@ -198,6 +201,14 @@ class MockDataService {
             features: _stringList(p['features']),
           ),
         )
+        .toList();
+  }
+
+  List<AppNotification> _parseNotifications(dynamic raw) {
+    final list = raw is List ? raw : const [];
+    return list
+        .whereType<Map<String, dynamic>>()
+        .map((n) => AppNotification.fromJson(n))
         .toList();
   }
 

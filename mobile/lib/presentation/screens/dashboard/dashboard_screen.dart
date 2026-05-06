@@ -6,6 +6,7 @@ import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
 import 'package:gighub/data/models/job_model.dart';
 import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/data/providers/notification_provider.dart';
 import 'package:gighub/presentation/widgets/gigs/gig_card.dart';
 import 'package:gighub/presentation/widgets/jobs/job_card.dart';
 
@@ -31,10 +32,7 @@ class DashboardScreen extends ConsumerWidget {
             icon: const Icon(Icons.search),
             onPressed: () => context.push('/search'),
           ),
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {},
-          ),
+          _NotificationBell(),
         ],
       ),
       body: ListView(
@@ -169,6 +167,36 @@ class _SectionHeader extends StatelessWidget {
         ),
         TextButton(onPressed: onSeeAll, child: const Text('See All')),
       ],
+    );
+  }
+}
+
+class _NotificationBell extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadAsync = ref.watch(unreadNotificationCountProvider);
+
+    return unreadAsync.when(
+      data: (count) {
+        return IconButton(
+          icon: Badge(
+            isLabelVisible: count > 0,
+            label: count > 99
+                ? const Text('99+', style: TextStyle(fontSize: 10))
+                : Text('$count', style: const TextStyle(fontSize: 10)),
+            child: const Icon(Icons.notifications_outlined),
+          ),
+          onPressed: () => context.push('/notifications'),
+        );
+      },
+      loading: () => IconButton(
+        icon: const Icon(Icons.notifications_outlined),
+        onPressed: () => context.push('/notifications'),
+      ),
+      error: (_, __) => IconButton(
+        icon: const Icon(Icons.notifications_outlined),
+        onPressed: () => context.push('/notifications'),
+      ),
     );
   }
 }
