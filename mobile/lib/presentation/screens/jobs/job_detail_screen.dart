@@ -167,6 +167,8 @@ class JobDetailScreen extends ConsumerWidget {
                         ),
                         backgroundColor: theme.colorScheme.secondaryContainer,
                         visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
                       ),
                     )
                     .toList(),

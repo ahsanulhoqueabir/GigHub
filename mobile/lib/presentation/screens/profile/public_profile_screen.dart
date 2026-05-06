@@ -148,6 +148,9 @@ class PublicProfileScreen extends ConsumerWidget {
                     color: theme.colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w600,
                   ),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
                 );
               }).toList(),
             ),
