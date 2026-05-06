@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
 import 'package:gighub/presentation/widgets/common/gh_toast.dart';
@@ -148,7 +149,10 @@ class MyGigsScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/gigs/create'),
+        onPressed: () async {
+          final authed = await requireAuth(context, ref);
+          if (authed && context.mounted) context.push('/gigs/create');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Create Gig'),
       ),

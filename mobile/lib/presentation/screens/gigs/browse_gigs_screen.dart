@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/providers/category_provider.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
@@ -247,7 +248,10 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/gigs/create'),
+        onPressed: () async {
+          final authed = await requireAuth(context, ref);
+          if (authed && context.mounted) context.push('/gigs/create');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Create Gig'),
       ),

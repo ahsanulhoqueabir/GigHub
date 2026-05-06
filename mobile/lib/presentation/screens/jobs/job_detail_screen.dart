@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/providers/job_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
@@ -198,7 +199,10 @@ class JobDetailScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: FilledButton(
-                  onPressed: () => _showProposalSheet(context, job.id),
+                  onPressed: () async {
+                    final authed = await requireAuth(context, ref);
+                    if (authed) _showProposalSheet(context, job.id);
+                  },
                   child: const Text('Submit Proposal'),
                 ),
               ),
