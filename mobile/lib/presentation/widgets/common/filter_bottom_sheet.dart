@@ -180,7 +180,16 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
                     }
                   });
                 },
+                backgroundColor: theme.colorScheme.secondaryContainer,
                 selectedColor: theme.colorScheme.primaryContainer,
+                labelStyle: theme.textTheme.labelSmall?.copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.onPrimaryContainer
+                      : theme.colorScheme.onSecondaryContainer,
+                  fontWeight: FontWeight.w600,
+                ),
+                visualDensity: VisualDensity.compact,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               );
             }).toList(),
           ),

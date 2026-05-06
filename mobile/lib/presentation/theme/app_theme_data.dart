@@ -142,11 +142,17 @@ class AppThemeData {
 
       // ── Chip ──────────────────────────────────────
       chipTheme: ChipThemeData(
-        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundColor: colorScheme.secondaryContainer,
         selectedColor: colorScheme.primaryContainer,
-        labelStyle: AppTextStyles.labelMedium,
-        secondaryLabelStyle: AppTextStyles.labelSmall,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        labelStyle: AppTextStyles.labelSmall.copyWith(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSecondaryContainer,
+        ),
+        secondaryLabelStyle: AppTextStyles.labelSmall.copyWith(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.onSecondaryContainer,
+        ),
+        padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide.none,
       ),

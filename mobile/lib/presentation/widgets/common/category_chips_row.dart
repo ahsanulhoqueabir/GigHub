@@ -61,9 +61,17 @@ class _Chip extends StatelessWidget {
         label: Text(label),
         selected: isSelected,
         onSelected: (_) => onTap(),
+        backgroundColor: theme.colorScheme.secondaryContainer,
         selectedColor: theme.colorScheme.primaryContainer,
         checkmarkColor: theme.colorScheme.primary,
+        labelStyle: theme.textTheme.labelSmall?.copyWith(
+          color: isSelected
+              ? theme.colorScheme.onPrimaryContainer
+              : theme.colorScheme.onSecondaryContainer,
+          fontWeight: FontWeight.w600,
+        ),
         visualDensity: VisualDensity.compact,
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }

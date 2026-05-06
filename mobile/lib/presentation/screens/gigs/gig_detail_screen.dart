@@ -74,6 +74,9 @@ class GigDetailScreen extends ConsumerWidget {
                           ),
                           backgroundColor: theme.colorScheme.secondaryContainer,
                           visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          padding: EdgeInsets.zero,
                         ),
                         const Spacer(),
                         Icon(Icons.star, size: 18, color: Colors.amber),
@@ -109,6 +112,7 @@ class GigDetailScreen extends ConsumerWidget {
                               visualDensity: VisualDensity.compact,
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
+                              padding: EdgeInsets.zero,
                             ),
                           )
                           .toList(),
