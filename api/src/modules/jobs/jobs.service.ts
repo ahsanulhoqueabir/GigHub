@@ -79,7 +79,11 @@ export class JobsService {
         `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to modify this job', undefined, 403);
       if (existing.data.status !== JobStatus.OPEN)
         return fail('Job cannot be edited in current status', undefined, 400);
@@ -119,7 +123,11 @@ export class JobsService {
         `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to modify this job', undefined, 403);
 
       const { data } = await directusApi.patch<{ data: Job }>(
@@ -140,7 +148,11 @@ export class JobsService {
         `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to delete this job', undefined, 403);
 
       const { data } = await directusApi.patch<{ data: Job }>(
