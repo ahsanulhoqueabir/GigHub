@@ -1,3 +1,8 @@
+import { Gig } from './gig.types';
+import { Job } from './job.types';
+import { Order } from './order.types';
+import { Profile } from './profile.types';
+
 export enum ReviewContext {
   ORDER = 'order',
   TUITION = 'tuition',
@@ -12,11 +17,11 @@ export enum ReviewStatus {
 export interface Review {
   id: string;
   review_context: ReviewContext;
-  order: string | null;
-  tuition_job: string | null;
-  gig: string | null;
-  reviewer: string;
-  reviewee: string;
+  order: string | Partial<Order> | null;
+  tuition_job: string | Partial<Job> | null;
+  gig: string | Partial<Gig> | null;
+  reviewer: string | Partial<Profile> | null;
+  reviewee: string | Partial<Profile> | null;
   rating_overall: number;
   rating_quality: number;
   rating_communication: number;

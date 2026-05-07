@@ -2,6 +2,7 @@ import type { PaginationQuery } from '@/types/services/common.types';
 import type { Order } from '@/types/order.types';
 import type { Review } from '@/types/review.types';
 import { Profile } from './profile.types';
+import { Category } from './category.types';
 
 export enum GigStatus {
   DRAFT = 'draft',
@@ -37,7 +38,7 @@ export interface GigPackage {
 export interface Gig {
   id: string;
   seller: string | Partial<Profile>;
-  category: string;
+  category: string | Partial<Category>;
   title: string;
   slug: string;
   description: string;
@@ -51,9 +52,7 @@ export interface Gig {
   created_at: string;
   updated_at: string;
   packages: GigPackage[];
-  /** O2M: related reviews (via gh_reviews.gig → gh_gigs.id) */
   reviews?: Review[];
-  /** O2M: related orders (via gh_orders.gig → gh_gigs.id) */
   orders?: Order[];
 }
 

@@ -1,3 +1,5 @@
+import { Profile } from './profile.types';
+
 export enum WithdrawalMethod {
   BKASH = 'bkash',
   NAGAD = 'nagad',
@@ -14,7 +16,7 @@ export enum WithdrawalStatus {
 
 export interface Withdrawal {
   id: string;
-  profile: string;
+  profile: string | Partial<Profile>;
   amount: number;
   method: WithdrawalMethod;
   account_details: Record<string, unknown>;
@@ -25,4 +27,4 @@ export interface Withdrawal {
   updated_at: string;
 }
 
-export interface WithdrawalDetail extends Withdrawal {}
+export type WithdrawalDetail = Withdrawal;
