@@ -15,7 +15,6 @@ import {
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import type { JwtPayload } from '@/types/auth.types';
-import { GigStatus } from '@/types/gig.types';
 import { GigsService } from './gigs.service';
 import { CreateGigDto } from './dto/create-gig.dto';
 import { UpdateGigDto } from './dto/update-gig.dto';
@@ -111,5 +110,4 @@ export class GigsController {
     }
     return result;
   }
-
 }

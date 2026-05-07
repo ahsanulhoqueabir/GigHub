@@ -25,27 +25,26 @@ describe('GigsService', () => {
     description: 'I will build a production-grade web app for you',
     tags: ['nestjs', 'typescript'],
     images: [],
-    status: GigStatus.DRAFT,
+    status: GigStatus.ACTIVE,
     avg_rating: 0,
     total_reviews: 0,
     total_orders: 0,
     view_count: 0,
     created_at: '2026-01-01T00:00:00.000Z',
     updated_at: '2026-01-01T00:00:00.000Z',
+    packages: [
+      {
+        id: 'pkg-1',
+        tier: GigPackageTier.BASIC,
+        title: 'Basic package',
+        description: 'Basic package description',
+        price: 50,
+        delivery_days: 3,
+        revision_count: 1,
+        features: null,
+      },
+    ],
   };
-
-  const packages = [
-    {
-      id: 'pkg-1',
-      gig: 'gig-1',
-      tier: GigPackageTier.BASIC,
-      title: 'Basic package',
-      description: 'Basic package description',
-      price: 50,
-      delivery_days: 3,
-      revisions: 1,
-    },
-  ];
 
   beforeEach(() => {
     service = new GigsService();
@@ -54,11 +53,9 @@ describe('GigsService', () => {
     mockedDirectusApi.patch.mockReset();
   });
 
-  it('creates gig with packages', async () => {
+  it('creates gig with embedded packages and defaults to active status', async () => {
     mockedDirectusApi.get.mockResolvedValueOnce({ data: { data: [] } } as never);
-    mockedDirectusApi.post
-      .mockResolvedValueOnce({ data: { data: gig } } as never)
-      .mockResolvedValueOnce({ data: { data: packages } } as never);
+    mockedDirectusApi.post.mockResolvedValueOnce({ data: { data: gig } } as never);
 
     const result = await service.create('profile-1', {
       title: 'Build a web app',
@@ -72,7 +69,8 @@ describe('GigsService', () => {
           description: 'Basic package description',
           price: 50,
           delivery_days: 3,
-          revisions: 1,
+          revision_count: 1,
+          features: [],
         },
       ],
       images: [],
@@ -80,7 +78,48 @@ describe('GigsService', () => {
 
     expect(result.success).toBe(true);
     expect(result.data?.slug).toBe('build-a-web-app');
-    expect(mockedDirectusApi.post).toHaveBeenCalledTimes(2);
+    expect(result.data?.status).toBe(GigStatus.ACTIVE);
+    // Verify packages are embedded in the gig payload
+    expect(mockedDirectusApi.post).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        packages: expect.arrayContaining([expect.objectContaining({ tier: GigPackageTier.BASIC })]),
+      }),
+    );
+    // Only one post call (no separate packages collection call)
+    expect(mockedDirectusApi.post).toHaveBeenCalledTimes(1);
+  });
+
+  it('creates gig with draft status when specified', async () => {
+    const draftGig = { ...gig, status: GigStatus.DRAFT };
+    mockedDirectusApi.get.mockResolvedValueOnce({ data: { data: [] } } as never);
+    mockedDirectusApi.post.mockResolvedValueOnce({ data: { data: draftGig } } as never);
+
+    const result = await service.create('profile-1', {
+      title: 'Build a web app',
+      description: 'I will build a production-grade web app for you',
+      category_id: 'cat-1',
+      tags: ['nestjs', 'typescript'],
+      status: GigStatus.DRAFT,
+      packages: [
+        {
+          tier: GigPackageTier.BASIC,
+          title: 'Basic package',
+          description: 'Basic package description',
+          price: 50,
+          delivery_days: 3,
+          revision_count: 1,
+          features: [],
+        },
+      ],
+      images: [],
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockedDirectusApi.post).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ status: GigStatus.DRAFT }),
+    );
   });
 
   it('rejects create when basic package is missing', async () => {
@@ -96,7 +135,8 @@ describe('GigsService', () => {
           description: 'Standard package description',
           price: 100,
           delivery_days: 5,
-          revisions: 2,
+          revision_count: 2,
+          features: [],
         },
       ],
       images: [],
@@ -128,15 +168,16 @@ describe('GigsService', () => {
     expect(result.status).toBe(403);
   });
 
-  it('returns gig detail with packages by slug', async () => {
-    mockedDirectusApi.get
-      .mockResolvedValueOnce({ data: { data: [{ ...gig, status: GigStatus.ACTIVE }] } } as never)
-      .mockResolvedValueOnce({ data: { data: packages } } as never);
+  it('returns gig detail with embedded packages by slug', async () => {
+    const activeGig = { ...gig, status: GigStatus.ACTIVE };
+    mockedDirectusApi.get.mockResolvedValueOnce({ data: { data: [activeGig] } } as never);
 
     const result = await service.detail('build-a-web-app');
 
     expect(result.success).toBe(true);
-    expect(result.data?.packages).toEqual(packages);
+    expect(result.data?.packages).toEqual(gig.packages);
+    // Detail should only make one API call (no separate packages fetch)
+    expect(mockedDirectusApi.get).toHaveBeenCalledTimes(1);
   });
 
   it('returns 404 when slug is not found', async () => {
@@ -175,5 +216,98 @@ describe('GigsService', () => {
 
     expect(result.success).toBe(true);
     expect(result.data?.length).toBe(2);
+  });
+
+  it('updates gig edit with package merge by tier', async () => {
+    const existingGig = {
+      ...gig,
+      status: GigStatus.ACTIVE,
+      packages: [
+        {
+          id: 'pkg-basic',
+          tier: GigPackageTier.BASIC,
+          title: 'Old Basic',
+          description: 'Old description',
+          price: 50,
+          delivery_days: 3,
+          revision_count: 1,
+          features: [],
+        },
+      ],
+    };
+
+    const mergedPackages = [
+      {
+        id: 'pkg-basic',
+        tier: GigPackageTier.BASIC,
+        title: 'Updated Basic',
+        description: 'Updated description',
+        price: 60,
+        delivery_days: 2,
+        revision_count: 2,
+        features: ['feature1'],
+      },
+      {
+        id: 'new-pkg-standard',
+        tier: GigPackageTier.STANDARD,
+        title: 'New Standard',
+        description: 'Standard description',
+        price: 100,
+        delivery_days: 5,
+        revision_count: 3,
+        features: [],
+      },
+    ];
+
+    // First get: getOwnedGig fetches existing gig
+    // Second get: ensureUniqueSlug checks slug uniqueness
+    mockedDirectusApi.get
+      .mockResolvedValueOnce({ data: { data: existingGig } } as never)
+      .mockResolvedValueOnce({ data: { data: [] } } as never);
+    mockedDirectusApi.patch.mockResolvedValueOnce({
+      data: {
+        data: {
+          ...existingGig,
+          title: 'Updated Title',
+          packages: mergedPackages,
+        },
+      },
+    } as never);
+
+    const result = await service.updateEdit('gig-1', 'profile-1', {
+      type: 'edit',
+      title: 'Updated Title',
+      packages: [
+        {
+          tier: GigPackageTier.BASIC,
+          title: 'Updated Basic',
+          description: 'Updated description',
+          price: 60,
+          delivery_days: 2,
+          revision_count: 2,
+          features: ['feature1'],
+        },
+        {
+          tier: GigPackageTier.STANDARD,
+          title: 'New Standard',
+          description: 'Standard description',
+          price: 100,
+          delivery_days: 5,
+          revision_count: 3,
+          features: [],
+        },
+      ],
+    });
+
+    expect(result.success).toBe(true);
+    // Should have been called with packages array containing both tiers
+    // and the existing basic package should retain its ID
+    const patchCallArgs = mockedDirectusApi.patch.mock.calls[0];
+    const patchedPackages = (patchCallArgs[1] as Record<string, unknown>).packages as any[];
+    const basicPkg = patchedPackages.find((p: any) => p.tier === GigPackageTier.BASIC);
+    expect(basicPkg.id).toBe('pkg-basic'); // Retained existing ID
+    const standardPkg = patchedPackages.find((p: any) => p.tier === GigPackageTier.STANDARD);
+    expect(standardPkg.id).toBeDefined(); // Got a new UUID
+    expect(standardPkg.id).not.toBe('pkg-basic');
   });
 });

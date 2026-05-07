@@ -4,14 +4,13 @@ import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
 import { GigPackageTier, GigStatus } from '@/types/gig.types';
-import type { Gig, GigDetail, GigPackage, GigQuery } from '@/types/gig.types';
+import type { Gig, GigPackage, GigQuery } from '@/types/gig.types';
 import type { CreateGigDto, GigPackageDto } from './dto/create-gig.dto';
 import type { UpdateGigDto } from './dto/update-gig.dto';
 
 @Injectable()
 export class GigsService {
   private readonly gigsCollection = 'gh_gigs';
-  private readonly packagesCollection = 'gh_gig_packages';
 
   private gigFields(): string {
     return [
@@ -30,21 +29,7 @@ export class GigsService {
       'view_count',
       'created_at',
       'updated_at',
-    ].join(',');
-  }
-
-  private packageFields(): string {
-    return [
-      'id',
-      'gig',
-      'tier',
-      'title',
-      'description',
-      'price',
-      'delivery_days',
-      'revision_count',
-      'features',
-      'created_at',
+      'packages',
     ].join(',');
   }
 
@@ -123,7 +108,7 @@ export class GigsService {
     }
   }
 
-  async create(sellerId: string, dto: CreateGigDto): Promise<ServiceResponse<GigDetail>> {
+  async create(sellerId: string, dto: CreateGigDto): Promise<ServiceResponse<Gig>> {
     const packageValidation = this.ensureValidPackages(dto.packages);
     if (packageValidation) {
       return packageValidation;
@@ -132,6 +117,17 @@ export class GigsService {
     try {
       const slug = await this.ensureUniqueSlug(dto.title);
       const gigId = uuid();
+
+      const packagesPayload = dto.packages.map((item) => ({
+        id: uuid(),
+        tier: item.tier,
+        title: item.title,
+        description: item.description,
+        price: item.price,
+        delivery_days: item.delivery_days,
+        revision_count: item.revision_count,
+        features: item.features ?? [],
+      }));
 
       const gigPayload = {
         id: gigId,
@@ -142,7 +138,8 @@ export class GigsService {
         description: dto.description,
         tags: dto.tags,
         images: dto.images ?? [],
-        status: GigStatus.DRAFT,
+        status: dto.status ?? GigStatus.ACTIVE,
+        packages: packagesPayload,
       };
 
       const { data: gigData } = await directusApi.post<{ data: Gig }>(
@@ -150,24 +147,7 @@ export class GigsService {
         gigPayload,
       );
 
-      const packagesPayload = dto.packages.map((item) => ({
-        id: uuid(),
-        gig: gigId,
-        tier: item.tier,
-        title: item.title,
-        description: item.description,
-        price: item.price,
-        delivery_days: item.delivery_days,
-        revision_count: item.revision_count,
-        features: item.features ?? [],
-      }));
-
-      const { data: packageData } = await directusApi.post<{ data: GigPackage[] }>(
-        `/items/${this.packagesCollection}`,
-        packagesPayload,
-      );
-
-      return ok({ ...gigData.data, packages: packageData.data });
+      return ok(gigData.data);
     } catch (error) {
       return fail('Failed to create gig', error);
     }
@@ -177,10 +157,10 @@ export class GigsService {
     gigId: string,
     sellerId: string,
     dto: UpdateGigDto,
-  ): Promise<ServiceResponse<GigDetail>> {
+  ): Promise<ServiceResponse<Gig>> {
     const owned = await this.getOwnedGig(gigId, sellerId);
     if (!owned.success || !owned.data) {
-      return owned as ServiceResponse<GigDetail>;
+      return owned as ServiceResponse<Gig>;
     }
 
     if (owned.data.status === GigStatus.DELETED) {
@@ -206,62 +186,40 @@ export class GigsService {
       if (dto.tags !== undefined) payload['tags'] = dto.tags;
       if (dto.images !== undefined) payload['images'] = dto.images;
 
+      // Merge packages by tier: fetch existing gig's packages, then update/add by tier
+      if (dto.packages?.length) {
+        const existingPackages: GigPackage[] = owned.data.packages ?? [];
+
+        for (const incoming of dto.packages) {
+          const existingIndex = existingPackages.findIndex((pkg) => pkg.tier === incoming.tier);
+
+          const merged: GigPackage = {
+            id: existingIndex !== -1 ? existingPackages[existingIndex].id : uuid(),
+            tier: incoming.tier,
+            title: incoming.title,
+            description: incoming.description,
+            price: incoming.price,
+            delivery_days: incoming.delivery_days,
+            revision_count: incoming.revision_count,
+            features: incoming.features ?? [],
+          };
+
+          if (existingIndex !== -1) {
+            existingPackages[existingIndex] = merged;
+          } else {
+            existingPackages.push(merged);
+          }
+        }
+
+        payload['packages'] = existingPackages;
+      }
+
       const { data: updatedGigData } = await directusApi.patch<{ data: Gig }>(
         `/items/${this.gigsCollection}/${gigId}`,
         payload,
       );
 
-      if (dto.packages?.length) {
-        for (const item of dto.packages) {
-          const { data: existingData } = await directusApi.get<{ data: GigPackage[] }>(
-            `/items/${this.packagesCollection}`,
-            {
-              params: {
-                filter: { gig: { _eq: gigId }, tier: { _eq: item.tier } },
-                fields: 'id',
-                limit: 1,
-              },
-            },
-          );
-
-          if (existingData.data[0]) {
-            await directusApi.patch(
-              `/items/${this.packagesCollection}/${existingData.data[0].id}`,
-              {
-                title: item.title,
-                description: item.description,
-                price: item.price,
-                delivery_days: item.delivery_days,
-                revision_count: item.revision_count,
-                features: item.features ?? [],
-              },
-            );
-          } else {
-            await directusApi.post(`/items/${this.packagesCollection}`, {
-              id: uuid(),
-              gig: gigId,
-              tier: item.tier,
-              title: item.title,
-              description: item.description,
-              price: item.price,
-              delivery_days: item.delivery_days,
-              revision_count: item.revision_count,
-              features: item.features ?? [],
-            });
-          }
-        }
-      }
-
-      const packages = await this.getPackages(gigId);
-      if (!packages.success) {
-        return fail(
-          packages.error ?? 'Failed to fetch gig packages',
-          packages.details,
-          packages.status ?? 500,
-        );
-      }
-
-      return ok({ ...updatedGigData.data, packages: packages.data ?? [] });
+      return ok(updatedGigData.data);
     } catch (error) {
       return fail('Failed to update gig', error);
     }
@@ -369,7 +327,7 @@ export class GigsService {
     }
   }
 
-  async detail(slug: string): Promise<ServiceResponse<GigDetail>> {
+  async detail(slug: string): Promise<ServiceResponse<Gig>> {
     try {
       const { data } = await directusApi.get<{ data: Gig[] }>(`/items/${this.gigsCollection}`, {
         params: {
@@ -384,16 +342,7 @@ export class GigsService {
         return fail('Gig not found', undefined, 404);
       }
 
-      const packages = await this.getPackages(gig.id);
-      if (!packages.success) {
-        return fail(
-          packages.error ?? 'Failed to fetch gig packages',
-          packages.details,
-          packages.status ?? 500,
-        );
-      }
-
-      return ok({ ...gig, packages: packages.data ?? [] });
+      return ok(gig);
     } catch (error) {
       return fail('Failed to fetch gig', error);
     }
@@ -437,24 +386,6 @@ export class GigsService {
       });
     } catch (error) {
       return fail('Failed to fetch your gigs', error) as PaginatedServiceResponse<Gig>;
-    }
-  }
-
-  private async getPackages(gigId: string): Promise<ServiceResponse<GigPackage[]>> {
-    try {
-      const { data } = await directusApi.get<{ data: GigPackage[] }>(
-        `/items/${this.packagesCollection}`,
-        {
-          params: {
-            filter: { gig: { _eq: gigId } },
-            fields: this.packageFields(),
-            sort: ['tier'],
-          },
-        },
-      );
-      return ok(data.data);
-    } catch (error) {
-      return fail('Failed to fetch gig packages', error);
     }
   }
 }

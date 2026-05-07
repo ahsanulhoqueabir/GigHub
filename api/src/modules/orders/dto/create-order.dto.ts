@@ -6,7 +6,7 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsString()
-  gig_package_id?: string;
+  gig_package_tier?: string;
 
   @IsOptional()
   @IsString()

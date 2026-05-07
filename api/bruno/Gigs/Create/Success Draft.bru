@@ -1,0 +1,54 @@
+meta {
+  name: Success Draft
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "I will create a Gatsby frontend",
+    "description": "I will build a blazing fast static site using Gatsby, React, and GraphQL.",
+    "category_id": "81c0e37e-decf-486b-97f2-0015c20e48c2",
+    "tags": ["gatsby", "react", "graphql", "frontend"],
+    "status": "draft",
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic Site Setup",
+        "description": "Basic Gatsby site with 2 pages and SEO setup.",
+        "price": 40,
+        "delivery_days": 4,
+        "revision_count": 1,
+        "features": ["2 Pages", "SEO Optimization"]
+      },
+      {
+        "tier": "standard",
+        "title": "Standard Site Development",
+        "description": "Full Gatsby site with 5 pages, CMS integration, and SEO.",
+        "price": 120,
+        "delivery_days": 8,
+        "revision_count": 2,
+        "features": ["5 Pages", "CMS Integration", "SEO"]
+      },
+      {
+        "tier": "premium",
+        "title": "Premium Site Development",
+        "description": "Enterprise Gatsby site with 10+ pages, CMS, animations, and SEO.",
+        "price": 250,
+        "delivery_days": 14,
+        "revision_count": 5,
+        "features": ["10+ Pages", "CMS", "Animations", "SEO"]
+      }
+    ]
+  }
+}
