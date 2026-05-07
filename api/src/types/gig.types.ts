@@ -21,16 +21,13 @@ export interface GigImage {
 }
 
 export interface GigPackage {
-  id: string;
-  gig: string;
   tier: GigPackageTier;
   title: string;
   description: string | null;
-  price: number;
-  delivery_days: number;
-  revision_count: number;
+  price: string;
+  delivery_days: string;
+  revision_count: string;
   features: string[] | null;
-  created_at: string;
 }
 
 export interface Gig {
@@ -49,6 +46,7 @@ export interface Gig {
   view_count: number;
   created_at: string;
   updated_at: string;
+  packages: GigPackage[];
 }
 
 export interface GigDetail extends Gig {
