@@ -16,8 +16,14 @@ export class GigsService {
   private gigFields(): string {
     return [
       'id',
-      'seller',
-      'category',
+      'seller.id',
+      'seller.display_name',
+      'seller.email',
+      'seller.username',
+      'seller.avatar',
+      'category.id',
+      'category.name',
+      'category.icon',
       'title',
       'slug',
       'description',
@@ -56,17 +62,17 @@ export class GigsService {
   private async getOwnedGig(gigId: string, sellerId: string): Promise<ServiceResponse<Gig>> {
     try {
       const { data } = await directusApi.get<{ data: Gig }>(
-        `/items/${this.gigsCollection}/${gigId}`,
-        {
-          params: { fields: this.gigDetailFields() },
-        },
+        `/items/${this.gigsCollection}/${gigId}?fields=${this.gigDetailFields()}`,
       );
 
       if (!data.data) {
         return fail('Gig not found', undefined, 404);
       }
 
-      if (data.data.seller !== sellerId) {
+      const seller = data.data.seller;
+      const sellerOwnerId = typeof seller === 'string' ? seller : (seller as any)?.id;
+
+      if (sellerOwnerId !== sellerId) {
         return fail('You are not allowed to modify this gig', undefined, 403);
       }
 
@@ -111,7 +117,7 @@ export class GigsService {
       };
 
       const { data: gigData } = await directusApi.post<{ data: Gig }>(
-        `/items/${this.gigsCollection}`,
+        `/items/${this.gigsCollection}?fields=${this.gigFields()}`,
         gigPayload,
       );
 
@@ -132,7 +138,7 @@ export class GigsService {
     }
 
     if (owned.data.status === GigStatus.DELETED) {
-      return fail('Deleted gig cannot be modified', undefined, 400);
+      return fail('This gig has been deleted and cannot be modified', undefined, 400);
     }
 
     if (dto.packages && dto.packages.length) {
@@ -183,7 +189,7 @@ export class GigsService {
       }
 
       const { data: updatedGigData } = await directusApi.patch<{ data: Gig }>(
-        `/items/${this.gigsCollection}/${gigId}`,
+        `/items/${this.gigsCollection}/${gigId}?fields=${this.gigFields()}`,
         payload,
       );
 
@@ -203,7 +209,7 @@ export class GigsService {
 
     try {
       const { data } = await directusApi.patch<{ data: Gig }>(
-        `/items/${this.gigsCollection}/${gigId}`,
+        `/items/${this.gigsCollection}/${gigId}?fields=${this.gigFields()}`,
         {
           status,
         },
@@ -220,7 +226,7 @@ export class GigsService {
 
     try {
       const { data } = await directusApi.patch<{ data: Gig }>(
-        `/items/${this.gigsCollection}/${gigId}`,
+        `/items/${this.gigsCollection}/${gigId}?fields=${this.gigFields()}`,
         {
           status: GigStatus.DELETED,
         },

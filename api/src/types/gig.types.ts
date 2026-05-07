@@ -1,6 +1,7 @@
 import type { PaginationQuery } from '@/types/services/common.types';
 import type { Order } from '@/types/order.types';
 import type { Review } from '@/types/review.types';
+import { Profile } from './profile.types';
 
 export enum GigStatus {
   DRAFT = 'draft',
@@ -35,7 +36,7 @@ export interface GigPackage {
 
 export interface Gig {
   id: string;
-  seller: string;
+  seller: string | Partial<Profile>;
   category: string;
   title: string;
   slug: string;

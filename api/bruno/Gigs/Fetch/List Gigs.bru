@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{base_url}}/gigs
+  url: {{base_url}}/gigs?page=1&limit=10&sort=price_asc
   body: none
   auth: none
 }
@@ -13,8 +13,8 @@ get {
 params:query {
   page: 1
   limit: 10
-  ~sort: price_asc
-  ~search: nestjs
+  sort: price_asc
+  ~search: abir
   ~category: 
   ~min_rating: 4
   ~tags: 
