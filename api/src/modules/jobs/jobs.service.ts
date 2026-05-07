@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { ok, fail, paginated } from '@/utils/service-response';
+import { generateUniqueSlug } from '@/utils/slug.util';
 import type { ServiceResponse, PaginatedServiceResponse } from '@/types/services/common.types';
 import type { Job, JobDetail, JobQuery } from '@/types/job.types';
 import { JobStatus, JobType } from '@/types/job.types';
@@ -32,42 +33,9 @@ export class JobsService {
     ].join(',');
   }
 
-  private slugify(input: string): string {
-    return input
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  private async ensureUniqueSlug(title: string, excludeId?: string): Promise<string> {
-    const base = this.slugify(title) || 'job';
-    let attempt = 0;
-
-    while (attempt < 30) {
-      const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`;
-      const filter: Record<string, unknown> = { slug: { _eq: candidate } };
-      if (excludeId) filter['id'] = { _neq: excludeId };
-
-      const { data } = await directusApi.get<{ data: Array<{ id: string }> }>(
-        `/items/${this.collection}`,
-        {
-          params: { filter, fields: 'id', limit: 1 },
-        },
-      );
-
-      if (!data.data.length) return candidate;
-      attempt += 1;
-    }
-
-    return `${base}-${Date.now()}`;
-  }
-
   async create(posterId: string, dto: any): Promise<ServiceResponse<JobDetail>> {
     try {
-      const slug = await this.ensureUniqueSlug(dto.title);
+      const slug = generateUniqueSlug(dto.title);
 
       const payload: Record<string, any> = {
         id: uuid(),
@@ -109,7 +77,7 @@ export class JobsService {
       const payload: Record<string, unknown> = {};
       if (dto.title) {
         payload['title'] = dto.title;
-        payload['slug'] = await this.ensureUniqueSlug(dto.title, id);
+        payload['slug'] = generateUniqueSlug(dto.title);
       }
       if (dto.description !== undefined) payload['description'] = dto.description;
       if (dto.category_id !== undefined) payload['category'] = dto.category_id;

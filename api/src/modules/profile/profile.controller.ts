@@ -5,11 +5,10 @@ import {
   Body,
   Param,
   Query,
-  NotFoundException,
   BadRequestException,
   ConflictException,
-  InternalServerErrorException,
 } from '@nestjs/common';
+import { throwOnError } from '@/utils/service-error.util';
 import { ProfileService } from './profile.service';
 import { UploadService } from '@/modules/upload/upload.service';
 
@@ -29,7 +28,7 @@ export class ProfileController {
   @Get('me')
   async getMe(@CurrentUser() user: JwtPayload) {
     const result = await this.profileService.get(user.profile_id);
-    if (!result.success) throw new NotFoundException('Profile not found');
+    throwOnError(result);
     return result;
   }
 
@@ -56,7 +55,7 @@ export class ProfileController {
           availability_status: dto.availability_status,
         });
 
-        if (!result.success) throw new InternalServerErrorException(result.error);
+        throwOnError(result);
         return result;
       }
 
@@ -67,21 +66,18 @@ export class ProfileController {
 
         // Upload new avatar to R2
         const upload = await this.uploadService.base64(dto.avatar_base64, 'avatars');
-        if (!upload.success) {
-          if (upload.status === 400) throw new BadRequestException(upload.error);
-          throw new InternalServerErrorException(upload.error);
-        }
+        throwOnError(upload);
 
         // Update profile with new avatar URL
         const result = await this.profileService.setAvatar(user.profile_id, upload.data!.url);
-        if (!result.success) throw new InternalServerErrorException(result.error);
+        throwOnError(result);
         return result;
       }
 
       case 'fcm_token': {
         if (!dto.fcm_token) throw new BadRequestException('fcm_token is required');
         const result = await this.profileService.setFcmToken(user.profile_id, dto.fcm_token);
-        if (!result.success) throw new InternalServerErrorException(result.error);
+        throwOnError(result);
         return result;
       }
 
@@ -90,7 +86,7 @@ export class ProfileController {
           throw new BadRequestException('notification_prefs is required');
         }
         const result = await this.profileService.setPrefs(user.profile_id, dto.notification_prefs);
-        if (!result.success) throw new InternalServerErrorException(result.error);
+        throwOnError(result);
         return result;
       }
 
@@ -106,9 +102,7 @@ export class ProfileController {
     @Query('type') type: ProfileViewType = 'profile',
   ) {
     const profileResult = await this.profileService.find(username);
-    if (!profileResult.success || !profileResult.data) {
-      throw new NotFoundException('Profile not found');
-    }
+    throwOnError(profileResult);
 
     if (type === 'profile') {
       return profileResult;

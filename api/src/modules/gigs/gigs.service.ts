@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { fail, ok, paginated } from '@/utils/service-response';
+import { generateUniqueSlug } from '@/utils/slug.util';
 import type { PaginatedServiceResponse, ServiceResponse } from '@/types/services/common.types';
 import { GigPackageTier, GigStatus } from '@/types/gig.types';
 import type { Gig, GigPackage, GigQuery } from '@/types/gig.types';
@@ -31,44 +32,6 @@ export class GigsService {
       'updated_at',
       'packages',
     ].join(',');
-  }
-
-  private slugify(input: string): string {
-    return input
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  private async ensureUniqueSlug(title: string, excludeId?: string): Promise<string> {
-    const base = this.slugify(title) || 'gig';
-    let attempt = 0;
-
-    while (attempt < 30) {
-      const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`;
-      const filter: Record<string, unknown> = { slug: { _eq: candidate } };
-      if (excludeId) {
-        filter['id'] = { _neq: excludeId };
-      }
-
-      const { data } = await directusApi.get<{ data: Array<{ id: string }> }>(
-        `/items/${this.gigsCollection}`,
-        {
-          params: { filter, fields: 'id', limit: 1 },
-        },
-      );
-
-      if (!data.data.length) {
-        return candidate;
-      }
-
-      attempt += 1;
-    }
-
-    return `${base}-${Date.now()}`;
   }
 
   private ensureValidPackages(packages: GigPackageDto[]): ServiceResponse<never> | null {
@@ -115,7 +78,7 @@ export class GigsService {
     }
 
     try {
-      const slug = await this.ensureUniqueSlug(dto.title);
+      const slug = generateUniqueSlug(dto.title);
       const gigId = uuid();
 
       const packagesPayload = dto.packages.map((item) => ({
@@ -179,7 +142,7 @@ export class GigsService {
 
       if (dto.title) {
         payload['title'] = dto.title;
-        payload['slug'] = await this.ensureUniqueSlug(dto.title, gigId);
+        payload['slug'] = generateUniqueSlug(dto.title);
       }
       if (dto.description !== undefined) payload['description'] = dto.description;
       if (dto.category_id !== undefined) payload['category'] = dto.category_id;

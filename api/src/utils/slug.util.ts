@@ -7,7 +7,11 @@ export function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-export function generateUniqueSlug(text: string, suffix?: string): string {
-  const base = generateSlug(text);
-  return suffix ? `${base}-${suffix}` : base;
+/**
+ * Creates a unique slug by appending Date.now() — no DB query needed.
+ * The resulting format is: `my-title-1712345678901`
+ */
+export function generateUniqueSlug(text: string): string {
+  const base = generateSlug(text) || 'item';
+  return `${base}-${Date.now()}`;
 }

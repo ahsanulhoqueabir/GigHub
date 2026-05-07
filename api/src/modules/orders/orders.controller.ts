@@ -1,17 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  NotFoundException,
-  Param,
-  Patch,
-  Post,
-  Query,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { throwOnError } from '@/utils/service-error.util';
 import type { JwtPayload } from '@/types/auth.types';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -24,7 +13,7 @@ export class OrdersController {
   @Post()
   async create(@CurrentUser() user: JwtPayload, @Body() dto: CreateOrderDto) {
     const res = await this.ordersService.create(user.profile_id, dto);
-    if (!res.success) throw new InternalServerErrorException(res.error);
+    throwOnError(res);
     return res;
   }
 
@@ -35,26 +24,21 @@ export class OrdersController {
     @Body() dto: UpdateOrderDto,
   ) {
     const res = await this.ordersService.update(id, user.profile_id, dto);
-    if (!res.success) {
-      if (res.status === 400) throw new BadRequestException(res.error);
-      if (res.status === 403) throw new ForbiddenException(res.error);
-      if (res.status === 404) throw new NotFoundException(res.error);
-      throw new InternalServerErrorException(res.error);
-    }
+    throwOnError(res);
     return res;
   }
 
   @Get('me')
   async mine(@CurrentUser() user: JwtPayload, @Query('page') page = 1, @Query('limit') limit = 20) {
     const res = await this.ordersService.listByUser(user.profile_id, Number(page), Number(limit));
-    if (!res.success) throw new InternalServerErrorException(res.error);
+    throwOnError(res);
     return res;
   }
 
   @Get(':id')
   async detail(@Param('id') id: string) {
     const res = await this.ordersService.getById(id);
-    if (!res.success) throw new NotFoundException(res.error);
+    throwOnError(res);
     return res;
   }
 }
