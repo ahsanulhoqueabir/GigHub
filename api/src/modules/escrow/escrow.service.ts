@@ -138,9 +138,11 @@ export class EscrowService {
         status: OrderStatus.COMPLETED,
       });
 
+      const sellerProfileId = typeof order.seller === 'string' ? order.seller : order.seller?.id;
+
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
-        profile: order.seller,
+        profile: sellerProfileId,
         order: order.id,
         type: 'escrow_release',
         direction: TransactionDirection.CREDIT,
@@ -188,9 +190,11 @@ export class EscrowService {
         status: OrderStatus.REFUNDED,
       });
 
+      const buyerProfileId = typeof order.buyer === 'string' ? order.buyer : order.buyer?.id;
+
       await directusApi.post(`/items/${this.transactionsCollection}`, {
         id: uuid(),
-        profile: order.buyer,
+        profile: buyerProfileId,
         order: order.id,
         type: 'escrow_refund',
         direction: TransactionDirection.CREDIT,
