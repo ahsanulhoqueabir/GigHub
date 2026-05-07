@@ -13,10 +13,9 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: [
-      config.get<string>('cors.originWeb') ?? 'http://localhost:3001',
-      config.get<string>('cors.originMobile') ?? 'http://localhost:8081',
-    ],
+    origin: (origin:string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      callback(null, true)
+    },
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
