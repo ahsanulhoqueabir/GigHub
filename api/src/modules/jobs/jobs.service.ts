@@ -14,8 +14,14 @@ export class JobsService {
   private fields(): string {
     return [
       'id',
-      'poster',
-      'category',
+      'poster.id',
+      'poster.display_name',
+      'poster.avatar',
+      'poster.email',
+      'poster.username',
+      'category.id',
+      'category.name',
+      'category.icon',
       'title',
       'slug',
       'description',
@@ -56,7 +62,11 @@ export class JobsService {
       if (dto.required_skills?.length) payload.required_skills = dto.required_skills;
       if (dto.attachments?.length) payload.attachments = dto.attachments;
 
-      const { data } = await directusApi.post<{ data: Job }>(`/items/${this.collection}`, payload);
+      const { data } = await directusApi.post<{ data: Job }>(
+        `/items/${this.collection}?fields=${this.fields()}`,
+        payload,
+      );
+
       return ok(data.data as JobDetail);
     } catch (error) {
       return fail('Failed to create job', error);
@@ -66,7 +76,7 @@ export class JobsService {
   async updateEdit(id: string, posterId: string, dto: any): Promise<ServiceResponse<JobDetail>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
       if (existing.data.poster !== posterId)
@@ -90,7 +100,7 @@ export class JobsService {
       if (dto.attachments !== undefined) payload['attachments'] = dto.attachments;
 
       const { data } = await directusApi.patch<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as JobDetail);
@@ -106,15 +116,18 @@ export class JobsService {
   ): Promise<ServiceResponse<Job>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
       if (existing.data.poster !== posterId)
         return fail('You are not allowed to modify this job', undefined, 403);
 
-      const { data } = await directusApi.patch<{ data: Job }>(`/items/${this.collection}/${id}`, {
-        status,
-      });
+      const { data } = await directusApi.patch<{ data: Job }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+        {
+          status,
+        },
+      );
       return ok(data.data);
     } catch (error) {
       return fail('Failed to update job status', error);
@@ -124,15 +137,18 @@ export class JobsService {
   async remove(id: string, posterId: string): Promise<ServiceResponse<Job>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
       if (existing.data.poster !== posterId)
         return fail('You are not allowed to delete this job', undefined, 403);
 
-      const { data } = await directusApi.patch<{ data: Job }>(`/items/${this.collection}/${id}`, {
-        status: JobStatus.CANCELLED,
-      });
+      const { data } = await directusApi.patch<{ data: Job }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+        {
+          status: JobStatus.CANCELLED,
+        },
+      );
       return ok(data.data, 'Job cancelled successfully');
     } catch (error) {
       return fail('Failed to cancel job', error);
