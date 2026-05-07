@@ -34,6 +34,11 @@ export class GigsService {
     ].join(',');
   }
 
+  /** Fields that include O2M relation expansions (reviews, orders) for detail views. */
+  private gigDetailFields(): string {
+    return [this.gigFields(), 'reviews.*', 'orders.*'].join(',');
+  }
+
   private ensureValidPackages(packages: GigPackageDto[]): ServiceResponse<never> | null {
     const tiers = new Set(packages.map((item) => item.tier));
 
@@ -53,7 +58,7 @@ export class GigsService {
       const { data } = await directusApi.get<{ data: Gig }>(
         `/items/${this.gigsCollection}/${gigId}`,
         {
-          params: { fields: this.gigFields() },
+          params: { fields: this.gigDetailFields() },
         },
       );
 
@@ -295,7 +300,7 @@ export class GigsService {
       const { data } = await directusApi.get<{ data: Gig[] }>(`/items/${this.gigsCollection}`, {
         params: {
           filter: { slug: { _eq: slug }, status: { _eq: GigStatus.ACTIVE } },
-          fields: this.gigFields(),
+          fields: this.gigDetailFields(),
           limit: 1,
         },
       });

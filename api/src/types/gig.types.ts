@@ -1,4 +1,6 @@
 import type { PaginationQuery } from '@/types/services/common.types';
+import type { Order } from '@/types/order.types';
+import type { Review } from '@/types/review.types';
 
 export enum GigStatus {
   DRAFT = 'draft',
@@ -48,6 +50,10 @@ export interface Gig {
   created_at: string;
   updated_at: string;
   packages: GigPackage[];
+  /** O2M: related reviews (via gh_reviews.gig → gh_gigs.id) */
+  reviews?: Review[];
+  /** O2M: related orders (via gh_orders.gig → gh_gigs.id) */
+  orders?: Order[];
 }
 
 export interface GigQuery extends PaginationQuery {
