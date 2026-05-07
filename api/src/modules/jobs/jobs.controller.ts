@@ -65,17 +65,17 @@ export class JobsController {
     return result;
   }
 
-  @Public()
-  @Get(':slug')
-  async detail(@Param('slug') slug: string) {
-    const result = await this.jobsService.detail(slug);
+  @Get('me')
+  async mine(@CurrentUser() user: JwtPayload, @Query('page') page = 1, @Query('limit') limit = 20) {
+    const result = await this.jobsService.mine(user.profile_id, Number(page), Number(limit));
     throwOnError(result);
     return result;
   }
 
-  @Get('me')
-  async mine(@CurrentUser() user: JwtPayload, @Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.jobsService.mine(user.profile_id, Number(page), Number(limit));
+  @Public()
+  @Get(':slug')
+  async detail(@Param('slug') slug: string) {
+    const result = await this.jobsService.detail(slug);
     throwOnError(result);
     return result;
   }
