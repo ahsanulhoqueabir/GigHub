@@ -33,10 +33,21 @@ export class OrdersService {
     return [
       'id',
       'order_number',
-      'buyer',
-      'seller',
+      'buyer.id',
+      'buyer.display_name',
+      'buyer.username',
+      'buyer.email',
+      'buyer.avatar',
+      'seller.id',
+      'seller.display_name',
+      'seller.username',
+      'seller.email',
+      'seller.avatar',
       'source_type',
-      'gig',
+      'gig.id',
+      'gig.title',
+      'gig.description',
+      'gig.packages',
       'gig_package',
       'job',
       'proposal',
@@ -112,7 +123,7 @@ export class OrdersService {
       };
 
       const { data } = await directusApi.post<{ data: Order }>(
-        `/items/${this.collection}`,
+        `/items/${this.collection}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as OrderDetail);
@@ -123,7 +134,9 @@ export class OrdersService {
 
   async getById(id: string): Promise<ServiceResponse<OrderDetail>> {
     try {
-      const { data } = await directusApi.get<{ data: Order }>(`/items/${this.collection}/${id}`);
+      const { data } = await directusApi.get<{ data: Order }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+      );
       if (!data.data) return fail('Order not found', undefined, 404);
       return ok(data.data as OrderDetail);
     } catch (error) {
@@ -138,7 +151,7 @@ export class OrdersService {
   ): Promise<ServiceResponse<OrderDetail>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Order }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Order not found', undefined, 404);
 
@@ -153,7 +166,7 @@ export class OrdersService {
         payload['cancellation_reason'] = dto.cancellation_reason;
 
       const { data } = await directusApi.patch<{ data: Order }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as OrderDetail);
@@ -165,7 +178,7 @@ export class OrdersService {
   async listByUser(userId: string, page = 1, limit = 20): Promise<PaginatedServiceResponse<Order>> {
     try {
       const { data } = await directusApi.get<{ data: Order[]; meta?: { filter_count?: number } }>(
-        `/items/${this.collection}`,
+        `/items/${this.collection}?fields=${this.fields()}`,
         {
           params: {
             filter: { _or: [{ buyer: { _eq: userId } }, { seller: { _eq: userId } }] },
