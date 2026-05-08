@@ -19,6 +19,7 @@ migrate_working_dir/
 .idea/
 index.md
 docs/
+bruno/
 
 
 # The .vscode folder contains launch configuration and tasks you configure in

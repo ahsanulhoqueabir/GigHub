@@ -18,185 +18,195 @@ class GigDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final gigAsync = ref.watch(gigDetailProvider(slug));
-    final relatedAsync = ref.watch(relatedGigsProvider(slug));
 
     return Scaffold(
       body: gigAsync.when(
-        data: (gig) => CustomScrollView(
-          slivers: [
-            // AppBar with image carousel
-            SliverAppBar(
-              expandedHeight: 280,
-              pinned: true,
-              title: Text(
-                gig.title,
-                style: theme.textTheme.titleSmall,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              flexibleSpace: FlexibleSpaceBar(
-                background: ImageCarousel(
-                  images: gig.images.isNotEmpty
-                      ? gig.images
-                      : (gig.thumbnail != null ? [gig.thumbnail!] : []),
+        data: (gig) {
+          // Watch related gigs using the gig's category ID
+          final relatedAsync = ref.watch(
+            relatedGigsProvider((
+              categoryId: gig.category.id,
+              excludeSlug: gig.slug,
+            )),
+          );
+          return CustomScrollView(
+            slivers: [
+              // AppBar with image carousel
+              SliverAppBar(
+                expandedHeight: 280,
+                pinned: true,
+                title: Text(
+                  gig.title,
+                  style: theme.textTheme.titleSmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.bookmark_border),
-                  onPressed: () {},
+                flexibleSpace: FlexibleSpaceBar(
+                  background: ImageCarousel(
+                    images: gig.images.map((img) => img.url).toList(),
+                  ),
                 ),
-                IconButton(icon: const Icon(Icons.share), onPressed: () {}),
-              ],
-            ),
-            // Content
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSizes.space16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title
-                    Text(
-                      gig.title,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.bookmark_border),
+                    onPressed: () {},
+                  ),
+                  IconButton(icon: const Icon(Icons.share), onPressed: () {}),
+                ],
+              ),
+              // Content
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.space16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title
+                      Text(
+                        gig.title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: AppSizes.space8),
-                    // Category + Rating
-                    Row(
-                      children: [
-                        Chip(
-                          label: Text(gig.category.name),
-                          labelStyle: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSecondaryContainer,
-                            fontWeight: FontWeight.w600,
+                      const SizedBox(height: AppSizes.space8),
+                      // Category + Rating
+                      Row(
+                        children: [
+                          Chip(
+                            label: Text(gig.category.name),
+                            labelStyle: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSecondaryContainer,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            backgroundColor:
+                                theme.colorScheme.secondaryContainer,
+                            visualDensity: VisualDensity.compact,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            padding: EdgeInsets.zero,
                           ),
-                          backgroundColor: theme.colorScheme.secondaryContainer,
-                          visualDensity: VisualDensity.compact,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          padding: EdgeInsets.zero,
-                        ),
-                        const Spacer(),
-                        Icon(Icons.star, size: 18, color: Colors.amber),
-                        const SizedBox(width: 4),
-                        Text(
-                          gig.avgRating.toStringAsFixed(1),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+                          const Spacer(),
+                          Icon(Icons.star, size: 18, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            gig.avgRating.toStringAsFixed(1),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        Text(
-                          ' (${gig.totalReviews})',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                          Text(
+                            ' (${gig.totalReviews})',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.space12),
-                    // Tags
-                    Wrap(
-                      spacing: AppSizes.space8,
-                      children: gig.tags
-                          .map(
-                            (t) => Chip(
-                              label: Text(t),
-                              labelStyle: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSecondaryContainer,
-                                fontWeight: FontWeight.w600,
+                        ],
+                      ),
+                      const SizedBox(height: AppSizes.space12),
+                      // Tags
+                      Wrap(
+                        spacing: AppSizes.space8,
+                        children: gig.tags
+                            .map(
+                              (t) => Chip(
+                                label: Text(t),
+                                labelStyle: theme.textTheme.labelSmall
+                                    ?.copyWith(
+                                      color: theme
+                                          .colorScheme
+                                          .onSecondaryContainer,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                backgroundColor:
+                                    theme.colorScheme.secondaryContainer,
+                                visualDensity: VisualDensity.compact,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                padding: EdgeInsets.zero,
                               ),
-                              backgroundColor:
-                                  theme.colorScheme.secondaryContainer,
-                              visualDensity: VisualDensity.compact,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              padding: EdgeInsets.zero,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                    const SizedBox(height: AppSizes.space16),
-                    // Seller card
-                    _SellerCard(
-                      seller: gig.seller,
-                      onViewProfile: () =>
-                          context.push('/u/${gig.seller.username}'),
-                    ),
-                    const SizedBox(height: AppSizes.space24),
-                    // Packages
-                    PackageTabView(
-                      packages: gig.packages,
-                      onContinue: (pkg) {
-                        GhToast.show(
-                          context,
-                          message:
-                              'Selected ${pkg.title} - \u09F3${pkg.price.toStringAsFixed(0)} (UI only)',
-                          type: GhToastType.info,
-                        );
-                      },
-                    ),
-                    const SizedBox(height: AppSizes.space24),
-                    // Description
-                    Text(
-                      'About This Gig',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                            )
+                            .toList(),
                       ),
-                    ),
-                    const SizedBox(height: AppSizes.space8),
-                    Text(gig.description, style: theme.textTheme.bodyMedium),
-                    const SizedBox(height: AppSizes.space24),
-                    // Related gigs
-                    Text(
-                      'Related Gigs',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: AppSizes.space16),
+                      // Seller card
+                      _SellerCard(
+                        seller: gig.seller,
+                        onViewProfile: () =>
+                            context.push('/u/${gig.seller.username}'),
                       ),
-                    ),
-                    const SizedBox(height: AppSizes.space8),
-                    relatedAsync.when(
-                      data: (related) => SizedBox(
-                        height: 230,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: related.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: AppSizes.space12),
-                          itemBuilder: (_, i) => SizedBox(
-                            width: 180,
-                            child: GigCard(
-                              gig: related[i],
-                              onTap: () =>
-                                  context.push('/gigs/${related[i].slug}'),
+                      const SizedBox(height: AppSizes.space24),
+                      // Packages
+                      PackageTabView(
+                        packages: gig.packages,
+                        onContinue: (pkg) {
+                          GhToast.show(
+                            context,
+                            message:
+                                'Selected ${pkg.title} - \u09F3${pkg.price.toStringAsFixed(0)} (UI only)',
+                            type: GhToastType.info,
+                          );
+                        },
+                      ),
+                      const SizedBox(height: AppSizes.space24),
+                      // Description
+                      Text(
+                        'About This Gig',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.space8),
+                      Text(gig.description, style: theme.textTheme.bodyMedium),
+                      const SizedBox(height: AppSizes.space24),
+                      // Related gigs
+                      Text(
+                        'Related Gigs',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSizes.space8),
+                      relatedAsync.when(
+                        data: (related) => SizedBox(
+                          height: 230,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: related.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: AppSizes.space12),
+                            itemBuilder: (_, i) => SizedBox(
+                              width: 180,
+                              child: GigCard(
+                                gig: related[i],
+                                onTap: () =>
+                                    context.push('/gigs/${related[i].slug}'),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      loading: () => SizedBox(
-                        height: 230,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 3,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(width: AppSizes.space12),
-                          itemBuilder: (_, __) => const SizedBox(
-                            width: 180,
-                            child: _RelatedShimmer(),
+                        loading: () => SizedBox(
+                          height: 230,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 3,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: AppSizes.space12),
+                            itemBuilder: (_, __) => const SizedBox(
+                              width: 180,
+                              child: _RelatedShimmer(),
+                            ),
                           ),
                         ),
+                        error: (_, __) => const SizedBox.shrink(),
                       ),
-                      error: (_, __) => const SizedBox.shrink(),
-                    ),
-                    const SizedBox(height: 80),
-                  ],
+                      const SizedBox(height: 80),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Error: $err')),
       ),

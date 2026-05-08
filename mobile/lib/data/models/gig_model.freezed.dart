@@ -15,6 +15,174 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
+GigImage _$GigImageFromJson(Map<String, dynamic> json) {
+  return _GigImage.fromJson(json);
+}
+
+/// @nodoc
+mixin _$GigImage {
+  String get url => throw _privateConstructorUsedError;
+  int get sortOrder => throw _privateConstructorUsedError;
+
+  /// Serializes this GigImage to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of GigImage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $GigImageCopyWith<GigImage> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $GigImageCopyWith<$Res> {
+  factory $GigImageCopyWith(GigImage value, $Res Function(GigImage) then) =
+      _$GigImageCopyWithImpl<$Res, GigImage>;
+  @useResult
+  $Res call({String url, int sortOrder});
+}
+
+/// @nodoc
+class _$GigImageCopyWithImpl<$Res, $Val extends GigImage>
+    implements $GigImageCopyWith<$Res> {
+  _$GigImageCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of GigImage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? url = null, Object? sortOrder = null}) {
+    return _then(
+      _value.copyWith(
+            url: null == url
+                ? _value.url
+                : url // ignore: cast_nullable_to_non_nullable
+                      as String,
+            sortOrder: null == sortOrder
+                ? _value.sortOrder
+                : sortOrder // ignore: cast_nullable_to_non_nullable
+                      as int,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$GigImageImplCopyWith<$Res>
+    implements $GigImageCopyWith<$Res> {
+  factory _$$GigImageImplCopyWith(
+    _$GigImageImpl value,
+    $Res Function(_$GigImageImpl) then,
+  ) = __$$GigImageImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({String url, int sortOrder});
+}
+
+/// @nodoc
+class __$$GigImageImplCopyWithImpl<$Res>
+    extends _$GigImageCopyWithImpl<$Res, _$GigImageImpl>
+    implements _$$GigImageImplCopyWith<$Res> {
+  __$$GigImageImplCopyWithImpl(
+    _$GigImageImpl _value,
+    $Res Function(_$GigImageImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of GigImage
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({Object? url = null, Object? sortOrder = null}) {
+    return _then(
+      _$GigImageImpl(
+        url: null == url
+            ? _value.url
+            : url // ignore: cast_nullable_to_non_nullable
+                  as String,
+        sortOrder: null == sortOrder
+            ? _value.sortOrder
+            : sortOrder // ignore: cast_nullable_to_non_nullable
+                  as int,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class _$GigImageImpl extends _GigImage {
+  const _$GigImageImpl({required this.url, this.sortOrder = 0}) : super._();
+
+  factory _$GigImageImpl.fromJson(Map<String, dynamic> json) =>
+      _$$GigImageImplFromJson(json);
+
+  @override
+  final String url;
+  @override
+  @JsonKey()
+  final int sortOrder;
+
+  @override
+  String toString() {
+    return 'GigImage(url: $url, sortOrder: $sortOrder)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$GigImageImpl &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.sortOrder, sortOrder) ||
+                other.sortOrder == sortOrder));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, url, sortOrder);
+
+  /// Create a copy of GigImage
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$GigImageImplCopyWith<_$GigImageImpl> get copyWith =>
+      __$$GigImageImplCopyWithImpl<_$GigImageImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$GigImageImplToJson(this);
+  }
+}
+
+abstract class _GigImage extends GigImage {
+  const factory _GigImage({required final String url, final int sortOrder}) =
+      _$GigImageImpl;
+  const _GigImage._() : super._();
+
+  factory _GigImage.fromJson(Map<String, dynamic> json) =
+      _$GigImageImpl.fromJson;
+
+  @override
+  String get url;
+  @override
+  int get sortOrder;
+
+  /// Create a copy of GigImage
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$GigImageImplCopyWith<_$GigImageImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 GigSummary _$GigSummaryFromJson(Map<String, dynamic> json) {
   return _GigSummary.fromJson(json);
 }
@@ -26,8 +194,10 @@ mixin _$GigSummary {
   String get slug => throw _privateConstructorUsedError;
   Category get category => throw _privateConstructorUsedError;
   PublicProfile get seller => throw _privateConstructorUsedError;
-  String? get thumbnail => throw _privateConstructorUsedError;
+  List<GigImage> get images => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromAnything)
   double get startingPrice => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromAnything)
   double get avgRating => throw _privateConstructorUsedError;
   int get totalReviews => throw _privateConstructorUsedError;
   int get totalOrders => throw _privateConstructorUsedError;
@@ -56,9 +226,9 @@ abstract class $GigSummaryCopyWith<$Res> {
     String slug,
     Category category,
     PublicProfile seller,
-    String? thumbnail,
-    double startingPrice,
-    double avgRating,
+    List<GigImage> images,
+    @JsonKey(fromJson: _doubleFromAnything) double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) double avgRating,
     int totalReviews,
     int totalOrders,
     String status,
@@ -88,7 +258,7 @@ class _$GigSummaryCopyWithImpl<$Res, $Val extends GigSummary>
     Object? slug = null,
     Object? category = null,
     Object? seller = null,
-    Object? thumbnail = freezed,
+    Object? images = null,
     Object? startingPrice = null,
     Object? avgRating = null,
     Object? totalReviews = null,
@@ -117,10 +287,10 @@ class _$GigSummaryCopyWithImpl<$Res, $Val extends GigSummary>
                 ? _value.seller
                 : seller // ignore: cast_nullable_to_non_nullable
                       as PublicProfile,
-            thumbnail: freezed == thumbnail
-                ? _value.thumbnail
-                : thumbnail // ignore: cast_nullable_to_non_nullable
-                      as String?,
+            images: null == images
+                ? _value.images
+                : images // ignore: cast_nullable_to_non_nullable
+                      as List<GigImage>,
             startingPrice: null == startingPrice
                 ? _value.startingPrice
                 : startingPrice // ignore: cast_nullable_to_non_nullable
@@ -182,9 +352,9 @@ abstract class _$$GigSummaryImplCopyWith<$Res>
     String slug,
     Category category,
     PublicProfile seller,
-    String? thumbnail,
-    double startingPrice,
-    double avgRating,
+    List<GigImage> images,
+    @JsonKey(fromJson: _doubleFromAnything) double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) double avgRating,
     int totalReviews,
     int totalOrders,
     String status,
@@ -215,7 +385,7 @@ class __$$GigSummaryImplCopyWithImpl<$Res>
     Object? slug = null,
     Object? category = null,
     Object? seller = null,
-    Object? thumbnail = freezed,
+    Object? images = null,
     Object? startingPrice = null,
     Object? avgRating = null,
     Object? totalReviews = null,
@@ -244,10 +414,10 @@ class __$$GigSummaryImplCopyWithImpl<$Res>
             ? _value.seller
             : seller // ignore: cast_nullable_to_non_nullable
                   as PublicProfile,
-        thumbnail: freezed == thumbnail
-            ? _value.thumbnail
-            : thumbnail // ignore: cast_nullable_to_non_nullable
-                  as String?,
+        images: null == images
+            ? _value._images
+            : images // ignore: cast_nullable_to_non_nullable
+                  as List<GigImage>,
         startingPrice: null == startingPrice
             ? _value.startingPrice
             : startingPrice // ignore: cast_nullable_to_non_nullable
@@ -283,13 +453,14 @@ class _$GigSummaryImpl extends _GigSummary {
     required this.slug,
     required this.category,
     required this.seller,
-    this.thumbnail,
-    required this.startingPrice,
-    required this.avgRating,
+    final List<GigImage> images = const [],
+    @JsonKey(fromJson: _doubleFromAnything) required this.startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required this.avgRating,
     required this.totalReviews,
     this.totalOrders = 0,
     required this.status,
-  }) : super._();
+  }) : _images = images,
+       super._();
 
   factory _$GigSummaryImpl.fromJson(Map<String, dynamic> json) =>
       _$$GigSummaryImplFromJson(json);
@@ -304,11 +475,20 @@ class _$GigSummaryImpl extends _GigSummary {
   final Category category;
   @override
   final PublicProfile seller;
+  final List<GigImage> _images;
   @override
-  final String? thumbnail;
+  @JsonKey()
+  List<GigImage> get images {
+    if (_images is EqualUnmodifiableListView) return _images;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_images);
+  }
+
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   final double startingPrice;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   final double avgRating;
   @override
   final int totalReviews;
@@ -320,7 +500,7 @@ class _$GigSummaryImpl extends _GigSummary {
 
   @override
   String toString() {
-    return 'GigSummary(id: $id, title: $title, slug: $slug, category: $category, seller: $seller, thumbnail: $thumbnail, startingPrice: $startingPrice, avgRating: $avgRating, totalReviews: $totalReviews, totalOrders: $totalOrders, status: $status)';
+    return 'GigSummary(id: $id, title: $title, slug: $slug, category: $category, seller: $seller, images: $images, startingPrice: $startingPrice, avgRating: $avgRating, totalReviews: $totalReviews, totalOrders: $totalOrders, status: $status)';
   }
 
   @override
@@ -334,8 +514,7 @@ class _$GigSummaryImpl extends _GigSummary {
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.seller, seller) || other.seller == seller) &&
-            (identical(other.thumbnail, thumbnail) ||
-                other.thumbnail == thumbnail) &&
+            const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.startingPrice, startingPrice) ||
                 other.startingPrice == startingPrice) &&
             (identical(other.avgRating, avgRating) ||
@@ -356,7 +535,7 @@ class _$GigSummaryImpl extends _GigSummary {
     slug,
     category,
     seller,
-    thumbnail,
+    const DeepCollectionEquality().hash(_images),
     startingPrice,
     avgRating,
     totalReviews,
@@ -385,9 +564,9 @@ abstract class _GigSummary extends GigSummary {
     required final String slug,
     required final Category category,
     required final PublicProfile seller,
-    final String? thumbnail,
-    required final double startingPrice,
-    required final double avgRating,
+    final List<GigImage> images,
+    @JsonKey(fromJson: _doubleFromAnything) required final double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required final double avgRating,
     required final int totalReviews,
     final int totalOrders,
     required final String status,
@@ -408,10 +587,12 @@ abstract class _GigSummary extends GigSummary {
   @override
   PublicProfile get seller;
   @override
-  String? get thumbnail;
+  List<GigImage> get images;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   double get startingPrice;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   double get avgRating;
   @override
   int get totalReviews;
@@ -439,10 +620,11 @@ mixin _$GigDetail {
   String get slug => throw _privateConstructorUsedError;
   Category get category => throw _privateConstructorUsedError;
   PublicProfile get seller => throw _privateConstructorUsedError;
-  String? get thumbnail => throw _privateConstructorUsedError;
-  List<String> get images => throw _privateConstructorUsedError;
+  List<GigImage> get images => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromAnything)
   double get startingPrice => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromAnything)
   double get avgRating => throw _privateConstructorUsedError;
   int get totalReviews => throw _privateConstructorUsedError;
   int get totalOrders => throw _privateConstructorUsedError;
@@ -472,11 +654,10 @@ abstract class $GigDetailCopyWith<$Res> {
     String slug,
     Category category,
     PublicProfile seller,
-    String? thumbnail,
-    List<String> images,
+    List<GigImage> images,
     String description,
-    double startingPrice,
-    double avgRating,
+    @JsonKey(fromJson: _doubleFromAnything) double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) double avgRating,
     int totalReviews,
     int totalOrders,
     String status,
@@ -509,7 +690,6 @@ class _$GigDetailCopyWithImpl<$Res, $Val extends GigDetail>
     Object? slug = null,
     Object? category = null,
     Object? seller = null,
-    Object? thumbnail = freezed,
     Object? images = null,
     Object? description = null,
     Object? startingPrice = null,
@@ -543,14 +723,10 @@ class _$GigDetailCopyWithImpl<$Res, $Val extends GigDetail>
                 ? _value.seller
                 : seller // ignore: cast_nullable_to_non_nullable
                       as PublicProfile,
-            thumbnail: freezed == thumbnail
-                ? _value.thumbnail
-                : thumbnail // ignore: cast_nullable_to_non_nullable
-                      as String?,
             images: null == images
                 ? _value.images
                 : images // ignore: cast_nullable_to_non_nullable
-                      as List<String>,
+                      as List<GigImage>,
             description: null == description
                 ? _value.description
                 : description // ignore: cast_nullable_to_non_nullable
@@ -628,11 +804,10 @@ abstract class _$$GigDetailImplCopyWith<$Res>
     String slug,
     Category category,
     PublicProfile seller,
-    String? thumbnail,
-    List<String> images,
+    List<GigImage> images,
     String description,
-    double startingPrice,
-    double avgRating,
+    @JsonKey(fromJson: _doubleFromAnything) double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) double avgRating,
     int totalReviews,
     int totalOrders,
     String status,
@@ -666,7 +841,6 @@ class __$$GigDetailImplCopyWithImpl<$Res>
     Object? slug = null,
     Object? category = null,
     Object? seller = null,
-    Object? thumbnail = freezed,
     Object? images = null,
     Object? description = null,
     Object? startingPrice = null,
@@ -700,14 +874,10 @@ class __$$GigDetailImplCopyWithImpl<$Res>
             ? _value.seller
             : seller // ignore: cast_nullable_to_non_nullable
                   as PublicProfile,
-        thumbnail: freezed == thumbnail
-            ? _value.thumbnail
-            : thumbnail // ignore: cast_nullable_to_non_nullable
-                  as String?,
         images: null == images
             ? _value._images
             : images // ignore: cast_nullable_to_non_nullable
-                  as List<String>,
+                  as List<GigImage>,
         description: null == description
             ? _value.description
             : description // ignore: cast_nullable_to_non_nullable
@@ -759,11 +929,10 @@ class _$GigDetailImpl extends _GigDetail {
     required this.slug,
     required this.category,
     required this.seller,
-    this.thumbnail,
-    final List<String> images = const [],
+    final List<GigImage> images = const [],
     required this.description,
-    required this.startingPrice,
-    required this.avgRating,
+    @JsonKey(fromJson: _doubleFromAnything) required this.startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required this.avgRating,
     required this.totalReviews,
     this.totalOrders = 0,
     required this.status,
@@ -788,12 +957,10 @@ class _$GigDetailImpl extends _GigDetail {
   final Category category;
   @override
   final PublicProfile seller;
-  @override
-  final String? thumbnail;
-  final List<String> _images;
+  final List<GigImage> _images;
   @override
   @JsonKey()
-  List<String> get images {
+  List<GigImage> get images {
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_images);
@@ -802,8 +969,10 @@ class _$GigDetailImpl extends _GigDetail {
   @override
   final String description;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   final double startingPrice;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   final double avgRating;
   @override
   final int totalReviews;
@@ -836,7 +1005,7 @@ class _$GigDetailImpl extends _GigDetail {
 
   @override
   String toString() {
-    return 'GigDetail(id: $id, title: $title, slug: $slug, category: $category, seller: $seller, thumbnail: $thumbnail, images: $images, description: $description, startingPrice: $startingPrice, avgRating: $avgRating, totalReviews: $totalReviews, totalOrders: $totalOrders, status: $status, tags: $tags, packages: $packages, deliveryDaysMin: $deliveryDaysMin)';
+    return 'GigDetail(id: $id, title: $title, slug: $slug, category: $category, seller: $seller, images: $images, description: $description, startingPrice: $startingPrice, avgRating: $avgRating, totalReviews: $totalReviews, totalOrders: $totalOrders, status: $status, tags: $tags, packages: $packages, deliveryDaysMin: $deliveryDaysMin)';
   }
 
   @override
@@ -850,8 +1019,6 @@ class _$GigDetailImpl extends _GigDetail {
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.seller, seller) || other.seller == seller) &&
-            (identical(other.thumbnail, thumbnail) ||
-                other.thumbnail == thumbnail) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
             (identical(other.description, description) ||
                 other.description == description) &&
@@ -879,7 +1046,6 @@ class _$GigDetailImpl extends _GigDetail {
     slug,
     category,
     seller,
-    thumbnail,
     const DeepCollectionEquality().hash(_images),
     description,
     startingPrice,
@@ -913,11 +1079,10 @@ abstract class _GigDetail extends GigDetail {
     required final String slug,
     required final Category category,
     required final PublicProfile seller,
-    final String? thumbnail,
-    final List<String> images,
+    final List<GigImage> images,
     required final String description,
-    required final double startingPrice,
-    required final double avgRating,
+    @JsonKey(fromJson: _doubleFromAnything) required final double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required final double avgRating,
     required final int totalReviews,
     final int totalOrders,
     required final String status,
@@ -941,14 +1106,14 @@ abstract class _GigDetail extends GigDetail {
   @override
   PublicProfile get seller;
   @override
-  String? get thumbnail;
-  @override
-  List<String> get images;
+  List<GigImage> get images;
   @override
   String get description;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   double get startingPrice;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   double get avgRating;
   @override
   int get totalReviews;
@@ -981,8 +1146,10 @@ mixin _$GigPackage {
   String get tier => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get description => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _doubleFromAnything)
   double get price => throw _privateConstructorUsedError;
   int get deliveryDays => throw _privateConstructorUsedError;
+  @JsonKey(name: 'revision_count')
   int get revisions => throw _privateConstructorUsedError;
   List<String> get features => throw _privateConstructorUsedError;
 
@@ -1008,9 +1175,9 @@ abstract class $GigPackageCopyWith<$Res> {
     String tier,
     String title,
     String description,
-    double price,
+    @JsonKey(fromJson: _doubleFromAnything) double price,
     int deliveryDays,
-    int revisions,
+    @JsonKey(name: 'revision_count') int revisions,
     List<String> features,
   });
 }
@@ -1093,9 +1260,9 @@ abstract class _$$GigPackageImplCopyWith<$Res>
     String tier,
     String title,
     String description,
-    double price,
+    @JsonKey(fromJson: _doubleFromAnything) double price,
     int deliveryDays,
-    int revisions,
+    @JsonKey(name: 'revision_count') int revisions,
     List<String> features,
   });
 }
@@ -1171,9 +1338,9 @@ class _$GigPackageImpl extends _GigPackage {
     required this.tier,
     required this.title,
     required this.description,
-    required this.price,
+    @JsonKey(fromJson: _doubleFromAnything) required this.price,
     required this.deliveryDays,
-    required this.revisions,
+    @JsonKey(name: 'revision_count') required this.revisions,
     final List<String> features = const [],
   }) : _features = features,
        super._();
@@ -1190,10 +1357,12 @@ class _$GigPackageImpl extends _GigPackage {
   @override
   final String description;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   final double price;
   @override
   final int deliveryDays;
   @override
+  @JsonKey(name: 'revision_count')
   final int revisions;
   final List<String> _features;
   @override
@@ -1261,9 +1430,9 @@ abstract class _GigPackage extends GigPackage {
     required final String tier,
     required final String title,
     required final String description,
-    required final double price,
+    @JsonKey(fromJson: _doubleFromAnything) required final double price,
     required final int deliveryDays,
-    required final int revisions,
+    @JsonKey(name: 'revision_count') required final int revisions,
     final List<String> features,
   }) = _$GigPackageImpl;
   const _GigPackage._() : super._();
@@ -1280,10 +1449,12 @@ abstract class _GigPackage extends GigPackage {
   @override
   String get description;
   @override
+  @JsonKey(fromJson: _doubleFromAnything)
   double get price;
   @override
   int get deliveryDays;
   @override
+  @JsonKey(name: 'revision_count')
   int get revisions;
   @override
   List<String> get features;
@@ -1607,6 +1778,7 @@ mixin _$CreatePackageInput {
   String get description => throw _privateConstructorUsedError;
   double get price => throw _privateConstructorUsedError;
   int get deliveryDays => throw _privateConstructorUsedError;
+  @JsonKey(name: 'revision_count')
   int get revisions => throw _privateConstructorUsedError;
   List<String> get features => throw _privateConstructorUsedError;
 
@@ -1633,7 +1805,7 @@ abstract class $CreatePackageInputCopyWith<$Res> {
     String description,
     double price,
     int deliveryDays,
-    int revisions,
+    @JsonKey(name: 'revision_count') int revisions,
     List<String> features,
   });
 }
@@ -1712,7 +1884,7 @@ abstract class _$$CreatePackageInputImplCopyWith<$Res>
     String description,
     double price,
     int deliveryDays,
-    int revisions,
+    @JsonKey(name: 'revision_count') int revisions,
     List<String> features,
   });
 }
@@ -1784,7 +1956,7 @@ class _$CreatePackageInputImpl extends _CreatePackageInput {
     required this.description,
     required this.price,
     required this.deliveryDays,
-    required this.revisions,
+    @JsonKey(name: 'revision_count') required this.revisions,
     final List<String> features = const [],
   }) : _features = features,
        super._();
@@ -1803,6 +1975,7 @@ class _$CreatePackageInputImpl extends _CreatePackageInput {
   @override
   final int deliveryDays;
   @override
+  @JsonKey(name: 'revision_count')
   final int revisions;
   final List<String> _features;
   @override
@@ -1872,7 +2045,7 @@ abstract class _CreatePackageInput extends CreatePackageInput {
     required final String description,
     required final double price,
     required final int deliveryDays,
-    required final int revisions,
+    @JsonKey(name: 'revision_count') required final int revisions,
     final List<String> features,
   }) = _$CreatePackageInputImpl;
   const _CreatePackageInput._() : super._();
@@ -1891,6 +2064,7 @@ abstract class _CreatePackageInput extends CreatePackageInput {
   @override
   int get deliveryDays;
   @override
+  @JsonKey(name: 'revision_count')
   int get revisions;
   @override
   List<String> get features;

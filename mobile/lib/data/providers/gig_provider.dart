@@ -1,10 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/models/pagination_model.dart';
+import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/data/repositories/gig_repository.dart';
 
-/// Repository provider.
-final gigRepositoryProvider = Provider<GigRepository>((ref) => GigRepository());
+/// Repository provider — depends on [apiClientProvider] from auth_provider.
+final gigRepositoryProvider = Provider<GigRepository>((ref) {
+  final client = ref.watch(apiClientProvider);
+  return GigRepository(client: client);
+});
 
 /// Fetches paginated gigs list.
 final gigsListProvider =
@@ -25,14 +29,19 @@ final gigDetailProvider = FutureProvider.family<GigDetail, String>((
   return repo.getGigBySlug(slug);
 });
 
-/// Fetches related gigs (same category, excluding current gig).
-final relatedGigsProvider = FutureProvider.family<List<GigSummary>, String>((
-  ref,
-  slug,
-) async {
-  final repo = ref.watch(gigRepositoryProvider);
-  return repo.getRelatedGigs(slug);
-});
+/// Fetches related gigs by category ID (excluding current gig by slug).
+final relatedGigsProvider =
+    FutureProvider.family<
+      List<GigSummary>,
+      ({String categoryId, String excludeSlug})
+    >((ref, params) async {
+      final repo = ref.watch(gigRepositoryProvider);
+      return repo.getRelatedGigs(
+        categoryId: params.categoryId,
+        excludeSlug: params.excludeSlug,
+        limit: 5,
+      );
+    });
 
 /// Fetches gigs belonging to the current user.
 final myGigsProvider =
@@ -61,6 +70,20 @@ class GigFormNotifier extends StateNotifier<AsyncValue<void>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await _repo.updateGig(id, input);
+    });
+  }
+
+  Future<void> deleteGig(String id) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _repo.deleteGig(id);
+    });
+  }
+
+  Future<void> toggleGigStatus(String id, String newStatus) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await _repo.toggleGigStatus(id, newStatus);
     });
   }
 }

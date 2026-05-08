@@ -22,6 +22,7 @@ class BrowseGigsScreen extends ConsumerStatefulWidget {
 class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
   final _searchController = TextEditingController();
   String? _categorySlug;
+  String? _categoryId;
   String _sortBy = 'newest';
   double? _minPrice;
   double? _maxPrice;
@@ -106,7 +107,7 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoriesProvider);
     final params = GigQueryParams(
-      categorySlug: _categorySlug,
+      categoryId: _categoryId,
       search: _searchController.text.isEmpty ? null : _searchController.text,
       minPrice: _minPrice,
       maxPrice: _maxPrice,
@@ -172,6 +173,12 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
               onSelected: (slug) {
                 setState(() {
                   _categorySlug = slug;
+                  _categoryId = slug != null
+                      ? cats
+                            .where((c) => c.slug == slug)
+                            .map((c) => c.id)
+                            .firstOrNull
+                      : null;
                   _page = 1;
                   _gigs.clear();
                 });
