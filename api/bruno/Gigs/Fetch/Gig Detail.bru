@@ -9,3 +9,36 @@ get {
   body: none
   auth: none
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "seller": { "id": "uuid", "display_name": "John", "username": "john_doe", "avatar": null },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+      "title": "I will create a high performance NestJS backend",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "description": "I will build a robust, scalable...",
+      "tags": ["nestjs", "backend", "api"],
+      "images": [],
+      "status": "active",
+      "avg_rating": 4.5,
+      "total_reviews": 10,
+      "total_orders": 25,
+      "view_count": 150,
+      "packages": [
+        { "tier": "basic", "title": "Basic API Setup", "price": 50, "delivery_days": 3 },
+        { "tier": "standard", "title": "Standard API Development", "price": 150, "delivery_days": 7 }
+      ],
+      "reviews": [],
+      "orders": [],
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

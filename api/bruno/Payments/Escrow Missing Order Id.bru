@@ -17,3 +17,16 @@ auth:bearer {
 params:query {
   type: escrow
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": "order_id is required for escrow queries",
+    "status": 400
+  }
+  ```
+}
