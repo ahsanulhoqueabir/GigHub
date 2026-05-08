@@ -9,7 +9,7 @@ class Category with _$Category {
   const factory Category({
     required String id,
     required String name,
-    required String slug,
+    @Default('') String slug,
     String? description,
     String? icon,
     @Default(0) int gigCount,

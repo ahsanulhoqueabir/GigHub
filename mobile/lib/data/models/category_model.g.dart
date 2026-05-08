@@ -10,7 +10,7 @@ _$CategoryImpl _$$CategoryImplFromJson(Map<String, dynamic> json) =>
     _$CategoryImpl(
       id: json['id'] as String,
       name: json['name'] as String,
-      slug: json['slug'] as String,
+      slug: json['slug'] as String? ?? '',
       description: json['description'] as String?,
       icon: json['icon'] as String?,
       gigCount: (json['gig_count'] as num?)?.toInt() ?? 0,

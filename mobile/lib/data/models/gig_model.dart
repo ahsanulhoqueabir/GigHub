@@ -9,7 +9,7 @@ part 'gig_model.g.dart';
 @freezed
 class GigImage with _$GigImage {
   @JsonSerializable(fieldRename: FieldRename.snake)
-  const factory GigImage({required String url, @Default(0) int sortOrder}) =
+  const factory GigImage({@Default('') String url, @Default(0) int sortOrder}) =
       _GigImage;
 
   factory GigImage.fromJson(Map<String, dynamic> json) =>

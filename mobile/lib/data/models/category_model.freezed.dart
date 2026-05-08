@@ -185,7 +185,7 @@ class _$CategoryImpl extends _Category {
   const _$CategoryImpl({
     required this.id,
     required this.name,
-    required this.slug,
+    this.slug = '',
     this.description,
     this.icon,
     this.gigCount = 0,
@@ -199,6 +199,7 @@ class _$CategoryImpl extends _Category {
   @override
   final String name;
   @override
+  @JsonKey()
   final String slug;
   @override
   final String? description;
@@ -251,7 +252,7 @@ abstract class _Category extends Category {
   const factory _Category({
     required final String id,
     required final String name,
-    required final String slug,
+    final String slug,
     final String? description,
     final String? icon,
     final int gigCount,

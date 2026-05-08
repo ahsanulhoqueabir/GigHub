@@ -87,6 +87,7 @@ Map<String, dynamic> _normalizeProfileJson(Map<String, dynamic> json) {
     'avg_rating': _parseNum(raw['avg_rating']),
     'total_reviews': _parseInt(raw['total_reviews']),
     'completed_orders': _parseInt(raw['completed_orders']),
+    'member_since': raw['member_since'] ?? DateTime(2020).toIso8601String(),
   };
 }
 

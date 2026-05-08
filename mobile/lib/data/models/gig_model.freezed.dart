@@ -118,12 +118,13 @@ class __$$GigImageImplCopyWithImpl<$Res>
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class _$GigImageImpl extends _GigImage {
-  const _$GigImageImpl({required this.url, this.sortOrder = 0}) : super._();
+  const _$GigImageImpl({this.url = '', this.sortOrder = 0}) : super._();
 
   factory _$GigImageImpl.fromJson(Map<String, dynamic> json) =>
       _$$GigImageImplFromJson(json);
 
   @override
+  @JsonKey()
   final String url;
   @override
   @JsonKey()
@@ -163,7 +164,7 @@ class _$GigImageImpl extends _GigImage {
 }
 
 abstract class _GigImage extends GigImage {
-  const factory _GigImage({required final String url, final int sortOrder}) =
+  const factory _GigImage({final String url, final int sortOrder}) =
       _$GigImageImpl;
   const _GigImage._() : super._();
 

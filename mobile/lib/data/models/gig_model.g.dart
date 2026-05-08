@@ -8,7 +8,7 @@ part of 'gig_model.dart';
 
 _$GigImageImpl _$$GigImageImplFromJson(Map<String, dynamic> json) =>
     _$GigImageImpl(
-      url: json['url'] as String,
+      url: json['url'] as String? ?? '',
       sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
     );
 
