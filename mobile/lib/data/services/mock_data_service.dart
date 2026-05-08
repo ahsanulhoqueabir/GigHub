@@ -115,8 +115,7 @@ class MockDataService {
           slug: slug,
           category: categories[categoryId]!,
           seller: profiles[sellerId]!,
-          thumbnail: item['thumbnail'] as String?,
-          images: _stringList(item['images']),
+          images: _parseGigImages(item['thumbnail'], item['images']),
           description: item['description'] as String,
           startingPrice: _toDouble(item['startingPrice']),
           avgRating: _toDouble(item['avgRating']),
@@ -210,6 +209,19 @@ class MockDataService {
         .whereType<Map<String, dynamic>>()
         .map((n) => AppNotification.fromJson(n))
         .toList();
+  }
+
+  List<GigImage> _parseGigImages(dynamic thumbnailRaw, dynamic imagesRaw) {
+    final result = <GigImage>[];
+    if (thumbnailRaw != null) {
+      result.add(GigImage(url: thumbnailRaw as String, sortOrder: 0));
+    }
+    if (imagesRaw is List) {
+      for (final img in imagesRaw) {
+        result.add(GigImage(url: img.toString(), sortOrder: result.length));
+      }
+    }
+    return result;
   }
 
   List<String> _stringList(dynamic raw) {
