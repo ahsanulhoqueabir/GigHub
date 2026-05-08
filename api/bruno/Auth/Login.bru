@@ -18,6 +18,21 @@ body:json {
   }
 }
 
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "access_token": "eyJhbGciOiJIUzI1NiIs...",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+      "expires_in": "15m"
+    }
+  }
+  ```
+}
+
 script:post-response {
   if (res.status === 200) {
     bru.setEnvVar("token", res.body.data.access_token);

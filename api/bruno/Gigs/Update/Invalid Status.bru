@@ -20,3 +20,23 @@ body:json {
     "status": "invalid-status"
   }
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "status",
+        "constraints": {
+          "isEnum": "status must be one of: active, paused"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}

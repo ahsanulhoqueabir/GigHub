@@ -18,6 +18,21 @@ body:json {
   }
 }
 
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "access_token": "eyJhbGciOiJIUzI1NiIs...",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+      "expires_in": "15m"
+    }
+  }
+  ```
+}
+
 vars:pre-request {
   base_url: http://localhost:4000/v1
 }

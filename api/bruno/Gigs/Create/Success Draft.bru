@@ -52,3 +52,32 @@ body:json {
     ]
   }
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "seller": { "id": "uuid", "display_name": "John", "username": "john_doe" },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+      "title": "I will create a Gatsby frontend",
+      "slug": "i-will-create-a-gatsby-frontend-1778182254234",
+      "status": "draft",
+      "packages": [
+        { "tier": "basic", "title": "Basic Site Setup", "price": 40, "delivery_days": 4 },
+        { "tier": "standard", "title": "Standard Site Development", "price": 120, "delivery_days": 8 },
+        { "tier": "premium", "title": "Premium Site Development", "price": 250, "delivery_days": 14 }
+      ],
+      "avg_rating": 0,
+      "total_reviews": 0,
+      "total_orders": 0,
+      "view_count": 0,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

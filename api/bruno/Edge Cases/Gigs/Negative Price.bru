@@ -33,3 +33,23 @@ body:json {
   }
 }
 
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "price",
+        "constraints": {
+          "min": "price must not be less than 1"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}
+

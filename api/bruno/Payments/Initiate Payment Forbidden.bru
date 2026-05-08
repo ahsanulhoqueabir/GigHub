@@ -19,3 +19,16 @@ body:json {
     "order_id": "{{order_id}}"
   }
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Forbidden",
+    "details": "You are not allowed to initiate payment for this order",
+    "status": 403
+  }
+  ```
+}
