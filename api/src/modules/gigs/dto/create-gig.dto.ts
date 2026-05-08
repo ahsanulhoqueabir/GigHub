@@ -14,7 +14,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { GigPackageTier } from '@/types/gig.types';
+import { GigPackageTier, GigStatus } from '@/types/gig.types';
 
 export class GigImageDto {
   @IsString()
@@ -75,6 +75,10 @@ export class CreateGigDto {
 
   @IsString()
   category_id!: string;
+
+  @IsOptional()
+  @IsEnum(GigStatus)
+  status?: GigStatus = GigStatus.ACTIVE;
 
   @IsArray()
   @ArrayMinSize(1)

@@ -5,6 +5,7 @@ import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/models/job_model.dart';
 import 'package:gighub/data/providers/category_provider.dart';
 import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Single-page job creation form.
 class CreateJobScreen extends ConsumerStatefulWidget {
@@ -40,9 +41,11 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
   void _postJob() {
     if (!_formKey.currentState!.validate()) return;
     if (_categoryId == null) {
-      ScaffoldMessenger.of(
+      GhToast.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Select a category')));
+        message: 'Select a category',
+        type: GhToastType.warning,
+      );
       return;
     }
 
@@ -65,9 +68,11 @@ class _CreateJobScreenState extends ConsumerState<CreateJobScreen> {
       ),
     );
 
-    ScaffoldMessenger.of(
+    GhToast.show(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Job posted! (UI only)')));
+      message: 'Job posted! (UI only)',
+      type: GhToastType.success,
+    );
     context.pop();
   }
 

@@ -12,7 +12,6 @@ describe('JobsService', () => {
   });
 
   it('creates a job', async () => {
-    mockedDirectus.get.mockResolvedValueOnce({ data: { data: [] } } as any);
     const fakeJob = {
       id: '1',
       title: 'Test',
@@ -27,7 +26,8 @@ describe('JobsService', () => {
       created_at: '',
       updated_at: '',
     };
-    mockedDirectus.post.mockResolvedValueOnce({ data: { data: fakeJob } } as any);
+    mockedDirectus.post.mockResolvedValueOnce({ data: { data: { id: '1' } } } as any);
+    mockedDirectus.get.mockResolvedValueOnce({ data: { data: fakeJob } } as any);
 
     const res = await service.create('p1', {
       title: 'Test',

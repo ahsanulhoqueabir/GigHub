@@ -4,16 +4,14 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
-  NotFoundException,
   Patch,
   Post,
   Param,
   Query,
-  ForbiddenException,
 } from '@nestjs/common';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
 import { Public } from '@/common/decorators/public.decorator';
+import { throwOnError } from '@/utils/service-error.util';
 import type { JwtPayload } from '@/types/auth.types';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
@@ -26,12 +24,7 @@ export class JobsController {
   @Post()
   async create(@CurrentUser() user: JwtPayload, @Body() dto: CreateJobDto) {
     const result = await this.jobsService.create(user.profile_id, dto);
-    if (!result.success) {
-      if (result.status === 400) throw new BadRequestException(result);
-      if (result.status === 403) throw new ForbiddenException(result);
-      if (result.status === 404) throw new NotFoundException(result);
-      throw new InternalServerErrorException(result);
-    }
+    throwOnError(result);
     return result;
   }
 
@@ -43,23 +36,14 @@ export class JobsController {
   ) {
     if (dto.type === 'edit') {
       const result = await this.jobsService.updateEdit(id, user.profile_id, dto);
-      if (!result.success) {
-        if (result.status === 403) throw new ForbiddenException(result);
-        if (result.status === 404) throw new NotFoundException(result);
-        if (result.status === 400) throw new BadRequestException(result);
-        throw new InternalServerErrorException(result);
-      }
+      throwOnError(result);
       return result;
     }
 
     if (dto.type === 'status') {
       if (!dto.status) throw new BadRequestException('status is required for type status');
       const result = await this.jobsService.updateStatus(id, user.profile_id, dto.status as any);
-      if (!result.success) {
-        if (result.status === 403) throw new ForbiddenException(result);
-        if (result.status === 404) throw new NotFoundException(result);
-        throw new InternalServerErrorException(result);
-      }
+      throwOnError(result);
       return result;
     }
 
@@ -69,11 +53,7 @@ export class JobsController {
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     const result = await this.jobsService.remove(id, user.profile_id);
-    if (!result.success) {
-      if (result.status === 403) throw new ForbiddenException(result);
-      if (result.status === 404) throw new NotFoundException(result);
-      throw new InternalServerErrorException(result);
-    }
+    throwOnError(result);
     return result;
   }
 
@@ -81,7 +61,14 @@ export class JobsController {
   @Get()
   async list(@Query() query: any) {
     const result = await this.jobsService.list(query);
-    if (!result.success) throw new InternalServerErrorException(result);
+    throwOnError(result);
+    return result;
+  }
+
+  @Get('me')
+  async mine(@CurrentUser() user: JwtPayload, @Query('page') page = 1, @Query('limit') limit = 20) {
+    const result = await this.jobsService.mine(user.profile_id, Number(page), Number(limit));
+    throwOnError(result);
     return result;
   }
 
@@ -89,17 +76,7 @@ export class JobsController {
   @Get(':slug')
   async detail(@Param('slug') slug: string) {
     const result = await this.jobsService.detail(slug);
-    if (!result.success) {
-      if (result.status === 404) throw new NotFoundException(result);
-      throw new InternalServerErrorException(result);
-    }
-    return result;
-  }
-
-  @Get('me')
-  async mine(@CurrentUser() user: JwtPayload, @Query('page') page = 1, @Query('limit') limit = 20) {
-    const result = await this.jobsService.mine(user.profile_id, Number(page), Number(limit));
-    if (!result.success) throw new InternalServerErrorException(result);
+    throwOnError(result);
     return result;
   }
 }

@@ -48,3 +48,33 @@ body:json {
     ]
   }
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "seller": { "id": "uuid", "display_name": "John", "username": "john_doe", "avatar": null },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech", "icon": null },
+      "title": "I will create a high performance NestJS backend",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "status": "active",
+      "tags": ["nestjs", "backend", "api", "typescript"],
+      "images": [{ "url": "https://example.com/image1.jpg", "sort_order": 0 }],
+      "packages": [
+        { "tier": "basic", "title": "Basic API Setup", "price": 50, "delivery_days": 3, "revision_count": 1, "features": ["3 Endpoints", "Database Integration"] },
+        { "tier": "standard", "title": "Standard API Development", "price": 150, "delivery_days": 7, "revision_count": 3, "features": ["10 Endpoints", "Auth", "Database Integration"] }
+      ],
+      "avg_rating": 0,
+      "total_reviews": 0,
+      "total_orders": 0,
+      "view_count": 0,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

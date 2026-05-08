@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/providers/category_provider.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
@@ -196,16 +197,18 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
               data: (response) {
                 if (_page == 1) _gigs.clear();
                 for (final g in response.data) {
-                  if (!_gigs.any((existing) => existing.id == g.id))
+                  if (!_gigs.any((existing) => existing.id == g.id)) {
                     _gigs.add(g);
+                  }
                 }
-                if (_gigs.isEmpty)
+                if (_gigs.isEmpty) {
                   return Center(
                     child: Text(
                       'No gigs found',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   );
+                }
                 return GridView.builder(
                   padding: const EdgeInsets.all(AppSizes.space8),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -245,7 +248,10 @@ class _BrowseGigsScreenState extends ConsumerState<BrowseGigsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/gigs/create'),
+        onPressed: () async {
+          final authed = await requireAuth(context, ref);
+          if (authed && context.mounted) context.push('/gigs/create');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Create Gig'),
       ),

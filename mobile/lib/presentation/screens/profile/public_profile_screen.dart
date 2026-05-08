@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 import 'package:gighub/data/providers/profile_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_avatar.dart';
 import 'package:gighub/presentation/widgets/common/gh_error_state.dart';
@@ -146,8 +147,11 @@ class PublicProfileScreen extends ConsumerWidget {
                   backgroundColor: theme.colorScheme.secondaryContainer,
                   labelStyle: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSecondaryContainer,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight,
                   ),
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
                 );
               }).toList(),
             ),
@@ -160,8 +164,10 @@ class PublicProfileScreen extends ConsumerWidget {
             child: ElevatedButton.icon(
               onPressed: () {
                 // TODO: Phase 4 — create conversation
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Chat coming soon!')),
+                GhToast.show(
+                  context,
+                  message: 'Chat coming soon!',
+                  type: GhToastType.info,
                 );
               },
               icon: const Icon(Icons.chat_outlined),

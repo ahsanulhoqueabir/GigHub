@@ -10,11 +10,36 @@ get {
   auth: bearer
 }
 
-params:query {
-  page: 1
-  limit: 20
-}
-
 auth:bearer {
   token: {{access_token}}
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "01297b90-768e-4651-8ff4-5c7c89c7bd0d",
+        "poster": { "id": "uuid", "display_name": "John", "username": "john_doe" },
+        "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+        "title": "Need a React Developer for Portfolio Website",
+        "slug": "need-a-react-developer-for-portfolio-website-1778184181079",
+        "job_type": "paid",
+        "status": "open",
+        "total_proposals": 3,
+        "created_at": "2026-05-08T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalCount": 5,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
 }

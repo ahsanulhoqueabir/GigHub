@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/providers/job_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Full job detail screen with submit proposal button.
 class JobDetailScreen extends ConsumerWidget {
@@ -167,6 +169,8 @@ class JobDetailScreen extends ConsumerWidget {
                         ),
                         backgroundColor: theme.colorScheme.secondaryContainer,
                         visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
                       ),
                     )
                     .toList(),
@@ -195,7 +199,10 @@ class JobDetailScreen extends ConsumerWidget {
             children: [
               Expanded(
                 child: FilledButton(
-                  onPressed: () => _showProposalSheet(context, job.id),
+                  onPressed: () async {
+                    final authed = await requireAuth(context, ref);
+                    if (authed) _showProposalSheet(context, job.id);
+                  },
                   child: const Text('Submit Proposal'),
                 ),
               ),
@@ -279,10 +286,10 @@ class JobDetailScreen extends ConsumerWidget {
               width: double.infinity,
               child: FilledButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Proposal submitted! (UI only)'),
-                    ),
+                  GhToast.show(
+                    context,
+                    message: 'Proposal submitted! (UI only)',
+                    type: GhToastType.success,
                   );
                   Navigator.pop(ctx);
                 },

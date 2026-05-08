@@ -1,3 +1,6 @@
+import { Job } from './job.types';
+import { Profile } from './profile.types';
+
 export enum ProposalStatus {
   PENDING = 'pending',
   ACCEPTED = 'accepted',
@@ -7,8 +10,8 @@ export enum ProposalStatus {
 
 export interface Proposal {
   id: string;
-  job: string;
-  applicant: string;
+  job: string | Partial<Job>;
+  applicant: string | Partial<Profile>;
   cover_letter: string;
   quoted_price?: number;
   estimated_days?: number;
@@ -18,4 +21,4 @@ export interface Proposal {
   updated_at: string;
 }
 
-export interface ProposalDetail extends Proposal {}
+export type ProposalDetail = Proposal;

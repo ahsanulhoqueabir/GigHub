@@ -5,6 +5,7 @@ import { ok, fail, paginated } from '@/utils/service-response';
 import type { ServiceResponse, PaginatedServiceResponse } from '@/types/services/common.types';
 import type { Order, OrderDetail } from '@/types/order.types';
 import { OrderStatus } from '@/types/order.types';
+import type { Gig, GigPackage } from '@/types/gig.types';
 import type { UpdateOrderDto } from './dto/update-order.dto';
 import type { CreateOrderDto } from './dto/create-order.dto';
 
@@ -12,7 +13,6 @@ import type { CreateOrderDto } from './dto/create-order.dto';
 export class OrdersService {
   private readonly collection = 'gh_orders';
   private readonly gigsCollection = 'gh_gigs';
-  private readonly packagesCollection = 'gh_gig_packages';
 
   private generateOrderNumber(): string {
     const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -33,10 +33,21 @@ export class OrdersService {
     return [
       'id',
       'order_number',
-      'buyer',
-      'seller',
+      'buyer.id',
+      'buyer.display_name',
+      'buyer.username',
+      'buyer.email',
+      'buyer.avatar',
+      'seller.id',
+      'seller.display_name',
+      'seller.username',
+      'seller.email',
+      'seller.avatar',
       'source_type',
-      'gig',
+      'gig.id',
+      'gig.title',
+      'gig.description',
+      'gig.packages',
       'gig_package',
       'job',
       'proposal',
@@ -61,8 +72,10 @@ export class OrdersService {
   async create(buyerId: string, dto: CreateOrderDto): Promise<ServiceResponse<OrderDetail>> {
     try {
       const { data: gigData } = await directusApi.get<{
-        data: { id: string; seller: string; title: string; description: string };
-      }>(`/items/${this.gigsCollection}/${dto.gig_id}`);
+        data: Gig;
+      }>(`/items/${this.gigsCollection}/${dto.gig_id}`, {
+        params: { fields: 'id,seller,title,description,packages' },
+      });
 
       if (!gigData.data) {
         return fail('Gig not found', undefined, 404);
@@ -71,29 +84,20 @@ export class OrdersService {
       let delivery_days = 1;
       let revision_count = 0;
       let finalAmount = dto.amount;
+      let selectedPackageTier: string | null = null;
 
-      if (dto.gig_package_id) {
-        const { data: packageData } = await directusApi.get<{
-          data: {
-            id: string;
-            gig: string;
-            price: number;
-            delivery_days: number;
-            revision_count: number;
-          };
-        }>(`/items/${this.packagesCollection}/${dto.gig_package_id}`);
+      if (dto.gig_package_tier) {
+        const packages: GigPackage[] = gigData.data.packages ?? [];
+        const matched = packages.find((pkg) => pkg.tier === dto.gig_package_tier);
 
-        if (!packageData.data) {
+        if (!matched) {
           return fail('Gig package not found', undefined, 404);
         }
 
-        if (packageData.data.gig !== dto.gig_id) {
-          return fail('Gig package does not belong to the gig', undefined, 400);
-        }
-
-        finalAmount = packageData.data.price;
-        delivery_days = packageData.data.delivery_days;
-        revision_count = packageData.data.revision_count;
+        selectedPackageTier = matched.tier;
+        finalAmount = matched.price;
+        delivery_days = matched.delivery_days;
+        revision_count = matched.revision_count;
       }
 
       const fees = this.calculateFees(finalAmount);
@@ -105,7 +109,7 @@ export class OrdersService {
         seller: gigData.data.seller,
         source_type: 'gig',
         gig: dto.gig_id,
-        gig_package: dto.gig_package_id ?? null,
+        gig_package: selectedPackageTier,
         proposal: dto.proposal_id ?? null,
         title: gigData.data.title,
         description: gigData.data.description ?? null,
@@ -119,7 +123,7 @@ export class OrdersService {
       };
 
       const { data } = await directusApi.post<{ data: Order }>(
-        `/items/${this.collection}`,
+        `/items/${this.collection}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as OrderDetail);
@@ -130,7 +134,9 @@ export class OrdersService {
 
   async getById(id: string): Promise<ServiceResponse<OrderDetail>> {
     try {
-      const { data } = await directusApi.get<{ data: Order }>(`/items/${this.collection}/${id}`);
+      const { data } = await directusApi.get<{ data: Order }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+      );
       if (!data.data) return fail('Order not found', undefined, 404);
       return ok(data.data as OrderDetail);
     } catch (error) {
@@ -145,7 +151,7 @@ export class OrdersService {
   ): Promise<ServiceResponse<OrderDetail>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Order }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Order not found', undefined, 404);
 
@@ -160,7 +166,7 @@ export class OrdersService {
         payload['cancellation_reason'] = dto.cancellation_reason;
 
       const { data } = await directusApi.patch<{ data: Order }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as OrderDetail);
@@ -172,7 +178,7 @@ export class OrdersService {
   async listByUser(userId: string, page = 1, limit = 20): Promise<PaginatedServiceResponse<Order>> {
     try {
       const { data } = await directusApi.get<{ data: Order[]; meta?: { filter_count?: number } }>(
-        `/items/${this.collection}`,
+        `/items/${this.collection}?fields=${this.fields()}`,
         {
           params: {
             filter: { _or: [{ buyer: { _eq: userId } }, { seller: { _eq: userId } }] },

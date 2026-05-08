@@ -18,6 +18,8 @@ migrate_working_dir/
 *.iws
 .idea/
 index.md
+docs/
+
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -37,6 +39,7 @@ index.md
 # Symbolication related
 app.*.symbols
 .env.*
+.env
 
 # Obfuscation related
 app.*.map.json

@@ -18,4 +18,4 @@ export interface Escrow {
   updated_at: string;
 }
 
-export interface EscrowDetail extends Escrow {}
+export type EscrowDetail = Escrow;

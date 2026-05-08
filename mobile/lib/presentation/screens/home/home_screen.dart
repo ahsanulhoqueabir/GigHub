@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
 
+/// Fire auth init once globally.
+final _globalAuthInitProvider = FutureProvider<void>((ref) async {
+  await ref.read(authProvider.notifier).initialize();
+});
+
 /// Shell widget that wraps all main-app routes with a BottomNavigationBar.
 class HomeScreen extends ConsumerWidget {
   final Widget child;
@@ -53,6 +58,8 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Trigger auth init globally — does not block UI
+    ref.watch(_globalAuthInitProvider);
     final isAuth = ref.watch(authProvider).isAuthenticated;
     final currentIndex = _currentIndex(context, isAuth: isAuth);
     final profileItem = isAuth

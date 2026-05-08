@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import directusApi from '@/utils/directus.api';
 import { ok, fail, paginated } from '@/utils/service-response';
+import { generateUniqueSlug } from '@/utils/slug.util';
 import type { ServiceResponse, PaginatedServiceResponse } from '@/types/services/common.types';
 import type { Job, JobDetail, JobQuery } from '@/types/job.types';
 import { JobStatus, JobType } from '@/types/job.types';
@@ -13,8 +14,14 @@ export class JobsService {
   private fields(): string {
     return [
       'id',
-      'poster',
-      'category',
+      'poster.id',
+      'poster.display_name',
+      'poster.avatar',
+      'poster.email',
+      'poster.username',
+      'category.id',
+      'category.name',
+      'category.icon',
       'title',
       'slug',
       'description',
@@ -32,42 +39,9 @@ export class JobsService {
     ].join(',');
   }
 
-  private slugify(input: string): string {
-    return input
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-  }
-
-  private async ensureUniqueSlug(title: string, excludeId?: string): Promise<string> {
-    const base = this.slugify(title) || 'job';
-    let attempt = 0;
-
-    while (attempt < 30) {
-      const candidate = attempt === 0 ? base : `${base}-${attempt + 1}`;
-      const filter: Record<string, unknown> = { slug: { _eq: candidate } };
-      if (excludeId) filter['id'] = { _neq: excludeId };
-
-      const { data } = await directusApi.get<{ data: Array<{ id: string }> }>(
-        `/items/${this.collection}`,
-        {
-          params: { filter, fields: 'id', limit: 1 },
-        },
-      );
-
-      if (!data.data.length) return candidate;
-      attempt += 1;
-    }
-
-    return `${base}-${Date.now()}`;
-  }
-
   async create(posterId: string, dto: any): Promise<ServiceResponse<JobDetail>> {
     try {
-      const slug = await this.ensureUniqueSlug(dto.title);
+      const slug = generateUniqueSlug(dto.title);
 
       const payload: Record<string, any> = {
         id: uuid(),
@@ -88,7 +62,11 @@ export class JobsService {
       if (dto.required_skills?.length) payload.required_skills = dto.required_skills;
       if (dto.attachments?.length) payload.attachments = dto.attachments;
 
-      const { data } = await directusApi.post<{ data: Job }>(`/items/${this.collection}`, payload);
+      const { data } = await directusApi.post<{ data: Job }>(
+        `/items/${this.collection}?fields=${this.fields()}`,
+        payload,
+      );
+
       return ok(data.data as JobDetail);
     } catch (error) {
       return fail('Failed to create job', error);
@@ -98,10 +76,14 @@ export class JobsService {
   async updateEdit(id: string, posterId: string, dto: any): Promise<ServiceResponse<JobDetail>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to modify this job', undefined, 403);
       if (existing.data.status !== JobStatus.OPEN)
         return fail('Job cannot be edited in current status', undefined, 400);
@@ -109,7 +91,7 @@ export class JobsService {
       const payload: Record<string, unknown> = {};
       if (dto.title) {
         payload['title'] = dto.title;
-        payload['slug'] = await this.ensureUniqueSlug(dto.title, id);
+        payload['slug'] = generateUniqueSlug(dto.title);
       }
       if (dto.description !== undefined) payload['description'] = dto.description;
       if (dto.category_id !== undefined) payload['category'] = dto.category_id;
@@ -122,7 +104,7 @@ export class JobsService {
       if (dto.attachments !== undefined) payload['attachments'] = dto.attachments;
 
       const { data } = await directusApi.patch<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
         payload,
       );
       return ok(data.data as JobDetail);
@@ -138,15 +120,22 @@ export class JobsService {
   ): Promise<ServiceResponse<Job>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to modify this job', undefined, 403);
 
-      const { data } = await directusApi.patch<{ data: Job }>(`/items/${this.collection}/${id}`, {
-        status,
-      });
+      const { data } = await directusApi.patch<{ data: Job }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+        {
+          status,
+        },
+      );
       return ok(data.data);
     } catch (error) {
       return fail('Failed to update job status', error);
@@ -156,15 +145,22 @@ export class JobsService {
   async remove(id: string, posterId: string): Promise<ServiceResponse<Job>> {
     try {
       const { data: existing } = await directusApi.get<{ data: Job }>(
-        `/items/${this.collection}/${id}`,
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
       );
       if (!existing.data) return fail('Job not found', undefined, 404);
-      if (existing.data.poster !== posterId)
+      if (
+        typeof existing.data.poster === 'string'
+          ? existing.data.poster !== posterId
+          : existing.data.poster.id !== posterId
+      )
         return fail('You are not allowed to delete this job', undefined, 403);
 
-      const { data } = await directusApi.patch<{ data: Job }>(`/items/${this.collection}/${id}`, {
-        status: JobStatus.CANCELLED,
-      });
+      const { data } = await directusApi.patch<{ data: Job }>(
+        `/items/${this.collection}/${id}?fields=${this.fields()}`,
+        {
+          status: JobStatus.CANCELLED,
+        },
+      );
       return ok(data.data, 'Job cancelled successfully');
     } catch (error) {
       return fail('Failed to cancel job', error);

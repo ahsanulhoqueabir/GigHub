@@ -19,3 +19,23 @@ body:json {
     "skills": "not-an-array"
   }
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "skills",
+        "constraints": {
+          "isArray": "skills must be an array"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}

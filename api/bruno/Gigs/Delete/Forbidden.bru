@@ -13,3 +13,16 @@ delete {
 auth:bearer {
   token: {{access_token}}
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "You are not allowed to modify this gig",
+    "details": {},
+    "status": 403
+  }
+  ```
+}

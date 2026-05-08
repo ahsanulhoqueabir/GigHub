@@ -14,3 +14,35 @@ params:query {
   collection: profiles
   q: developer
 }
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid",
+        "display_name": "John Doe",
+        "username": "john_doe",
+        "avatar": "https://r2.gighub.com/avatars/uuid.jpg",
+        "bio": "I am a professional developer",
+        "skills": ["Node.js", "TypeScript", "NestJS"],
+        "availability_status": "available",
+        "is_verified": true,
+        "avg_rating": 4.5,
+        "total_reviews": 12
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalCount": 2,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}
+}

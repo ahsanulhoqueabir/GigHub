@@ -1,3 +1,8 @@
+import { Gig } from './gig.types';
+import { Job } from './job.types';
+import { Profile } from './profile.types';
+import { Proposal } from './proposal.types';
+
 export enum OrderStatus {
   PENDING = 'pending',
   PROCESSING = 'processing',
@@ -9,13 +14,13 @@ export enum OrderStatus {
 export interface Order {
   id: string;
   order_number: string;
-  buyer: string;
-  seller: string;
+  buyer: string | Partial<Profile>;
+  seller: string | Partial<Profile>;
   source_type: string;
-  gig?: string | null;
-  gig_package?: string | null;
-  job?: string | null;
-  proposal?: string | null;
+  gig?: string | Partial<Gig> | null;
+  gig_package?: string;
+  job?: string | Partial<Job> | null;
+  proposal?: string | Partial<Proposal> | null;
   title: string;
   description?: string | null;
   amount: number;
@@ -33,4 +38,4 @@ export interface Order {
   updated_at: string;
 }
 
-export interface OrderDetail extends Order {}
+export type OrderDetail = Order;

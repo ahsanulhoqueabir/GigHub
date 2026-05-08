@@ -1,21 +1,16 @@
 import {
   ArrayMaxSize,
   IsArray,
-  IsEnum,
   IsIn,
-  IsInt,
-  IsNumber,
   IsOptional,
   IsString,
-  Max,
   MaxLength,
-  Min,
   MinLength,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { GigPackageTier, GigStatus, type GigUpdateType } from '@/types/gig.types';
+import { GigStatus, type GigUpdateType } from '@/types/gig.types';
 
 import { GigImageDto, GigPackageDto } from './create-gig.dto';
 

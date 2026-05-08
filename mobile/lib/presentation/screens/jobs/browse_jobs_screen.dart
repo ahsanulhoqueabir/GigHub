@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/models/job_model.dart';
 import 'package:gighub/data/providers/category_provider.dart';
 import 'package:gighub/data/providers/job_provider.dart';
@@ -169,13 +170,14 @@ class _BrowseJobsScreenState extends ConsumerState<BrowseJobsScreen> {
                 for (final j in response.data) {
                   if (!_jobs.any((e) => e.id == j.id)) _jobs.add(j);
                 }
-                if (_jobs.isEmpty)
+                if (_jobs.isEmpty) {
                   return Center(
                     child: Text(
                       'No jobs found',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   );
+                }
                 return ListView.builder(
                   itemCount: _jobs.length + (response.hasMore ? 1 : 0),
                   itemBuilder: (_, i) {
@@ -207,7 +209,10 @@ class _BrowseJobsScreenState extends ConsumerState<BrowseJobsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/jobs/create'),
+        onPressed: () async {
+          final authed = await requireAuth(context, ref);
+          if (authed && context.mounted) context.push('/jobs/create');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Post Job'),
       ),

@@ -1,4 +1,8 @@
 import type { PaginationQuery } from '@/types/services/common.types';
+import type { Order } from '@/types/order.types';
+import type { Review } from '@/types/review.types';
+import { Profile } from './profile.types';
+import { Category } from './category.types';
 
 export enum GigStatus {
   DRAFT = 'draft',
@@ -21,8 +25,7 @@ export interface GigImage {
 }
 
 export interface GigPackage {
-  id: string;
-  gig: string;
+  id?: string;
   tier: GigPackageTier;
   title: string;
   description: string | null;
@@ -30,13 +33,12 @@ export interface GigPackage {
   delivery_days: number;
   revision_count: number;
   features: string[] | null;
-  created_at: string;
 }
 
 export interface Gig {
   id: string;
-  seller: string;
-  category: string;
+  seller: string | Partial<Profile>;
+  category: string | Partial<Category>;
   title: string;
   slug: string;
   description: string;
@@ -49,10 +51,9 @@ export interface Gig {
   view_count: number;
   created_at: string;
   updated_at: string;
-}
-
-export interface GigDetail extends Gig {
   packages: GigPackage[];
+  reviews?: Review[];
+  orders?: Order[];
 }
 
 export interface GigQuery extends PaginationQuery {

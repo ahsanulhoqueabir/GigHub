@@ -138,10 +138,19 @@ class _SkillsInputState extends State<SkillsInput> {
                 .take(10)
                 .map((suggestion) {
                   return ActionChip(
-                    label: Text(suggestion, style: theme.textTheme.labelSmall),
+                    label: Text(
+                      suggestion,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSecondaryContainer,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     avatar: const Icon(Icons.add, size: 14),
                     onPressed: () => _addSkill(suggestion),
+                    backgroundColor: theme.colorScheme.secondaryContainer,
                     visualDensity: VisualDensity.compact,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    padding: EdgeInsets.zero,
                   );
                 })
                 .toList(),
@@ -162,11 +171,13 @@ class _SkillsInputState extends State<SkillsInput> {
               ),
               onDeleted: () => _removeSkill(index),
               backgroundColor: theme.colorScheme.secondaryContainer,
-              labelStyle: TextStyle(
+              labelStyle: theme.textTheme.labelSmall?.copyWith(
                 color: theme.colorScheme.onSecondaryContainer,
-                fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
+              visualDensity: VisualDensity.compact,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.zero,
             );
           }),
         ),

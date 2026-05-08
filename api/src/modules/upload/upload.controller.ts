@@ -7,10 +7,10 @@ import {
   UseInterceptors,
   Query,
   BadRequestException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { throwOnError } from '@/utils/service-error.util';
 import { UploadService } from './upload.service';
 import type { UploadFolder } from '@/types/upload.types';
 
@@ -39,10 +39,7 @@ export class UploadController {
     }
 
     const result = await this.uploadService.image(file, folder);
-    if (!result.success) {
-      if (result.status === 400) throw new BadRequestException(result.error);
-      throw new InternalServerErrorException(result.error);
-    }
+    throwOnError(result);
     return result;
   }
 
@@ -58,10 +55,7 @@ export class UploadController {
     }
 
     const result = await this.uploadService.file(file, folder);
-    if (!result.success) {
-      if (result.status === 400) throw new BadRequestException(result.error);
-      throw new InternalServerErrorException(result.error);
-    }
+    throwOnError(result);
     return result;
   }
 
@@ -70,7 +64,7 @@ export class UploadController {
     if (!key) throw new BadRequestException('key is required');
 
     const result = await this.uploadService.remove(key);
-    if (!result.success) throw new InternalServerErrorException(result.error);
+    throwOnError(result);
     return result;
   }
 }

@@ -15,5 +15,19 @@ auth:bearer {
 }
 
 body:multipart-form {
-  file: @file()
+  file: @file(/home/ahsanul/Downloads/photo_2026-03-05_13-39-49.jpg)
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "url": "https://r2.gighub.com/gigs/uuid.jpg",
+      "key": "gigs/uuid.jpg"
+    }
+  }
+  ```
 }

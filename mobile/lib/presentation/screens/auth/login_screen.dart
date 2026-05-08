@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 import 'package:gighub/core/utils/validators.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Login screen with email/password and social login options.
 class LoginScreen extends ConsumerStatefulWidget {
@@ -44,11 +46,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_formatError(e.toString())),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        GhToast.show(
+          context,
+          message: _formatError(e),
+          type: GhToastType.error,
         );
       }
     } finally {
@@ -56,11 +57,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  String _formatError(String error) {
-    if (error.contains('invalid email or password'))
-      return 'Invalid email or password';
-    if (error.contains('NetworkException'))
+  String _formatError(Object error) {
+    if (error is ApiException) {
+      return error.message;
+    }
+    final message = error.toString();
+    if (message.contains('NetworkException')) {
       return 'Network error — please try again';
+    }
     return 'Login failed — please try again';
   }
 
@@ -176,11 +180,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         if (mounted) context.go('/home');
                       } catch (e) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google login failed'),
-                              backgroundColor: theme.colorScheme.error,
-                            ),
+                          GhToast.show(
+                            context,
+                            message: 'Google login failed',
+                            type: GhToastType.error,
                           );
                         }
                       } finally {
@@ -188,11 +191,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       }
                     },
                     onError: (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(error),
-                          backgroundColor: theme.colorScheme.error,
-                        ),
+                      GhToast.show(
+                        context,
+                        message: error,
+                        type: GhToastType.error,
                       );
                     },
                   ),

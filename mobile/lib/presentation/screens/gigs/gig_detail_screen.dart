@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 import 'package:gighub/presentation/widgets/gigs/gig_card.dart';
 import 'package:gighub/presentation/widgets/gigs/image_carousel.dart';
 import 'package:gighub/presentation/widgets/gigs/package_tab_view.dart';
@@ -74,6 +75,9 @@ class GigDetailScreen extends ConsumerWidget {
                           ),
                           backgroundColor: theme.colorScheme.secondaryContainer,
                           visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          padding: EdgeInsets.zero,
                         ),
                         const Spacer(),
                         Icon(Icons.star, size: 18, color: Colors.amber),
@@ -109,6 +113,7 @@ class GigDetailScreen extends ConsumerWidget {
                               visualDensity: VisualDensity.compact,
                               materialTapTargetSize:
                                   MaterialTapTargetSize.shrinkWrap,
+                              padding: EdgeInsets.zero,
                             ),
                           )
                           .toList(),
@@ -125,12 +130,11 @@ class GigDetailScreen extends ConsumerWidget {
                     PackageTabView(
                       packages: gig.packages,
                       onContinue: (pkg) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
+                        GhToast.show(
+                          context,
+                          message:
                               'Selected ${pkg.title} - \u09F3${pkg.price.toStringAsFixed(0)} (UI only)',
-                            ),
-                          ),
+                          type: GhToastType.info,
                         );
                       },
                     ),
@@ -230,10 +234,10 @@ class GigDetailScreen extends ConsumerWidget {
               Expanded(
                 child: FilledButton(
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Continue button clicked (UI only)'),
-                      ),
+                    GhToast.show(
+                      context,
+                      message: 'Continue button clicked (UI only)',
+                      type: GhToastType.info,
                     );
                   },
                   child: const Text('Continue'),

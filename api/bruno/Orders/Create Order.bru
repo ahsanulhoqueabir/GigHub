@@ -16,9 +16,90 @@ auth:bearer {
 
 body:json {
   {
-    "gig_id": "paste-gig-uuid-here",
-    "gig_package_id": "paste-gig-package-uuid-here",
+    "gig_id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+    "gig_package_tier": "basic",
     "amount": 50,
     "proposal_id": null
   }
+}
+
+docs {
+  ## Response
+  
+  ```
+  {
+    "success": true,
+    "data": {
+    "id": "4c02521b-9dd5-48db-bd97-ab58cd1ddb8d",
+    "order_number": "ORD-20260508-7097",
+    "source_type": "gig",
+    "gig_package": "basic",
+    "job": null,
+    "proposal": null,
+    "title": "I will create a high performance NestJS backend",
+    "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
+    "amount": "50.00",
+    "platform_fee": "3.00",
+    "seller_earnings": "47.00",
+    "delivery_days": 3,
+    "revision_count": 1,
+    "revisions_used": 0,
+    "status": "pending",
+    "delivery_deadline": null,
+    "completed_at": null,
+    "cancelled_at": null,
+    "cancellation_reason": null,
+    "created_at": "2026-05-08T06:47:12.034Z",
+    "updated_at": "2026-05-08T06:47:12.034Z",
+    "buyer": {
+      "id": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+      "display_name": "Updated Name",
+      "username": "testuser_01",
+      "email": "test@example.com",
+      "avatar": null
+    },
+    "seller": {
+      "id": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+      "display_name": "Updated Name",
+      "username": "testuser_01",
+      "email": "test@example.com",
+      "avatar": null
+    },
+    "gig": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "title": "I will create a high performance NestJS backend",
+      "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
+      "packages": [
+        {
+          "id": "ab60613e-3313-4250-b03d-452e4a2f42e0",
+          "tier": "basic",
+          "title": "Basic API Setup",
+          "description": "Basic setup with 3 endpoints and database integration.",
+          "price": 50,
+          "delivery_days": 3,
+          "revision_count": 1,
+          "features": [
+            "3 Endpoints",
+            "Database Integration"
+          ]
+        },
+        {
+          "id": "940c804c-812e-486c-85f9-b09b95f7bd4e",
+          "tier": "standard",
+          "title": "Standard API Development",
+          "description": "Standard setup with 10 endpoints, auth, and database integration.",
+          "price": 150,
+          "delivery_days": 7,
+          "revision_count": 3,
+          "features": [
+            "10 Endpoints",
+            "Auth",
+            "Database Integration"
+          ]
+        }
+      ]
+    }
+    }
+  }
+  ```
 }

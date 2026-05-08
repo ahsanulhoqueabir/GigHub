@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/auth_guard.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
 import 'package:gighub/presentation/widgets/common/gh_shimmer.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Seller's gig management screen.
 class MyGigsScreen extends ConsumerWidget {
@@ -80,12 +82,10 @@ class MyGigsScreen extends ConsumerWidget {
                       if (action == 'edit') {
                         context.push('/gigs/${gig.id}/edit');
                       } else if (action == 'toggle') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Status toggled for ${gig.title} (UI only)',
-                            ),
-                          ),
+                        GhToast.show(
+                          context,
+                          message: 'Status toggled for ${gig.title} (UI only)',
+                          type: GhToastType.info,
                         );
                       } else if (action == 'delete') {
                         showDialog(
@@ -103,12 +103,10 @@ class MyGigsScreen extends ConsumerWidget {
                               FilledButton(
                                 onPressed: () {
                                   Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Deleted ${gig.title} (UI only)',
-                                      ),
-                                    ),
+                                  GhToast.show(
+                                    context,
+                                    message: 'Deleted ${gig.title} (UI only)',
+                                    type: GhToastType.warning,
                                   );
                                 },
                                 child: const Text('Delete'),
@@ -151,7 +149,10 @@ class MyGigsScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/gigs/create'),
+        onPressed: () async {
+          final authed = await requireAuth(context, ref);
+          if (authed && context.mounted) context.push('/gigs/create');
+        },
         icon: const Icon(Icons.add),
         label: const Text('Create Gig'),
       ),

@@ -5,6 +5,7 @@ import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/providers/category_provider.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
 import 'package:gighub/data/models/gig_model.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Multi-step gig creation screen.
 class CreateGigScreen extends ConsumerStatefulWidget {
@@ -105,9 +106,11 @@ class _CreateGigScreenState extends ConsumerState<CreateGigScreen> {
   void _publish() {
     if (!_formKey.currentState!.validate()) return;
     if (_categoryId == null) {
-      ScaffoldMessenger.of(
+      GhToast.show(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Please select a category')));
+        message: 'Please select a category',
+        type: GhToastType.warning,
+      );
       return;
     }
 
@@ -141,8 +144,10 @@ class _CreateGigScreenState extends ConsumerState<CreateGigScreen> {
       ),
     );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Gig published successfully!')),
+    GhToast.show(
+      context,
+      message: 'Gig published successfully!',
+      type: GhToastType.success,
     );
     context.pop();
   }

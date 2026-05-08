@@ -74,7 +74,7 @@ describe('ProfileController', () => {
     });
 
     it('throws NotFoundException when profile not found', async () => {
-      profileService.get.mockResolvedValueOnce({ success: false, error: 'Not found' });
+      profileService.get.mockResolvedValueOnce({ success: false, error: 'Not found', status: 404 });
 
       await expect(controller.getMe(currentUser)).rejects.toThrow(NotFoundException);
     });
@@ -314,7 +314,7 @@ describe('ProfileController', () => {
     });
 
     it('throws NotFoundException when profile not found', async () => {
-      profileService.find.mockResolvedValueOnce({ success: false });
+      profileService.find.mockResolvedValueOnce({ success: false, status: 404 });
 
       await expect(controller.getProfile('nonexistent')).rejects.toThrow(NotFoundException);
     });

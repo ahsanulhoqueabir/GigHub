@@ -1,4 +1,6 @@
 import type { PaginationQuery } from '@/types/services/common.types';
+import { Profile } from './profile.types';
+import { Category } from './category.types';
 
 export enum JobType {
   PAID = 'paid',
@@ -22,8 +24,8 @@ export enum BudgetType {
 
 export interface Job {
   id: string;
-  poster: string;
-  category: string;
+  poster: string | Partial<Profile>;
+  category: string | Partial<Category>;
   title: string;
   slug: string;
   description: string;
@@ -40,7 +42,7 @@ export interface Job {
   updated_at: string;
 }
 
-export interface JobDetail extends Job {}
+export type JobDetail = Job;
 
 export interface JobQuery extends PaginationQuery {
   category?: string;

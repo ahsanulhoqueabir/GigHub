@@ -1,14 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Post,
-  Query,
-  BadRequestException,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, BadRequestException } from '@nestjs/common';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { throwOnError } from '@/utils/service-error.util';
 import type { JwtPayload } from '@/types/auth.types';
 import { PaymentQueryType } from '@/types/payment.types';
 import { PaymentsService } from './payments.service';
@@ -22,7 +15,7 @@ export class PaymentsController {
   @Post('initiate')
   async initiate(@CurrentUser() user: JwtPayload, @Body() dto: InitiatePaymentDto) {
     const result = await this.paymentsService.initiate(user.profile_id, dto);
-    if (!result.success) throw new InternalServerErrorException(result.error);
+    throwOnError(result);
     return result;
   }
 
@@ -70,7 +63,7 @@ export class PaymentsController {
       Number(query.page ?? 1),
       Number(query.limit ?? 20),
     );
-    if (!result.success) throw new InternalServerErrorException(result.error);
+    throwOnError(result);
     return result;
   }
 }

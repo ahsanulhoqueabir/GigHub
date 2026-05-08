@@ -12,9 +12,24 @@ post {
 
 body:json {
   {
-    "email": "test_{{process.hrtime()[1]}}@example.com",
+    "email": "test_{{$randomInt}}@gighub.com",
     "password": "Password123!",
     "display_name": "Test User",
-    "username": "user_{{process.hrtime()[1]}}"
+    "username": "user_{{$randomInt}}"
   }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "access_token": "eyJhbGciOiJIUzI1NiIs...",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+      "expires_in": "15m"
+    }
+  }
+  ```
 }

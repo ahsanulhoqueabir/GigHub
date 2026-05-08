@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/core/constants/app_strings.dart';
+import 'package:gighub/core/network/api_exceptions.dart';
 import 'package:gighub/core/utils/validators.dart';
 import 'package:gighub/data/models/auth_model.dart';
 import 'package:gighub/data/providers/auth_provider.dart';
 import 'package:gighub/presentation/widgets/auth/social_login_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_button.dart';
 import 'package:gighub/presentation/widgets/common/gh_text_field.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Registration screen for creating a new account.
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -58,11 +60,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_formatError(e.toString())),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        GhToast.show(
+          context,
+          message: _formatError(e),
+          type: GhToastType.error,
         );
       }
     } finally {
@@ -70,12 +71,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  String _formatError(String error) {
-    if (error.contains('already exists'))
-      return 'An account with that email already exists';
-    if (error.contains('username')) return 'That username is already taken';
-    if (error.contains('NetworkException'))
+  String _formatError(Object error) {
+    if (error is ApiException) {
+      return error.message;
+    }
+    final message = error.toString();
+    if (message.contains('NetworkException')) {
       return 'Network error — please try again';
+    }
     return 'Registration failed — please try again';
   }
 
@@ -235,11 +238,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (mounted) context.go('/home');
                       } catch (e) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Google sign up failed'),
-                              backgroundColor: theme.colorScheme.error,
-                            ),
+                          GhToast.show(
+                            context,
+                            message: 'Google sign up failed',
+                            type: GhToastType.error,
                           );
                         }
                       } finally {
@@ -247,11 +249,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       }
                     },
                     onError: (error) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(error),
-                          backgroundColor: theme.colorScheme.error,
-                        ),
+                      GhToast.show(
+                        context,
+                        message: error,
+                        type: GhToastType.error,
                       );
                     },
                   ),

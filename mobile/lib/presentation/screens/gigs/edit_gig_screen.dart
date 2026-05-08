@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
 import 'package:gighub/data/models/gig_model.dart';
 import 'package:gighub/data/providers/gig_provider.dart';
+import 'package:gighub/presentation/widgets/common/gh_toast.dart';
 
 /// Edit an existing gig.
 ///
@@ -33,9 +34,11 @@ class _EditGigScreenState extends ConsumerState<EditGigScreen> {
       widget.gigId,
       UpdateGigInput(title: _titleCtrl.text, description: _descCtrl.text),
     );
-    ScaffoldMessenger.of(
+    GhToast.show(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Gig updated! (UI only)')));
+      message: 'Gig updated! (UI only)',
+      type: GhToastType.success,
+    );
     Navigator.pop(context);
   }
 

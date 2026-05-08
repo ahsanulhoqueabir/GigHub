@@ -23,8 +23,8 @@ AuthResponse _$AuthResponseFromJson(Map<String, dynamic> json) {
 mixin _$AuthResponse {
   String get accessToken => throw _privateConstructorUsedError;
   String get refreshToken => throw _privateConstructorUsedError;
-  int get expiresIn => throw _privateConstructorUsedError;
-  Profile get profile => throw _privateConstructorUsedError;
+  String? get expiresIn => throw _privateConstructorUsedError;
+  Profile? get profile => throw _privateConstructorUsedError;
 
   /// Serializes this AuthResponse to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -46,11 +46,11 @@ abstract class $AuthResponseCopyWith<$Res> {
   $Res call({
     String accessToken,
     String refreshToken,
-    int expiresIn,
-    Profile profile,
+    String? expiresIn,
+    Profile? profile,
   });
 
-  $ProfileCopyWith<$Res> get profile;
+  $ProfileCopyWith<$Res>? get profile;
 }
 
 /// @nodoc
@@ -70,7 +70,7 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
   $Res call({
     Object? accessToken = null,
     Object? refreshToken = null,
-    Object? expiresIn = null,
+    Object? expiresIn = freezed,
     Object? profile = null,
   }) {
     return _then(
@@ -83,14 +83,14 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
                 ? _value.refreshToken
                 : refreshToken // ignore: cast_nullable_to_non_nullable
                       as String,
-            expiresIn: null == expiresIn
+            expiresIn: freezed == expiresIn
                 ? _value.expiresIn
                 : expiresIn // ignore: cast_nullable_to_non_nullable
-                      as int,
+                      as String?,
             profile: null == profile
                 ? _value.profile
                 : profile // ignore: cast_nullable_to_non_nullable
-                      as Profile,
+                      as Profile?,
           )
           as $Val,
     );
@@ -100,8 +100,10 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
   /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  $ProfileCopyWith<$Res> get profile {
-    return $ProfileCopyWith<$Res>(_value.profile, (value) {
+  $ProfileCopyWith<$Res>? get profile {
+    final value = _value.profile;
+    if (value == null) return null;
+    return $ProfileCopyWith<$Res>(value, (value) {
       return _then(_value.copyWith(profile: value) as $Val);
     });
   }
@@ -119,12 +121,12 @@ abstract class _$$AuthResponseImplCopyWith<$Res>
   $Res call({
     String accessToken,
     String refreshToken,
-    int expiresIn,
-    Profile profile,
+    String? expiresIn,
+    Profile? profile,
   });
 
   @override
-  $ProfileCopyWith<$Res> get profile;
+  $ProfileCopyWith<$Res>? get profile;
 }
 
 /// @nodoc
@@ -143,7 +145,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
   $Res call({
     Object? accessToken = null,
     Object? refreshToken = null,
-    Object? expiresIn = null,
+    Object? expiresIn = freezed,
     Object? profile = null,
   }) {
     return _then(
@@ -156,14 +158,14 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
             ? _value.refreshToken
             : refreshToken // ignore: cast_nullable_to_non_nullable
                   as String,
-        expiresIn: null == expiresIn
+        expiresIn: freezed == expiresIn
             ? _value.expiresIn
             : expiresIn // ignore: cast_nullable_to_non_nullable
-                  as int,
+                  as String?,
         profile: null == profile
             ? _value.profile
             : profile // ignore: cast_nullable_to_non_nullable
-                  as Profile,
+                  as Profile?,
       ),
     );
   }
@@ -175,8 +177,8 @@ class _$AuthResponseImpl implements _AuthResponse {
   const _$AuthResponseImpl({
     required this.accessToken,
     required this.refreshToken,
-    required this.expiresIn,
-    required this.profile,
+    this.expiresIn,
+    this.profile,
   });
 
   factory _$AuthResponseImpl.fromJson(Map<String, dynamic> json) =>
@@ -187,9 +189,9 @@ class _$AuthResponseImpl implements _AuthResponse {
   @override
   final String refreshToken;
   @override
-  final int expiresIn;
+  final String? expiresIn;
   @override
-  final Profile profile;
+  final Profile? profile;
 
   @override
   String toString() {
@@ -233,8 +235,8 @@ abstract class _AuthResponse implements AuthResponse {
   const factory _AuthResponse({
     required final String accessToken,
     required final String refreshToken,
-    required final int expiresIn,
-    required final Profile profile,
+    final String? expiresIn,
+    final Profile? profile,
   }) = _$AuthResponseImpl;
 
   factory _AuthResponse.fromJson(Map<String, dynamic> json) =
@@ -245,9 +247,9 @@ abstract class _AuthResponse implements AuthResponse {
   @override
   String get refreshToken;
   @override
-  int get expiresIn;
+  String? get expiresIn;
   @override
-  Profile get profile;
+  Profile? get profile;
 
   /// Create a copy of AuthResponse
   /// with the given fields replaced by the non-null parameter values.
