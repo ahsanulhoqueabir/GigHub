@@ -147,7 +147,7 @@ class PublicProfileScreen extends ConsumerWidget {
                   backgroundColor: theme.colorScheme.secondaryContainer,
                   labelStyle: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSecondaryContainer,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight,
                   ),
                   visualDensity: VisualDensity.compact,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
