@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:gighub/core/constants/app_sizes.dart';
+import 'package:gighub/core/utils/category_icon_mapper.dart';
 import 'package:gighub/data/models/category_model.dart';
 
 /// Horizontal scroll of category chips for filtering.
+///
+/// Each chip shows the category icon (resolved via [CategoryIconMapper])
+/// alongside its name. Icons come from Flutter's built-in Material Icons.
 class CategoryChipsRow extends StatelessWidget {
   final List<Category> categories;
   final String? selectedSlug;
@@ -25,12 +29,14 @@ class CategoryChipsRow extends StatelessWidget {
         children: [
           _Chip(
             label: 'All',
+            icon: Icons.grid_view_rounded,
             isSelected: selectedSlug == null,
             onTap: () => onSelected(null),
           ),
           ...categories.map(
             (cat) => _Chip(
               label: cat.name,
+              icon: CategoryIconMapper.resolve(cat.icon),
               isSelected: selectedSlug == cat.slug,
               onTap: () => onSelected(cat.slug),
             ),
@@ -43,11 +49,13 @@ class CategoryChipsRow extends StatelessWidget {
 
 class _Chip extends StatelessWidget {
   final String label;
+  final IconData? icon;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _Chip({
     required this.label,
+    this.icon,
     required this.isSelected,
     required this.onTap,
   });
@@ -58,7 +66,14 @@ class _Chip extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: AppSizes.space8),
       child: FilterChip(
-        label: Text(label),
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon ?? Icons.category_outlined, size: 18),
+            const SizedBox(width: 6),
+            Text(label),
+          ],
+        ),
         selected: isSelected,
         onSelected: (_) => onTap(),
         backgroundColor: theme.colorScheme.secondaryContainer,
