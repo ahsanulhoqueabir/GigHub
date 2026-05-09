@@ -34,7 +34,7 @@ export class ProfileService {
           email: params.email,
           name: params.name,
           username: params.username ?? null,
-          role: "user",
+          role: "student",
         })
         .select()
         .single();
