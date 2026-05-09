@@ -7,7 +7,21 @@ export type CreateProfileParams = {
   email: string;
   name: string;
   username?: string;
+  bio?: string;
+  skills?: string[];
+  avatar?: string;
 };
+
+export type UpdateProfileParams = Partial<{
+  name: string;
+  username: string;
+  avatar: string;
+  bio: string;
+  skills: string[];
+  availability_status: string;
+  fcm_token: string;
+  notification_prefs: Record<string, unknown>;
+}>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ServiceResult<T = any> =
@@ -19,6 +33,7 @@ export class ProfileService {
 
   /**
    * Creates a new profile linked to an auth user via the `user` field (O2O relation).
+   * Now accepts optional bio, skills, and avatar fields.
    */
   static async create(
     params: CreateProfileParams,
@@ -34,8 +49,39 @@ export class ProfileService {
           email: params.email,
           name: params.name,
           username: params.username ?? null,
+          bio: params.bio ?? null,
+          skills: params.skills ?? [],
+          avatar: params.avatar ?? null,
           role: "student",
         })
+        .select()
+        .single();
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      return success(data as Profile);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Updates an existing profile. Only provided fields are changed.
+   */
+  static async update(
+    id: string,
+    params: UpdateProfileParams,
+  ): Promise<ServiceResult<Profile>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: sbError } = await (supabase as any)
+        .from(this.collection)
+        .update({ ...params, updated_at: new Date().toISOString() })
+        .eq("id", id)
         .select()
         .single();
 

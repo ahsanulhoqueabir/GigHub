@@ -90,7 +90,29 @@ export const useAuthStore = create<AuthStore>()(
         set({ isProcessing: true, error: null });
 
         try {
-          const { data } = await api_client.post("/auth/signup", params);
+          // Build FormData for multipart upload
+          const formData = new FormData();
+          formData.append("email", params.email);
+          formData.append("password", params.password);
+          formData.append("name", params.name);
+
+          if (params.username) {
+            formData.append("username", params.username);
+          }
+
+          if (params.bio) {
+            formData.append("bio", params.bio);
+          }
+
+          if (params.skills && params.skills.length > 0) {
+            formData.append("skills", JSON.stringify(params.skills));
+          }
+
+          if (params.avatar) {
+            formData.append("avatar", params.avatar);
+          }
+
+          const { data } = await api_client.post("/auth/signup", formData);
           const { user, token } = data.data;
 
           set({
