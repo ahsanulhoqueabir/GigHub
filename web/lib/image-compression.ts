@@ -12,14 +12,14 @@ export interface CompressOptions {
   /** JPEG/WebP quality 0–1 (default: 0.8) */
   quality?: number;
   /** Output format (default: 'webp') */
-  format?: 'image/jpeg' | 'image/png' | 'image/webp';
+  format?: "image/jpeg" | "image/png" | "image/webp";
 }
 
 const DEFAULTS: Required<CompressOptions> = {
   maxWidth: 1200,
   maxHeight: 1200,
   quality: 0.8,
-  format: 'image/webp',
+  format: "image/webp",
 };
 
 /**
@@ -47,7 +47,7 @@ export async function compressImage(
   }
 
   const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext("2d")!;
   ctx.drawImage(bitmap, 0, 0, width, height);
 
   const blob = await canvas.convertToBlob({
@@ -70,9 +70,10 @@ export async function compressImageToFile(
 ): Promise<File> {
   const blob = await compressImage(file, options);
 
-  const ext = blob.type === 'image/webp' ? 'webp' : blob.type.split('/')[1] || 'jpg';
+  const ext =
+    blob.type === "image/webp" ? "webp" : blob.type.split("/")[1] || "jpg";
 
-  return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.${ext}`, {
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.${ext}`, {
     type: blob.type,
   });
 }
