@@ -11,3 +11,11 @@ export const jt = {
   expiresIn: process.env.JWT_EXPIRES_IN || "1d",
   refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "15d",
 };
+
+export const r2 = {
+  account: process.env.R2_ACCOUNT_ID,
+  accessKey: process.env.R2_ACCESS_KEY_ID,
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+  bucket: process.env.R2_BUCKET_NAME,
+  publicUrl: process.env.R2_PUBLIC_URL,
+};
