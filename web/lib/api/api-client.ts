@@ -18,6 +18,11 @@ const createApiClient = (): AxiosInstance => {
   // Request interceptor to wait for auth and add token
   instance.interceptors.request.use(
     async (config) => {
+      // Let axios/browser set Content-Type for FormData (multipart)
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+      }
+
       // Skip auth check for public endpoints
       const isPublic = config.url?.startsWith("/auth/") ?? false;
 
