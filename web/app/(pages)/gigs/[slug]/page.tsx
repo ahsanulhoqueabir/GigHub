@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,14 +15,22 @@ import {
   IconCheck,
   IconLoader2,
   IconUser,
+  IconLock,
 } from "@tabler/icons-react";
 import { useGigsStore, selectGigStartingPrice } from "@/store/gig.store";
+import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
-import { LoginRequired } from "@/components/shared/login-required";
 import type { GigPackage } from "@/types/db/gig.types";
 
 export default function GigDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+
+  const isAuthenticated = useAuthStore((s) => selectIsAuthenticated(s));
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
+
+  const [selectedTier, setSelectedTier] = useState<
+    "basic" | "standard" | "premium"
+  >("basic");
 
   const selectedGig = useGigsStore((s) => s.selectedGig);
   const isFetchingDetail = useGigsStore((s) => s.isFetchingDetail);
@@ -40,6 +48,33 @@ export default function GigDetailPage() {
       clearError();
     };
   }, [slug, fetchGigBySlug, clearSelectedGig, clearError]);
+
+  // ── Auth guard — redirect to login prompt ──────────────────────
+  if (hasHydrated && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="mx-auto max-w-md w-full px-4 py-12 text-center">
+          <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-muted">
+            <IconLock size={28} className="text-muted-foreground" />
+          </div>
+          <h2 className="text-xl font-semibold text-foreground mb-2">
+            Authentication Required
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Please log in or create an account to view gig details.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button asChild>
+              <Link href="/login">Log In</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/signup">Sign Up</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── Loading state ──────────────────────────────────────────────
   if (isFetchingDetail) {
@@ -305,30 +340,50 @@ export default function GigDetailPage() {
               </Button>
             </div>
 
-            {/* ── Packages ───────────────────────────────────── */}
-            <div className="space-y-3">
-              <h2 className="text-base font-semibold text-foreground">
-                Choose a Package
-              </h2>
-
-              {sortedPackages.map((pkg) => (
-                <PackageCard key={pkg.tier} pkg={pkg} />
-              ))}
-            </div>
-
-            {/* ── Summary ────────────────────────────────────── */}
-            <div className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-muted-foreground">
-                  Starting from
-                </span>
-                <span className="text-2xl font-bold text-foreground">
-                  ${startingPrice.toLocaleString()}
-                </span>
+            {/* ── Packages (Tab-based) ───────────────────────── */}
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              {/* Tab bar */}
+              <div className="flex border-b border-border bg-muted/30">
+                {sortedPackages.map((pkg) => {
+                  const tabStyles: Record<string, string> = {
+                    basic: "",
+                    standard: "border-primary/30",
+                    premium: "border-amber-500/30",
+                  };
+                  const activeTabStyles: Record<string, string> = {
+                    basic: "border-b-primary text-primary font-semibold",
+                    standard: "border-b-primary text-primary font-semibold",
+                    premium:
+                      "border-b-amber-500 text-amber-600 dark:text-amber-400 font-semibold",
+                  };
+                  return (
+                    <button
+                      key={pkg.tier}
+                      onClick={() => setSelectedTier(pkg.tier)}
+                      className={`flex-1 px-3 py-3 text-center text-xs sm:text-sm font-medium transition-all border-b-2 ${
+                        selectedTier === pkg.tier
+                          ? (activeTabStyles[pkg.tier] ??
+                            "border-b-primary text-primary font-semibold")
+                          : "border-b-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className="capitalize">{pkg.tier}</span>
+                      <span className="block mt-0.5 text-xs opacity-80">
+                        ${pkg.price.toLocaleString()}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Prices vary by package. Select a package above for details.
-              </p>
+
+              {/* Active package detail */}
+              {(() => {
+                const activePkg =
+                  sortedPackages.find((p) => p.tier === selectedTier) ??
+                  sortedPackages[0];
+                if (!activePkg) return null;
+                return <PackageCard pkg={activePkg} />;
+              })()}
             </div>
           </div>
         </div>
@@ -340,23 +395,17 @@ export default function GigDetailPage() {
 // ─── Package Card Component ────────────────────────────────────────────────
 
 function PackageCard({ pkg }: { pkg: GigPackage }) {
-  const tierStyles: Record<
-    string,
-    { label: string; border: string; badge: string }
-  > = {
+  const tierStyles: Record<string, { label: string; badge: string }> = {
     basic: {
       label: "Basic",
-      border: "border-border",
       badge: "bg-muted text-muted-foreground",
     },
     standard: {
       label: "Standard",
-      border: "border-primary/30",
       badge: "bg-primary/10 text-primary",
     },
     premium: {
       label: "Premium",
-      border: "border-amber-500/30",
       badge:
         "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400",
     },
@@ -365,18 +414,16 @@ function PackageCard({ pkg }: { pkg: GigPackage }) {
   const style = tierStyles[pkg.tier] ?? tierStyles.basic;
 
   return (
-    <div
-      className={`rounded-xl border ${style.border} bg-card overflow-hidden transition-all hover:shadow-sm`}
-    >
+    <div className="bg-card">
       {/* Header */}
-      <div className="p-4 pb-3 border-b border-border">
-        <div className="flex items-center justify-between mb-1">
+      <div className="p-4 sm:p-5 border-b border-border">
+        <div className="flex items-center justify-between mb-2">
           <span
-            className={`rounded-md px-2 py-0.5 text-xs font-semibold ${style.badge}`}
+            className={`rounded-md px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
           >
             {style.label}
           </span>
-          <span className="text-lg font-bold text-foreground">
+          <span className="text-xl font-bold text-foreground">
             ${pkg.price.toLocaleString()}
           </span>
         </div>
@@ -389,25 +436,29 @@ function PackageCard({ pkg }: { pkg: GigPackage }) {
       </div>
 
       {/* Features */}
-      <div className="p-4 space-y-2">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <IconClock size={14} />
-          {pkg.delivery_days} day{pkg.delivery_days > 1 ? "s" : ""} delivery
+      <div className="p-4 sm:p-5 space-y-3">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <IconClock size={16} />
+          <span>
+            {pkg.delivery_days} day{pkg.delivery_days > 1 ? "s" : ""} delivery
+          </span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <IconCheck size={14} />
-          {pkg.revision_count} revision{pkg.revision_count > 1 ? "s" : ""}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <IconCheck size={16} />
+          <span>
+            {pkg.revision_count} revision{pkg.revision_count > 1 ? "s" : ""}
+          </span>
         </div>
 
         {pkg.features.length > 0 && (
-          <ul className="space-y-1.5 pt-2">
+          <ul className="space-y-2 pt-1">
             {pkg.features.map((feature, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-xs text-muted-foreground"
+                className="flex items-start gap-2 text-sm text-muted-foreground"
               >
                 <IconCheck
-                  size={14}
+                  size={16}
                   className="mt-0.5 shrink-0 text-green-500"
                 />
                 <span>{feature}</span>
@@ -418,12 +469,10 @@ function PackageCard({ pkg }: { pkg: GigPackage }) {
       </div>
 
       {/* CTA */}
-      <div className="px-4 pb-4">
-        <LoginRequired message="Please log in to place an order.">
-          <Button className="w-full" size="sm">
-            Continue (${pkg.price.toLocaleString()})
-          </Button>
-        </LoginRequired>
+      <div className="px-4 sm:px-5 pb-5">
+        <Button className="w-full" size="sm">
+          Continue (${pkg.price.toLocaleString()})
+        </Button>
       </div>
     </div>
   );

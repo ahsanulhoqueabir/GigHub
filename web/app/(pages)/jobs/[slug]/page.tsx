@@ -13,17 +13,21 @@ import {
   IconMapPin,
   IconCalendar,
   IconCurrencyDollar,
+  IconLock,
 } from "@tabler/icons-react";
 import {
   useJobsStore,
   selectJobBudgetDisplay,
   selectJobTypeLabel,
 } from "@/store/job.store";
+import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
-import { LoginRequired } from "@/components/shared/login-required";
 
 export default function JobDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+
+  const isAuthenticated = useAuthStore((s) => selectIsAuthenticated(s));
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
 
   const selectedJob = useJobsStore((s) => s.selectedJob);
   const isFetchingDetail = useJobsStore((s) => s.isFetchingDetail);
@@ -41,6 +45,33 @@ export default function JobDetailPage() {
       clearError();
     };
   }, [slug, fetchJobBySlug, clearSelectedJob, clearError]);
+
+  // ── Auth guard — redirect to login prompt ──────────────────────
+  if (hasHydrated && !isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="mx-auto max-w-md w-full px-4 py-12 text-center">
+          <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-muted">
+            <IconLock size={28} className="text-muted-foreground" />
+          </div>
+          <h2 className="text-xl font-semibold text-foreground mb-2">
+            Authentication Required
+          </h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Please log in or create an account to view job details.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button asChild>
+              <Link href="/login">Log In</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/signup">Sign Up</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ── Loading state ──────────────────────────────────────────────
   if (isFetchingDetail) {
@@ -243,11 +274,9 @@ export default function JobDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* ── Apply CTA ────────────────────────────────────── */}
             <div className="rounded-xl border border-border bg-card p-5">
-              <LoginRequired message="Please log in to apply for this job.">
-                <Button className="w-full" size="lg">
-                  Apply Now
-                </Button>
-              </LoginRequired>
+              <Button className="w-full" size="lg">
+                Apply Now
+              </Button>
               <p className="text-xs text-muted-foreground text-center mt-2">
                 {job.total_proposals > 0
                   ? `${job.total_proposals} proposal${job.total_proposals > 1 ? "s" : ""} already submitted`

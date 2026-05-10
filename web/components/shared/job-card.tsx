@@ -1,20 +1,26 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Job } from "@/types/db/job.types";
 import { selectJobBudgetDisplay, selectJobTypeLabel } from "@/store/job.store";
+import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
 import {
   IconMapPin,
   IconBriefcase,
   IconUsers,
   IconClock,
 } from "@tabler/icons-react";
+import { AuthModal } from "@/components/shared/auth-modal";
 
 interface JobCardProps {
   job: Job;
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const isAuthenticated = useAuthStore((s) => selectIsAuthenticated(s));
+
   const budgetDisplay = selectJobBudgetDisplay(job);
   const jobTypeLabel = selectJobTypeLabel(job.job_type);
 
@@ -37,97 +43,113 @@ export function JobCard({ job }: JobCardProps) {
 
   const timeAgo = getTimeAgo(job.created_at);
 
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      setShowAuthModal(true);
+    }
+  };
+
   return (
-    <Link
-      href={`/jobs/${job.slug}`}
-      className="group block rounded-xl border border-border bg-card p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-primary/20"
-    >
-      {/* Top row: poster + time */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          {posterAvatar ? (
-            <img
-              src={posterAvatar}
-              alt={posterName}
-              className="size-6 rounded-full object-cover"
-            />
-          ) : (
-            <div className="size-6 rounded-full bg-muted-foreground/20 flex items-center justify-center text-xs font-medium text-muted-foreground">
-              {posterName.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <span className="text-sm text-muted-foreground">{posterName}</span>
+    <>
+      <Link
+        href={`/jobs/${job.slug}`}
+        onClick={handleClick}
+        className="group block rounded-xl border border-border bg-card p-4 sm:p-5 transition-all duration-200 hover:shadow-md hover:border-primary/20"
+      >
+        {/* Top row: poster + time */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            {posterAvatar ? (
+              <img
+                src={posterAvatar}
+                alt={posterName}
+                className="size-6 rounded-full object-cover"
+              />
+            ) : (
+              <div className="size-6 rounded-full bg-muted-foreground/20 flex items-center justify-center text-xs font-medium text-muted-foreground">
+                {posterName.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <span className="text-sm text-muted-foreground">{posterName}</span>
+          </div>
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <IconClock size={12} />
+            {timeAgo}
+          </span>
         </div>
-        <span className="text-xs text-muted-foreground flex items-center gap-1">
-          <IconClock size={12} />
-          {timeAgo}
-        </span>
-      </div>
 
-      {/* Title */}
-      <h3 className="text-base font-semibold text-foreground line-clamp-2 leading-snug mb-2 group-hover:text-primary transition-colors">
-        {job.title}
-      </h3>
+        {/* Title */}
+        <h3 className="text-base font-semibold text-foreground line-clamp-2 leading-snug mb-2 group-hover:text-primary transition-colors">
+          {job.title}
+        </h3>
 
-      {/* Description snippet */}
-      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-        {job.description}
-      </p>
+        {/* Description snippet */}
+        <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+          {job.description}
+        </p>
 
-      {/* Badges row */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        {/* Job type badge */}
-        <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium">
-          <IconBriefcase size={12} />
-          {jobTypeLabel}
-        </span>
-
-        {/* Category badge */}
-        {categoryName && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            {categoryName}
+        {/* Badges row */}
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          {/* Job type badge */}
+          <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 text-primary px-2 py-0.5 text-xs font-medium">
+            <IconBriefcase size={12} />
+            {jobTypeLabel}
           </span>
-        )}
 
-        {/* Proposals count */}
-        {job.total_proposals > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-            <IconUsers size={12} />
-            {job.total_proposals} proposal{job.total_proposals > 1 ? "s" : ""}
-          </span>
-        )}
-      </div>
-
-      {/* Skills */}
-      {job.required_skills && job.required_skills.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {job.required_skills.slice(0, 4).map((skill) => (
-            <span
-              key={skill}
-              className="inline-block rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
-            >
-              {skill}
+          {/* Category badge */}
+          {categoryName && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              {categoryName}
             </span>
-          ))}
-          {job.required_skills.length > 4 && (
-            <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
-              +{job.required_skills.length - 4}
+          )}
+
+          {/* Proposals count */}
+          {job.total_proposals > 0 && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+              <IconUsers size={12} />
+              {job.total_proposals} proposal{job.total_proposals > 1 ? "s" : ""}
             </span>
           )}
         </div>
-      )}
 
-      {/* Divider */}
-      <div className="border-t border-border my-2" />
+        {/* Skills */}
+        {job.required_skills && job.required_skills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {job.required_skills.slice(0, 4).map((skill) => (
+              <span
+                key={skill}
+                className="inline-block rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+              >
+                {skill}
+              </span>
+            ))}
+            {job.required_skills.length > 4 && (
+              <span className="inline-block rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+                +{job.required_skills.length - 4}
+              </span>
+            )}
+          </div>
+        )}
 
-      {/* Footer: budget */}
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground">Budget</span>
-        <span className="text-sm font-semibold text-foreground">
-          {budgetDisplay}
-        </span>
-      </div>
-    </Link>
+        {/* Divider */}
+        <div className="border-t border-border my-2" />
+
+        {/* Footer: budget */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">Budget</span>
+          <span className="text-sm font-semibold text-foreground">
+            {budgetDisplay}
+          </span>
+        </div>
+      </Link>
+
+      <AuthModal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        message="Please log in to view job details."
+      />
+    </>
   );
 }
 
