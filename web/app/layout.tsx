@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { CentralDataInitializer } from "@/components/shared/central-initializer";
 import { ThemeProvider } from "@/components/shared/theme-provider";
 import { Navbar } from "@/components/shared/navbar";
-import { BottomNav } from "@/components/shared/bottom-nav";
 import { Footer } from "@/components/shared/footer";
 import { siteConfig } from "@/config/site.config";
 
@@ -58,7 +57,6 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1 pb-16 md:pb-0">{children}</main>
           <Footer />
-          <BottomNav />
         </ThemeProvider>
       </body>
     </html>
