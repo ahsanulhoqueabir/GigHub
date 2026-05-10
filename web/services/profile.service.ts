@@ -32,6 +32,33 @@ export class ProfileService {
   private static collection = "profiles";
 
   /**
+   * Check if a username already exists.
+   */
+  static async checkUsernameExists(
+    username: string,
+  ): Promise<ServiceResult<{ exists: boolean }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: sbError } = await (supabase as any)
+        .from(this.collection)
+        .select("id")
+        .eq("username", username)
+        .limit(1);
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      const exists = Array.isArray(data) && data.length > 0;
+      return success({ exists });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
    * Creates a new profile linked to an auth user via the `user` field (O2O relation).
    * Now accepts optional bio, skills, and avatar fields.
    */

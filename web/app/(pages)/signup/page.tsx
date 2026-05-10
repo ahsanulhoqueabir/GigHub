@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef, useEffect, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import Image from "next/image";
 import { useAuthStore } from "@/store/auth.store";
+import { useProfileStore } from "@/store/profile.store";
 import { Button } from "@/components/ui/button";
 import { compressImageToFile } from "@/lib/image-compression";
 import { signUpSchema, type SignUpFormValues } from "@/schema/signup.zod";
@@ -52,6 +53,12 @@ export default function SignUpPage() {
   const error = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
 
+  const checkUsername = useProfileStore((s) => s.checkUsername);
+  const clearUsernameCheck = useProfileStore((s) => s.clearUsernameCheck);
+  const isCheckingUsername = useProfileStore((s) => s.isCheckingUsername);
+  const usernameExists = useProfileStore((s) => s.usernameExists);
+  const usernameCheckError = useProfileStore((s) => s.usernameCheckError);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Step state ──────────────────────────────────────────────────────────
@@ -67,6 +74,8 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     setValue,
+    setError,
+    clearErrors,
     getValues,
     trigger,
     control,
@@ -85,9 +94,9 @@ export default function SignUpPage() {
     mode: "onTouched",
   });
 
-  const [name, email, password] = useWatch({
+  const [name, username, email, password] = useWatch({
     control,
-    name: ["name", "email", "password"],
+    name: ["name", "username", "email", "password"],
   });
   const skills = useWatch({ control, name: "skills" }) || [];
 
@@ -99,8 +108,62 @@ export default function SignUpPage() {
     clearError();
     const step1Valid = await trigger(["name", "email", "password", "username"]);
     if (!step1Valid) return;
+
+    const trimmedUsername = username?.trim();
+    if (trimmedUsername) {
+      if (isCheckingUsername) {
+        setError("username", {
+          message: "Checking username availability...",
+        });
+        return;
+      }
+
+      if (usernameExists) {
+        setError("username", { message: "Username already exists" });
+        return;
+      }
+
+      if (usernameCheckError) {
+        setError("username", {
+          message: usernameCheckError,
+        });
+        return;
+      }
+    }
+
     setStep(2);
   };
+
+  useEffect(() => {
+    const trimmed = username?.trim() || "";
+
+    if (!trimmed) {
+      clearUsernameCheck();
+      clearErrors("username");
+      return;
+    }
+
+    if (
+      errors.username?.message === "Username already exists" ||
+      errors.username?.message === "Checking username availability..." ||
+      errors.username?.message === usernameCheckError
+    ) {
+      clearErrors("username");
+    }
+
+    const timeoutId = setTimeout(() => {
+      checkUsername(trimmed);
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [
+    username,
+    checkUsername,
+    clearUsernameCheck,
+    clearErrors,
+    errors.username?.message,
+    usernameCheckError,
+  ]);
 
   // ── Step 2: Avatar ───────────────────────────────────────────────────────
   const handleAvatarSelect = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -244,6 +307,35 @@ export default function SignUpPage() {
                     {...register("username")}
                     className="block w-full rounded-lg border border-zinc-200 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                   />
+                  {isCheckingUsername && !errors.username && (
+                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                      Checking availability...
+                    </p>
+                  )}
+                  {!isCheckingUsername &&
+                    !errors.username &&
+                    username?.trim() &&
+                    usernameExists === false && (
+                      <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+                        Username is available
+                      </p>
+                    )}
+                  {!isCheckingUsername &&
+                    !errors.username &&
+                    username?.trim() &&
+                    usernameExists === true && (
+                      <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                        Username already exists
+                      </p>
+                    )}
+                  {!isCheckingUsername &&
+                    !errors.username &&
+                    username?.trim() &&
+                    usernameCheckError && (
+                      <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                        {usernameCheckError}
+                      </p>
+                    )}
                   {errors.username && (
                     <p className="mt-1 text-xs text-red-600 dark:text-red-400">
                       {errors.username.message}

@@ -19,6 +19,10 @@ export interface ProfileState {
   isSaving: boolean;
   isUploadingAvatar: boolean;
   isChangingPassword: boolean;
+  isCheckingUsername: boolean;
+  usernameExists: boolean | null;
+  usernameCheckError: string | null;
+  usernameCheckedValue: string | null;
   error: string | null;
   passwordError: string | null;
   saveSuccess: boolean;
@@ -30,10 +34,12 @@ interface ProfileActions {
   updateProfile: (values: UpdateProfileInput) => Promise<void>;
   changePassword: (values: ChangePasswordInput) => Promise<void>;
   uploadAvatar: (file: File) => Promise<void>;
+  checkUsername: (username: string) => Promise<void>;
   clearError: () => void;
   clearPasswordError: () => void;
   clearSaveSuccess: () => void;
   clearPasswordSuccess: () => void;
+  clearUsernameCheck: () => void;
 }
 
 type ProfileStore = ProfileState & ProfileActions;
@@ -44,6 +50,10 @@ const initialState: ProfileState = {
   isSaving: false,
   isUploadingAvatar: false,
   isChangingPassword: false,
+  isCheckingUsername: false,
+  usernameExists: null,
+  usernameCheckError: null,
+  usernameCheckedValue: null,
   error: null,
   passwordError: null,
   saveSuccess: false,
@@ -64,13 +74,20 @@ const readAsDataUrl = (file: File) =>
     reader.readAsDataURL(file);
   });
 
-export const useProfileStore = create<ProfileStore>()((set) => ({
+export const useProfileStore = create<ProfileStore>()((set, get) => ({
   ...initialState,
 
   clearError: () => set({ error: null }),
   clearPasswordError: () => set({ passwordError: null }),
   clearSaveSuccess: () => set({ saveSuccess: false }),
   clearPasswordSuccess: () => set({ passwordSuccess: false }),
+  clearUsernameCheck: () =>
+    set({
+      isCheckingUsername: false,
+      usernameExists: null,
+      usernameCheckError: null,
+      usernameCheckedValue: null,
+    }),
 
   fetchProfile: async () => {
     set({ isLoading: true, error: null });
@@ -145,6 +162,52 @@ export const useProfileStore = create<ProfileStore>()((set) => ({
       set({ isUploadingAvatar: false });
     }
   },
+
+  checkUsername: async (username) => {
+    const trimmed = username.trim();
+    if (!trimmed) {
+      set({
+        isCheckingUsername: false,
+        usernameExists: null,
+        usernameCheckError: null,
+        usernameCheckedValue: null,
+      });
+      return;
+    }
+
+    set({
+      isCheckingUsername: true,
+      usernameCheckError: null,
+      usernameExists: null,
+      usernameCheckedValue: trimmed,
+    });
+
+    try {
+      const { data } = await api_client.get("/auth/username-exists", {
+        params: { username: trimmed },
+      });
+
+      if (get().usernameCheckedValue !== trimmed) {
+        return;
+      }
+
+      set({
+        isCheckingUsername: false,
+        usernameExists: Boolean(data?.data?.exists),
+        usernameCheckError: null,
+      });
+    } catch (err: unknown) {
+      if (get().usernameCheckedValue !== trimmed) {
+        return;
+      }
+
+      set({
+        isCheckingUsername: false,
+        usernameExists: null,
+        usernameCheckError: getErrorMessage(err, "Failed to check username"),
+      });
+    }
+  },
 }));
 
 // ─── Derived helpers ───────────────────────────────────────────────────────
@@ -161,3 +224,9 @@ export const selectProfilePasswordError = (s: ProfileStore) => s.passwordError;
 export const selectProfileSaveSuccess = (s: ProfileStore) => s.saveSuccess;
 export const selectProfilePasswordSuccess = (s: ProfileStore) =>
   s.passwordSuccess;
+export const selectProfileUsernameChecking = (s: ProfileStore) =>
+  s.isCheckingUsername;
+export const selectProfileUsernameExists = (s: ProfileStore) =>
+  s.usernameExists;
+export const selectProfileUsernameCheckError = (s: ProfileStore) =>
+  s.usernameCheckError;
