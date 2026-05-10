@@ -101,7 +101,7 @@ Map<String, dynamic> _normalizeAuthJson(Map<String, dynamic> json) {
   final accessToken = raw['accessToken'] ?? raw['access_token'];
   final refreshToken = raw['refreshToken'] ?? raw['refresh_token'];
   final expiresIn = raw['expiresIn'] ?? raw['expires_in'];
-  final expiresInValue = expiresIn == null ? null : expiresIn.toString();
+  final expiresInValue = expiresIn?.toString();
 
   return {
     'accessToken': accessToken,

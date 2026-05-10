@@ -60,6 +60,7 @@ class ConflictException extends ApiException {
 /// due to semantic errors (validation).
 class ValidationException extends ApiException {
   final Map<String, List<String>>? errors;
+  @override
   final dynamic details;
 
   const ValidationException({
