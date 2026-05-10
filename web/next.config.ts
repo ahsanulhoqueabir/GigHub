@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "file.briefly60.online",
       },
+      {
+        protocol: "https",
+        hostname: "example.com",
+      },
     ],
   },
 };
