@@ -82,10 +82,17 @@ class MyGigsScreen extends ConsumerWidget {
                       if (action == 'edit') {
                         context.push('/gigs/${gig.id}/edit');
                       } else if (action == 'toggle') {
+                        final newStatus = gig.status == 'active'
+                            ? 'paused'
+                            : 'active';
+                        ref
+                            .read(gigFormNotifierProvider.notifier)
+                            .toggleGigStatus(gig.id, newStatus);
+                        ref.invalidate(myGigsProvider(1));
                         GhToast.show(
                           context,
-                          message: 'Status toggled for ${gig.title} (UI only)',
-                          type: GhToastType.info,
+                          message: 'Status changed to $newStatus',
+                          type: GhToastType.success,
                         );
                       } else if (action == 'delete') {
                         showDialog(
@@ -103,9 +110,13 @@ class MyGigsScreen extends ConsumerWidget {
                               FilledButton(
                                 onPressed: () {
                                   Navigator.pop(context);
+                                  ref
+                                      .read(gigFormNotifierProvider.notifier)
+                                      .deleteGig(gig.id);
+                                  ref.invalidate(myGigsProvider(1));
                                   GhToast.show(
                                     context,
-                                    message: 'Deleted ${gig.title} (UI only)',
+                                    message: 'Deleted ${gig.title}',
                                     type: GhToastType.warning,
                                   );
                                 },

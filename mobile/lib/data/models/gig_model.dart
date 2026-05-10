@@ -5,6 +5,19 @@ import 'package:gighub/data/models/profile_model.dart';
 part 'gig_model.freezed.dart';
 part 'gig_model.g.dart';
 
+/// A gig image from the API (`{url, sort_order}`).
+@freezed
+class GigImage with _$GigImage {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory GigImage({@Default('') String url, @Default(0) int sortOrder}) =
+      _GigImage;
+
+  factory GigImage.fromJson(Map<String, dynamic> json) =>
+      _$GigImageFromJson(json);
+
+  const GigImage._();
+}
+
 /// Summary view of a gig for list/grid display.
 @freezed
 class GigSummary with _$GigSummary {
@@ -15,9 +28,9 @@ class GigSummary with _$GigSummary {
     required String slug,
     required Category category,
     required PublicProfile seller,
-    String? thumbnail,
-    required double startingPrice,
-    required double avgRating,
+    @Default([]) List<GigImage> images,
+    @JsonKey(fromJson: _doubleFromAnything) required double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required double avgRating,
     required int totalReviews,
     @Default(0) int totalOrders,
     required String status,
@@ -27,6 +40,9 @@ class GigSummary with _$GigSummary {
       _$GigSummaryFromJson(json);
 
   const GigSummary._();
+
+  /// Derived: first image URL or null.
+  String? get thumbnail => images.isNotEmpty ? images.first.url : null;
 }
 
 /// Full gig detail including packages, images, and description.
@@ -39,11 +55,10 @@ class GigDetail with _$GigDetail {
     required String slug,
     required Category category,
     required PublicProfile seller,
-    String? thumbnail,
-    @Default([]) List<String> images,
+    @Default([]) List<GigImage> images,
     required String description,
-    required double startingPrice,
-    required double avgRating,
+    @JsonKey(fromJson: _doubleFromAnything) required double startingPrice,
+    @JsonKey(fromJson: _doubleFromAnything) required double avgRating,
     required int totalReviews,
     @Default(0) int totalOrders,
     required String status,
@@ -56,6 +71,9 @@ class GigDetail with _$GigDetail {
       _$GigDetailFromJson(json);
 
   const GigDetail._();
+
+  /// Derived: first image URL or null.
+  String? get thumbnail => images.isNotEmpty ? images.first.url : null;
 }
 
 /// A single package (tier) within a gig.
@@ -67,9 +85,9 @@ class GigPackage with _$GigPackage {
     required String tier,
     required String title,
     required String description,
-    required double price,
+    @JsonKey(fromJson: _doubleFromAnything) required double price,
     required int deliveryDays,
-    required int revisions,
+    @JsonKey(name: 'revision_count') required int revisions,
     @Default([]) List<String> features,
   }) = _GigPackage;
 
@@ -78,6 +96,19 @@ class GigPackage with _$GigPackage {
 
   const GigPackage._();
 }
+
+// ── JSON helpers ──────────────────────────────────────
+
+/// Parses a field that may be String or num into double.
+double _doubleFromAnything(dynamic value) {
+  if (value == null) return 0.0;
+  if (value is double) return value;
+  if (value is int) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? 0.0;
+  return 0.0;
+}
+
+// ── Input models (unchanged logic) ────────────────────
 
 /// Input for creating a gig.
 @freezed
@@ -108,7 +139,7 @@ class CreatePackageInput with _$CreatePackageInput {
     required String description,
     required double price,
     required int deliveryDays,
-    required int revisions,
+    @JsonKey(name: 'revision_count') required int revisions,
     @Default([]) List<String> features,
   }) = _CreatePackageInput;
 
@@ -140,7 +171,7 @@ class UpdateGigInput with _$UpdateGigInput {
 
 /// Query parameters for filtering gigs.
 class GigQueryParams {
-  final String? categorySlug;
+  final String? categoryId;
   final String? search;
   final double? minPrice;
   final double? maxPrice;
@@ -149,7 +180,7 @@ class GigQueryParams {
   final int limit;
 
   const GigQueryParams({
-    this.categorySlug,
+    this.categoryId,
     this.search,
     this.minPrice,
     this.maxPrice,
@@ -158,14 +189,14 @@ class GigQueryParams {
     this.limit = 20,
   });
 
-  Map<String, dynamic> toJson() => {
-    if (categorySlug != null) 'category_slug': categorySlug,
-    if (search != null) 'search': search,
+  Map<String, dynamic> toQuery() => {
+    if (categoryId != null) 'category': categoryId,
+    if (search != null && search!.isNotEmpty) 'search': search,
     if (minPrice != null) 'min_price': minPrice,
     if (maxPrice != null) 'max_price': maxPrice,
-    if (sortBy != null) 'sort_by': sortBy,
-    'page': page,
-    'limit': limit,
+    if (sortBy != null) 'sort': sortBy,
+    'page': page.toString(),
+    'limit': limit.toString(),
   };
 
   @override
@@ -173,7 +204,7 @@ class GigQueryParams {
       identical(this, other) ||
       other is GigQueryParams &&
           runtimeType == other.runtimeType &&
-          categorySlug == other.categorySlug &&
+          categoryId == other.categoryId &&
           search == other.search &&
           minPrice == other.minPrice &&
           maxPrice == other.maxPrice &&
@@ -182,13 +213,6 @@ class GigQueryParams {
           limit == other.limit;
 
   @override
-  int get hashCode => Object.hash(
-    categorySlug,
-    search,
-    minPrice,
-    maxPrice,
-    sortBy,
-    page,
-    limit,
-  );
+  int get hashCode =>
+      Object.hash(categoryId, search, minPrice, maxPrice, sortBy, page, limit);
 }

@@ -144,6 +144,10 @@ class _CreateGigScreenState extends ConsumerState<CreateGigScreen> {
       ),
     );
 
+    // Refresh gig lists before navigating away
+    ref.invalidate(gigsListProvider);
+    ref.invalidate(myGigsProvider(1));
+
     GhToast.show(
       context,
       message: 'Gig published successfully!',

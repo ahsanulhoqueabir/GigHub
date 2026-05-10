@@ -24,6 +24,7 @@ export class GigsService {
       'category.id',
       'category.name',
       'category.icon',
+      'category.slug',
       'title',
       'slug',
       'description',

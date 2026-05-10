@@ -1,0 +1,463 @@
+"use client";
+
+import { useState, useRef, type FormEvent, type ChangeEvent } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useAuthStore } from "@/store/auth.store";
+import { Button } from "@/components/ui/button";
+import { compressImageToFile } from "@/lib/image-compression";
+import type {
+  SignUpStep1Data,
+  SignUpStep2Data,
+  SignUpStep3Data,
+} from "@/types/business/user.types";
+
+type Step = 1 | 2 | 3;
+
+export default function SignUpPage() {
+  const router = useRouter();
+
+  const signUp = useAuthStore((s) => s.signUp);
+  const isProcessing = useAuthStore((s) => s.isProcessing);
+  const error = useAuthStore((s) => s.error);
+  const clearError = useAuthStore((s) => s.clearError);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Step state ──────────────────────────────────────────────────────────
+  const [step, setStep] = useState<Step>(1);
+
+  // Step 1: Basic info
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+
+  // Step 2: Avatar
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  // Step 3: Bio & skills
+  const [bio, setBio] = useState("");
+  const [skillInput, setSkillInput] = useState("");
+  const [skills, setSkills] = useState<string[]>([]);
+
+  // ── Step 1: Validation ───────────────────────────────────────────────────
+  const isStep1Valid = name.trim() && email.trim() && password.length >= 6;
+
+  const handleStep1Next = () => {
+    clearError();
+    if (!isStep1Valid) return;
+    setStep(2);
+  };
+
+  // ── Step 2: Avatar ───────────────────────────────────────────────────────
+  const handleAvatarSelect = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Compress client-side before storing in state
+    const compressed = await compressImageToFile(file, {
+      maxWidth: 600,
+      maxHeight: 600,
+      quality: 0.8,
+      format: "image/webp",
+    });
+
+    setAvatarFile(compressed);
+    setAvatarPreview(URL.createObjectURL(compressed));
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  // ── Step 3: Skills ───────────────────────────────────────────────────────
+  const handleAddSkill = () => {
+    const trimmed = skillInput.trim();
+    if (trimmed && !skills.includes(trimmed)) {
+      setSkills([...skills, trimmed]);
+      setSkillInput("");
+    }
+  };
+
+  const handleSkillKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddSkill();
+    }
+  };
+
+  const handleRemoveSkill = (skill: string) => {
+    setSkills(skills.filter((s) => s !== skill));
+  };
+
+  // ── Submit ───────────────────────────────────────────────────────────────
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    clearError();
+
+    try {
+      await signUp({
+        email,
+        password,
+        name,
+        username: username || undefined,
+        avatar: avatarFile,
+        bio: bio || undefined,
+        skills: skills.length > 0 ? skills : undefined,
+      });
+      router.push("/");
+    } catch {
+      // error is already set in the store
+    }
+  };
+
+  // ── Step indicator ───────────────────────────────────────────────────────
+  const StepIndicator = () => (
+    <div className="mb-8 flex items-center justify-center gap-2">
+      {([1, 2, 3] as const).map((s) => (
+        <div key={s} className="flex items-center gap-2">
+          <div
+            className={`flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
+              step === s
+                ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+                : step > s
+                  ? "bg-green-500 text-white"
+                  : "bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+            }`}
+          >
+            {step > s ? "✓" : s}
+          </div>
+          {s < 3 && (
+            <div
+              className={`h-px w-8 transition-colors ${
+                step > s ? "bg-green-500" : "bg-zinc-200 dark:bg-zinc-700"
+              }`}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+
+  // ── Render ───────────────────────────────────────────────────────────────
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-black">
+      <div className="w-full max-w-sm">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
+            Create an account
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            {step === 1 && "Tell us about yourself."}
+            {step === 2 && "Add a profile picture (optional)."}
+            {step === 3 && "Tell others what you do."}
+          </p>
+        </div>
+
+        <StepIndicator />
+
+        {/* Error */}
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit}>
+          {/* ══════════ Step 1: Name, Email, Password ══════════ */}
+          {step === 1 && (
+            <div className="space-y-5">
+              {/* Name */}
+              <div>
+                <label
+                  htmlFor="name"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Full name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  required
+                  autoComplete="name"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                />
+              </div>
+
+              {/* Username (optional) */}
+              <div>
+                <label
+                  htmlFor="username"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Username{" "}
+                  <span className="text-zinc-400 dark:text-zinc-500">
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  id="username"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="johndoe"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label
+                  htmlFor="password"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  autoComplete="new-password"
+                  placeholder="Min. 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                />
+              </div>
+
+              {/* Next */}
+              <Button
+                type="button"
+                disabled={!isStep1Valid}
+                className="w-full"
+                size="lg"
+                onClick={handleStep1Next}
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+
+          {/* ══════════ Step 2: Avatar ══════════ */}
+          {step === 2 && (
+            <div className="space-y-6">
+              {/* Avatar preview / upload */}
+              <div className="flex flex-col items-center gap-4">
+                {avatarPreview ? (
+                  <div className="relative">
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar preview"
+                      className="size-32 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      className="absolute -right-1 -top-1 flex size-6 items-center justify-center rounded-full bg-red-500 text-xs text-white shadow hover:bg-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex size-32 cursor-pointer items-center justify-center rounded-full border-2 border-dashed border-zinc-300 bg-zinc-100 text-zinc-400 transition-colors hover:border-zinc-400 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+                  >
+                    <svg
+                      className="size-10"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"
+                      />
+                    </svg>
+                  </div>
+                )}
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarSelect}
+                />
+
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  PNG, JPG or WebP. Max 600px. Compressed automatically.
+                </p>
+              </div>
+
+              {/* Navigation */}
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                  onClick={() => setStep(1)}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  className="flex-1"
+                  size="lg"
+                  onClick={() => setStep(3)}
+                >
+                  {avatarFile ? "Next" : "Skip"}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════ Step 3: Bio & Skills ══════════ */}
+          {step === 3 && (
+            <div className="space-y-5">
+              {/* Bio */}
+              <div>
+                <label
+                  htmlFor="bio"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Bio{" "}
+                  <span className="text-zinc-400 dark:text-zinc-500">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  id="bio"
+                  rows={3}
+                  placeholder="Tell us about yourself, your skills, and what you offer…"
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  className="block w-full resize-none rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                />
+              </div>
+
+              {/* Skills */}
+              <div>
+                <label
+                  htmlFor="skills-input"
+                  className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+                >
+                  Skills{" "}
+                  <span className="text-zinc-400 dark:text-zinc-500">
+                    (optional)
+                  </span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    id="skills-input"
+                    type="text"
+                    placeholder="e.g. Web Development"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={handleSkillKeyDown}
+                    className="block flex-1 rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddSkill}
+                    disabled={!skillInput.trim()}
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {/* Skill tags */}
+                {skills.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-zinc-200 px-3 py-1 text-xs font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      >
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="text-zinc-400 hover:text-red-500"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Navigation */}
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                  onClick={() => setStep(2)}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isProcessing}
+                  className="flex-1"
+                  size="lg"
+                >
+                  {isProcessing ? "Creating account…" : "Create account"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </form>
+
+        {/* Footer */}
+        <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="font-medium text-zinc-900 underline-offset-2 hover:underline dark:text-white"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -71,7 +71,7 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
     Object? accessToken = null,
     Object? refreshToken = null,
     Object? expiresIn = freezed,
-    Object? profile = null,
+    Object? profile = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -87,7 +87,7 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
                 ? _value.expiresIn
                 : expiresIn // ignore: cast_nullable_to_non_nullable
                       as String?,
-            profile: null == profile
+            profile: freezed == profile
                 ? _value.profile
                 : profile // ignore: cast_nullable_to_non_nullable
                       as Profile?,
@@ -101,9 +101,11 @@ class _$AuthResponseCopyWithImpl<$Res, $Val extends AuthResponse>
   @override
   @pragma('vm:prefer-inline')
   $ProfileCopyWith<$Res>? get profile {
-    final value = _value.profile;
-    if (value == null) return null;
-    return $ProfileCopyWith<$Res>(value, (value) {
+    if (_value.profile == null) {
+      return null;
+    }
+
+    return $ProfileCopyWith<$Res>(_value.profile!, (value) {
       return _then(_value.copyWith(profile: value) as $Val);
     });
   }
@@ -146,7 +148,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
     Object? accessToken = null,
     Object? refreshToken = null,
     Object? expiresIn = freezed,
-    Object? profile = null,
+    Object? profile = freezed,
   }) {
     return _then(
       _$AuthResponseImpl(
@@ -162,7 +164,7 @@ class __$$AuthResponseImplCopyWithImpl<$Res>
             ? _value.expiresIn
             : expiresIn // ignore: cast_nullable_to_non_nullable
                   as String?,
-        profile: null == profile
+        profile: freezed == profile
             ? _value.profile
             : profile // ignore: cast_nullable_to_non_nullable
                   as Profile?,

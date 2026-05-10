@@ -6,6 +6,15 @@ part of 'gig_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_$GigImageImpl _$$GigImageImplFromJson(Map<String, dynamic> json) =>
+    _$GigImageImpl(
+      url: json['url'] as String? ?? '',
+      sortOrder: (json['sort_order'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$$GigImageImplToJson(_$GigImageImpl instance) =>
+    <String, dynamic>{'url': instance.url, 'sort_order': instance.sortOrder};
+
 _$GigSummaryImpl _$$GigSummaryImplFromJson(Map<String, dynamic> json) =>
     _$GigSummaryImpl(
       id: json['id'] as String,
@@ -13,9 +22,13 @@ _$GigSummaryImpl _$$GigSummaryImplFromJson(Map<String, dynamic> json) =>
       slug: json['slug'] as String,
       category: Category.fromJson(json['category'] as Map<String, dynamic>),
       seller: PublicProfile.fromJson(json['seller'] as Map<String, dynamic>),
-      thumbnail: json['thumbnail'] as String?,
-      startingPrice: (json['starting_price'] as num).toDouble(),
-      avgRating: (json['avg_rating'] as num).toDouble(),
+      images:
+          (json['images'] as List<dynamic>?)
+              ?.map((e) => GigImage.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      startingPrice: _doubleFromAnything(json['starting_price']),
+      avgRating: _doubleFromAnything(json['avg_rating']),
       totalReviews: (json['total_reviews'] as num).toInt(),
       totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,
       status: json['status'] as String,
@@ -28,7 +41,7 @@ Map<String, dynamic> _$$GigSummaryImplToJson(_$GigSummaryImpl instance) =>
       'slug': instance.slug,
       'category': instance.category,
       'seller': instance.seller,
-      'thumbnail': instance.thumbnail,
+      'images': instance.images,
       'starting_price': instance.startingPrice,
       'avg_rating': instance.avgRating,
       'total_reviews': instance.totalReviews,
@@ -43,15 +56,14 @@ _$GigDetailImpl _$$GigDetailImplFromJson(Map<String, dynamic> json) =>
       slug: json['slug'] as String,
       category: Category.fromJson(json['category'] as Map<String, dynamic>),
       seller: PublicProfile.fromJson(json['seller'] as Map<String, dynamic>),
-      thumbnail: json['thumbnail'] as String?,
       images:
           (json['images'] as List<dynamic>?)
-              ?.map((e) => e as String)
+              ?.map((e) => GigImage.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       description: json['description'] as String,
-      startingPrice: (json['starting_price'] as num).toDouble(),
-      avgRating: (json['avg_rating'] as num).toDouble(),
+      startingPrice: _doubleFromAnything(json['starting_price']),
+      avgRating: _doubleFromAnything(json['avg_rating']),
       totalReviews: (json['total_reviews'] as num).toInt(),
       totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,
       status: json['status'] as String,
@@ -73,7 +85,6 @@ Map<String, dynamic> _$$GigDetailImplToJson(_$GigDetailImpl instance) =>
       'slug': instance.slug,
       'category': instance.category,
       'seller': instance.seller,
-      'thumbnail': instance.thumbnail,
       'images': instance.images,
       'description': instance.description,
       'starting_price': instance.startingPrice,
@@ -92,9 +103,9 @@ _$GigPackageImpl _$$GigPackageImplFromJson(Map<String, dynamic> json) =>
       tier: json['tier'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
-      price: (json['price'] as num).toDouble(),
+      price: _doubleFromAnything(json['price']),
       deliveryDays: (json['delivery_days'] as num).toInt(),
-      revisions: (json['revisions'] as num).toInt(),
+      revisions: (json['revision_count'] as num).toInt(),
       features:
           (json['features'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -110,7 +121,7 @@ Map<String, dynamic> _$$GigPackageImplToJson(_$GigPackageImpl instance) =>
       'description': instance.description,
       'price': instance.price,
       'delivery_days': instance.deliveryDays,
-      'revisions': instance.revisions,
+      'revision_count': instance.revisions,
       'features': instance.features,
     };
 
@@ -151,7 +162,7 @@ _$CreatePackageInputImpl _$$CreatePackageInputImplFromJson(
   description: json['description'] as String,
   price: (json['price'] as num).toDouble(),
   deliveryDays: (json['delivery_days'] as num).toInt(),
-  revisions: (json['revisions'] as num).toInt(),
+  revisions: (json['revision_count'] as num).toInt(),
   features:
       (json['features'] as List<dynamic>?)?.map((e) => e as String).toList() ??
       const [],
@@ -165,7 +176,7 @@ Map<String, dynamic> _$$CreatePackageInputImplToJson(
   'description': instance.description,
   'price': instance.price,
   'delivery_days': instance.deliveryDays,
-  'revisions': instance.revisions,
+  'revision_count': instance.revisions,
   'features': instance.features,
 };
 
