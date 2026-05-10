@@ -4,6 +4,13 @@ interface SuccessResponseOptions {
   data?: unknown;
   message?: string;
   statusCode?: number;
+  pagination?: {
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
 }
 
 interface ErrorResponseOptions {
@@ -18,12 +25,13 @@ interface ErrorResponseOptions {
  * @example ok({ data: result, statusCode: 201 })
  */
 export function ok(options: SuccessResponseOptions) {
-  const { data, message, statusCode = 200 } = options;
+  const { data, message, statusCode = 200, pagination } = options;
   const response: Record<string, unknown> = {
     success: true,
   };
   if (message) response.message = message;
   if (data !== undefined) response.data = data;
+  if (pagination) response.pagination = pagination;
   return NextResponse.json(response, { status: statusCode });
 }
 

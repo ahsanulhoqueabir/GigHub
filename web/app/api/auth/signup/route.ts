@@ -3,7 +3,7 @@ import { ok, fail } from "@/lib/api/api-response";
 import { AuthService } from "@/services/auth.service";
 import { ProfileService } from "@/services/profile.service";
 import { R2Service } from "@/services/r2.service";
-import { signJwt } from "@/lib/jwt.helper";
+import { signJwt, signRefreshJwt } from "@/lib/jwt.helper";
 import type { JwtPayload } from "@/types/business/user.types";
 
 export async function POST(request: NextRequest) {
@@ -93,11 +93,14 @@ export async function POST(request: NextRequest) {
     };
 
     const token = await signJwt(jwtPayload);
+    const refreshToken = await signRefreshJwt(jwtPayload);
 
     return ok({
       data: {
         user: profile,
-        token,
+        access_token: token,
+        refresh_token: refreshToken,
+        expires_in: "15m",
       },
       message: "User created successfully",
       statusCode: 201,

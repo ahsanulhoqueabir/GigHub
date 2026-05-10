@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyJwt } from "@/lib/jwt.helper";
 import type { JwtPayload } from "@/types/business/user.types";
 
-export type AuthenticatedHandler = (
+export type AuthenticatedHandler<TContext = undefined> = (
   req: NextRequest,
   jwtPayload: JwtPayload,
+  context: TContext,
 ) => Promise<NextResponse>;
 
 /**
@@ -12,13 +13,19 @@ export type AuthenticatedHandler = (
  * Extracts the Bearer token from the Authorization header,
  * verifies it, and passes the decoded payload to the handler.
  *
- * Usage:
- * ```ts
- * export const GET = withAuth(async (req, jwtPayload) => { … });
- * ```
+ * For static routes:
+ *   export const GET = withAuth(async (req, jwtPayload) => { … });
+ *
+ * For dynamic routes with params:
+ *   export const GET = withAuth<{ params: Promise<{ id: string }> }>(
+ *     async (req, jwtPayload, ctx) => { const { id } = await ctx.params; … }
+ *   );
  */
-export function withAuth(handler: AuthenticatedHandler) {
-  return async (req: NextRequest): Promise<NextResponse> => {
+export function withAuth<TContext = undefined>(
+  handler: AuthenticatedHandler<TContext>,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return async (req: NextRequest, ...rest: any[]): Promise<NextResponse> => {
     try {
       const authHeader = req.headers.get("Authorization");
 
@@ -29,7 +36,7 @@ export function withAuth(handler: AuthenticatedHandler) {
         );
       }
 
-      const token = authHeader.slice(7); // Strip "Bearer "
+      const token = authHeader.slice(7);
       const payload = await verifyJwt(token);
 
       if (!payload) {
@@ -39,7 +46,8 @@ export function withAuth(handler: AuthenticatedHandler) {
         );
       }
 
-      return handler(req, payload);
+      const context = (rest[0] ?? undefined) as TContext;
+      return handler(req, payload, context);
     } catch (err) {
       return NextResponse.json(
         {

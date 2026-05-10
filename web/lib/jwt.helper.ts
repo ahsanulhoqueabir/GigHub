@@ -29,6 +29,21 @@ export async function signJwt(payload: JwtPayload): Promise<string> {
 }
 
 /**
+ * Sign a refresh JWT token with longer expiry (default 15d).
+ */
+export async function signRefreshJwt(payload: JwtPayload): Promise<string> {
+  const secret = getSecret();
+
+  const token = await new SignJWT(payload as unknown as JWTPayload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(jt.refreshExpiresIn)
+    .sign(secret);
+
+  return token;
+}
+
+/**
  * Verify and decode a JWT token.
  * Returns the payload if valid, or null if invalid/expired.
  */
