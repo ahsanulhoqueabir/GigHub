@@ -18,10 +18,20 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
-import { api_client } from "@/lib/api/api-client";
+import {
+  selectProfile,
+  selectProfileAvatarUploading,
+  selectProfileChangingPassword,
+  selectProfileError,
+  selectProfileLoading,
+  selectProfilePasswordError,
+  selectProfilePasswordSuccess,
+  selectProfileSaveSuccess,
+  selectProfileSaving,
+  useProfileStore,
+} from "@/store/profile.store";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Profile } from "@/types/db/profile.types";
 import Image from "next/image";
 import {
   profileSchema,
@@ -46,25 +56,26 @@ export default function ProfilePage() {
   );
   const logout = useAuthStore((s) => s.logout);
 
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
 
   // Edit form state
   const [skillInput, setSkillInput] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Password change state
-  const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordServerError, setPasswordServerError] = useState<string | null>(
-    null,
-  );
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
-
-  // Avatar state
-  const [avatarUploading, setAvatarUploading] = useState(false);
+  const profile = useProfileStore(selectProfile);
+  const loading = useProfileStore(selectProfileLoading);
+  const saving = useProfileStore(selectProfileSaving);
+  const avatarUploading = useProfileStore(selectProfileAvatarUploading);
+  const changingPassword = useProfileStore(selectProfileChangingPassword);
+  const error = useProfileStore(selectProfileError);
+  const passwordServerError = useProfileStore(selectProfilePasswordError);
+  const saveSuccess = useProfileStore(selectProfileSaveSuccess);
+  const passwordSuccess = useProfileStore(selectProfilePasswordSuccess);
+  const fetchProfile = useProfileStore((s) => s.fetchProfile);
+  const updateProfile = useProfileStore((s) => s.updateProfile);
+  const changePassword = useProfileStore((s) => s.changePassword);
+  const uploadAvatar = useProfileStore((s) => s.uploadAvatar);
+  const clearSaveSuccess = useProfileStore((s) => s.clearSaveSuccess);
+  const clearPasswordSuccess = useProfileStore((s) => s.clearPasswordSuccess);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const profileForm = useForm<ProfileFormValues>({
@@ -101,81 +112,52 @@ export default function ProfilePage() {
       return;
     }
 
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api_client.get("/profiles/me");
-        const p = data.data as Profile;
-        setProfile(p);
-        profileForm.reset({
-          name: p.name || "",
-          bio: p.bio || "",
-          skills: p.skills || [],
-        });
-        setSkillInput("");
-      } catch (err) {
-        setError(
-          (err as { response?: { data?: { error?: string } } })?.response?.data
-            ?.error || "Failed to load profile",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProfile();
-  }, [hasHydrated, isProcessing, isAuthenticated, hasToken, router]);
+  }, [
+    hasHydrated,
+    isProcessing,
+    isAuthenticated,
+    hasToken,
+    router,
+    fetchProfile,
+  ]);
+
+  useEffect(() => {
+    if (!profile) return;
+
+    profileForm.reset({
+      name: profile.name || "",
+      bio: profile.bio || "",
+      skills: profile.skills || [],
+    });
+  }, [profile, profileForm]);
+
+  useEffect(() => {
+    if (!saveSuccess) return;
+    const timer = setTimeout(() => clearSaveSuccess(), 3000);
+    return () => clearTimeout(timer);
+  }, [saveSuccess, clearSaveSuccess]);
+
+  useEffect(() => {
+    if (!passwordSuccess) return;
+    const timer = setTimeout(() => clearPasswordSuccess(), 3000);
+    return () => clearTimeout(timer);
+  }, [passwordSuccess, clearPasswordSuccess]);
+
+  useEffect(() => {
+    if (passwordSuccess) {
+      passwordForm.reset();
+    }
+  }, [passwordSuccess, passwordForm]);
 
   // ── Save profile info ────────────────────────────────────────────────────
   const handleSaveProfile = async (values: ProfileFormValues) => {
-    setSaving(true);
-    setSaveSuccess(false);
-
-    try {
-      await api_client.patch("/profiles/me", {
-        type: "basic_info",
-        display_name: values.name,
-        bio: values.bio?.trim() || "",
-        skills: values.skills || [],
-      });
-
-      // Refresh profile
-      const { data } = await api_client.get("/profiles/me");
-      setProfile(data.data);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
-      setError(
-        (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to update profile",
-      );
-    } finally {
-      setSaving(false);
-    }
+    await updateProfile(values);
   };
 
   // ── Change password ──────────────────────────────────────────────────────
   const handleChangePassword = async (values: PasswordFormValues) => {
-    setPasswordServerError(null);
-    setPasswordSuccess(false);
-
-    setChangingPassword(true);
-    try {
-      await api_client.post("/auth/change-password", {
-        currentPassword: values.currentPassword,
-        newPassword: values.newPassword,
-      });
-      setPasswordSuccess(true);
-      passwordForm.reset();
-      setTimeout(() => setPasswordSuccess(false), 3000);
-    } catch (err) {
-      setPasswordServerError(
-        (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error || "Failed to change password",
-      );
-    } finally {
-      setChangingPassword(false);
-    }
+    await changePassword(values);
   };
 
   // ── Avatar upload ────────────────────────────────────────────────────────
@@ -183,27 +165,7 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setAvatarUploading(true);
-    try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result as string;
-        await api_client.patch("/profiles/me", {
-          type: "avatar",
-          avatar_base64: base64,
-        });
-
-        // Refresh profile
-        const { data } = await api_client.get("/profiles/me");
-        setProfile(data.data);
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      setError("Failed to upload avatar");
-    } finally {
-      setAvatarUploading(false);
-    }
+    await uploadAvatar(file);
   };
 
   // ── Add/remove skills ────────────────────────────────────────────────────
