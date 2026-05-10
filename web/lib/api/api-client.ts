@@ -40,7 +40,16 @@ const createApiClient = (): AxiosInstance => {
       }
 
       // Skip auth check for public endpoints
-      const isPublic = config.url?.startsWith("/auth/") ?? false;
+      const url = config.url ?? "";
+      const method = (config.method ?? "get").toLowerCase();
+      const isPublic =
+        url.startsWith("/auth/") ||
+        (method === "get" &&
+          (url.startsWith("/gigs") ||
+            url.startsWith("/jobs") ||
+            url.startsWith("/categories") ||
+            url.startsWith("/search") ||
+            url.startsWith("/profiles/")));
 
       if (!isPublic) {
         await waitForHydration();

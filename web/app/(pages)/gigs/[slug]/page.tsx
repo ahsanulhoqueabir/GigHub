@@ -18,6 +18,7 @@ import {
 } from "@tabler/icons-react";
 import { useGigsStore, selectGigStartingPrice } from "@/store/gig.store";
 import { Button } from "@/components/ui/button";
+import { LoginRequired } from "@/components/shared/login-required";
 import type { GigPackage } from "@/types/db/gig.types";
 
 export default function GigDetailPage() {
@@ -418,9 +419,11 @@ function PackageCard({ pkg }: { pkg: GigPackage }) {
 
       {/* CTA */}
       <div className="px-4 pb-4">
-        <Button className="w-full" size="sm">
-          Continue (${pkg.price.toLocaleString()})
-        </Button>
+        <LoginRequired message="Please log in to place an order.">
+          <Button className="w-full" size="sm">
+            Continue (${pkg.price.toLocaleString()})
+          </Button>
+        </LoginRequired>
       </div>
     </div>
   );

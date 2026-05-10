@@ -9,17 +9,9 @@ import {
   IconX,
   IconChevronDown,
 } from "@tabler/icons-react";
-import { useJobsStore, selectJobsLoading } from "@/store/job.store";
+import { useJobsStore } from "@/store/job.store";
 import { JobCard } from "@/components/shared/job-card";
 import { Button } from "@/components/ui/button";
-
-const SORT_OPTIONS = [
-  { value: "", label: "Latest" },
-  { value: "oldest", label: "Oldest" },
-  { value: "budget_high", label: "Budget: High to Low" },
-  { value: "budget_low", label: "Budget: Low to High" },
-  { value: "proposals", label: "Most Proposals" },
-];
 
 const JOB_TYPE_OPTIONS = [
   { value: "", label: "All Types" },

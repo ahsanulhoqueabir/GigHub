@@ -20,6 +20,7 @@ import {
   selectJobTypeLabel,
 } from "@/store/job.store";
 import { Button } from "@/components/ui/button";
+import { LoginRequired } from "@/components/shared/login-required";
 
 export default function JobDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -242,9 +243,11 @@ export default function JobDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* ── Apply CTA ────────────────────────────────────── */}
             <div className="rounded-xl border border-border bg-card p-5">
-              <Button className="w-full" size="lg">
-                Apply Now
-              </Button>
+              <LoginRequired message="Please log in to apply for this job.">
+                <Button className="w-full" size="lg">
+                  Apply Now
+                </Button>
+              </LoginRequired>
               <p className="text-xs text-muted-foreground text-center mt-2">
                 {job.total_proposals > 0
                   ? `${job.total_proposals} proposal${job.total_proposals > 1 ? "s" : ""} already submitted`
