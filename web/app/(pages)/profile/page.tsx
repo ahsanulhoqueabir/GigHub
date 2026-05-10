@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, type FormEvent } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   IconUser,
@@ -15,12 +15,20 @@ import {
   IconLogout,
   IconLoader2,
 } from "@tabler/icons-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
 import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
 import { api_client } from "@/lib/api/api-client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Profile } from "@/types/db/profile.types";
 import Image from "next/image";
+import {
+  profileSchema,
+  passwordSchema,
+  type ProfileFormValues,
+  type PasswordFormValues,
+} from "@/schema/profile.zod";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -44,24 +52,43 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
 
   // Edit form state
-  const [editName, setEditName] = useState("");
-  const [editBio, setEditBio] = useState("");
-  const [editSkills, setEditSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   // Password change state
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordServerError, setPasswordServerError] = useState<string | null>(
+    null,
+  );
   const [passwordSuccess, setPasswordSuccess] = useState(false);
 
   // Avatar state
   const [avatarUploading, setAvatarUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const profileForm = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: "",
+      bio: "",
+      skills: [],
+    },
+    mode: "onTouched",
+  });
+
+  const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+    mode: "onTouched",
+  });
+
+  const profileSkills =
+    useWatch({ control: profileForm.control, name: "skills" }) || [];
 
   // ── Fetch profile ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -80,9 +107,12 @@ export default function ProfilePage() {
         const { data } = await api_client.get("/profiles/me");
         const p = data.data as Profile;
         setProfile(p);
-        setEditName(p.name);
-        setEditBio(p.bio || "");
-        setEditSkills(p.skills || []);
+        profileForm.reset({
+          name: p.name || "",
+          bio: p.bio || "",
+          skills: p.skills || [],
+        });
+        setSkillInput("");
       } catch (err) {
         setError(
           (err as { response?: { data?: { error?: string } } })?.response?.data
@@ -97,17 +127,16 @@ export default function ProfilePage() {
   }, [hasHydrated, isProcessing, isAuthenticated, hasToken, router]);
 
   // ── Save profile info ────────────────────────────────────────────────────
-  const handleSaveProfile = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSaveProfile = async (values: ProfileFormValues) => {
     setSaving(true);
     setSaveSuccess(false);
 
     try {
       await api_client.patch("/profiles/me", {
         type: "basic_info",
-        display_name: editName,
-        bio: editBio,
-        skills: editSkills,
+        display_name: values.name,
+        bio: values.bio?.trim() || "",
+        skills: values.skills || [],
       });
 
       // Refresh profile
@@ -126,33 +155,21 @@ export default function ProfilePage() {
   };
 
   // ── Change password ──────────────────────────────────────────────────────
-  const handleChangePassword = async (e: FormEvent) => {
-    e.preventDefault();
-    setPasswordError(null);
+  const handleChangePassword = async (values: PasswordFormValues) => {
+    setPasswordServerError(null);
     setPasswordSuccess(false);
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError("New passwords do not match");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setPasswordError("Password must be at least 6 characters");
-      return;
-    }
 
     setChangingPassword(true);
     try {
       await api_client.post("/auth/change-password", {
-        currentPassword,
-        newPassword,
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
       });
       setPasswordSuccess(true);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      passwordForm.reset();
       setTimeout(() => setPasswordSuccess(false), 3000);
     } catch (err) {
-      setPasswordError(
+      setPasswordServerError(
         (err as { response?: { data?: { error?: string } } })?.response?.data
           ?.error || "Failed to change password",
       );
@@ -192,14 +209,20 @@ export default function ProfilePage() {
   // ── Add/remove skills ────────────────────────────────────────────────────
   const addSkill = () => {
     const s = skillInput.trim();
-    if (s && !editSkills.includes(s)) {
-      setEditSkills([...editSkills, s]);
+    if (s && !profileSkills.includes(s)) {
+      profileForm.setValue("skills", [...profileSkills, s], {
+        shouldValidate: true,
+      });
     }
     setSkillInput("");
   };
 
   const removeSkill = (skill: string) => {
-    setEditSkills(editSkills.filter((s) => s !== skill));
+    profileForm.setValue(
+      "skills",
+      profileSkills.filter((s) => s !== skill),
+      { shouldValidate: true },
+    );
   };
 
   // ── Loading state ────────────────────────────────────────────────────────
@@ -412,7 +435,10 @@ export default function ProfilePage() {
 
       {/* ── Edit Profile Tab ───────────────────────────────────────────── */}
       {activeTab === "edit" && (
-        <form onSubmit={handleSaveProfile} className="space-y-6 max-w-2xl">
+        <form
+          onSubmit={profileForm.handleSubmit(handleSaveProfile)}
+          className="space-y-6 max-w-2xl"
+        >
           {/* Name */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground">
@@ -420,11 +446,14 @@ export default function ProfilePage() {
             </label>
             <input
               type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              required
+              {...profileForm.register("name")}
               className="block w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
+            {profileForm.formState.errors.name && (
+              <p className="mt-1 text-xs text-destructive">
+                {profileForm.formState.errors.name.message}
+              </p>
+            )}
           </div>
 
           {/* Bio */}
@@ -433,12 +462,16 @@ export default function ProfilePage() {
               Bio
             </label>
             <textarea
-              value={editBio}
-              onChange={(e) => setEditBio(e.target.value)}
+              {...profileForm.register("bio")}
               rows={4}
               className="block w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20 resize-y"
               placeholder="Tell others about yourself..."
             />
+            {profileForm.formState.errors.bio && (
+              <p className="mt-1 text-xs text-destructive">
+                {profileForm.formState.errors.bio.message}
+              </p>
+            )}
           </div>
 
           {/* Skills */}
@@ -461,9 +494,9 @@ export default function ProfilePage() {
                 Add
               </Button>
             </div>
-            {editSkills.length > 0 && (
+            {profileSkills.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {editSkills.map((skill) => (
+                {profileSkills.map((skill) => (
                   <span
                     key={skill}
                     className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium"
@@ -479,6 +512,11 @@ export default function ProfilePage() {
                   </span>
                 ))}
               </div>
+            )}
+            {profileForm.formState.errors.skills && (
+              <p className="mt-2 text-xs text-destructive">
+                {profileForm.formState.errors.skills.message}
+              </p>
             )}
           </div>
 
@@ -506,18 +544,24 @@ export default function ProfilePage() {
 
       {/* ── Password Tab ───────────────────────────────────────────────── */}
       {activeTab === "password" && (
-        <form onSubmit={handleChangePassword} className="space-y-6 max-w-md">
+        <form
+          onSubmit={passwordForm.handleSubmit(handleChangePassword)}
+          className="space-y-6 max-w-md"
+        >
           <div>
             <label className="mb-1.5 block text-sm font-medium text-foreground">
               Current Password
             </label>
             <input
               type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
+              {...passwordForm.register("currentPassword")}
               className="block w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
+            {passwordForm.formState.errors.currentPassword && (
+              <p className="mt-1 text-xs text-destructive">
+                {passwordForm.formState.errors.currentPassword.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -526,12 +570,14 @@ export default function ProfilePage() {
             </label>
             <input
               type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              minLength={6}
+              {...passwordForm.register("newPassword")}
               className="block w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
+            {passwordForm.formState.errors.newPassword && (
+              <p className="mt-1 text-xs text-destructive">
+                {passwordForm.formState.errors.newPassword.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -540,18 +586,20 @@ export default function ProfilePage() {
             </label>
             <input
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              minLength={6}
+              {...passwordForm.register("confirmPassword")}
               className="block w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-sm text-foreground placeholder-muted-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20"
             />
+            {passwordForm.formState.errors.confirmPassword && (
+              <p className="mt-1 text-xs text-destructive">
+                {passwordForm.formState.errors.confirmPassword.message}
+              </p>
+            )}
           </div>
 
-          {passwordError && (
+          {passwordServerError && (
             <p className="text-sm text-destructive flex items-center gap-1">
               <IconX size={14} />
-              {passwordError}
+              {passwordServerError}
             </p>
           )}
 

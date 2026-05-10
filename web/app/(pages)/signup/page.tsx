@@ -1,18 +1,48 @@
 "use client";
 
-import { useState, useRef, type FormEvent, type ChangeEvent } from "react";
+import { useState, useRef, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useWatch } from "react-hook-form";
+import Image from "next/image";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 import { compressImageToFile } from "@/lib/image-compression";
-import type {
-  SignUpStep1Data,
-  SignUpStep2Data,
-  SignUpStep3Data,
-} from "@/types/business/user.types";
+import { signUpSchema, type SignUpFormValues } from "@/schema/signup.zod";
 
 type Step = 1 | 2 | 3;
+
+type StepIndicatorProps = {
+  step: Step;
+};
+
+const StepIndicator = ({ step }: StepIndicatorProps) => (
+  <div className="mb-8 flex items-center justify-center gap-2">
+    {([1, 2, 3] as const).map((s) => (
+      <div key={s} className="flex items-center gap-2">
+        <div
+          className={`flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
+            step === s
+              ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
+              : step > s
+                ? "bg-green-500 text-white"
+                : "bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+          }`}
+        >
+          {step > s ? "✓" : s}
+        </div>
+        {s < 3 && (
+          <div
+            className={`h-px w-8 transition-colors ${
+              step > s ? "bg-green-500" : "bg-zinc-200 dark:bg-zinc-700"
+            }`}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+);
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -27,27 +57,48 @@ export default function SignUpPage() {
   // ── Step state ──────────────────────────────────────────────────────────
   const [step, setStep] = useState<Step>(1);
 
-  // Step 1: Basic info
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
-
   // Step 2: Avatar
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   // Step 3: Bio & skills
-  const [bio, setBio] = useState("");
   const [skillInput, setSkillInput] = useState("");
-  const [skills, setSkills] = useState<string[]>([]);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    trigger,
+    control,
+    formState: { errors },
+  } = useForm<SignUpFormValues>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      avatar: null,
+      bio: "",
+      skills: [],
+    },
+    mode: "onTouched",
+  });
+
+  const [name, email, password] = useWatch({
+    control,
+    name: ["name", "email", "password"],
+  });
+  const skills = useWatch({ control, name: "skills" }) || [];
 
   // ── Step 1: Validation ───────────────────────────────────────────────────
-  const isStep1Valid = name.trim() && email.trim() && password.length >= 6;
+  const isStep1Valid =
+    !!name?.trim() && !!email?.trim() && (password?.length ?? 0) >= 6;
 
-  const handleStep1Next = () => {
+  const handleStep1Next = async () => {
     clearError();
-    if (!isStep1Valid) return;
+    const step1Valid = await trigger(["name", "email", "password", "username"]);
+    if (!step1Valid) return;
     setStep(2);
   };
 
@@ -64,12 +115,12 @@ export default function SignUpPage() {
       format: "image/webp",
     });
 
-    setAvatarFile(compressed);
+    setValue("avatar", compressed, { shouldValidate: true });
     setAvatarPreview(URL.createObjectURL(compressed));
   };
 
   const handleRemoveAvatar = () => {
-    setAvatarFile(null);
+    setValue("avatar", null, { shouldValidate: true });
     setAvatarPreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -80,7 +131,7 @@ export default function SignUpPage() {
   const handleAddSkill = () => {
     const trimmed = skillInput.trim();
     if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
+      setValue("skills", [...skills, trimmed], { shouldValidate: true });
       setSkillInput("");
     }
   };
@@ -93,57 +144,33 @@ export default function SignUpPage() {
   };
 
   const handleRemoveSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill));
+    setValue(
+      "skills",
+      skills.filter((s) => s !== skill),
+      { shouldValidate: true },
+    );
   };
 
   // ── Submit ───────────────────────────────────────────────────────────────
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: SignUpFormValues) => {
     clearError();
 
     try {
       await signUp({
-        email,
-        password,
-        name,
-        username: username || undefined,
-        avatar: avatarFile,
-        bio: bio || undefined,
-        skills: skills.length > 0 ? skills : undefined,
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        username: values.username?.trim() || undefined,
+        avatar: values.avatar || undefined,
+        bio: values.bio?.trim() || undefined,
+        skills:
+          values.skills && values.skills.length > 0 ? values.skills : undefined,
       });
       router.push("/");
     } catch {
       // error is already set in the store
     }
   };
-
-  // ── Step indicator ───────────────────────────────────────────────────────
-  const StepIndicator = () => (
-    <div className="mb-8 flex items-center justify-center gap-2">
-      {([1, 2, 3] as const).map((s) => (
-        <div key={s} className="flex items-center gap-2">
-          <div
-            className={`flex size-8 items-center justify-center rounded-full text-sm font-medium transition-colors ${
-              step === s
-                ? "bg-zinc-900 text-white dark:bg-white dark:text-black"
-                : step > s
-                  ? "bg-green-500 text-white"
-                  : "bg-zinc-200 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
-            }`}
-          >
-            {step > s ? "✓" : s}
-          </div>
-          {s < 3 && (
-            <div
-              className={`h-px w-8 transition-colors ${
-                step > s ? "bg-green-500" : "bg-zinc-200 dark:bg-zinc-700"
-              }`}
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  );
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -161,7 +188,7 @@ export default function SignUpPage() {
           </p>
         </div>
 
-        <StepIndicator />
+        <StepIndicator step={step} />
 
         {/* Error */}
         {error && (
@@ -170,7 +197,7 @@ export default function SignUpPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {/* ══════════ Step 1: Name, Email, Password ══════════ */}
           {step === 1 && (
             <div className="space-y-5">
@@ -185,13 +212,16 @@ export default function SignUpPage() {
                 <input
                   id="name"
                   type="text"
-                  required
                   autoComplete="name"
                   placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  {...register("name")}
                   className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                 />
+                {errors.name && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
               {/* Username (optional) */}
@@ -210,10 +240,14 @@ export default function SignUpPage() {
                   type="text"
                   autoComplete="username"
                   placeholder="johndoe"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  {...register("username")}
                   className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                 />
+                {errors.username && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.username.message}
+                  </p>
+                )}
               </div>
 
               {/* Email */}
@@ -227,13 +261,16 @@ export default function SignUpPage() {
                 <input
                   id="email"
                   type="email"
-                  required
                   autoComplete="email"
                   placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  {...register("email")}
                   className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                 />
+                {errors.email && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
 
               {/* Password */}
@@ -247,13 +284,16 @@ export default function SignUpPage() {
                 <input
                   id="password"
                   type="password"
-                  required
                   autoComplete="new-password"
                   placeholder="Min. 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
                   className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                 />
+                {errors.password && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
 
               {/* Next */}
@@ -276,10 +316,13 @@ export default function SignUpPage() {
               <div className="flex flex-col items-center gap-4">
                 {avatarPreview ? (
                   <div className="relative">
-                    <img
+                    <Image
                       src={avatarPreview}
                       alt="Avatar preview"
                       className="size-32 rounded-full object-cover ring-2 ring-zinc-200 dark:ring-zinc-700"
+                      width={128}
+                      height={128}
+                      unoptimized
                     />
                     <button
                       type="button"
@@ -340,7 +383,7 @@ export default function SignUpPage() {
                   size="lg"
                   onClick={() => setStep(3)}
                 >
-                  {avatarFile ? "Next" : "Skip"}
+                  {getValues("avatar") ? "Next" : "Skip"}
                 </Button>
               </div>
             </div>
@@ -364,10 +407,14 @@ export default function SignUpPage() {
                   id="bio"
                   rows={3}
                   placeholder="Tell us about yourself, your skills, and what you offer…"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
+                  {...register("bio")}
                   className="block w-full resize-none rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
                 />
+                {errors.bio && (
+                  <p className="mt-1 text-xs text-red-600 dark:text-red-400">
+                    {errors.bio.message}
+                  </p>
+                )}
               </div>
 
               {/* Skills */}
@@ -420,6 +467,11 @@ export default function SignUpPage() {
                       </span>
                     ))}
                   </div>
+                )}
+                {errors.skills && (
+                  <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+                    {errors.skills.message}
+                  </p>
                 )}
               </div>
 
