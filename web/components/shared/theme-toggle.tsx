@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { IconSun, IconMoon, IconDeviceLaptop } from "@tabler/icons-react";
+import { IconSun, IconMoon } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -13,34 +13,32 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="h-8 w-20 rounded-lg border border-border bg-background" />
+      <div className="h-8 w-14 rounded-full border border-border bg-background" />
     );
   }
 
-  const options = [
-    { value: "light", icon: IconSun, label: "Light" },
-    { value: "dark", icon: IconMoon, label: "Dark" },
-    { value: "system", icon: IconDeviceLaptop, label: "System" },
-  ] as const;
+  const isDark = theme === "dark";
+  const nextTheme = isDark ? "light" : "dark";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/50 p-0.5">
-      {options.map(({ value, icon: Icon, label }) => (
-        <button
-          key={value}
-          onClick={() => setTheme(value)}
-          aria-label={label}
-          className={cn(
-            "flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors",
-            theme === value
-              ? "bg-background text-foreground shadow-xs"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          <Icon size={14} />
-          <span className="hidden sm:inline">{label}</span>
-        </button>
-      ))}
-    </div>
+    <button
+      type="button"
+      onClick={() => setTheme(nextTheme)}
+      aria-label={isDark ? "Switch to light" : "Switch to dark"}
+      className={cn(
+        "relative inline-flex h-8 w-14 items-center rounded-full border border-border bg-muted/50 px-1 transition-colors",
+        "hover:bg-muted",
+      )}
+    >
+      <span
+        className={cn(
+          "absolute left-1 flex size-6 items-center justify-center rounded-full bg-background shadow-xs transition-transform",
+          isDark && "translate-x-6",
+        )}
+      >
+        {isDark ? <IconMoon size={14} /> : <IconSun size={14} />}
+      </span>
+      <span className="sr-only">Theme toggle</span>
+    </button>
   );
 }
