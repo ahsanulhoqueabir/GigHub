@@ -14,10 +14,13 @@ export function Navbar() {
   const pathname = usePathname();
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const user = useAuthStore((s) => s.user);
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isProcessing = useAuthStore((s) => s.isProcessing);
   const logout = useAuthStore((s) => s.logout);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const showAuthUi = hasHydrated && !isProcessing;
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -75,7 +78,7 @@ export function Navbar() {
 
         {/* Right side */}
         <div className="flex items-center gap-3 ml-auto">
-          {isAuthenticated && user ? (
+          {showAuthUi && isAuthenticated && user ? (
             <div className="relative" ref={dropdownRef}>
               {/* Profile trigger */}
               <button
@@ -160,7 +163,7 @@ export function Navbar() {
                 </div>
               )}
             </div>
-          ) : (
+          ) : showAuthUi ? (
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">Sign in</Link>
@@ -169,7 +172,7 @@ export function Navbar() {
                 <Link href="/signup">Get started</Link>
               </Button>
             </div>
-          )}
+          ) : null}
 
           {/* Mobile menu toggle */}
           <button

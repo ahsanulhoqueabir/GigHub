@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from "axios";
-import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
+import { useAuthStore } from "@/store/auth.store";
 import { ServerNavigationHelper } from "./server-navigation-helper";
 
 /**
@@ -15,6 +15,22 @@ const createApiClient = (): AxiosInstance => {
     },
   });
 
+  const waitForHydration = () =>
+    new Promise<void>((resolve) => {
+      const { hasHydrated } = useAuthStore.getState();
+      if (hasHydrated) {
+        resolve();
+        return;
+      }
+
+      const unsubscribe = useAuthStore.subscribe((state) => {
+        if (state.hasHydrated) {
+          unsubscribe();
+          resolve();
+        }
+      });
+    });
+
   // Request interceptor to wait for auth and add token
   instance.interceptors.request.use(
     async (config) => {
@@ -27,17 +43,16 @@ const createApiClient = (): AxiosInstance => {
       const isPublic = config.url?.startsWith("/auth/") ?? false;
 
       if (!isPublic) {
-        const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
+        await waitForHydration();
 
-        if (!isAuthenticated) {
+        const accessToken = await useAuthStore.getState().getValidAccessToken();
+
+        if (!accessToken) {
           return Promise.reject(
             new Error("Authentication required. Please log in."),
           );
         }
-      }
 
-      const { accessToken } = useAuthStore.getState();
-      if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
       return config;
@@ -64,11 +79,10 @@ const createApiClient = (): AxiosInstance => {
           }
 
           try {
-            // Try to refresh the token by re-initializing auth
-            await useAuthStore.getState().initAuth();
-
-            // Get the updated token
-            const { accessToken } = useAuthStore.getState();
+            // Try to refresh the token
+            const accessToken = await useAuthStore
+              .getState()
+              .refreshAccessToken();
 
             // If we still don't have a token after refresh attempt, handle auth error
             if (!accessToken) {

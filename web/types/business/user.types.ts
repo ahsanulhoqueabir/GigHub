@@ -59,10 +59,14 @@ export interface Profile {
 
 export interface LoginResponseData {
   user: Profile;
-  token: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in?: string;
 }
 
 export interface SignUpResponseData {
   user: Profile;
-  token: string;
+  access_token: string;
+  refresh_token: string;
+  expires_in?: string;
 }

@@ -31,8 +31,12 @@ type ProfileTab = "overview" | "edit" | "password";
 export default function ProfilePage() {
   const router = useRouter();
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const hasHydrated = useAuthStore((s) => s.hasHydrated);
+  const isProcessing = useAuthStore((s) => s.isProcessing);
+  const hasToken = useAuthStore(
+    (s) => s.accessToken !== null || s.refreshToken !== null,
+  );
   const logout = useAuthStore((s) => s.logout);
-  const user = useAuthStore((s) => s.user);
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +65,11 @@ export default function ProfilePage() {
 
   // ── Fetch profile ────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!hasHydrated || isProcessing) {
+      return;
+    }
+
+    if (!isAuthenticated && !hasToken) {
       router.push("/login");
       return;
     }
@@ -86,7 +94,7 @@ export default function ProfilePage() {
     };
 
     fetchProfile();
-  }, [isAuthenticated, router]);
+  }, [hasHydrated, isProcessing, isAuthenticated, hasToken, router]);
 
   // ── Save profile info ────────────────────────────────────────────────────
   const handleSaveProfile = async (e: FormEvent) => {

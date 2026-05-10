@@ -7,7 +7,7 @@ import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
  * CentralDataInitializer — re-validates the stored auth token on mount.
  *
  * On every client-side navigation it checks whether a persisted token
- * is still valid by calling `initAuth()` (which hits `GET /api/auth/me`).
+ * is still valid by calling `initAuth()` (which hits `GET /api/profiles/me`).
  * If the token is expired the store is cleared and the user is treated
  * as logged-out.
  *
@@ -24,11 +24,10 @@ export function CentralDataInitializer() {
 
     hasInitialized.current = true;
 
-    const storedUser = useAuthStore.getState().user;
-    const storedToken = useAuthStore.getState().accessToken;
+    const { accessToken, refreshToken } = useAuthStore.getState();
 
     // Only call initAuth if we have a persisted token to validate
-    if (storedToken && storedUser) {
+    if (accessToken || refreshToken) {
       initAuth();
     }
   }, [hasHydrated, initAuth]);
@@ -42,9 +41,10 @@ export function CentralDataInitializer() {
  */
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
-  const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
+  const isProcessing = useAuthStore((s) => s.isProcessing);
+  const isAuthenticated = useAuthStore((s) => selectIsAuthenticated(s));
 
-  if (!hasHydrated) {
+  if (!hasHydrated || isProcessing) {
     return null; // or a minimal skeleton
   }
 
