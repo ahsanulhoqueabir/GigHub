@@ -45,7 +45,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 px-4 py-12 text-zinc-900 dark:bg-zinc-950 dark:text-white">
+    <div className="px-4 py-12">
       <div className="mx-auto flex w-full max-w-md flex-col gap-6">
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.35em] text-zinc-500 dark:text-zinc-400">
