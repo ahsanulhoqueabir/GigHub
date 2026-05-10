@@ -3,42 +3,12 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { siteConfig } from "@/config/site.config";
-import {
-  IconSearch,
-  IconBriefcase,
-  IconUsers,
-  IconShieldCheck,
-  IconArrowRight,
-  IconLoader2,
-} from "@tabler/icons-react";
+import { IconArrowRight, IconLoader2 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { GigCard } from "@/components/shared/gig-card";
 import { JobCard } from "@/components/shared/job-card";
 import { useGigsStore, selectGigsLoading } from "@/store/gig.store";
 import { useJobsStore, selectJobsLoading } from "@/store/job.store";
-
-const features = [
-  {
-    icon: IconSearch,
-    title: "Find Gigs",
-    desc: "Browse thousands of freelance opportunities from top clients worldwide.",
-  },
-  {
-    icon: IconBriefcase,
-    title: "Post Projects",
-    desc: "Hire skilled professionals to bring your ideas to life.",
-  },
-  {
-    icon: IconUsers,
-    title: "Top Talent",
-    desc: "Connect with verified freelancers across every category.",
-  },
-  {
-    icon: IconShieldCheck,
-    title: "Secure Payments",
-    desc: "Escrow-backed payments ensure peace of mind for both parties.",
-  },
-];
 
 export default function Home() {
   const gigs = useGigsStore((s) => s.gigs);
@@ -75,33 +45,6 @@ export default function Home() {
                 <Link href="/gigs">Browse Gigs</Link>
               </Button>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Features ─────────────────────────────────────────── */}
-      <section className="border-b border-border">
-        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="rounded-xl border border-border bg-card p-4 sm:p-6 hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                    <Icon size={18} className="sm:size-5" />
-                  </div>
-                  <h3 className="mt-3 font-semibold text-sm sm:text-base text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
-                    {feature.desc}
-                  </p>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
