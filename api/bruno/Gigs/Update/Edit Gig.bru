@@ -1,0 +1,57 @@
+meta {
+  name: Edit Gig
+  type: http
+  seq: 1
+}
+
+patch {
+  url: {{base_url}}/gigs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "edit",
+    "title": "Updated: I will create a high performance NestJS backend",
+    "description": "Updated description with more details about the service.",
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic API Setup (Updated)",
+        "description": "Updated basic description.",
+        "price": 60,
+        "delivery_days": 2,
+        "revision_count": 2
+      }
+    ]
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "title": "Updated: I will create a high performance NestJS backend",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "status": "active",
+      "packages": [
+        { "tier": "basic", "title": "Basic API Setup (Updated)", "price": 60, "delivery_days": 2, "revision_count": 2 }
+      ],
+      "updated_at": "2026-05-08T12:00:00.000Z"
+    }
+  }
+  ```
+}

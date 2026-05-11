@@ -1,0 +1,39 @@
+meta {
+  name: Initiate Payment
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/payments/initiate
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "order_id": "paste-order-uuid-here"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "tran_id": "GH-PAY-1778182254234-5296add4",
+      "gateway_page_url": "https://sandbox.sslcommerz.com/gwprocess/...",
+      "fees": {
+        "platform_fee": 2.5,
+        "total_charges": 52.5
+      }
+    }
+  }
+  ```
+}

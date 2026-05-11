@@ -1,0 +1,33 @@
+meta {
+  name: Duplicate Email
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test@example.com",
+    "password": "Password123!",
+    "display_name": "Test User",
+    "username": "newuser_01"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Email already registered",
+    "details": {},
+    "status": 409
+  }
+  ```
+}

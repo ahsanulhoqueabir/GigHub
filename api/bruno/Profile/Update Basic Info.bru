@@ -1,0 +1,47 @@
+meta {
+  name: Update Basic Info
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/profiles/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "basic_info",
+    "display_name": "Updated Name",
+    "bio": "New bio content...",
+    "skills": ["Node.js", "NestJS", "Bruno"]
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "display_name": "Updated Name",
+      "username": "john_doe",
+      "email": "john@example.com",
+      "avatar": null,
+      "bio": "New bio content...",
+      "skills": ["Node.js", "NestJS", "Bruno"],
+      "availability_status": "available",
+      "is_verified": false,
+      "role": "student",
+      "updated_at": "2026-05-08T12:00:00.000Z"
+    }
+  }
+  ```
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Upload Image
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/upload/image?folder=gigs
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:multipart-form {
+  file: @file(/home/ahsanul/Downloads/photo_2026-03-05_13-39-49.jpg)
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "url": "https://r2.gighub.com/gigs/uuid.jpg",
+      "key": "gigs/uuid.jpg"
+    }
+  }
+  ```
+}

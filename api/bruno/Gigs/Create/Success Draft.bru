@@ -1,0 +1,83 @@
+meta {
+  name: Success Draft
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "I will create a Gatsby frontend",
+    "description": "I will build a blazing fast static site using Gatsby, React, and GraphQL.",
+    "category_id": "81c0e37e-decf-486b-97f2-0015c20e48c2",
+    "tags": ["gatsby", "react", "graphql", "frontend"],
+    "status": "draft",
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic Site Setup",
+        "description": "Basic Gatsby site with 2 pages and SEO setup.",
+        "price": 40,
+        "delivery_days": 4,
+        "revision_count": 1,
+        "features": ["2 Pages", "SEO Optimization"]
+      },
+      {
+        "tier": "standard",
+        "title": "Standard Site Development",
+        "description": "Full Gatsby site with 5 pages, CMS integration, and SEO.",
+        "price": 120,
+        "delivery_days": 8,
+        "revision_count": 2,
+        "features": ["5 Pages", "CMS Integration", "SEO"]
+      },
+      {
+        "tier": "premium",
+        "title": "Premium Site Development",
+        "description": "Enterprise Gatsby site with 10+ pages, CMS, animations, and SEO.",
+        "price": 250,
+        "delivery_days": 14,
+        "revision_count": 5,
+        "features": ["10+ Pages", "CMS", "Animations", "SEO"]
+      }
+    ]
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "seller": { "id": "uuid", "display_name": "John", "username": "john_doe" },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+      "title": "I will create a Gatsby frontend",
+      "slug": "i-will-create-a-gatsby-frontend-1778182254234",
+      "status": "draft",
+      "packages": [
+        { "tier": "basic", "title": "Basic Site Setup", "price": 40, "delivery_days": 4 },
+        { "tier": "standard", "title": "Standard Site Development", "price": 120, "delivery_days": 8 },
+        { "tier": "premium", "title": "Premium Site Development", "price": 250, "delivery_days": 14 }
+      ],
+      "avg_rating": 0,
+      "total_reviews": 0,
+      "total_orders": 0,
+      "view_count": 0,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

@@ -1,0 +1,42 @@
+meta {
+  name: Status Change
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/jobs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "closed"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "01297b90-768e-4651-8ff4-5c7c89c7bd0d",
+      "slug": "need-a-react-developer-for-portfolio-website-1778184181079",
+      "status": "closed",
+      "updated_at": "2026-05-08T12:00:00.000Z"
+    }
+  }
+  ```
+}

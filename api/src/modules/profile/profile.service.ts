@@ -75,19 +75,11 @@ export class ProfileService {
       Pick<Profile, 'display_name' | 'username' | 'bio' | 'skills' | 'availability_status'>
     >,
   ): Promise<ServiceResponse<Profile>> {
-    const payload: Record<string, unknown> = { ...dto };
-    if (dto.username) {
-      payload['username_updated_at'] = new Date().toISOString();
-    }
-    return this.patch(id, payload, 'Failed to update profile');
+    return this.patch(id, { ...dto }, 'Failed to update profile');
   }
 
-  async setAvatar(
-    id: string,
-    avatarUrl: string,
-    avatarKey: string,
-  ): Promise<ServiceResponse<Profile>> {
-    return this.patch(id, { avatar: avatarUrl, avatar_key: avatarKey }, 'Failed to update avatar');
+  async setAvatar(id: string, avatarUrl: string): Promise<ServiceResponse<Profile>> {
+    return this.patch(id, { avatar: avatarUrl }, 'Failed to update avatar');
   }
 
   async setFcmToken(id: string, fcmToken: string): Promise<ServiceResponse<Profile>> {
@@ -103,18 +95,7 @@ export class ProfileService {
   }
 
   async canRename(id: string): Promise<boolean> {
-    try {
-      const { data } = await directusApi.get<{ data: Profile }>(`/items/${this.collection}/${id}`, {
-        params: { fields: 'username_updated_at' },
-      });
-      const lastChanged = data.data?.username_updated_at;
-      if (!lastChanged) return true;
-
-      const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-      return Date.now() - new Date(lastChanged).getTime() >= THIRTY_DAYS_MS;
-    } catch {
-      return true; // Fail open: allow change if check fails
-    }
+    return true;
   }
 
   async isTaken(username: string, excludeId?: string): Promise<boolean> {

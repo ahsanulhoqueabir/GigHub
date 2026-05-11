@@ -1,0 +1,35 @@
+meta {
+  name: Not Found
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{base_url}}/gigs/00000000-0000-0000-0000-000000000000
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "edit",
+    "title": "New Title"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Gig not found",
+    "details": {},
+    "status": 404
+  }
+  ```
+}

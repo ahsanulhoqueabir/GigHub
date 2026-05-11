@@ -1,0 +1,28 @@
+meta {
+  name: Not Found
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{base_url}}/gigs/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Gig not found",
+    "details": {},
+    "status": 404
+  }
+  ```
+}

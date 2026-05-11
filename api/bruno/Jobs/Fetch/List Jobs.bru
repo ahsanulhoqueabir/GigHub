@@ -1,0 +1,55 @@
+meta {
+  name: List Jobs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/jobs?search=math
+  body: none
+  auth: none
+}
+
+params:query {
+  search: math
+  ~page: 1
+  ~limit: 20
+  ~category: 
+  ~job_type: paid
+  ~listing_scope: jobs
+  ~status: open
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "01297b90-768e-4651-8ff4-5c7c89c7bd0d",
+        "poster": { "id": "uuid", "display_name": "Poster", "username": "poster1" },
+        "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+        "title": "Need a React Developer for Portfolio Website",
+        "slug": "need-a-react-developer-for-portfolio-website-1778184181079",
+        "job_type": "paid",
+        "budget_type": "fixed",
+        "budget_min": 100,
+        "budget_max": 500,
+        "required_skills": ["react", "framer-motion", "css"],
+        "status": "open",
+        "total_proposals": 3,
+        "created_at": "2026-05-08T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 2,
+      "totalCount": 8,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}

@@ -1,0 +1,115 @@
+meta {
+  name: Gig Detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/gigs/i-will-create-a-high-performance-nestjs-backend-1778182254234
+  body: none
+  auth: none
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+    "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+    "title": "I will create a high performance NestJS backend",
+    "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+    "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
+    "tags": [
+      "nestjs",
+      "backend",
+      "api",
+      "typescript"
+    ],
+    "images": [
+      {
+        "url": "https://example.com/image1.jpg",
+        "sort_order": 0
+      }
+    ],
+    "status": "active",
+    "avg_rating": "0.00",
+    "total_reviews": 0,
+    "total_orders": 0,
+    "view_count": 0,
+    "created_at": "2026-05-07T19:30:54.718Z",
+    "updated_at": "2026-05-07T19:30:54.718Z",
+    "packages": [
+      {
+        "id": "ab60613e-3313-4250-b03d-452e4a2f42e0",
+        "tier": "basic",
+        "title": "Basic API Setup",
+        "description": "Basic setup with 3 endpoints and database integration.",
+        "price": 50,
+        "delivery_days": 3,
+        "revision_count": 1,
+        "features": [
+          "3 Endpoints",
+          "Database Integration"
+        ]
+      },
+      {
+        "id": "940c804c-812e-486c-85f9-b09b95f7bd4e",
+        "tier": "standard",
+        "title": "Standard API Development",
+        "description": "Standard setup with 10 endpoints, auth, and database integration.",
+        "price": 150,
+        "delivery_days": 7,
+        "revision_count": 3,
+        "features": [
+          "10 Endpoints",
+          "Auth",
+          "Database Integration"
+        ]
+      }
+    ],
+    "seller": {
+      "id": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+      "display_name": "Updated Name",
+      "email": "test@example.com",
+      "username": "testuser_01",
+      "avatar": null
+    },
+    "category": {
+      "id": "81c0e37e-decf-486b-97f2-0015c20e48c2",
+      "name": "Development",
+      "icon": "code"
+    },
+    "orders": [
+      {
+        "id": "5296add4-02f9-4583-90e9-bd6e5c4c89ea",
+        "order_number": "ORD-20260507-9536",
+        "buyer": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+        "seller": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+        "source_type": "gig",
+        "gig": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+        "job": null,
+        "proposal": null,
+        "title": "I will create a high performance NestJS backend",
+        "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
+        "amount": "50.00",
+        "platform_fee": "3.00",
+        "seller_earnings": "47.00",
+        "delivery_days": 3,
+        "revision_count": 1,
+        "revisions_used": 0,
+        "status": "pending",
+        "delivery_deadline": null,
+        "completed_at": null,
+        "cancelled_at": null,
+        "cancellation_reason": null,
+        "created_at": "2026-05-07T20:27:30.410Z",
+        "updated_at": "2026-05-07T20:27:30.410Z",
+        "gig_package": "basic"
+      },
+    ]
+  }
+  }
+  ```
+}

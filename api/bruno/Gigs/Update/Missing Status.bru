@@ -1,0 +1,41 @@
+meta {
+  name: Missing Status
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "status",
+        "constraints": {
+          "isEnum": "status should not be empty"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}

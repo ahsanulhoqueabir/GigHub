@@ -8,7 +8,7 @@
 
 ## Phase Overview
 
-Build the core marketplace experience in Flutter: gig discovery and creation, job board with proposals, and the search/filter system. Each feature mirrors the Next.js frontend but follows native mobile design patterns.
+Build the core marketplace experience in Flutter: gig discovery and creation, job board with proposals, and the search/filter system. **Note: All repositories in this phase should initially implement a 'Mock' version that reads from `mock_data.json` to enable UI development.**
 
 ---
 

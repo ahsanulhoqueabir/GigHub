@@ -1,0 +1,51 @@
+meta {
+  name: List Tuitions
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/jobs?page=1&listing_scope=tuition
+  body: none
+  auth: none
+}
+
+params:query {
+  page: 1
+  listing_scope: tuition
+  ~limit: 20
+  ~search: math
+  ~category: 
+  ~status: open
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid",
+        "poster": { "id": "uuid", "display_name": "Tutor", "username": "tutor1" },
+        "category": { "id": "uuid", "name": "Math", "slug": "math" },
+        "title": "Math Tutor for Class 10",
+        "slug": "math-tutor-for-class-10-1778184181079",
+        "job_type": "tuition",
+        "required_skills": ["math", "teaching"],
+        "status": "open",
+        "total_proposals": 2,
+        "created_at": "2026-05-08T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalCount": 3,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}

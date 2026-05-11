@@ -8,14 +8,14 @@
 
 ## Phase Overview
 
-Set up the Flutter project with clean architecture, implement authentication (email/password + Google), profile management, and establish the app-wide design system, navigation, and API client layer.
+Set up the Flutter project with clean architecture, implement authentication (email/password + Google), and establish a **Mock Data Service** to power the UI using `mock_data.json`. This allows for full UI/UX validation without an active backend.
 
 ---
 
 ## Project Structure
 
 ```
-gighub_app/
+mobile/
 ├── lib/
 │   ├── main.dart                      # App entry point
 │   ├── app.dart                       # MaterialApp configuration
@@ -151,7 +151,7 @@ gighub_app/
 
 - [ ] **1.1.1** Create Flutter project:
   ```bash
-  flutter create --org com.gighub gighub_app
+  flutter create --org com.gighub mobile
   ```
 - [ ] **1.1.2** Configure `pubspec.yaml` — add dependencies:
 
@@ -682,3 +682,16 @@ gighub_app/
 - [ ] Public profile page rendering
 - [ ] Code generation (freezed, json_serializable) configured
 - [ ] All tests passing
+
+---
+
+### 1.5 Testing & Verification
+
+- [ ] **1.5.1** Unit tests: `AuthRepository` (login, register, token refresh)
+- [ ] **1.5.2** Unit tests: `API Client` & `AuthInterceptor` (request/error handling)
+- [ ] **1.5.3** Unit tests: `Validation` logic (email, password, profile fields)
+- [ ] **1.5.4** Widget tests: `LoginScreen` & `RegisterScreen` rendering + validation
+- [ ] **1.5.5** Widget tests: Common UI components (`GHButton`, `GHTextField`)
+- [ ] **1.5.6** Manual test: Successfully persist session across app restarts
+- [ ] **1.5.7** Manual test: Verify theme switching (Light/Dark) applies app-wide
+- [ ] **1.5.8** Manual test: Verify logout clears all secure storage data

@@ -1,0 +1,42 @@
+meta {
+  name: Invalid Type
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "invalid-type",
+    "title": "Should fail due to invalid type"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "type",
+        "constraints": {
+          "isEnum": "type must be one of: edit, status"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}

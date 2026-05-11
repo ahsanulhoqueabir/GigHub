@@ -11,6 +11,14 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { ProfileModule } from '@/modules/profile/profile.module';
 import { CategoryModule } from '@/modules/category/category.module';
 import { UploadModule } from '@/modules/upload/upload.module';
+import { GigsModule } from '@/modules/gigs/gigs.module';
+import { OrdersModule } from '@/modules/orders/orders.module';
+import { PaymentsModule } from '@/modules/payments/payments.module';
+import { EscrowModule } from '@/modules/escrow/escrow.module';
+import { WithdrawalsModule } from '@/modules/withdrawals/withdrawals.module';
+import { JobsModule } from '@/modules/jobs/jobs.module';
+import { ProposalsModule } from '@/modules/proposals/proposals.module';
+import { SearchModule } from '@/modules/search/search.module';
 
 @Module({
   imports: [
@@ -35,6 +43,14 @@ import { UploadModule } from '@/modules/upload/upload.module';
     ProfileModule,
     CategoryModule,
     UploadModule,
+    GigsModule,
+    OrdersModule,
+    PaymentsModule,
+    EscrowModule,
+    WithdrawalsModule,
+    JobsModule,
+    ProposalsModule,
+    SearchModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

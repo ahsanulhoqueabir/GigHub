@@ -1,0 +1,42 @@
+meta {
+  name: Status Change
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{base_url}}/gigs/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "active"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "status": "active",
+      "updated_at": "2026-05-08T12:00:00.000Z"
+    }
+  }
+  ```
+}

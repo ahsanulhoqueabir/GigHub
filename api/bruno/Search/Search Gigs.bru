@@ -1,0 +1,48 @@
+meta {
+  name: Search Gigs
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/search
+  body: none
+  auth: none
+}
+
+params:query {
+  collection: gigs
+  q: nestjs
+  ~category: 
+  ~skills: 
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+        "title": "I will create a high performance NestJS backend",
+        "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+        "seller": { "id": "uuid", "display_name": "John", "username": "john_doe" },
+        "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+        "status": "active",
+        "avg_rating": 4.5,
+        "total_reviews": 10,
+        "price": 50
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalCount": 5,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}

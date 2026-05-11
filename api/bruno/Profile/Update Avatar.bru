@@ -1,0 +1,39 @@
+meta {
+  name: Update Avatar
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/profiles/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "avatar",
+    "avatar_base64": "data:image/png;base64,..."
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "display_name": "John Doe",
+      "username": "john_doe",
+      "avatar": "https://r2.gighub.com/avatars/uuid.jpg",
+      "updated_at": "2026-05-08T12:00:00.000Z"
+    }
+  }
+  ```
+}
