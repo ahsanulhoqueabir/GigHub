@@ -1,0 +1,24 @@
+meta {
+  name: Unauthorized Access
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/profiles/me
+  body: none
+  auth: none
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Unauthorized",
+    "details": "Missing or invalid token",
+    "status": 401
+  }
+  ```
+}

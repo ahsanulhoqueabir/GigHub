@@ -1,0 +1,38 @@
+meta {
+  name: Job Detail
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/jobs/need-a-react-developer-for-portfolio-website-1778184181079
+  body: none
+  auth: none
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "01297b90-768e-4651-8ff4-5c7c89c7bd0d",
+      "poster": { "id": "uuid", "display_name": "Poster", "username": "poster1" },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+      "title": "Need a React Developer for Portfolio Website",
+      "slug": "need-a-react-developer-for-portfolio-website-1778184181079",
+      "description": "Looking for an experienced React developer...",
+      "job_type": "paid",
+      "budget_type": "fixed",
+      "budget_min": 100,
+      "budget_max": 500,
+      "required_skills": ["react", "framer-motion", "css"],
+      "status": "open",
+      "total_proposals": 3,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

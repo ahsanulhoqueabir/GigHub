@@ -1,0 +1,105 @@
+meta {
+  name: My Gigs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/gigs/me
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 20
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+     {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "title": "I will create a high performance NestJS backend",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "description": "I will build a robust, scalable, and maintainable backend using NestJS, PostgreSQL, and Directus.",
+      "tags": [
+        "nestjs",
+        "backend",
+        "api",
+        "typescript"
+      ],
+      "images": [
+        {
+          "url": "https://example.com/image1.jpg",
+          "sort_order": 0
+        }
+      ],
+      "status": "active",
+      "avg_rating": "0.00",
+      "total_reviews": 0,
+      "total_orders": 0,
+      "view_count": 0,
+      "created_at": "2026-05-07T19:30:54.718Z",
+      "updated_at": "2026-05-07T19:30:54.718Z",
+      "packages": [
+        {
+          "id": "ab60613e-3313-4250-b03d-452e4a2f42e0",
+          "tier": "basic",
+          "title": "Basic API Setup",
+          "description": "Basic setup with 3 endpoints and database integration.",
+          "price": 50,
+          "delivery_days": 3,
+          "revision_count": 1,
+          "features": [
+            "3 Endpoints",
+            "Database Integration"
+          ]
+        },
+        {
+          "id": "940c804c-812e-486c-85f9-b09b95f7bd4e",
+          "tier": "standard",
+          "title": "Standard API Development",
+          "description": "Standard setup with 10 endpoints, auth, and database integration.",
+          "price": 150,
+          "delivery_days": 7,
+          "revision_count": 3,
+          "features": [
+            "10 Endpoints",
+            "Auth",
+            "Database Integration"
+          ]
+        }
+      ],
+      "seller": {
+        "id": "bd0b6275-adcc-4a1e-a966-0554647fe1e2",
+        "display_name": "Updated Name",
+        "email": "test@example.com",
+        "username": "testuser_01",
+        "avatar": null
+      },
+      "category": {
+        "id": "81c0e37e-decf-486b-97f2-0015c20e48c2",
+        "name": "Development",
+        "icon": "code"
+      }
+    }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 3,
+      "totalCount": 12,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}

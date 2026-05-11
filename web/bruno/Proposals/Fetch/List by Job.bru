@@ -1,0 +1,48 @@
+meta {
+  name: List by Job
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/proposals/job/:jobId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  jobId: 
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid",
+        "job": { "id": "uuid", "title": "Need a React Developer...", "slug": "need-a-react-developer..." },
+        "applicant": { "id": "uuid", "display_name": "John", "username": "john_doe", "avatar": null },
+        "cover_letter": "I am interested in this job...",
+        "quoted_price": 200,
+        "estimated_days": 5,
+        "status": "pending",
+        "created_at": "2026-05-08T10:00:00.000Z"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "totalPages": 1,
+      "totalCount": 3,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  }
+  ```
+}

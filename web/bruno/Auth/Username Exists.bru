@@ -1,0 +1,36 @@
+meta {
+  name: Username Exists
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/auth/username-exists?username=johndoe
+  body: none
+  auth: none
+}
+
+docs {
+  ## Query Params
+  - `username` (required)
+
+  ## Success Response (200)
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "exists": false
+    }
+  }
+  ```
+
+  ## Error Response (400)
+
+  ```json
+  {
+    "success": false,
+    "error": "Username is required"
+  }
+  ```
+}

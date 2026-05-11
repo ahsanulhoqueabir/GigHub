@@ -1,0 +1,42 @@
+meta {
+  name: Escrow Detail
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/payments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  type: escrow
+  order_id: 
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "order": "5296add4-02f9-4583-90e9-bd6e5c4c89ea",
+      "buyer": "uuid",
+      "seller": "uuid",
+      "status": "held",
+      "amount": 50,
+      "platform_fee": 2.5,
+      "auto_release_at": "2026-05-18T10:00:00.000Z",
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

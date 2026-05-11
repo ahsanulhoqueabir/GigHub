@@ -1,0 +1,42 @@
+meta {
+  name: Invalid Status
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "invalid-status"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      {
+        "property": "status",
+        "constraints": {
+          "isEnum": "status must be one of: active, paused"
+        }
+      }
+    ],
+    "status": 400
+  }
+  ```
+}

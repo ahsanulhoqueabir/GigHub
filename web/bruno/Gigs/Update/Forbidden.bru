@@ -1,0 +1,35 @@
+meta {
+  name: Forbidden
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{base_url}}/gigs/{{gig_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "type": "status",
+    "status": "active"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "You are not allowed to modify this gig",
+    "details": {},
+    "status": 403
+  }
+  ```
+}

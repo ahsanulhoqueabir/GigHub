@@ -1,0 +1,32 @@
+meta {
+  name: Escrow Missing Order Id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/payments
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+params:query {
+  type: escrow
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": "order_id is required for escrow queries",
+    "status": 400
+  }
+  ```
+}

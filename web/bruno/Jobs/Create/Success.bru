@@ -1,0 +1,55 @@
+meta {
+  name: Success
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/jobs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Need Business Consultant for Startup Plan",
+    "description": "Looking for an experienced business consultant to help prepare a startup business plan and pitch deck.",
+    "category_id": "005f2845-46c3-4d04-aa04-02f6c69a1f45",
+    "job_type": "paid",
+    "budget_min": 200,
+    "budget_max": 1000,
+    "budget_type": "fixed",
+    "required_skills": ["business-strategy", "pitch-deck", "consulting"],
+    "attachments": []
+  }
+}
+
+docs {
+  ## Response
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "01297b90-768e-4651-8ff4-5c7c89c7bd0d",
+      "poster": { "id": "uuid", "display_name": "John", "username": "john_doe" },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech" },
+      "title": "Need a React Developer for Portfolio Website",
+      "slug": "need-a-react-developer-for-portfolio-website-1778184181079",
+      "job_type": "paid",
+      "budget_type": "fixed",
+      "budget_min": 100,
+      "budget_max": 500,
+      "required_skills": ["react", "framer-motion", "css"],
+      "status": "open",
+      "total_proposals": 0,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

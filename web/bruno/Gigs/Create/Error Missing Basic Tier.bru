@@ -1,0 +1,47 @@
+meta {
+  name: Error Missing Basic Tier
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Invalid Gig Title",
+    "description": "This gig will fail because it lacks a basic tier package.",
+    "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "tags": ["fail"],
+    "packages": [
+      {
+        "tier": "standard",
+        "title": "Standard Only",
+        "description": "Missing basic tier.",
+        "price": 100,
+        "delivery_days": 5,
+        "revision_count": 2
+      }
+    ]
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "At least one basic package is required",
+    "details": {},
+    "status": 400
+  }
+  ```
+}

@@ -1,0 +1,80 @@
+meta {
+  name: Success
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "I will translate documents professionally",
+    "description": "I will provide accurate and natural translations for your documents and content.",
+    "category_id": "ff5b2df7-d568-49be-b949-1d8f6f1aee32",
+    "tags": ["translation", "language", "documents", "localization"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "500 Word Translation",
+        "description": "Translate up to 500 words professionally.",
+        "price": 20,
+        "delivery_days": 1,
+        "revision_count": 1,
+        "features": ["Proofreading", "Accurate Translation"]
+      },
+      {
+        "tier": "standard",
+        "title": "2000 Word Translation",
+        "description": "Detailed translation with localization.",
+        "price": 70,
+        "delivery_days": 3,
+        "revision_count": 3,
+        "features": ["Localization", "Formatting", "Proofreading"]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://images.unsplash.com/photo-1521791136064-7986c2920216",
+        "sort_order": 0
+      }
+    ]
+  }
+}
+
+docs {
+  ## Response
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "3c9c1302-989a-49e5-8dc9-1c7e7fe6754e",
+      "seller": { "id": "uuid", "display_name": "John", "username": "john_doe", "avatar": null },
+      "category": { "id": "uuid", "name": "Programming & Tech", "slug": "programming-tech", "icon": null },
+      "title": "I will create a high performance NestJS backend",
+      "slug": "i-will-create-a-high-performance-nestjs-backend-1778182254234",
+      "status": "active",
+      "tags": ["nestjs", "backend", "api", "typescript"],
+      "images": [{ "url": "https://example.com/image1.jpg", "sort_order": 0 }],
+      "packages": [
+        { "tier": "basic", "title": "Basic API Setup", "price": 50, "delivery_days": 3, "revision_count": 1, "features": ["3 Endpoints", "Database Integration"] },
+        { "tier": "standard", "title": "Standard API Development", "price": 150, "delivery_days": 7, "revision_count": 3, "features": ["10 Endpoints", "Auth", "Database Integration"] }
+      ],
+      "avg_rating": 0,
+      "total_reviews": 0,
+      "total_orders": 0,
+      "view_count": 0,
+      "created_at": "2026-05-08T10:00:00.000Z",
+      "updated_at": "2026-05-08T10:00:00.000Z"
+    }
+  }
+  ```
+}

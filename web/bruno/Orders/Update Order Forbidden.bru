@@ -1,0 +1,34 @@
+meta {
+  name: Update Order Forbidden
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{base_url}}/orders/{{order_id}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "status": "processing"
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Forbidden",
+    "details": "You are not allowed to modify this order",
+    "status": 403
+  }
+  ```
+}

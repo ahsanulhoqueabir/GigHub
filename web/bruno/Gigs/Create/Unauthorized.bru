@@ -1,0 +1,43 @@
+meta {
+  name: Unauthorized
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/gigs
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Unauthorized Gig",
+    "description": "This should fail because no token is provided.",
+    "category_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "tags": ["auth"],
+    "packages": [
+      {
+        "tier": "basic",
+        "title": "Basic",
+        "description": "Basic tier.",
+        "price": 50,
+        "delivery_days": 3,
+        "revision_count": 1
+      }
+    ]
+  }
+}
+
+docs {
+  ## Response
+
+  ```json
+  {
+    "success": false,
+    "error": "Unauthorized",
+    "details": "Missing or invalid token",
+    "status": 401
+  }
+  ```
+}

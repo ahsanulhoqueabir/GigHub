@@ -1,0 +1,51 @@
+meta {
+  name: Refresh Token
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/auth/refresh
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "refresh_token": "{{refresh_token}}"
+  }
+}
+
+docs {
+  ## Payload
+  - Content-Type: `application/json`
+  - Required fields: `refresh_token`
+
+  ## Success Response (200)
+
+  ```json
+  {
+    "success": true,
+    "data": {
+      "access_token": "eyJhbGciOiJIUzI1NiIs...",
+      "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
+      "expires_in": "15m"
+    }
+  }
+  ```
+
+  ## Error Response (401)
+
+  ```json
+  {
+    "success": false,
+    "error": "Invalid or expired refresh token"
+  }
+  ```
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("access_token", res.body.data.access_token);
+  }
+}
