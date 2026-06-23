@@ -1,0 +1,46 @@
+meta {
+  name: Update Gig
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/gigs/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: d43fc4a2-bc56-4587-bca9-b70a66c5d93a
+}
+
+body:json {
+  {
+    "title": "Build premium NestJS and React applications",
+    "status": "draft"
+  }
+}
+
+docs {
+  ### Update Gig
+  Updates an existing gig. The user must be the seller/owner of the gig.
+  Updating the `title` will automatically generate a new unique `slug`.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "seller": "uuid-string",
+      "title": "Build premium NestJS and React applications",
+      "slug": "build-premium-nestjs-and-react-applications-20260624003001",
+      "status": "active"
+    },
+    "message": "Gig updated successfully"
+  }
+  ```
+}

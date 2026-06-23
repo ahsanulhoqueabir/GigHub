@@ -42,9 +42,9 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload = (await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConfig.secret,
-      })) as JwtPayload;
+      });
 
       // Verify user exists and is active, fetching id, role, active, and verified
       const response = await this.db.client
@@ -53,7 +53,7 @@ export class JwtAuthGuard implements CanActivate {
         .eq('id', payload.id)
         .single();
 
-      const user = response.data as UserAuthFields | null;
+      const user = response.data;
       const error = response.error;
 
       if (error || !user) {
@@ -106,7 +106,8 @@ export class JwtAuthGuard implements CanActivate {
       ) {
         throw e;
       }
-      const errorMessage = e instanceof Error ? e.message : 'Invalid or expired access token';
+      const errorMessage =
+        e instanceof Error ? e.message : 'Invalid or expired access token';
       throw new UnauthorizedException(errorMessage);
     }
 
@@ -118,4 +119,3 @@ export class JwtAuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   }
 }
-

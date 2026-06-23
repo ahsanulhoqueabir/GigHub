@@ -1,0 +1,65 @@
+meta {
+  name: List Gigs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/gigs?page=1&limit=10
+  body: none
+  auth: none
+}
+
+query {
+  page: 1
+  limit: 10
+  ~search: nestjs
+}
+
+docs {
+  ### List Gigs
+  Public endpoint to list all `active` status gigs with pagination and optional search filter.
+  Response includes the seller profile and category info in a structured layout.
+  
+  #### Request Query
+  - `page` (number, optional, default: 1)
+  - `limit` (number, optional, default: 10)
+  - `search` (string, optional)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "data": [
+        {
+          "id": "uuid-string",
+          "seller": "uuid-string",
+          "title": "Build NestJS Backend",
+          "slug": "build-nestjs-backend-20260624003000",
+          "status": "active",
+          "seller": {
+            "id": "uuid-string",
+            "name": "Jane Doe",
+            "username": "janedoe",
+            "email": "jane@example.com",
+            "avatar": "https://cdn.gighub.ahsanull.com/avatars/jane.png"
+          },
+          "category": {
+            "id": "uuid-string",
+            "name": "Web Development",
+            "slug": "web-dev"
+          }
+        }
+      ],
+      "meta": {
+        "total": 1,
+        "page": 1,
+        "limit": 10,
+        "lastPage": 1
+      }
+    },
+    "message": "Gigs retrieved successfully"
+  }
+  ```
+}

@@ -1,0 +1,49 @@
+meta {
+  name: Update Proposal
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/job-proposals/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "description": "Updated proposal details: I can deliver it in 1 day with full integration test suites.",
+    "status": "active"
+  }
+}
+
+docs {
+  ### Update Proposal
+  Updates an existing proposal description, attachments, or status.
+  Only accessible to the applicant who submitted the proposal.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "active",
+      "job": "uuid-string",
+      "applicant": "uuid-string",
+      "description": "Updated proposal details...",
+      "attachments": [...],
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:32:00.000Z"
+    },
+    "message": "Job proposal updated successfully"
+  }
+  ```
+}

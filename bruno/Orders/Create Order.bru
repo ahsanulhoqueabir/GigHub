@@ -1,0 +1,65 @@
+meta {
+  name: Create Order
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/orders
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "source": "gig",
+    "gig": "00000000-0000-0000-0000-000000000000",
+    "package": "basic",
+    "amount": 1,
+    "description": "Standard delivery request",
+    "note": "Include API docs please"
+  }
+}
+
+docs {
+  ### Create Order
+  Places a new order based on either a Gig package or a Job proposal.
+  Buyer ID is strictly extracted from the authenticated user token.
+  
+  #### Request Fields (Gig Sourced)
+  - `source`: `"gig"`
+  - `gig` (UUID, required)
+  - `package` (string, required): `"basic"`, `"standard"`, `"premium"`, or `"custom"`
+  - `amount` (integer, optional, default: 1)
+  - `description` (string, optional)
+  - `note` (string, optional)
+  
+  #### Request Fields (Job Sourced)
+  - `source`: `"job"`
+  - `job` (UUID, required)
+  - `proposal` (UUID, required)
+  
+  #### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "pending",
+      "code": "G2606240030B",
+      "buyer": "uuid-string",
+      "seller": "uuid-string",
+      "gig": "uuid-string",
+      "package": "basic",
+      "source": "gig",
+      "total_price": 50,
+      "title": "Build NestJS Backend",
+      "amount": 1,
+      "deadline": "2026-06-26T00:30:00.000Z",
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:30:00.000Z"
+    },
+    "message": "Order placed successfully"
+  }
+  ```
+}

@@ -1,0 +1,53 @@
+meta {
+  name: Submit Proposal
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/job-proposals
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "job": "00000000-0000-0000-0000-000000000000",
+    "description": "I can fix your container DNS resolution within 2 hours. I have extensive experience with NestJS and Supabase Docker networks.",
+    "attachments": [
+      {
+        "file": "https://cdn.gighub.ahsanull.com/proposals/resume.pdf"
+      }
+    ],
+    "status": "active"
+  }
+}
+
+docs {
+  ### Submit Proposal
+  Submits a proposal to a job. The calling user is set as the applicant.
+  
+  > [!IMPORTANT]
+  > Users cannot submit a proposal to their own job. Each applicant can only submit one proposal per job.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "active",
+      "job": "00000000-0000-0000-0000-000000000000",
+      "applicant": "uuid-string",
+      "description": "I can fix your container...",
+      "attachments": [...],
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:30:00.000Z"
+    },
+    "message": "Job proposal submitted successfully"
+  }
+  ```
+}

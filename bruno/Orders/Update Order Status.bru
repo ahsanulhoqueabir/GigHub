@@ -1,0 +1,56 @@
+meta {
+  name: Update Order Status
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/orders/:id/status
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "status": "accepted"
+  }
+}
+
+docs {
+  ### Update Order Status
+  Updates the status of an existing order. The user must be the buyer or seller.
+  
+  #### Status Transition Logic & Rules
+  - To **accept** a pending order:
+    - `status` must be `"accepted"`.
+    - Only the **seller** can accept the order.
+    - Previous status must be `"pending"`.
+  - To **cancel** an order:
+    - `status` must be `"cancelled"`.
+    - Allowed for buyer or seller if the order is not yet `"completed"` or `"cancelled"`.
+    - Requires providing `cancellation_reason` in the request body (optional, defaults if empty).
+  
+  #### Request Body
+  - `status` (string, required): `"accepted"`, `"in_progress"`, `"in_review"`, `"completed"`, `"cancelled"`, `"dispute"`
+  - `cancellation_reason` (string, optional)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "accepted",
+      "code": "G2606240030B",
+      "total_price": 50,
+      "title": "Build NestJS Backend",
+      "updated_at": "2026-06-24T00:35:00.000Z"
+    },
+    "message": "Order status updated successfully"
+  }
+  ```
+}

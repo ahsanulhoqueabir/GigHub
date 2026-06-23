@@ -1,0 +1,60 @@
+meta {
+  name: Get Order
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/orders/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+docs {
+  ### Get Order
+  Retrieves detailed information of a single order.
+  The user must be either the buyer or the seller associated with the order.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "pending",
+      "code": "G2606240030B",
+      "total_price": 50,
+      "title": "Build NestJS Backend",
+      "source": "gig",
+      "buyer": {
+        "id": "uuid-string",
+        "name": "Jane Doe",
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "avatar": "..."
+      },
+      "seller": {
+        "id": "uuid-string",
+        "name": "John Doe",
+        "username": "johndoe",
+        "email": "john@example.com",
+        "avatar": "..."
+      },
+      "gig": {
+        "id": "uuid-string",
+        "title": "Build NestJS Backend",
+        "slug": "..."
+      },
+      "job": null
+    },
+    "message": "Order details retrieved successfully"
+  }
+  ```
+}

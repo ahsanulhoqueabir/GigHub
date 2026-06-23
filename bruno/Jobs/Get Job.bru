@@ -1,0 +1,51 @@
+meta {
+  name: Get Job
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/jobs/:idOrSlug
+  body: none
+  auth: none
+}
+
+params:path {
+  idOrSlug: need-a-nestjs-expert-to-debug-container-networking-20260624003000
+}
+
+docs {
+  ### Get Job
+  Public endpoint to retrieve details of a single job by its UUID or unique slug.
+  
+  > [!IMPORTANT]
+  > Details are only returned if the job status is `active`. If draft or closed, a `400 Bad Request` error is returned.
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "owner": "uuid-string",
+      "title": "Need a NestJS expert to debug container networking",
+      "slug": "need-a-nestjs-expert-to-debug-container-networking-20260624003000",
+      "status": "active",
+      "views": 2,
+      "owner": {
+        "id": "uuid-string",
+        "name": "Jane Doe",
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "avatar": "https://cdn.gighub.ahsanull.com/avatars/jane.png"
+      },
+      "category": {
+        "id": "uuid-string",
+        "name": "Web Development",
+        "slug": "web-dev"
+      }
+    },
+    "message": "Job retrieved successfully"
+  }
+  ```
+}

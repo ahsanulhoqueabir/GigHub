@@ -1,0 +1,37 @@
+meta {
+  name: Delete Gig
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/gigs/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+docs {
+  ### Delete Gig
+  Deletes an existing gig. The user must be the seller/owner of the gig.
+  
+  > [!IMPORTANT]
+  > Before deletion, the service checks if there are associated orders. If associated orders exist, a `400 Bad Request` error is returned.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "message": "Gig deleted successfully"
+    },
+    "message": "Gig deleted successfully"
+  }
+  ```
+}

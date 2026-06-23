@@ -1,0 +1,46 @@
+meta {
+  name: Update Job
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/jobs/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "title": "Need a NestJS expert to fix Docker search domain bug",
+    "status": "active"
+  }
+}
+
+docs {
+  ### Update Job
+  Updates an existing job post. The user must be the owner of the job.
+  Updating the `title` will automatically generate a new unique `slug`.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "owner": "uuid-string",
+      "title": "Need a NestJS expert to fix Docker search domain bug",
+      "slug": "need-a-nestjs-expert-to-fix-docker-search-domain-bug-20260624003001",
+      "status": "active"
+    },
+    "message": "Job updated successfully"
+  }
+  ```
+}

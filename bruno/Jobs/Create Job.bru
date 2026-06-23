@@ -1,0 +1,64 @@
+meta {
+  name: Create Job
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/jobs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Need a NestJS expert to debug container networking",
+    "category": "90e290f9-a682-4fdb-bb8e-1d638706d860",
+    "description": "Fix DNS search domains and configure local Supabase auth callback resolution.",
+    "attachments": [
+      {
+        "file": "https://cdn.gighub.ahsanull.com/jobs/logs.txt"
+      }
+    ],
+    "type": "contract",
+    "budget": "$100-500",
+    "deadline": "2026-07-01T12:00:00.000Z",
+    "location": "Remote",
+    "required_skills": ["nestjs", "docker", "dns"],
+    "tags": ["bugfix", "networking"],
+    "status": "active"
+  }
+}
+
+docs {
+  ### Create Job
+  Creates a new job post. The owner information is populated from the authenticated user token.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "owner": "uuid-string",
+      "category": "90e290f9-a682-4fdb-bb8e-1d638706d860",
+      "title": "Need a NestJS expert to debug container networking",
+      "slug": "need-a-nestjs-expert-to-debug-container-networking-20260624003000",
+      "description": "...",
+      "type": "contract",
+      "budget": "$100-500",
+      "deadline": "2026-07-01T12:00:00.000Z",
+      "location": "Remote",
+      "required_skills": [...],
+      "tags": [...],
+      "status": "active",
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:30:00.000Z"
+    },
+    "message": "Job created successfully"
+  }
+  ```
+}

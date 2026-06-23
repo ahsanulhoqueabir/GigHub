@@ -1,0 +1,62 @@
+meta {
+  name: Accept Proposal
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/job-proposals/:id/accept
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "total_price": 250,
+    "note": "Agreed on $250 for delivery by next week."
+  }
+}
+
+docs {
+  ### Accept Proposal
+  Endpoint for job owners to accept a submitted proposal.
+  This action triggers:
+  1. Automated creation of a new job-sourced order in `pending` status.
+  2. Transition of proposal status to `hired`.
+  3. Returns the newly created order details including the unique order code (`J-TIMESTAMP-Rand`).
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Request Body
+  - `total_price` (number, optional): Custom total budget/price agreed upon.
+  - `note` (string, optional): Order instructions.
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "status": "pending",
+      "code": "J2606240030A",
+      "buyer": "job-owner-uuid",
+      "seller": "applicant-uuid",
+      "job": "job-uuid",
+      "proposal": "proposal-uuid",
+      "source": "job",
+      "total_price": 250,
+      "title": "Need a NestJS expert",
+      "amount": 1,
+      "deadline": "2026-07-01T12:00:00.000Z",
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:30:00.000Z"
+    },
+    "message": "Proposal accepted and order created successfully"
+  }
+  ```
+}

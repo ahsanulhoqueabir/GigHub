@@ -1,0 +1,54 @@
+meta {
+  name: List Proposals
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/job-proposals?jobId=00000000-0000-0000-0000-000000000000
+  body: none
+  auth: inherit
+}
+
+query {
+  jobId: 00000000-0000-0000-0000-000000000000
+}
+
+docs {
+  ### List Proposals
+  Lists job proposals.
+  
+  #### Behavior
+  - If `jobId` query param is provided:
+    - If the user is the job owner, all proposals for that job are returned.
+    - Otherwise, only the user's own proposal for that job is returned.
+  - If `jobId` query param is NOT provided:
+    - Lists all proposals submitted by the authenticated user.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid-string",
+        "status": "active",
+        "job": "00000000-0000-0000-0000-000000000000",
+        "applicant": "uuid-string",
+        "description": "...",
+        "applicant": {
+          "id": "uuid-string",
+          "name": "Jane Doe",
+          "username": "janedoe",
+          "email": "jane@example.com",
+          "avatar": "https://cdn.gighub.ahsanull.com/avatars/jane.png"
+        }
+      }
+    ],
+    "message": "Job proposals retrieved successfully"
+  }
+  ```
+}

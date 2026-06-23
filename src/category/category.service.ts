@@ -49,7 +49,7 @@ export class CategoryService {
         break;
       }
 
-      const parent = response.data as { parent_id: string | null };
+      const parent = response.data;
       if (parent.parent_id === categoryId) {
         return true;
       }

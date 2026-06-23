@@ -1,0 +1,75 @@
+meta {
+  name: Create Gig
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/gigs
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Build responsive NestJS and React applications",
+    "category": "94c308f0-b89d-437e-8c7d-abf821af01e7",
+    "description": "High-quality, production-ready NestJS and React software engineering.",
+    "images": [
+      {
+        "image": "https://cdn.gighub.ahsanull.com/gigs/cover.png",
+        "isCover": true
+      }
+    ],
+    "tags": ["nestjs", "typescript", "react"],
+    "status": "active",
+    "packages": [
+      {
+        "title": "Basic API",
+        "tier": "basic",
+        "description": "A single NestJS API endpoint with test coverage.",
+        "price": 50,
+        "delivery_days": 2,
+        "revision_limit": 2,
+        "features": ["1 API Endpoint", "Unit Tests", "Documentation"]
+      }
+    ],
+    "faq": [
+      {
+        "question": "Do you provide source code?",
+        "answer": "Yes, full source code is provided on delivery."
+      }
+    ]
+  }
+}
+
+docs {
+  ### Create Gig
+  Creates a new gig. Seller information is populated from the authenticated user token.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "seller": "uuid-string",
+      "category": "90e290f9-a682-4fdb-bb8e-1d638706d860",
+      "title": "Build responsive NestJS and React applications",
+      "slug": "build-responsive-nestjs-and-react-applications-20260624003000",
+      "description": "High-quality, production-ready NestJS and React software engineering.",
+      "images": [...],
+      "tags": [...],
+      "status": "draft",
+      "packages": [...],
+      "faq": [...],
+      "created_at": "2026-06-24T00:30:00.000Z",
+      "updated_at": "2026-06-24T00:30:00.000Z"
+    },
+    "message": "Gig created successfully"
+  }
+  ```
+}

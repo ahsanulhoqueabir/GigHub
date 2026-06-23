@@ -1,0 +1,37 @@
+meta {
+  name: Delete Job
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/jobs/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+docs {
+  ### Delete Job
+  Deletes an existing job. The user must be the owner of the job.
+  
+  > [!IMPORTANT]
+  > Before deletion, the service checks if there are associated proposals or orders. If associated records exist, a `400 Bad Request` error is returned.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "message": "Job deleted successfully"
+    },
+    "message": "Job deleted successfully"
+  }
+  ```
+}

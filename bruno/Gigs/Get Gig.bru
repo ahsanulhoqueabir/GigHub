@@ -1,0 +1,51 @@
+meta {
+  name: Get Gig
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/gigs/:idOrSlug
+  body: none
+  auth: none
+}
+
+params:path {
+  idOrSlug: build-responsive-nestjs-and-react-applications-20260624012429
+}
+
+docs {
+  ### Get Gig
+  Public endpoint to retrieve details of a single gig by its UUID or unique slug.
+  
+  > [!IMPORTANT]
+  > Details are only returned if the gig status is `active`. If draft, paused, or archived, a `400 Bad Request` is returned.
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "seller": "uuid-string",
+      "title": "Build NestJS Backend",
+      "slug": "build-nestjs-backend-20260624003000",
+      "status": "active",
+      "views": 4,
+      "seller": {
+        "id": "uuid-string",
+        "name": "Jane Doe",
+        "username": "janedoe",
+        "email": "jane@example.com",
+        "avatar": "https://cdn.gighub.ahsanull.com/avatars/jane.png"
+      },
+      "category": {
+        "id": "uuid-string",
+        "name": "Web Development",
+        "slug": "web-dev"
+      }
+    },
+    "message": "Gig retrieved successfully"
+  }
+  ```
+}
