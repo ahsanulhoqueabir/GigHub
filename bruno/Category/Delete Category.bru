@@ -1,0 +1,42 @@
+meta {
+  name: Delete Category
+  type: http
+  seq: 3
+}
+
+delete {
+  url: {{baseUrl}}/categories/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+docs {
+  ### Delete Category
+  Soft deletes an existing category (sets `active = false`). Only accessible to Admins and Moderators.
+  Will fail if the category has children.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Route Parameters
+  - `id` (UUID, required) - Category ID
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "Design & Creative",
+      "slug": "design-creative",
+      "active": false,
+      "updated_at": "2026-06-24T00:40:00Z"
+    },
+    "message": "Category deleted successfully"
+  }
+  ```
+}

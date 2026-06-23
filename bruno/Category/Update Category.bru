@@ -1,0 +1,62 @@
+meta {
+  name: Update Category
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/categories/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 00000000-0000-0000-0000-000000000000
+}
+
+body:json {
+  {
+    "name": "Updated Design & Creative",
+    "ordering": 2
+  }
+}
+
+docs {
+  ### Update Category
+  Updates an existing category. Only accessible to Admins and Moderators.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Route Parameters
+  - `id` (UUID, required) - Category ID
+  
+  #### Request Body
+  - `name` (string, optional)
+  - `slug` (string, optional)
+  - `description` (string, optional)
+  - `image` (string, optional)
+  - `parent_id` (UUID, optional)
+  - `ordering` (integer, optional)
+  - `active` (boolean, optional)
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "Updated Design & Creative",
+      "description": "Graphic design, illustration, and creative services",
+      "slug": "design-creative",
+      "image": "https://cdn.gighub.ahsanull.com/categories/design.png",
+      "parent_id": null,
+      "ordering": 2,
+      "active": true,
+      "created_at": "2026-06-24T00:30:00Z",
+      "updated_at": "2026-06-24T00:35:00Z"
+    },
+    "message": "Category updated successfully"
+  }
+  ```
+}

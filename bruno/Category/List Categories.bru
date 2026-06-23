@@ -1,0 +1,44 @@
+meta {
+  name: List Categories
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/categories
+  body: none
+  auth: none
+}
+
+docs {
+  ### List Categories
+  Retrieves a hierarchical tree of all active categories (where `active = true`). Public access, no authentication required.
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid-1",
+        "name": "Design & Creative",
+        "slug": "design-creative",
+        "active": true,
+        "ordering": 1,
+        "subCategories": [
+          {
+            "id": "uuid-2",
+            "name": "Logo Design",
+            "slug": "logo-design",
+            "parent_id": "uuid-1",
+            "active": true,
+            "ordering": 1,
+            "subCategories": []
+          }
+        ]
+      }
+    ],
+    "message": "Categories retrieved successfully"
+  }
+  ```
+}

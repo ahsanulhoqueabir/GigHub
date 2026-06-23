@@ -1,0 +1,49 @@
+meta {
+  name: Get Category
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/categories/:idOrSlug
+  body: none
+  auth: none
+}
+
+params:path {
+  idOrSlug: design-creative
+}
+
+docs {
+  ### Get Category
+  Retrieves a single active category along with its active subcategories by either its UUID or unique slug. Public access, no authentication required.
+  
+  #### Route Parameters
+  - `idOrSlug` (string, required) - Either the category UUID or the unique slug.
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-1",
+      "name": "Design & Creative",
+      "slug": "design-creative",
+      "active": true,
+      "ordering": 1,
+      "subCategories": [
+        {
+          "id": "uuid-2",
+          "name": "Logo Design",
+          "slug": "logo-design",
+          "parent_id": "uuid-1",
+          "active": true,
+          "ordering": 1,
+          "subCategories": []
+        }
+      ]
+    },
+    "message": "Category retrieved successfully"
+  }
+  ```
+}
