@@ -6,33 +6,12 @@ import {
 import { DatabaseService } from '../database/database.service';
 import { CreateJobProposalDto } from './dto/create-job-proposal.dto';
 import { UpdateJobProposalDto } from './dto/update-job-proposal.dto';
-import { JobRecord } from '../job/job.service';
-import { OrderRecord } from '../order/order.service';
-
-export interface JobProposalRecord {
-  id: string;
-  status: 'draft' | 'active' | 'expired' | 'hired' | 'rejected';
-  job: string;
-  applicant: string;
-  description: string;
-  attachments: any;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PopulatedJobProposalRecord extends Omit<
+import {
+  JobRecord,
+  OrderRecord,
   JobProposalRecord,
-  'job' | 'applicant'
-> {
-  job: JobRecord;
-  applicant: {
-    id: string;
-    name: string;
-    username: string;
-    email: string;
-    avatar: string | null;
-  };
-}
+  PopulatedJobProposalRecord,
+} from '../types';
 
 @Injectable()
 export class JobProposalService {

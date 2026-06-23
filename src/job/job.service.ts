@@ -6,50 +6,7 @@ import {
 import { DatabaseService } from '../database/database.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
-
-export interface JobRecord {
-  id: string;
-  owner: string;
-  category: string;
-  title: string;
-  slug: string;
-  description: string;
-  attachments: any;
-  type: 'parttime' | 'fulltime' | 'contract' | 'tution' | 'volunteer' | 'other';
-  budget: '<$100' | '$100-500' | '$500-1000' | '$1000+';
-  deadline: string;
-  location: string;
-  required_skills: string[];
-  tags: string[];
-  status: 'draft' | 'active' | 'closed';
-  views: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PublicProfile {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-  verified: boolean;
-  bio?: string | null;
-}
-
-export interface PublicCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface PopulatedJobRecord extends Omit<
-  JobRecord,
-  'owner' | 'category'
-> {
-  owner: PublicProfile;
-  category: PublicCategory;
-}
+import { JobRecord, PopulatedJobRecord } from '../types';
 
 @Injectable()
 export class JobService {

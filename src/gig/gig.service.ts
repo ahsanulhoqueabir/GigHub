@@ -6,47 +6,7 @@ import {
 import { DatabaseService } from '../database/database.service';
 import { CreateGigDto } from './dto/create-gig.dto';
 import { UpdateGigDto } from './dto/update-gig.dto';
-
-export interface GigRecord {
-  id: string;
-  seller: string;
-  category: string;
-  title: string;
-  slug: string;
-  description: string;
-  images: any;
-  tags: string[];
-  status: 'draft' | 'active' | 'paused' | 'archived';
-  views: number;
-  packages: any;
-  faq: any;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface PublicProfile {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  avatar: string | null;
-  verified: boolean;
-  bio?: string | null;
-}
-
-export interface PublicCategory {
-  id: string;
-  name: string;
-  slug: string;
-}
-
-export interface PopulatedGigRecord extends Omit<
-  GigRecord,
-  'seller' | 'category'
-> {
-  seller: PublicProfile;
-  category: PublicCategory;
-}
+import { GigRecord, PopulatedGigRecord } from '../types';
 
 @Injectable()
 export class GigService {

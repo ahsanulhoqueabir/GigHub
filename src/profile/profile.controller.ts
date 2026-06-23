@@ -14,14 +14,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { createSuccessResponse } from '../common/utils/response.util';
-
-export interface RequestUser {
-  id: string;
-  email: string;
-  role: string;
-  active: boolean;
-  verified: boolean;
-}
+import type { RequestUser } from '../types';
 
 @Controller('profile')
 @UseGuards(JwtAuthGuard)

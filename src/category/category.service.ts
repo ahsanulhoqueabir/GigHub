@@ -6,23 +6,7 @@ import {
 import { DatabaseService } from '../database/database.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-
-export interface CategoryRecord {
-  id: string;
-  name: string;
-  description: string | null;
-  slug: string;
-  image: string | null;
-  parent_id: string | null;
-  ordering: number;
-  active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CategoryTree extends CategoryRecord {
-  subCategories: CategoryTree[];
-}
+import { CategoryRecord, CategoryTree } from '../types';
 
 @Injectable()
 export class CategoryService {

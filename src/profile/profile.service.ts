@@ -8,33 +8,7 @@ import { DatabaseService } from '../database/database.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-
-export interface ProfileRecord {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  phone?: string;
-  bio?: string;
-  avatar?: string;
-  cover?: string;
-  skills?: string[];
-  website?: string;
-  portfolio?: string;
-  experience?: string;
-  education?: string;
-  active: boolean;
-  google?: string;
-  socials?: any;
-  verified: boolean;
-  role: string;
-  fcm_token?: string;
-  department?: string;
-  student_id?: string;
-  password?: string;
-  created_at?: string;
-  updated_at?: string;
-}
+import { ProfileRecord } from '../types';
 
 @Injectable()
 export class ProfileService {
