@@ -1,0 +1,62 @@
+meta {
+  name: Get or Create Room
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/chat/order/:orderId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  orderId: 0e8d67fd-2544-46dc-aa9d-db4c07acabb7
+}
+
+docs {
+  ### Get or Create Room
+  Returns the chat room associated with a specific order. If no chat room exists yet, it will be automatically initialized.
+  Only participants of the order (buyer and seller) are authorized to call this endpoint.
+  
+  #### Path Parameters
+  - `orderId` (string, required): The UUID of the order.
+  
+  #### Response (200 OK)
+  Returns the populated chat room details:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "room-uuid",
+      "order": {
+        "id": "order-uuid",
+        "status": "pending",
+        "code": "G2406240001A",
+        "title": "Build a NextJS Web App",
+        "total_price": 500.00,
+        "deadline": "timestamp",
+        "source": "gig"
+      },
+      "buyer": {
+        "id": "buyer-uuid",
+        "name": "Buyer Name",
+        "username": "buyer",
+        "email": "buyer@example.com",
+        "avatar": "url"
+      },
+      "seller": {
+        "id": "seller-uuid",
+        "name": "Seller Name",
+        "username": "seller",
+        "email": "seller@example.com",
+        "avatar": "url"
+      },
+      "lastMessage": null,
+      "created_at": "timestamp",
+      "updated_at": "timestamp"
+    },
+    "message": "Chat room initialized successfully"
+  }
+  ```
+}

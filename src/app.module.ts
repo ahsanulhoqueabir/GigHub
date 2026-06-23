@@ -11,6 +11,7 @@ import { GigModule } from './gig/gig.module';
 import { JobModule } from './job/job.module';
 import { JobProposalModule } from './job-proposal/job-proposal.module';
 import { OrderModule } from './order/order.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -24,8 +25,10 @@ import { OrderModule } from './order/order.module';
     JobModule,
     JobProposalModule,
     OrderModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+

@@ -1,0 +1,61 @@
+meta {
+  name: Get Messages
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/chat/rooms/:roomId/messages?limit=50
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 50
+  ~before: 
+}
+
+params:path {
+  roomId: 
+}
+
+docs {
+  ### Get Messages
+  Fetches the message history of a chat room.
+  Supports cursor-based pagination using the `before` query parameter (an ISO-8601 timestamp string).
+  
+  #### Path Parameters
+  - `roomId` (string, required): The UUID of the chat room.
+  
+  #### Query Parameters
+  - `limit` (number, optional): Max number of messages to return. Defaults to `50`.
+  - `before` (string, optional): Timestamp cursor to retrieve messages sent before a specific time.
+  
+  #### Response (200 OK)
+  Returns messages in chronological order (oldest first) so they can be rendered directly into a chat window.
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "msg-uuid",
+        "room": "room-uuid",
+        "content": "Hi there, I uploaded the requirements document.",
+        "attachment_url": "https://cdn.gighub.ahsanull.com/user-id/general/1723456789-requirements.pdf",
+        "attachment_name": "requirements.pdf",
+        "attachment_type": "application/pdf",
+        "created_at": "timestamp",
+        "sender": {
+          "id": "sender-uuid",
+          "name": "Sender Name",
+          "username": "sender",
+          "email": "sender@example.com",
+          "avatar": "url",
+          "verified": true
+        }
+      }
+    ],
+    "message": "Messages retrieved successfully"
+  }
+  ```
+}

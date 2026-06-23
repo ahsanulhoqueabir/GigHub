@@ -69,4 +69,33 @@ export class FirebaseService implements OnModuleInit {
     }
     return getAuth().verifyIdToken(token);
   }
+
+  async sendPushNotification(
+    token: string,
+    title: string,
+    body: string,
+    data?: Record<string, string>,
+  ): Promise<void> {
+    if (!this.firebaseApp) {
+      this.logger.warn(
+        `Firebase Admin is not initialized. Mock sending FCM notification: "${title}" - "${body}" to token: ${token}`,
+      );
+      return;
+    }
+    try {
+      const messaging = (await import('firebase-admin/messaging')).getMessaging(this.firebaseApp);
+      await messaging.send({
+        token,
+        notification: {
+          title,
+          body,
+        },
+        data: data || {},
+      });
+      this.logger.log(`FCM notification sent successfully to token: ${token}`);
+    } catch (error) {
+      this.logger.error(`Failed to send FCM notification: ${error.message}`);
+    }
+  }
 }
+

@@ -1,0 +1,64 @@
+meta {
+  name: Get Conversations
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/chat/rooms
+  body: none
+  auth: inherit
+}
+
+docs {
+  ### Get Conversations
+  Retrieves a list of all active chat rooms/conversations for the authenticated user (either buyer or seller).
+  
+  #### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "room-uuid",
+        "order": {
+          "id": "order-uuid",
+          "status": "pending",
+          "code": "G2406240001A",
+          "title": "Build a NextJS Web App",
+          "total_price": 500.00,
+          "deadline": "timestamp",
+          "source": "gig"
+        },
+        "buyer": {
+          "id": "buyer-uuid",
+          "name": "Buyer Name",
+          "username": "buyer",
+          "email": "buyer@example.com",
+          "avatar": "url"
+        },
+        "seller": {
+          "id": "seller-uuid",
+          "name": "Seller Name",
+          "username": "seller",
+          "email": "seller@example.com",
+          "avatar": "url"
+        },
+        "lastMessage": {
+          "id": "msg-uuid",
+          "room": "room-uuid",
+          "sender": "sender-uuid",
+          "content": "Hello",
+          "attachment_url": null,
+          "attachment_name": null,
+          "attachment_type": null,
+          "created_at": "timestamp"
+        },
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
+    ],
+    "message": "Conversations retrieved successfully"
+  }
+  ```
+}

@@ -1,0 +1,64 @@
+meta {
+  name: Send Message
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/chat/rooms/:roomId/messages
+  body: json
+  auth: inherit
+}
+
+params:path {
+  roomId: 
+}
+
+body:json {
+  {
+    "content": "Hi there, I uploaded the requirements document.",
+    "attachment_url": "https://cdn.gighub.ahsanull.com/user-id/general/1723456789-requirements.pdf",
+    "attachment_name": "requirements.pdf",
+    "attachment_type": "application/pdf"
+  }
+}
+
+docs {
+  ### Send Message
+  Sends a chat message in a specific chat room.
+  It also automatically updates the room's `updated_at` timestamp and triggers an FCM push notification to the recipient of the message (if their `fcm_token` is present).
+  
+  #### Path Parameters
+  - `roomId` (string, required): The UUID of the chat room.
+  
+  #### Request Body
+  - `content` (string, optional): Text content. Required if no attachment is provided.
+  - `attachment_url` (string, optional): Public CDN URL of the uploaded file.
+  - `attachment_name` (string, optional): Original file name.
+  - `attachment_type` (string, optional): File type / MIME type.
+  
+  #### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "msg-uuid",
+      "room": "room-uuid",
+      "content": "Hi there, I uploaded the requirements document.",
+      "attachment_url": "https://cdn.gighub.ahsanull.com/user-id/general/1723456789-requirements.pdf",
+      "attachment_name": "requirements.pdf",
+      "attachment_type": "application/pdf",
+      "created_at": "timestamp",
+      "sender": {
+        "id": "sender-uuid",
+        "name": "Sender Name",
+        "username": "sender",
+        "email": "sender@example.com",
+        "avatar": "url",
+        "verified": true
+      }
+    },
+    "message": "Message sent successfully"
+  }
+  ```
+}
