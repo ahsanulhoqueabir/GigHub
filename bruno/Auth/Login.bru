@@ -1,0 +1,59 @@
+meta {
+  name: Login - Success
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "identifier": "jane.doe@example.com",
+    "password": "securepassword123"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+tests {
+  test("Set token in local environment", function () {
+    const body = res.getBody();
+    bru.setEnvVar("token", body.token);
+  });
+}
+
+docs {
+  ### User Login (Happy Path)
+  Logs in an existing user and returns a new session token.
+  
+  #### Request Body
+  - `identifier` (string, required): Can be the user's email or phone number.
+  - `password` (string, required): The user's account password.
+  
+  #### Response (200 OK)
+  Returns the user profile details along with the JWT auth token.
+  
+  ```json
+  {
+    "user": {
+      "id": "uuid-string",
+      "name": "Jane Doe",
+      "avatar": null,
+      "email": "jane.doe@example.com",
+      "phone": "01700000001",
+      "department": "CSE",
+      "student_id": "2023-1-60-001",
+      "role": "student"
+    },
+    "token": "jwt-token-string"
+  }
+  ```
+}

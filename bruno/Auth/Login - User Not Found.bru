@@ -1,0 +1,32 @@
+meta {
+  name: Login - User Not Found
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "identifier": "unknown.user@example.com",
+    "password": "securepassword123"
+  }
+}
+
+docs {
+  ### User Login - User Not Found
+  Attempts to log in using an identifier (email or phone) that does not exist in the database.
+  
+  #### Response (404 Not Found)
+  ```json
+  {
+    "statusCode": 404,
+    "message": "user not found",
+    "error": "Not Found"
+  }
+  ```
+}

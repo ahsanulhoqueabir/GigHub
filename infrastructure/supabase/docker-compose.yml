@@ -70,6 +70,8 @@ services:
     container_name: supabase-kong
     image: kong/kong:3.9.1
     restart: unless-stopped
+    dns_search:
+      - .
     networks:
       default:
         aliases:

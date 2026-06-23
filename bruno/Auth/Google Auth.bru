@@ -1,0 +1,50 @@
+meta {
+  name: Google Auth - Success
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/auth/google
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "valid-firebase-id-token"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+docs {
+  ### Google / Firebase Authenticate
+  Authenticates a Google account using a Firebase ID token.
+  
+  #### Request Body
+  - `token` (string, required): The Google ID token obtained from Firebase Auth on the client side.
+  
+  #### Response (200 OK - When user is already registered)
+  Returns the user profile details and issues a JWT token.
+  
+  ```json
+  {
+    "user": {
+      "id": "uuid-string",
+      "name": "Jane Doe",
+      "avatar": null,
+      "email": "jane.doe@example.com",
+      "phone": "01700000001",
+      "department": "CSE",
+      "student_id": "2023-1-60-001",
+      "role": "student"
+    },
+    "token": "jwt-token-string"
+  }
+  ```
+}

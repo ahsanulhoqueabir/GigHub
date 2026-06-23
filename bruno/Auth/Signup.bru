@@ -1,0 +1,62 @@
+meta {
+  name: Signup - Success
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Jane Doe",
+    "email": "jane.doe@example.com",
+    "phone": "01700000001",
+    "department": "CSE",
+    "student_id": "2023-1-60-001",
+    "password": "securepassword123",
+    "username": "janedoe"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+docs {
+  ### User Signup (Happy Path)
+  Registers a new student profile in the system.
+  
+  #### Request Body
+  - `name` (string, required): Full name of the user.
+  - `email` (string, required): Must be a valid, unique email.
+  - `phone` (string, required): Must be a unique phone number.
+  - `department` (string, required): Department name (e.g., CSE, EEE).
+  - `student_id` (string, required): Student Identification Code.
+  - `password` (string, required): Must be at least 6 characters.
+  - `username` (string, optional): Desired unique username. If not provided, it will be automatically generated from the email prefix.
+  
+  #### Response (201 Created)
+  On success, returns the newly created user profile and an active JWT session token.
+  
+  ```json
+  {
+    "user": {
+      "id": "uuid-string",
+      "name": "Jane Doe",
+      "avatar": null,
+      "email": "jane.doe@example.com",
+      "phone": "01700000001",
+      "department": "CSE",
+      "student_id": "2023-1-60-001",
+      "role": "student"
+    },
+    "token": "jwt-token-string"
+  }
+  ```
+}

@@ -1,0 +1,62 @@
+meta {
+  name: Google Signup - Success
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/auth/google/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "valid-firebase-id-token",
+    "name": "Jane Google",
+    "email": "jane-google@example.com",
+    "phone": "01700000002",
+    "department": "CSE",
+    "student_id": "2023-1-60-002",
+    "username": "janegoogle"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+docs {
+  ### Google Registration / Signup Complete
+  Completes registration for a Google user after they have been prompted for extra profile information (like phone, department, student ID).
+  
+  #### Request Body
+  - `token` (string, required): The Google ID token.
+  - `name` (string, required): Full name.
+  - `email` (string, required): Matching Google account email.
+  - `phone` (string, required): Unique phone number.
+  - `department` (string, required): Department (e.g., CSE).
+  - `student_id` (string, required): Unique student ID.
+  - `username` (string, optional): Unique username.
+  
+  #### Response (201 Created)
+  Returns the created/linked user profile and the session token.
+  
+  ```json
+  {
+    "user": {
+      "id": "uuid-string",
+      "name": "Jane Google",
+      "avatar": null,
+      "email": "jane-google@example.com",
+      "phone": "01700000002",
+      "department": "CSE",
+      "student_id": "2023-1-60-002",
+      "role": "student"
+    },
+    "token": "jwt-token-string"
+  }
+  ```
+}

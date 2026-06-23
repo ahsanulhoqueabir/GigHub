@@ -1,0 +1,37 @@
+meta {
+  name: Signup - Email Exists
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Jane Doe",
+    "email": "jane.doe@example.com",
+    "phone": "01700000999",
+    "department": "CSE",
+    "student_id": "2023-1-60-999",
+    "password": "securepassword123",
+    "username": "janedoe-new"
+  }
+}
+
+docs {
+  ### User Signup - Email Already Registered
+  Attempts to register using an email address that is already associated with another account.
+  
+  #### Response (400 Bad Request)
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Email already registered",
+    "error": "Bad Request"
+  }
+  ```
+}

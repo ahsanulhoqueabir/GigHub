@@ -1,0 +1,37 @@
+meta {
+  name: Google Signup - Phone Registered
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/auth/google/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "token": "valid-firebase-id-token",
+    "name": "Jane Google",
+    "email": "jane-google@example.com",
+    "phone": "01700000001",
+    "department": "CSE",
+    "student_id": "2023-1-60-002",
+    "username": "janegoogle"
+  }
+}
+
+docs {
+  ### Google Signup - Phone Number Already Registered
+  Attempts to sign up with a Google account, but provides a phone number that is already associated with an existing student profile.
+  
+  #### Response (400 Bad Request)
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Phone number already registered",
+    "error": "Bad Request"
+  }
+  ```
+}
