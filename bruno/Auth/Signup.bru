@@ -23,8 +23,8 @@ body:json {
 }
 
 script:post-response {
-  if (res.body && res.body.token) {
-    bru.setVar("authToken", res.body.token);
+  if (res.body && res.body.data && res.body.data.token) {
+    bru.setVar("authToken", res.body.data.token);
   }
 }
 
@@ -40,23 +40,27 @@ docs {
   - `student_id` (string, required): Student Identification Code.
   - `password` (string, required): Must be at least 6 characters.
   - `username` (string, optional): Desired unique username. If not provided, it will be automatically generated from the email prefix.
-  
+  - 
   #### Response (201 Created)
   On success, returns the newly created user profile and an active JWT session token.
   
   ```json
   {
-    "user": {
-      "id": "uuid-string",
-      "name": "Jane Doe",
-      "avatar": null,
-      "email": "jane.doe@example.com",
-      "phone": "01700000001",
-      "department": "CSE",
-      "student_id": "2023-1-60-001",
-      "role": "student"
+    "success": true,
+    "data": {
+      "user": {
+        "id": "uuid-string",
+        "name": "Jane Doe",
+        "avatar": null,
+        "email": "jane.doe@example.com",
+        "phone": "01700000001",
+        "department": "CSE",
+        "student_id": "2023-1-60-001",
+        "role": "student"
+      },
+      "token": "jwt-token-string"
     },
-    "token": "jwt-token-string"
+    "message": "User signup successful"
   }
   ```
 }

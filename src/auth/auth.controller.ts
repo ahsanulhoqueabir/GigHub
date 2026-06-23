@@ -4,6 +4,7 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { GoogleAuthDto } from './dto/google-auth.dto';
 import { GoogleSignupDto } from './dto/google-signup.dto';
+import { createSuccessResponse } from '../common/utils/response.util';
 
 @Controller('auth')
 export class AuthController {
@@ -12,24 +13,28 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() dto: SignupDto) {
-    return this.authService.signUp(dto);
+    const result = await this.authService.signUp(dto);
+    return createSuccessResponse(result, 'User signup successful');
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+    const result = await this.authService.login(dto);
+    return createSuccessResponse(result, 'User login successful');
   }
 
   @Post('google')
   @HttpCode(HttpStatus.OK)
   async googleAuth(@Body() dto: GoogleAuthDto) {
-    return this.authService.googleAuth(dto);
+    const result = await this.authService.googleAuth(dto);
+    return createSuccessResponse(result, 'Google authentication successful');
   }
 
   @Post('google/signup')
   @HttpCode(HttpStatus.CREATED)
   async googleSignUp(@Body() dto: GoogleSignupDto) {
-    return this.authService.googleSignUp(dto);
+    const result = await this.authService.googleSignUp(dto);
+    return createSuccessResponse(result, 'Google signup successful');
   }
 }

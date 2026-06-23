@@ -18,15 +18,17 @@ body:json {
 }
 
 script:post-response {
-  if (res.body && res.body.token) {
-    bru.setVar("authToken", res.body.token);
+  if (res.body && res.body.data && res.body.data.token) {
+    bru.setVar("authToken", res.body.data.token);
   }
 }
 
 tests {
   test("Set token in local environment", function () {
     const body = res.getBody();
-    bru.setEnvVar("token", body.token);
+    if (body.data && body.data.token) {
+      bru.setEnvVar("token", body.data.token);
+    }
   });
 }
 
@@ -43,17 +45,21 @@ docs {
   
   ```json
   {
-    "user": {
-      "id": "uuid-string",
-      "name": "Jane Doe",
-      "avatar": null,
-      "email": "jane.doe@example.com",
-      "phone": "01700000001",
-      "department": "CSE",
-      "student_id": "2023-1-60-001",
-      "role": "student"
+    "success": true,
+    "data": {
+      "user": {
+        "id": "uuid-string",
+        "name": "Jane Doe",
+        "avatar": null,
+        "email": "jane.doe@example.com",
+        "phone": "01700000001",
+        "department": "CSE",
+        "student_id": "2023-1-60-001",
+        "role": "student"
+      },
+      "token": "jwt-token-string"
     },
-    "token": "jwt-token-string"
+    "message": "User login successful"
   }
   ```
 }

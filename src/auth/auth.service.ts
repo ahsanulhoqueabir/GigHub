@@ -144,6 +144,10 @@ export class AuthService {
 
     const user = data[0];
 
+    if (!user.active) {
+      throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+    }
+
     if (!user.password) {
       throw new BadRequestException('Invalid login credentials');
     }
@@ -201,6 +205,10 @@ export class AuthService {
 
     if (data && data.length > 0) {
       const user = data[0];
+
+      if (!user.active) {
+        throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+      }
 
       // User exists, login and issue JWT token
       const token = this.jwtService.sign({
@@ -260,6 +268,9 @@ export class AuthService {
     if (existingCheck && existingCheck.length > 0) {
       const matchedUser = existingCheck.find((r) => r.google === googleUid);
       if (matchedUser) {
+        if (!matchedUser.active) {
+          throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+        }
         // Already registered with this Google account, return login
         const token = this.jwtService.sign({
           id: matchedUser.id,
@@ -285,6 +296,9 @@ export class AuthService {
       // If email exists but google is empty, link Google UID to it
       const emailUser = existingCheck.find((r) => r.email === email);
       if (emailUser && !emailUser.google) {
+        if (!emailUser.active) {
+          throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+        }
         const { data: linkedUser, error: updateError } = await this.db.client
           .from('profile')
           .update({ google: googleUid })

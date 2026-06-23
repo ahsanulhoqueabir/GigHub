@@ -1,0 +1,47 @@
+meta {
+  name: Get Presigned URL - Success
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/storage/presigned-url
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "fileName": "my-avatar.png",
+    "contentType": "image/png",
+    "folder": "avatars"
+  }
+}
+
+docs {
+  ### Get Presigned R2 Upload URL
+  Generates a presigned URL using Cloudflare R2 to upload files from the client.
+  
+  #### Headers
+  - `Authorization: Bearer <authToken>` (Usually inherited or set in environmental config)
+  
+  #### Request Body
+  - `fileName` (string, required): The original name of the file to upload.
+  - `contentType` (string, required): The MIME type of the file (e.g. `image/png`, `image/jpeg`).
+  - `folder` (string, optional): Folder to organize the upload (e.g. `avatars`, `gigs`). Defaults to `general`.
+  
+  #### Response (201 Created)
+  Returns the generated presigned upload URL and the final public CDN URL.
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "uploadUrl": "https://<accountId>.r2.cloudflarestorage.com/gighub/<userId>/avatars/1723456789-abcd-my-avatar.png?X-Amz-...",
+      "key": "<userId>/avatars/1723456789-abcd-my-avatar.png",
+      "cdnUrl": "https://cdn.gighub.ahsanull.com/<userId>/avatars/1723456789-abcd-my-avatar.png"
+    },
+    "message": "Pre-signed upload URL generated successfully"
+  }
+  ```
+}

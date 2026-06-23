@@ -1,0 +1,36 @@
+meta {
+  name: Get Presigned URL - Validation Failure
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/storage/presigned-url
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "fileName": "",
+    "contentType": ""
+  }
+}
+
+docs {
+  ### Get Presigned R2 Upload URL - Validation Failure
+  Verifies that sending an invalid or empty request body fails validation checks.
+  
+  #### Response (400 Bad Request)
+  ```json
+  {
+    "success": false,
+    "error": "Bad Request",
+    "details": [
+      "fileName should not be empty",
+      "contentType should not be empty"
+    ],
+    "status": 400
+  }
+  ```
+}
