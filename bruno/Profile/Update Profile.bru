@@ -1,0 +1,51 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/profile
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Jane Updated Name",
+    "bio": "Experienced NestJS and TypeScript Backend Developer",
+    "avatar": "https://cdn.gighub.ahsanull.com/users/avatars/new-avatar.png",
+    "skills": ["TypeScript", "NestJS", "PostgreSQL", "Docker"]
+  }
+}
+
+docs {
+  ### Update Profile
+  Updates the profile information of the currently logged-in user.
+  
+  Note: Role, active status, and verified status cannot be updated using this endpoint (they are sanitized out at the controller level).
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Request Body
+  Optional fields:
+  - `name` (string)
+  - `username` (string, must be unique)
+  - `phone` (string)
+  - `bio` (string)
+  - `avatar` (string, CDN URL of uploaded photo)
+  - `cover` (string)
+  - `skills` (array of strings)
+  - `website` (string)
+  - `portfolio` (string)
+  - `experience` (string)
+  - `education` (string)
+  - `socials` (any json)
+  - `fcm_token` (string)
+  - `department` (string)
+  - `student_id` (string)
+  
+  #### Response (200 OK)
+  Returns the updated profile object.
+}

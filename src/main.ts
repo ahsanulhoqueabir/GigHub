@@ -6,7 +6,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import helmet from 'helmet';
 import compression from 'compression';
 
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

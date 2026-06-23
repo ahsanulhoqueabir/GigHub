@@ -9,8 +9,14 @@ export class FirebaseService implements OnModuleInit {
   private firebaseApp: App | null = null;
 
   onModuleInit() {
-    if (!firebaseConfig.projectId || !firebaseConfig.clientEmail || !firebaseConfig.privateKey) {
-      this.logger.warn('Firebase configuration is incomplete. Firebase Admin SDK NOT initialized. Google Auth will work in mock mode only.');
+    if (
+      !firebaseConfig.projectId ||
+      !firebaseConfig.clientEmail ||
+      !firebaseConfig.privateKey
+    ) {
+      this.logger.warn(
+        'Firebase configuration is incomplete. Firebase Admin SDK NOT initialized. Google Auth will work in mock mode only.',
+      );
       return;
     }
 
@@ -24,7 +30,9 @@ export class FirebaseService implements OnModuleInit {
       });
       this.logger.log('Firebase Admin SDK initialized successfully.');
     } catch (error) {
-      this.logger.error(`Failed to initialize Firebase Admin: ${error.message}`);
+      this.logger.error(
+        `Failed to initialize Firebase Admin: ${error.message}`,
+      );
     }
   }
 
@@ -33,7 +41,9 @@ export class FirebaseService implements OnModuleInit {
       // Allow development mock tokens when Firebase credentials are not provided
       if (token.startsWith('mock_')) {
         const mockUid = token.replace('mock_', '');
-        this.logger.log(`Mocking Google ID Token verification for UID: ${mockUid}`);
+        this.logger.log(
+          `Mocking Google ID Token verification for UID: ${mockUid}`,
+        );
         return {
           uid: mockUid,
           email: `${mockUid}@gmail.com`,
@@ -47,13 +57,15 @@ export class FirebaseService implements OnModuleInit {
           sub: mockUid,
           firebase: {
             identities: {
-              'google.com': [mockUid]
+              'google.com': [mockUid],
             },
-            sign_in_provider: 'google.com'
-          }
-        } as DecodedIdToken;
+            sign_in_provider: 'google.com',
+          },
+        };
       }
-      throw new Error('Firebase Admin SDK is not initialized. Provide FCM environment variables or use a mock_ token for development.');
+      throw new Error(
+        'Firebase Admin SDK is not initialized. Provide FCM environment variables or use a mock_ token for development.',
+      );
     }
     return getAuth().verifyIdToken(token);
   }

@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { DatabaseService } from '../database/database.service';
@@ -19,7 +25,10 @@ export class AuthService {
   ) {}
 
   async generateUniqueUsername(email: string): Promise<string> {
-    const base = email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+    const base = email
+      .split('@')[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
     let username = base || 'user';
     let count = 0;
     while (true) {
@@ -29,7 +38,9 @@ export class AuthService {
         .eq('username', username);
 
       if (error) {
-        throw new Error(`Failed to check username uniqueness: ${error.message}`);
+        throw new Error(
+          `Failed to check username uniqueness: ${error.message}`,
+        );
       }
 
       if (!data || data.length === 0) {
@@ -41,7 +52,8 @@ export class AuthService {
   }
 
   async signUp(dto: SignupDto) {
-    const { name, email, phone, department, student_id, password, username } = dto;
+    const { name, email, phone, department, student_id, password, username } =
+      dto;
 
     // Check if email already exists
     const { data: emailData, error: emailError } = await this.db.client
@@ -109,7 +121,9 @@ export class AuthService {
       .single();
 
     if (insertError) {
-      throw new BadRequestException(`Failed to create profile: ${insertError.message}`);
+      throw new BadRequestException(
+        `Failed to create profile: ${insertError.message}`,
+      );
     }
 
     // Generate JWT token
@@ -145,7 +159,9 @@ export class AuthService {
     const user = data[0];
 
     if (!user.active) {
-      throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+      throw new UnauthorizedException(
+        'Your account has been deactivated. Please contact support.',
+      );
     }
 
     if (!user.password) {
@@ -188,7 +204,9 @@ export class AuthService {
     try {
       decodedToken = await this.firebase.verifyIdToken(googleToken);
     } catch (e) {
-      throw new UnauthorizedException(`Google auth token verification failed: ${e.message}`);
+      throw new UnauthorizedException(
+        `Google auth token verification failed: ${e.message}`,
+      );
     }
 
     const googleUid = decodedToken.uid;
@@ -207,7 +225,9 @@ export class AuthService {
       const user = data[0];
 
       if (!user.active) {
-        throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+        throw new UnauthorizedException(
+          'Your account has been deactivated. Please contact support.',
+        );
       }
 
       // User exists, login and issue JWT token
@@ -244,13 +264,23 @@ export class AuthService {
   }
 
   async googleSignUp(dto: GoogleSignupDto) {
-    const { token: googleToken, name, email, phone, department, student_id, username } = dto;
+    const {
+      token: googleToken,
+      name,
+      email,
+      phone,
+      department,
+      student_id,
+      username,
+    } = dto;
 
     let decodedToken;
     try {
       decodedToken = await this.firebase.verifyIdToken(googleToken);
     } catch (e) {
-      throw new UnauthorizedException(`Google auth token verification failed: ${e.message}`);
+      throw new UnauthorizedException(
+        `Google auth token verification failed: ${e.message}`,
+      );
     }
 
     const googleUid = decodedToken.uid;
@@ -262,14 +292,18 @@ export class AuthService {
       .or(`google.eq.${googleUid},email.eq.${email}`);
 
     if (existError) {
-      throw new Error(`Google signup validation query failed: ${existError.message}`);
+      throw new Error(
+        `Google signup validation query failed: ${existError.message}`,
+      );
     }
 
     if (existingCheck && existingCheck.length > 0) {
       const matchedUser = existingCheck.find((r) => r.google === googleUid);
       if (matchedUser) {
         if (!matchedUser.active) {
-          throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+          throw new UnauthorizedException(
+            'Your account has been deactivated. Please contact support.',
+          );
         }
         // Already registered with this Google account, return login
         const token = this.jwtService.sign({
@@ -297,17 +331,23 @@ export class AuthService {
       const emailUser = existingCheck.find((r) => r.email === email);
       if (emailUser && !emailUser.google) {
         if (!emailUser.active) {
-          throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+          throw new UnauthorizedException(
+            'Your account has been deactivated. Please contact support.',
+          );
         }
         const { data: linkedUser, error: updateError } = await this.db.client
           .from('profile')
           .update({ google: googleUid })
           .eq('id', emailUser.id)
-          .select('id, name, avatar, email, phone, department, student_id, role')
+          .select(
+            'id, name, avatar, email, phone, department, student_id, role',
+          )
           .single();
 
         if (updateError) {
-          throw new BadRequestException(`Failed to link Google account: ${updateError.message}`);
+          throw new BadRequestException(
+            `Failed to link Google account: ${updateError.message}`,
+          );
         }
 
         const token = this.jwtService.sign({
@@ -375,7 +415,9 @@ export class AuthService {
       .single();
 
     if (insertError) {
-      throw new BadRequestException(`Failed to complete Google registration: ${insertError.message}`);
+      throw new BadRequestException(
+        `Failed to complete Google registration: ${insertError.message}`,
+      );
     }
 
     const token = this.jwtService.sign({

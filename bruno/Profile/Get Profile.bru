@@ -1,0 +1,53 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/profile
+  body: none
+  auth: inherit
+}
+
+docs {
+  ### Get User Profile
+  Retrieves the complete profile of the currently logged-in user.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Inherited)
+  
+  #### Response (200 OK)
+  Returns the profile object (excluding sensitive credential fields).
+  
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid-string",
+      "name": "Jane Doe",
+      "username": "janedoe",
+      "email": "jane.doe@example.com",
+      "phone": "01700000001",
+      "bio": "Software developer",
+      "avatar": "https://cdn.gighub.ahsanull.com/path-to-avatar.png",
+      "cover": null,
+      "skills": ["JavaScript", "TypeScript", "NestJS"],
+      "website": "https://example.com",
+      "portfolio": "https://portfolio.example.com",
+      "experience": "2 years",
+      "education": "B.Sc. in CSE",
+      "active": true,
+      "socials": [],
+      "verified": true,
+      "role": "student",
+      "fcm_token": null,
+      "department": "CSE",
+      "student_id": "2023-1-60-001",
+      "created_at": "2026-06-24T00:15:09Z",
+      "updated_at": "2026-06-24T00:15:09Z"
+    },
+    "message": "Profile retrieved successfully"
+  }
+  ```
+}

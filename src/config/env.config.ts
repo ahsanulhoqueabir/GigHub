@@ -15,7 +15,9 @@ export const jwtConfig = {
 };
 
 export const dbConfig = {
-  url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres',
+  url:
+    process.env.DATABASE_URL ||
+    'postgresql://postgres:postgres@localhost:5432/postgres',
 };
 
 export const redisConfig = {
@@ -43,5 +45,3 @@ export const supabaseConfig = {
   url: process.env.SUPABASE_URL || 'http://localhost:8000',
   secretKey: process.env.SUPABASE_SECRET_KEY || '',
 };
-
-

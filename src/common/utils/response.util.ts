@@ -24,7 +24,13 @@ export interface ErrorResponse {
 export function createSuccessResponse<T>(
   data: T,
   message?: string,
-  meta?: { page?: number; limit?: number; total?: number; totalPages?: number; [key: string]: any }
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    totalPages?: number;
+    [key: string]: any;
+  },
 ): SuccessResponse<T> {
   return {
     success: true,
@@ -40,7 +46,7 @@ export function createSuccessResponse<T>(
 export function createErrorResponse(
   error: string,
   details: any,
-  status: number = 400
+  status: number = 400,
 ): ErrorResponse {
   return {
     success: false,

@@ -1,0 +1,44 @@
+meta {
+  name: Admin Update User
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/admin/users/:userId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  userId: <target-user-uuid>
+}
+
+body:json {
+  {
+    "role": "moderator",
+    "active": true,
+    "verified": true
+  }
+}
+
+docs {
+  ### Admin Update User
+  Allows an administrator to modify user role, active status, verification status, or change their password.
+  
+  #### Headers
+  - `Authorization: Bearer <token>` (Must belong to an admin user)
+  
+  #### Path Parameters
+  - `userId` (string, required): The UUID of the user to update.
+  
+  #### Request Body
+  Optional fields (at least one must be provided):
+  - `role` (enum: `'student' | 'admin' | 'moderator'`)
+  - `active` (boolean)
+  - `verified` (boolean)
+  - `password` (string, min 6 characters) - optional password reset
+  
+  #### Response (200 OK)
+  Returns the updated user profile.
+}

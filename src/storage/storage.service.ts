@@ -24,10 +24,7 @@ export class StorageService {
     });
   }
 
-  async getPresignedUploadUrl(
-    userId: string,
-    dto: GeneratePresignedUrlDto,
-  ) {
+  async getPresignedUploadUrl(userId: string, dto: GeneratePresignedUrlDto) {
     const { fileName, contentType, folder = 'general' } = dto;
 
     // Generate a unique file name to avoid collisions
@@ -43,7 +40,9 @@ export class StorageService {
     });
 
     // URL expires in 15 minutes (900 seconds)
-    const uploadUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 900 });
+    const uploadUrl = await getSignedUrl(this.s3Client, command, {
+      expiresIn: 900,
+    });
 
     const cdnUrl = r2Config.publicUrl
       ? `${r2Config.publicUrl.trim().replace(/\/$/, '')}/${uniqueFileName}`

@@ -5,12 +5,17 @@ import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { FirebaseModule } from './firebase/firebase.module';
 import { StorageModule } from './storage/storage.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
-  imports: [DatabaseModule, FirebaseModule, AuthModule, StorageModule],
+  imports: [
+    DatabaseModule,
+    FirebaseModule,
+    AuthModule,
+    StorageModule,
+    ProfileModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
-
-
