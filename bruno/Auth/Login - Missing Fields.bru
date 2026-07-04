@@ -1,0 +1,35 @@
+meta {
+  name: Login - Missing Fields
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "emailOrUsername": ""
+  }
+}
+
+docs {
+  ## Login — Missing Fields
+
+  Sends request without a password.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Email/Username and password are required"
+  }
+  ```
+}

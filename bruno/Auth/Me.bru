@@ -1,0 +1,49 @@
+meta {
+  name: Me
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Me — Get authenticated user profile
+
+  Protected endpoint. Requires a valid JWT token in the `Authorization` header.
+  The token is automatically injected from the `authToken` variable (set by Login or Signup).
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "user": {
+        "id": "uuid",
+        "email": "abir@example.com",
+        "name": "Abir Hasan",
+        "username": "hasan-452187",
+        "role": "USER",
+        "student_id": "2023-123-456",
+        "department": "uuid"
+      }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid/expired token
+  - **404** — Profile not found
+}

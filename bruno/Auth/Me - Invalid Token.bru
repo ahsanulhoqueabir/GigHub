@@ -1,0 +1,29 @@
+meta {
+  name: Me - Invalid Token
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer invalid-jwt-token-here
+}
+
+docs {
+  ## Me — Invalid / Expired Token
+
+  Sends a request with a malformed or expired JWT token.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Invalid or expired token"
+  }
+  ```
+}

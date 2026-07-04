@@ -1,0 +1,35 @@
+meta {
+  name: Signup - Missing Fields
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Abir Hasan"
+  }
+}
+
+docs {
+  ## Signup — Missing Required Fields
+
+  Sends only `name` without `email`, `password`, `student_id`, or `department`.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Email, password, and name are required"
+  }
+  ```
+}

@@ -1,4 +1,4 @@
-import { Profile, UserRole } from "@/types/db/profile.types";
+import type { Profile, UserRole } from "@/types/db/profile.types";
 
 export interface JwtPayload {
   profile: string;
@@ -7,15 +7,16 @@ export interface JwtPayload {
 }
 
 export interface LoginParams {
-  email: string;
+  emailOrUsername: string;
   password: string;
 }
 
 export interface SignUpParams {
+  name: string;
   email: string;
   password: string;
-  name: string;
-  username?: string;
+  student_id: string;
+  department: string;
 }
 
 export interface AuthUser {
@@ -24,6 +25,8 @@ export interface AuthUser {
   name: string;
   username: string | null;
   role: string;
+  student_id: string | null;
+  department: string | null;
 }
 
 export interface LoginResponseData {

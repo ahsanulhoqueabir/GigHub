@@ -14,7 +14,7 @@ export default function LoginPage() {
   const error = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
 
-  const [email, setEmail] = useState("");
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
@@ -22,7 +22,7 @@ export default function LoginPage() {
     clearError();
 
     try {
-      await login({ email, password });
+      await login({ emailOrUsername, password });
       router.push("/"); // redirect to home on success
     } catch {
       // error is already set in the store
@@ -44,22 +44,22 @@ export default function LoginPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Email */}
+          {/* Email or Username */}
           <div>
             <label
-              htmlFor="email"
+              htmlFor="emailOrUsername"
               className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Email
+              Email or Username
             </label>
             <input
-              id="email"
-              type="email"
+              id="emailOrUsername"
+              type="text"
               required
-              autoComplete="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              placeholder="you@example.com or username"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
           </div>

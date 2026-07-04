@@ -1,0 +1,70 @@
+meta {
+  name: Signup
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Abir Hasan",
+    "email": "abir@gighub.com",
+    "password": "password123",
+    "student_id": "2023-123-456",
+    "department": "2acbc219-42d9-4d18-83e1-40fabf13fcdc"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.token) {
+    bru.setVar("authToken", res.body.data.token);
+  }
+}
+
+docs {
+  ## Signup — Create a new account
+  
+  Creates a profile + wallet atomically. Username is auto-generated from the last word of `name` + 6 random digits (e.g. `hasan-452187`).
+  
+  ### Request Body
+  | Field        | Type   | Required | Description                |
+  |--------------|--------|----------|----------------------------|
+  | name         | string | ✅       | Full name                  |
+  | email        | string | ✅       | Valid email address        |
+  | password     | string | ✅       | Min. 6 characters          |
+  | student_id   | string | ✅       | Student ID                 |
+  | department   | string | ✅       | Department UUID            |
+  
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "User created successfully",
+    "data": {
+      "user": {
+        "id": "uuid",
+        "name": "Abir Hasan",
+        "username": "hasan-452187",
+        "email": "abir@example.com",
+        "role": "USER",
+        "student_id": "2023-123-456",
+        "department": "uuid"
+      },
+      "token": "eyJhbGciOiJIUzI1NiJ9..."
+    }
+  }
+  ```
+  
+  ### Error Responses
+  - **400** — Missing required fields
+  - **500** — Username collision after 3 retries / DB error
+}

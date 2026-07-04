@@ -69,7 +69,15 @@ export const useAuthStore = create<AuthStore>()(
           const { user, token } = data.data;
 
           set({
-            user,
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              username: user.username,
+              role: user.role,
+              student_id: user.student_id ?? null,
+              department: user.department ?? null,
+            },
             accessToken: token,
             isProcessing: false,
             error: null,
@@ -94,7 +102,15 @@ export const useAuthStore = create<AuthStore>()(
           const { user, token } = data.data;
 
           set({
-            user,
+            user: {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              username: user.username,
+              role: user.role,
+              student_id: user.student_id ?? null,
+              department: user.department ?? null,
+            },
             accessToken: token,
             isProcessing: false,
             error: null,

@@ -30,7 +30,7 @@ BEGIN
 
   -- Create a default wallet for the user
   INSERT INTO wallet (name, "user", balance, currency)
-  VALUES ('Primary Wallet', v_profile_id, 0, 'BDT');
+  VALUES (  format('%s''s Wallet', p_name), v_profile_id, 0, 'BDT');
 
   -- Return the created profile as JSON
   SELECT row_to_json(p) INTO v_profile

@@ -1,0 +1,8 @@
+{
+  "version": "1",
+  "name": "Gighub API",
+  "type": "collection",
+  "ignore": ["node_modules", ".git"],
+  "preserveFolderStructure": true,
+  "folders": ["Auth"]
+}

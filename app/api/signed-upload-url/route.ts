@@ -20,7 +20,7 @@ import { ok, fail } from "@/lib/api/api-response";
  *   ]
  * }
  */
-export const POST = withAuth()(async ({ req }) => {
+export const POST = withAuth(async ({ req }) => {
   try {
     const body = (await req.json()) as {
       files: SignedUploadRequest[];

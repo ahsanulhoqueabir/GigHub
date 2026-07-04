@@ -1,0 +1,38 @@
+meta {
+  name: Login - By Username
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "emailOrUsername": "hasan-452187",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.token) {
+    bru.setVar("authToken", res.body.data.token);
+  }
+}
+
+docs {
+  ## Login — Authenticate with username
+
+  Logs in using username instead of email. The `emailOrUsername` field
+  works for both email and username — when no `@` is present, it queries by username.
+
+  ### Expected Response (200)
+  Same shape as the email login.
+}

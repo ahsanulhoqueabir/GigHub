@@ -1,0 +1,39 @@
+meta {
+  name: Signup - Duplicate Email
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/auth/signup
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Another User",
+    "email": "abir@example.com",
+    "password": "password123",
+    "student_id": "2023-999-999",
+    "department": "2acbc219-42d9-4d18-83e1-40fabf13fcdc"
+  }
+}
+
+docs {
+  ## Signup — Duplicate Email
+  
+  Uses an email that already exists in the system. The `email` column has a UNIQUE constraint.
+  
+  ### Expected Response (500)
+  ```json
+  {
+    "success": false,
+    "error": "duplicate key value violates unique constraint \"profile_email_key\""
+  }
+  ```
+}

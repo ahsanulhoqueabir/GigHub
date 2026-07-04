@@ -1,0 +1,25 @@
+meta {
+  name: Me - No Token
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/auth/me
+  body: none
+  auth: none
+}
+
+docs {
+  ## Me — No Authorization Token
+
+  Sends request without the `Authorization` header.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

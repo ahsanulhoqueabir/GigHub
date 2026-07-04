@@ -17,14 +17,21 @@ export default function SignUpPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [studentId, setStudentId] = useState("");
+  const [department, setDepartment] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
 
     try {
-      await signUp({ email, password, name, username: username || undefined });
+      await signUp({
+        name,
+        email,
+        password,
+        student_id: studentId,
+        department,
+      });
       router.push("/"); // redirect to home on success
     } catch {
       // error is already set in the store
@@ -66,24 +73,42 @@ export default function SignUpPage() {
             />
           </div>
 
-          {/* Username (optional) */}
+          {/* Student ID */}
           <div>
             <label
-              htmlFor="username"
+              htmlFor="studentId"
               className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
-              Username{" "}
-              <span className="text-zinc-400 dark:text-zinc-500">
-                (optional)
-              </span>
+              Student ID
             </label>
             <input
-              id="username"
+              id="studentId"
               type="text"
-              autoComplete="username"
-              placeholder="johndoe"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoComplete="off"
+              placeholder="e.g. 2023-123-456"
+              value={studentId}
+              onChange={(e) => setStudentId(e.target.value)}
+              className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
+            />
+          </div>
+
+          {/* Department */}
+          <div>
+            <label
+              htmlFor="department"
+              className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
+              Department
+            </label>
+            <input
+              id="department"
+              type="text"
+              required
+              autoComplete="off"
+              placeholder="e.g. Computer Science"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
           </div>

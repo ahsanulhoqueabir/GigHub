@@ -34,6 +34,9 @@ export interface Socials {
 
 export interface Profile extends ProfileCore, SystemFields {}
 
-export interface ProfileForm extends Omit<ProfileCore, "department"> {
+export interface ProfileForm extends Omit<
+  ProfileCore,
+  "department" | "status" | "verified" | "fcm_token" | "role"
+> {
   department?: string | null;
 }
