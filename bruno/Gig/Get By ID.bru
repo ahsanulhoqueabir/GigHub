@@ -1,0 +1,37 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/gig/GIG_UUID
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Gig by ID — Public
+
+  Returns a single gig by its UUID with seller, category, and reviews.
+  View counter is auto-incremented on each fetch.
+  Replace `GIG_UUID` with the actual gig ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "...",
+      "title": "...",
+      "slug": "...",
+      "views": 1,
+      "seller": { ... },
+      "category": { ... },
+      "reviews": [ ... ],
+      "packages": [ ... ],
+      ...
+    }
+  }
+  ```
+}

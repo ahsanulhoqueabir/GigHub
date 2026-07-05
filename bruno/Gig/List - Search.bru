@@ -1,0 +1,18 @@
+meta {
+  name: List - Search
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/gig?search=website
+  body: none
+  auth: none
+}
+
+docs {
+  ## Search Gigs — Public
+
+  Searches gigs by title and description.
+  Uses case-insensitive partial matching.
+}

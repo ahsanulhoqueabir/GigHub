@@ -1,0 +1,48 @@
+meta {
+  name: Create - Duplicate Tier
+  type: http
+  seq: 13
+}
+
+post {
+  url: {{baseUrl}}/api/gig
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "category": "CATEGORY_UUID",
+    "title": "Gig with duplicate tiers",
+    "description": "Testing duplicate tier validation",
+    "packages": [
+      {
+        "title": "Basic",
+        "tier": "BASIC",
+        "description": "Basic package"
+      },
+      {
+        "title": "Standard",
+        "tier": "STANDARD",
+        "description": "Standard package"
+      },
+      {
+        "title": "Another Basic",
+        "tier": "BASIC",
+        "description": "Duplicate BASIC tier"
+      }
+    ]
+  }
+}
+
+docs {
+  ## Create Gig — Duplicate Package Tier
+
+  Tests validation when package tiers are duplicated.
+  Expected: 400 Bad Request — "Each package tier must be unique".
+}

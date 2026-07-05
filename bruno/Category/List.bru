@@ -5,16 +5,21 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/api/category
+  url: {{baseUrl}}/api/category?page=2&limit=5
   body: none
   auth: none
 }
 
+params:query {
+  page: 2
+  limit: 5
+}
+
 docs {
   ## List Categories — Public
-
+  
   Returns a paginated list of active (non-deleted) categories.
-
+  
   ### Query Parameters
   | Parameter | Type    | Description                                      |
   |-----------|---------|--------------------------------------------------|
@@ -23,7 +28,7 @@ docs {
   | parent    | string  | Filter by parent UUID; use `null` for root only  |
   | sortBy    | string  | Sort field: `name`, `ordering`, `created_at`     |
   | sortOrder | string  | `asc` or `desc`                                  |
-
+  
   ### Success Response (200)
   ```json
   {

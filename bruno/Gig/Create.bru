@@ -1,0 +1,89 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/gig
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "category": "fa6dedc2-277e-43bf-a20c-c7aae7cf0ccd",
+    "title": "I will build a professional website",
+    "description": "I will create a fully responsive, modern website using the latest technologies. Perfect for businesses, portfolios, and startups.",
+    "images": [
+      "https://example.com/image1.jpg",
+      "https://example.com/image2.jpg"
+    ],
+    "tags": ["web", "development", "react", "responsive"],
+    "packages": [
+      {
+        "title": "Basic",
+        "tier": "BASIC",
+        "description": "Single page website with basic features",
+        "price": 50,
+        "delivery_days": 7,
+        "revisions": 2,
+        "features": ["1 page", "Responsive design", "Contact form"]
+      },
+      {
+        "title": "Standard",
+        "tier": "STANDARD",
+        "description": "Multi-page website with advanced features",
+        "price": 120,
+        "delivery_days": 14,
+        "revisions": 5,
+        "features": ["5 pages", "Responsive design", "Contact form", "SEO optimization", "Blog setup"]
+      },
+      {
+        "title": "Premium",
+        "tier": "PREMIUM",
+        "description": "Full-featured website with everything included",
+        "price": 250,
+        "delivery_days": 21,
+        "revisions": 10,
+        "features": ["Unlimited pages", "Responsive design", "Contact form", "SEO optimization", "Blog setup", "E-commerce integration", "Admin dashboard"]
+      }
+    ],
+    "faq": [
+      {
+        "question": "What information do you need from me?",
+        "answer": "I need your brand guidelines, content, and any reference websites you like."
+      },
+      {
+        "question": "Do you provide hosting?",
+        "answer": "Yes, I can help you set up hosting at an additional cost."
+      }
+    ]
+  }
+}
+
+docs {
+  ## Create Gig — Authenticated Seller
+  
+  Creates a new gig. The seller is extracted from the JWT token.
+  Replace `CATEGORY_UUID` with an actual category ID.
+  
+  ### Requirements
+  - Exactly 3 packages (BASIC, STANDARD, PREMIUM)
+  - Each tier must be unique
+  - Slug is auto-generated from title
+  
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Gig created successfully",
+    "data": { ... }
+  }
+  ```
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Create - Missing Fields
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/gig
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "title": "Missing category and packages"
+  }
+}
+
+docs {
+  ## Create Gig — Missing Fields
+
+  Tests validation when required fields (category, packages) are missing.
+  Expected: 400 Bad Request with validation error message.
+}

@@ -1,0 +1,22 @@
+meta {
+  name: List - By Category
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/gig?category=fa6dedc2-277e-43bf-a20c-c7aae7cf0ccd
+  body: none
+  auth: none
+}
+
+params:query {
+  category: fa6dedc2-277e-43bf-a20c-c7aae7cf0ccd
+}
+
+docs {
+  ## List Gigs by Category — Public
+  
+  Filters gigs by category UUID.
+  Replace `CATEGORY_UUID` with an actual category ID.
+}

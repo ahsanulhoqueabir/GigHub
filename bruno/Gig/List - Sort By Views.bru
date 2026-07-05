@@ -1,0 +1,17 @@
+meta {
+  name: List - Sort By Views
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/gig?sortBy=views&sortOrder=desc
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Gigs Sorted by Views — Public
+
+  Returns gigs sorted by view count in descending order.
+}

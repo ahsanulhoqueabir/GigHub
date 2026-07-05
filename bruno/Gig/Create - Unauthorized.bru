@@ -1,0 +1,47 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/gig
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "category": "CATEGORY_UUID",
+    "title": "Test Gig",
+    "description": "Test description",
+    "packages": [
+      {
+        "title": "Basic",
+        "tier": "BASIC",
+        "description": "Basic package"
+      },
+      {
+        "title": "Standard",
+        "tier": "STANDARD",
+        "description": "Standard package"
+      },
+      {
+        "title": "Premium",
+        "tier": "PREMIUM",
+        "description": "Premium package"
+      }
+    ]
+  }
+}
+
+docs {
+  ## Create Gig — Unauthorized (No Token)
+
+  Tests that creating a gig without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

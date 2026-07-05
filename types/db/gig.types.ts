@@ -8,21 +8,21 @@ export interface GigCore {
   title: string;
   slug: string;
   description: string;
-  images: string[];
-  tags: string[];
+  images?: string[];
+  tags?: string[];
   views: number;
   packages: GigPackage[];
-  faq: FAQ[];
+  faq?: FAQ[];
 }
 
 export interface GigPackage {
   title: string;
   tier: GIGPackageTier;
   description: string;
-  price: number;
-  delivery_days: number;
-  revisions: number;
-  features: string[];
+  price?: number;
+  delivery_days?: number;
+  revisions?: number;
+  features?: string[];
 }
 
 export interface FAQ {

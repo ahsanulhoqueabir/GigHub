@@ -1,0 +1,48 @@
+meta {
+  name: List
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/gig
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Gigs — Public
+
+  Returns a paginated list of active gigs with seller and category relations.
+
+  ### Query Parameters
+  | Parameter  | Type    | Description                                      |
+  |-----------|---------|--------------------------------------------------|
+  | page      | number  | Page number (default: 1)                         |
+  | limit     | number  | Items per page (default: 50, max: 1000)          |
+  | sortBy    | string  | Sort field: `created_at`, `updated_at`, `title`, `views`, `price` |
+  | sortOrder | string  | `asc` or `desc`                                  |
+  | category  | string  | Filter by category UUID                          |
+  | seller    | string  | Filter by seller UUID                            |
+  | search    | string  | Search in title and description                  |
+  | tags      | string  | Comma-separated tag filter                       |
+  | status    | string  | Filter by status (default: ACTIVE)               |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "totalPages": 1,
+        "total": 5,
+        "hasNext": false,
+        "hasPrev": false
+      }
+    }
+  }
+  ```
+}

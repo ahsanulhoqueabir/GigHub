@@ -1,0 +1,38 @@
+meta {
+  name: Create - Wrong Package Count
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/api/gig
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "category": "CATEGORY_UUID",
+    "title": "Gig with wrong package count",
+    "description": "Testing package count validation",
+    "packages": [
+      {
+        "title": "Basic",
+        "tier": "BASIC",
+        "description": "Only one package"
+      }
+    ]
+  }
+}
+
+docs {
+  ## Create Gig — Wrong Package Count
+
+  Tests validation when fewer than 3 packages are provided.
+  Expected: 400 Bad Request — "Exactly 3 packages are required".
+}

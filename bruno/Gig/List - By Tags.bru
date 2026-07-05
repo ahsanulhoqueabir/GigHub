@@ -1,0 +1,17 @@
+meta {
+  name: List - By Tags
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/gig?tags=react,web
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Gigs by Tags — Public
+
+  Filters gigs that contain all specified tags (comma-separated).
+}

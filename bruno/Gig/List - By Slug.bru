@@ -1,0 +1,22 @@
+meta {
+  name: List - By Slug
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/gig?slug=i-will-build-a-professional-website-260706013408
+  body: none
+  auth: none
+}
+
+params:query {
+  slug: i-will-build-a-professional-website-260706013408
+}
+
+docs {
+  ## Get Gig by Slug — Public
+  
+  Returns a single gig by its unique slug.
+  Replace `gig-slug-here` with the actual gig slug.
+}

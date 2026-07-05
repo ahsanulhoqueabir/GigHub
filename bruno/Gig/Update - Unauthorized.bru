@@ -1,0 +1,28 @@
+meta {
+  name: Update - Unauthorized
+  type: http
+  seq: 16
+}
+
+patch {
+  url: {{baseUrl}}/api/gig/GIG_UUID
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Hacked title"
+  }
+}
+
+docs {
+  ## Update Gig — Unauthorized (No Token)
+
+  Tests that updating a gig without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

@@ -1,0 +1,23 @@
+meta {
+  name: Delete - In Use
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{baseUrl}}/api/gig/GIG_WITH_ACTIVE_ORDERS_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Gig — In Use (Conflict)
+
+  Tests the safe-delete behavior when a gig has active order references.
+  Expected: 409 Conflict with order reference count.
+  Replace `GIG_WITH_ACTIVE_ORDERS_UUID` with a gig ID that has active orders.
+}

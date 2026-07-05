@@ -1,0 +1,48 @@
+meta {
+  name: Get By ID - Details
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseUrl}}/api/gig/GIG_UUID/details
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Gig Details — Protected (Seller or Admin)
+
+  Returns a single gig by UUID with all non-deleted statuses visible.
+  Does NOT increment the view counter.
+  Used for the gig edit page and other owner/admin views.
+
+  Replace `GIG_UUID` with the actual gig ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "...",
+      "title": "...",
+      "status": "DRAFT",
+      "seller": { ... },
+      "category": { ... },
+      "reviews": [ ... ]
+    }
+  }
+  ```
+
+  ### Error Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Gig not found"
+  }
+  ```
+}

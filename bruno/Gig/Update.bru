@@ -1,0 +1,41 @@
+meta {
+  name: Update
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/api/gig/GIG_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "title": "I will build a professional website (Updated)",
+    "description": "Updated description with more details about my services.",
+    "tags": ["web", "development", "react", "nextjs"]
+  }
+}
+
+docs {
+  ## Update Gig — Seller or Admin
+
+  Partially updates a gig. Only the seller or an admin can update.
+  If title is changed, slug is auto-regenerated.
+  Replace `GIG_UUID` with the actual gig ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Gig updated successfully",
+    "data": { ... }
+  }
+  ```
+}
