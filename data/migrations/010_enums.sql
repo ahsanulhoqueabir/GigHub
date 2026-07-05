@@ -31,3 +31,5 @@ DO $$ BEGIN
   CREATE TYPE wallet_record_type AS ENUM ('CREDIT', 'DEBIT');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+
+

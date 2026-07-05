@@ -20,6 +20,7 @@ Files with lower numbers must run before files with higher numbers.
 | 10       | `100_chat_message.sql`       | Chat message table                    |
 | 11       | `110_wallet.sql`             | Wallet table                          |
 | 12       | `120_wallet_record.sql`      | Wallet record table                   |
+| 13       | `130_escrow.sql`             | Escrow table                          |
 | 90       | `900_triggers.sql`           | updated_at trigger (all tables)       |
 | 91       | `910_rls.sql`                | Row Level Security policies           |
 | 99       | `990_stored_procedures.sql`  | Stored procedures                     |
