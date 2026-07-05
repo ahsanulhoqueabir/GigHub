@@ -1,0 +1,41 @@
+meta {
+  name: Update
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/api/job/JOB_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "title": "Looking for a senior full-stack developer (Updated)",
+    "description": "Updated description with more details about the position.",
+    "tags": ["full-stack", "web", "react", "nextjs"]
+  }
+}
+
+docs {
+  ## Update Job — Owner or Admin
+
+  Partially updates a job. Only the owner or an admin can update.
+  If title is changed, slug is auto-regenerated.
+  Replace `JOB_UUID` with the actual job ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Job updated successfully",
+    "data": { ... }
+  }
+  ```
+}

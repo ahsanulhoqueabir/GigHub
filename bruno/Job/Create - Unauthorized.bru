@@ -1,0 +1,33 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/job
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "category": "CATEGORY_UUID",
+    "title": "Test Job",
+    "description": "Test description",
+    "type": "FULLTIME",
+    "budget": "$1000",
+    "deadline": "2026-08-15T00:00:00Z"
+  }
+}
+
+docs {
+  ## Create Job — Unauthorized (No Token)
+
+  Tests that creating a job without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

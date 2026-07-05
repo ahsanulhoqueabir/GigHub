@@ -1,0 +1,51 @@
+meta {
+  name: Manage
+  type: http
+  seq: 20
+}
+
+get {
+  url: {{baseUrl}}/api/job/manage
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Manage Jobs — Protected (Owner or Admin)
+
+  Returns a paginated list of the caller's own jobs (or all if admin).
+  Shows all statuses except DELETED.
+
+  ### Query Parameters
+  | Parameter  | Type    | Description                                      |
+  |-----------|---------|--------------------------------------------------|
+  | page      | number  | Page number (default: 1)                         |
+  | limit     | number  | Items per page (default: 50, max: 1000)          |
+  | sortBy    | string  | Sort field: `created_at`, `updated_at`, `title`, `views`, `deadline`, `budget` |
+  | sortOrder | string  | `asc` or `desc`                                  |
+  | status    | string  | Filter by specific status                        |
+  | search    | string  | Search in title and description                  |
+  | category  | string  | Filter by category UUID                          |
+  | type      | string  | Filter by job type                               |
+  | tags      | string  | Comma-separated tag filter                       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [ ... ],
+      "pagination": {
+        "page": 1,
+        "limit": 50,
+        "total": 5,
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+}

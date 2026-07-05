@@ -1,0 +1,17 @@
+meta {
+  name: List - By Type
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/job?type=FULLTIME
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Jobs by Type — Public
+
+  Filters jobs by job type (PARTTIME, FULLTIME, CONTRACT, TUTION, VOLUNTEER, OTHER).
+}

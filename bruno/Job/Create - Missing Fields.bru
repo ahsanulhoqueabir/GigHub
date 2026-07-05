@@ -1,0 +1,29 @@
+meta {
+  name: Create - Missing Fields
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/job
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "title": "Missing category and required fields"
+  }
+}
+
+docs {
+  ## Create Job — Missing Fields
+
+  Tests validation when required fields (category, description, type, budget, deadline) are missing.
+  Expected: 400 Bad Request with validation error message.
+}

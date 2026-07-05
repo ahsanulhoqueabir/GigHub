@@ -1,0 +1,17 @@
+meta {
+  name: List - By Tags
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/job?tags=react,nodejs
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Jobs by Tags — Public
+
+  Filters jobs that contain all specified tags (comma-separated).
+}

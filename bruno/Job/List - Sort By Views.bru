@@ -1,0 +1,17 @@
+meta {
+  name: List - Sort By Views
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/job?sortBy=views&sortOrder=desc
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Jobs Sorted by Views — Public
+
+  Returns jobs sorted by view count in descending order.
+}

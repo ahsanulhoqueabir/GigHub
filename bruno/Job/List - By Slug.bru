@@ -1,0 +1,22 @@
+meta {
+  name: List - By Slug
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/job?slug=looking-for-a-full-stack-developer-260706013408
+  body: none
+  auth: none
+}
+
+params:query {
+  slug: looking-for-a-full-stack-developer-260706013408
+}
+
+docs {
+  ## Get Job by Slug — Public
+
+  Returns a single job by its unique slug.
+  Replace `job-slug-here` with the actual job slug.
+}

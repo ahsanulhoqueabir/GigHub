@@ -1,21 +1,21 @@
 meta {
   name: Get By ID
   type: http
-  seq: 9
+  seq: 10
 }
 
 get {
-  url: {{baseUrl}}/api/gig/94678917-1713-46de-89ae-0d8beb62b0e6
+  url: {{baseUrl}}/api/job/0a8bd596-4616-4d7d-8e96-88952a7564c4
   body: none
   auth: none
 }
 
 docs {
-  ## Get Gig by ID — Public
+  ## Get Job by ID — Public
   
-  Returns a single gig by its UUID with seller, category, and reviews.
+  Returns a single job by its UUID with owner and category.
   View counter is auto-incremented on each fetch.
-  Replace `GIG_UUID` with the actual gig ID.
+  Replace `JOB_UUID` with the actual job ID.
   
   ### Success Response (200)
   ```json
@@ -26,10 +26,11 @@ docs {
       "title": "...",
       "slug": "...",
       "views": 1,
-      "seller": { ... },
+      "owner": { ... },
       "category": { ... },
-      "reviews": [ ... ],
-      "packages": [ ... ],
+      "type": "FULLTIME",
+      "budget": "$3000 - $5000",
+      "deadline": "2026-08-15T00:00:00Z",
       ...
     }
   }

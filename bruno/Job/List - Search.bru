@@ -1,0 +1,18 @@
+meta {
+  name: List - Search
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/job?search=developer
+  body: none
+  auth: none
+}
+
+docs {
+  ## Search Jobs — Public
+
+  Searches jobs by title and description.
+  Uses case-insensitive partial matching.
+}

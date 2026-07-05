@@ -1,0 +1,57 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/job
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "category": "fa6dedc2-277e-43bf-a20c-c7aae7cf0ccd",
+    "title": "Looking for a full-stack developer",
+    "description": "We are looking for an experienced full-stack developer to build a modern web application using React and Node.js.",
+    "type": "FULLTIME",
+    "budget": "$3000 - $5000",
+    "deadline": "2026-08-15T00:00:00Z",
+    "location": "Remote",
+    "required_skills": ["React", "Node.js", "TypeScript", "PostgreSQL"],
+    "tags": ["full-stack", "web", "react", "nodejs"],
+    "attachments": [
+      "https://example.com/job-description.pdf"
+    ]
+  }
+}
+
+docs {
+  ## Create Job — Authenticated User
+
+  Creates a new job. The owner is extracted from the JWT token.
+  Replace `CATEGORY_UUID` with an actual category ID.
+
+  ### Requirements
+  - Title is required (max 200 chars)
+  - Description is required (max 5000 chars)
+  - Type must be one of: PARTTIME, FULLTIME, CONTRACT, TUTION, VOLUNTEER, OTHER
+  - Budget is required
+  - Deadline is required (valid ISO date)
+  - Slug is auto-generated from title
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Job created successfully",
+    "data": { ... }
+  }
+  ```
+}

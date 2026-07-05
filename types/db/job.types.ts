@@ -8,14 +8,14 @@ export interface JobCore {
   title: string;
   slug: string;
   description: string;
-  attachments: string[];
   type: JobType;
-  budget: string;
-  deadline: string;
-  location: string;
-  required_skills: string[];
-  tags: string[];
   views: number;
+  attachments?: string[];
+  budget?: string;
+  deadline?: string;
+  location?: string;
+  required_skills?: string[];
+  tags?: string[];
 }
 
 export type JobType =
