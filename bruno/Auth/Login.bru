@@ -27,6 +27,15 @@ script:post-response {
   }
 }
 
+tests {
+  test("after login set token", function () {
+    const data = res.getBody();
+   const token = data.data.token;
+    console.log(token)
+    bru.setEnvVar("authToken", token, { persist: true });
+  });
+}
+
 docs {
   ## Login — Authenticate with email
   
