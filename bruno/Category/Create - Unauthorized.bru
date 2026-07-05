@@ -1,0 +1,36 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/category
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Test Category",
+    "slug": "test-category"
+  }
+}
+
+docs {
+  ## Create Category — No Token
+
+  Tests that creating a category without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

@@ -1,0 +1,33 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/category/CATEGORY_UUID
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Category by ID — Public
+
+  Returns a single category by its UUID.
+  Replace `CATEGORY_UUID` with the actual category ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "Web Development",
+      ...
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **404** — Category not found
+}

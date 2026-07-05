@@ -1,0 +1,35 @@
+meta {
+  name: List - Root Only
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/category?parent=null
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Root Categories — Public
+
+  Returns only top-level categories (those without a parent).
+
+  ### Query Parameters
+  | Parameter | Type   | Description            |
+  |-----------|--------|------------------------|
+  | parent    | string | Use `null` for roots   |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "total": 5,
+      "page": 1,
+      "limit": 50
+    }
+  }
+  ```
+}

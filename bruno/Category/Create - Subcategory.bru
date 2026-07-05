@@ -1,0 +1,43 @@
+meta {
+  name: Create - Subcategory
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/category
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Frontend Development",
+    "description": "Frontend development subcategory",
+    "slug": "frontend-development",
+    "image": null,
+    "parent": "PARENT_CATEGORY_UUID",
+    "ordering": 1
+  }
+}
+
+docs {
+  ## Create Subcategory — Admin only
+
+  Creates a subcategory under an existing parent category.
+  Replace `PARENT_CATEGORY_UUID` with the actual parent category ID.
+
+  ### Request Body
+  | Field       | Type   | Required | Description                           |
+  |-------------|--------|----------|---------------------------------------|
+  | name        | string | ✅       | Subcategory name                      |
+  | slug        | string | ✅       | URL-friendly unique slug              |
+  | description | string | ❌       | Optional description                  |
+  | parent      | string | ❌       | Parent category UUID                  |
+  | ordering    | number | ❌       | Sort order (default 0)                |
+}

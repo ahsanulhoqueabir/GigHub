@@ -1,0 +1,38 @@
+meta {
+  name: List - By Slug
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/category?slug=web-development
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Category by Slug — Public
+
+  Returns a single category identified by its URL slug.
+
+  ### Query Parameters
+  | Parameter | Type   | Description          |
+  |-----------|--------|----------------------|
+  | slug      | string | Category URL slug    |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "Web Development",
+      "slug": "web-development",
+      ...
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **404** — Category not found
+}

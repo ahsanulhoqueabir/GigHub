@@ -1,0 +1,36 @@
+meta {
+  name: Delete - In Use
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/api/category/CATEGORY_WITH_GIGS_OR_JOBS_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Category — In Use (Conflict)
+
+  Tests the safe-delete behavior when a category is referenced by gigs or jobs.
+  Replace `CATEGORY_WITH_GIGS_OR_JOBS_UUID` with a category UUID that has active gigs/jobs.
+
+  ### Expected Response (409 Conflict)
+  ```json
+  {
+    "success": false,
+    "error": "Category is in use and cannot be deleted",
+    "data": {
+      "references": {
+        "gigs": 2,
+        "jobs": 1
+      }
+    }
+  }
+  ```
+}

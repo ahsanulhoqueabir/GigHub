@@ -1,0 +1,36 @@
+meta {
+  name: Create - Missing Fields
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{baseUrl}}/api/category
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "description": "Missing name and slug"
+  }
+}
+
+docs {
+  ## Create Category — Missing Required Fields
+
+  Tests validation: name and slug are required.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Name is required"
+  }
+  ```
+}

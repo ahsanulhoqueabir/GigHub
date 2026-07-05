@@ -1,0 +1,62 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/category
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Web Development",
+    "description": "Web development related gigs and jobs",
+    "slug": "web-development",
+    "image": null,
+    "parent": null,
+    "ordering": 1
+  }
+}
+
+docs {
+  ## Create Category — Admin only
+
+  Creates a new category. Requires ADMIN role.
+
+  ### Request Body
+  | Field       | Type   | Required | Description                           |
+  |-------------|--------|----------|---------------------------------------|
+  | name        | string | ✅       | Category name                         |
+  | slug        | string | ✅       | URL-friendly unique slug              |
+  | description | string | ❌       | Optional description                  |
+  | image       | string | ❌       | Optional image URL                    |
+  | parent      | string | ❌       | Parent category UUID (null for root)  |
+  | ordering    | number | ❌       | Sort order (default 0)                |
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Category created successfully",
+    "data": {
+      "id": "uuid",
+      "name": "Web Development",
+      "slug": "web-development",
+      ...
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Not an admin
+  - **400** — Validation error (e.g. duplicate slug)
+}

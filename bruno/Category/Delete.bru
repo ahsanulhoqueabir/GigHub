@@ -1,0 +1,50 @@
+meta {
+  name: Delete
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/category/CATEGORY_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Category — Admin only
+
+  Safely deletes a category. Requires ADMIN role.
+  Replace `CATEGORY_UUID` with the actual category ID.
+
+  The API checks if any **gig** or **job** references this category.
+  If references exist, deletion is **blocked** with a 409 Conflict response.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Category deleted successfully",
+    "data": {
+      "deleted_id": "uuid"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Not an admin
+  - **409** — Category is in use (includes `references.gigs` and `references.jobs`)
+  ```json
+  {
+    "success": false,
+    "error": "Category is in use and cannot be deleted",
+    "data": {
+      "references": { "gigs": 2, "jobs": 1 }
+    }
+  }
+  ```
+}

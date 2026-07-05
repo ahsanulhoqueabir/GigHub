@@ -4,5 +4,5 @@
   "type": "collection",
   "ignore": ["node_modules", ".git"],
   "preserveFolderStructure": true,
-  "folders": ["Auth"]
+  "folders": ["Auth", "Category"]
 }

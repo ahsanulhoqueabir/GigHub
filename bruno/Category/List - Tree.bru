@@ -1,0 +1,42 @@
+meta {
+  name: List - Tree
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/category?tree=true
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Categories as Tree — Public
+
+  Returns all active categories organized as a hierarchical tree structure.
+
+  ### Query Parameters
+  | Parameter | Type    | Description            |
+  |-----------|---------|------------------------|
+  | tree      | boolean | Set to `true`          |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": "uuid",
+        "name": "Web Development",
+        "subCategories": [
+          {
+            "id": "uuid",
+            "name": "Frontend Development",
+            "subCategories": []
+          }
+        ]
+      }
+    ]
+  }
+  ```
+}

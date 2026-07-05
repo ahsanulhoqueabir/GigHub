@@ -1,0 +1,47 @@
+meta {
+  name: Update
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/category/CATEGORY_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Web Development (Updated)",
+    "description": "Updated description",
+    "ordering": 2
+  }
+}
+
+docs {
+  ## Update Category — Admin only
+
+  Partially updates a category. Requires ADMIN role.
+  Replace `CATEGORY_UUID` with the actual category ID.
+  Only send the fields you want to change.
+
+  ### Request Body (all optional)
+  | Field       | Type   | Description                           |
+  |-------------|--------|---------------------------------------|
+  | name        | string | Category name                         |
+  | slug        | string | URL-friendly unique slug              |
+  | description | string | Optional description                  |
+  | image       | string | Optional image URL                    |
+  | parent      | string | Parent category UUID or null          |
+  | ordering    | number | Sort order                            |
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Not an admin
+  - **400** — No fields provided / validation error
+}
