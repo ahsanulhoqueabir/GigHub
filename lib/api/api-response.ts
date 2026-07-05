@@ -50,3 +50,34 @@ export function success<T = unknown>(data: T) {
 export function error(error: string) {
   return { success: false as const, error };
 }
+
+import { type ZodSchema } from "zod";
+
+/**
+ * Parse and validate request body using a Zod schema.
+ * Returns the parsed data on success, or a `fail` response on validation error.
+ *
+ * @example
+ * const body = await parseBody(request, loginSchema);
+ * if (body instanceof NextResponse) return body;
+ * // body is now typed as LoginInput
+ */
+export async function parseBody<T>(
+  request: Request,
+  schema: ZodSchema<T>,
+): Promise<T | NextResponse> {
+  try {
+    const body = await request.json();
+    const parsed = schema.safeParse(body);
+
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0];
+      const message = firstIssue?.message ?? "Invalid input";
+      return fail({ error: message });
+    }
+
+    return parsed.data;
+  } catch {
+    return fail({ error: "Invalid JSON body" });
+  }
+}

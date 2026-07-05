@@ -242,23 +242,53 @@ if (!payload.emailOrUsername || !payload.password) {
 
 ## 4. Protecting Routes (Authentication)
 
-Use the `withAuth` higher-order function from `@/lib/api/auth-middleware` for protected endpoints.
+Use the `withAuth` higher-order function from `@/lib/api/auth-middleware` for protected endpoints.  
+It accepts a **single object** with `handler` and optional `options`.
 
 ```typescript
 import { withAuth } from "@/lib/api/auth-middleware";
 import { ok, fail } from "@/lib/api/api-response";
 
-export const GET = withAuth(async ({ req, user }) => {
-  // `user` is the decoded JWT payload: { profile, email, role }
-  const result = await SomeService.getById(user.profile);
+// Any authenticated user
+export const GET = withAuth({
+  handler: async ({ req, user }) => {
+    // `user` is the decoded JWT payload: { profile, email, role }
+    const result = await SomeService.getById(user.profile);
 
-  if (!result.success) {
-    return fail({ error: result.error, statusCode: 404 });
-  }
+    if (!result.success) {
+      return fail({ error: result.error, statusCode: 404 });
+    }
 
-  return ok({ data: result.data });
+    return ok({ data: result.data });
+  },
+});
+
+// Admin only
+export const POST = withAuth({
+  handler: async ({ req }) => {
+    // ...
+  },
+  options: { allowedRoles: ["ADMIN"] },
+});
+
+// Multiple roles
+export const PATCH = withAuth({
+  handler: async ({ req, params }) => {
+    // `params` is auto-resolved from Next.js route context
+    const id = params?.id;
+    // ...
+  },
+  options: { allowedRoles: ["USER", "ADMIN"] },
 });
 ```
+
+The handler context (`AuthenticatedHandlerContext`) provides:
+
+| Property | Type                                  | Description                             |
+| -------- | ------------------------------------- | --------------------------------------- |
+| `req`    | `NextRequest`                         | The incoming request object             |
+| `user`   | `JwtPayload`                          | Decoded JWT: `{ profile, email, role }` |
+| `params` | `Record<string, string \| undefined>` | Route params (auto-resolved)            |
 
 For public endpoints, use a standard `POST` / `GET` export without `withAuth`:
 
@@ -309,7 +339,88 @@ export class SomeService {
 
 ---
 
-## 6. Bruno Collection Syncing
+## 6. Multi-Step DB Operations (RPC / Transactions)
+
+Whenever an API flow requires **multiple database queries that must be atomic** (e.g. create profile + wallet in one go, delete a category only if unused), follow this pattern:
+
+### Step 1 — Write a PostgreSQL function in `schema/`
+
+Create a new file like `schema/993_your_feature.sql` with a `CREATE OR REPLACE FUNCTION` that wraps all steps in a single `plpgsql` block. Use `SECURITY DEFINER` if the function needs to bypass RLS.
+
+```sql
+-- ============================================================
+-- 993 — your_feature: description of what it does atomically
+-- Priority: 99 (run after all tables exist)
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION your_function_name(
+  p_param1 TEXT,
+  p_param2 UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_result JSONB;
+BEGIN
+  -- Step 1: validate / check references
+  -- Step 2: perform the main operation
+  -- Step 3: perform dependent operations
+  -- Step 4: return result as JSONB
+
+  RETURN jsonb_build_object('success', true, 'key', 'value');
+END;
+$$;
+```
+
+### Step 2 — Call the function from the service layer
+
+Use `supabase.rpc()` to invoke the function from `@/services/`:
+
+```typescript
+import { getSupabaseServerClient } from "@/lib/api/supabase";
+import { success, error } from "@/lib/api/api-response";
+
+export class SomeService {
+  static async doAtomicOperation(id: string) {
+    try {
+      const supabase = getSupabaseServerClient();
+      const { data, error: rpcError } = await supabase.rpc(
+        "your_function_name",
+        { p_param1: id },
+      );
+
+      if (rpcError) return error(rpcError.message);
+
+      const result = data as { success: boolean; [key: string]: unknown };
+      if (!result.success) {
+        return error((result as any).error || "Operation failed");
+      }
+
+      return success(result);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+}
+```
+
+### Step 3 — Do NOT run the SQL yourself
+
+The SQL file is committed to the repo. The developer manually runs it via the Supabase dashboard SQL Editor.
+
+### Existing examples
+
+| File                                       | Purpose                              |
+| ------------------------------------------ | ------------------------------------ |
+| `schema/991_signup_transaction.sql`        | Create profile + wallet atomically   |
+| `schema/992_delete_category_if_unused.sql` | Delete category with FK safety check |
+| `schema/990_stored_procedures.sql`         | Simple helper functions              |
+
+---
+
+## 7. Bruno Collection Syncing
 
 The Bruno collection lives in `bruno/` at the project root. For every new API route:
 

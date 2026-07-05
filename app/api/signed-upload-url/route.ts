@@ -20,32 +20,38 @@ import { ok, fail } from "@/lib/api/api-response";
  *   ]
  * }
  */
-export const POST = withAuth(async ({ req }) => {
-  try {
-    const body = (await req.json()) as {
-      files: SignedUploadRequest[];
-      folder?: string;
-    };
+export const POST = withAuth({
+  handler: async ({ req }) => {
+    try {
+      const body = (await req.json()) as {
+        files: SignedUploadRequest[];
+        folder?: string;
+      };
 
-    if (!body.files || !Array.isArray(body.files) || body.files.length === 0) {
-      return fail({ error: "R2_SIGNED_URLS_BAD_REQUEST" });
-    }
-
-    // Validate each file entry
-    for (const f of body.files) {
-      if (!f.fileName || !f.contentType) {
+      if (
+        !body.files ||
+        !Array.isArray(body.files) ||
+        body.files.length === 0
+      ) {
         return fail({ error: "R2_SIGNED_URLS_BAD_REQUEST" });
       }
+
+      // Validate each file entry
+      for (const f of body.files) {
+        if (!f.fileName || !f.contentType) {
+          return fail({ error: "R2_SIGNED_URLS_BAD_REQUEST" });
+        }
+      }
+
+      const results = await R2Service.generateSignedUploadUrls(
+        body.files,
+        body.folder || "",
+        1800, // 30 minutes
+      );
+
+      return ok({ data: results });
+    } catch {
+      return fail({ error: "R2_SIGNED_URLS_FAILED" });
     }
-
-    const results = await R2Service.generateSignedUploadUrls(
-      body.files,
-      body.folder || "",
-      1800, // 30 minutes
-    );
-
-    return ok({ data: results });
-  } catch {
-    return fail({ error: "R2_SIGNED_URLS_FAILED" });
-  }
+  },
 });

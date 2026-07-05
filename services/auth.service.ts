@@ -3,7 +3,7 @@ import { signJwt } from "@/lib/jwt.helper";
 import { hashPassword, verifyPassword } from "@/lib/api/password";
 import { stripPassword } from "@/lib/api/strip-password";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { generateUsername } from "@/lib/payload/auth-payload";
+import { generateUsername } from "@/lib/business/service.utils";
 import { ProfileService } from "@/services/profile.service";
 import type {
   JwtPayload,

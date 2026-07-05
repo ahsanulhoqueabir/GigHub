@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signUpSchema, type SignUpInput } from "@/lib/validations/auth.schema";
 import { useAuthStore } from "@/store/auth.store";
 import { Button } from "@/components/ui/button";
 
@@ -11,28 +13,36 @@ export default function SignUpPage() {
 
   const signUp = useAuthStore((s) => s.signUp);
   const isProcessing = useAuthStore((s) => s.isProcessing);
-  const error = useAuthStore((s) => s.error);
+  const authError = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [department, setDepartment] = useState("");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      student_id: "",
+      department: "",
+    },
+  });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: SignUpInput) => {
     clearError();
 
     try {
       await signUp({
-        name,
-        email,
-        password,
-        student_id: studentId,
-        department,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        student_id: data.student_id,
+        department: data.department,
       });
-      router.push("/"); // redirect to home on success
+      router.push("/");
     } catch {
       // error is already set in the store
     }
@@ -52,7 +62,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Name */}
           <div>
             <label
@@ -64,33 +74,37 @@ export default function SignUpPage() {
             <input
               id="name"
               type="text"
-              required
               autoComplete="name"
               placeholder="John Doe"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register("name")}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+            )}
           </div>
 
           {/* Student ID */}
           <div>
             <label
-              htmlFor="studentId"
+              htmlFor="student_id"
               className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
               Student ID
             </label>
             <input
-              id="studentId"
+              id="student_id"
               type="text"
-              required
               autoComplete="off"
               placeholder="e.g. 2023-123-456"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
+              {...register("student_id")}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
+            {errors.student_id && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.student_id.message}
+              </p>
+            )}
           </div>
 
           {/* Department */}
@@ -104,13 +118,16 @@ export default function SignUpPage() {
             <input
               id="department"
               type="text"
-              required
               autoComplete="off"
               placeholder="e.g. Computer Science"
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
+              {...register("department")}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
+            {errors.department && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.department.message}
+              </p>
+            )}
           </div>
 
           {/* Email */}
@@ -124,13 +141,16 @@ export default function SignUpPage() {
             <input
               id="email"
               type="email"
-              required
               autoComplete="email"
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register("email")}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           {/* Password */}
@@ -144,19 +164,22 @@ export default function SignUpPage() {
             <input
               id="password"
               type="password"
-              required
               autoComplete="new-password"
               placeholder="Min. 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              {...register("password")}
               className="block w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-500 focus:ring-2 focus:ring-zinc-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:placeholder-zinc-500 dark:focus:border-zinc-400"
             />
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.password.message}
+              </p>
+            )}
           </div>
 
-          {/* Error */}
-          {error && (
+          {/* Auth Error */}
+          {authError && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">
-              {error}
+              {authError}
             </p>
           )}
 

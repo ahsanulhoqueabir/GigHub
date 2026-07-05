@@ -1,17 +1,12 @@
 import { NextRequest } from "next/server";
-import { ok, fail } from "@/lib/api/api-response";
+import { ok, fail, parseBody } from "@/lib/api/api-response";
 import { AuthService } from "@/services/auth.service";
-import { sanitizeLoginPayload } from "@/lib/payload/auth-payload";
+import { loginSchema } from "@/lib/validations/auth.schema";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const payload = sanitizeLoginPayload(body);
-
-    // Validate required fields
-    if (!payload.emailOrUsername || !payload.password) {
-      return fail({ error: "Email/Username and password are required" });
-    }
+    const payload = await parseBody(request, loginSchema);
+    if (payload instanceof Response) return payload;
 
     // Authenticate user
     const result = await AuthService.login({

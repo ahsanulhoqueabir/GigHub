@@ -15,9 +15,17 @@ export interface CategoryTree extends Category {
   subCategories: CategoryTree[];
 }
 
-export interface CategoryForm extends Omit<
-  CategoryCore,
-  "parent" | "ordering"
-> {
+export interface CategoryForm extends Omit<CategoryCore, "parent"> {
   parent: string | null;
+}
+
+export function DefaultCategoryForm() {
+  return {
+    name: "",
+    description: null,
+    slug: "",
+    image: null,
+    parent: null,
+    ordering: 0,
+  };
 }

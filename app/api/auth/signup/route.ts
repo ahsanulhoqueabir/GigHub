@@ -1,29 +1,12 @@
 import { NextRequest } from "next/server";
-import { ok, fail } from "@/lib/api/api-response";
+import { ok, fail, parseBody } from "@/lib/api/api-response";
 import { AuthService } from "@/services/auth.service";
-import { sanitizeSignUpPayload } from "@/lib/payload/auth-payload";
+import { signUpSchema } from "@/lib/validations/auth.schema";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const payload = sanitizeSignUpPayload(body);
-
-    // Validate required fields
-    if (!payload.name || !payload.email || !payload.password) {
-      return fail({ error: "Name, email, and password are required" });
-    }
-
-    if (!payload.student_id) {
-      return fail({ error: "Student ID is required" });
-    }
-
-    if (!payload.department) {
-      return fail({ error: "Department is required" });
-    }
-
-    if (payload.password.length < 6) {
-      return fail({ error: "Password must be at least 6 characters" });
-    }
+    const payload = await parseBody(request, signUpSchema);
+    if (payload instanceof Response) return payload;
 
     // Create account via service
     const result = await AuthService.signup({
