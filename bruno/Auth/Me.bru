@@ -7,7 +7,7 @@ meta {
 get {
   url: {{baseUrl}}/api/auth/me
   body: none
-  auth: bearer
+  auth: inherit
 }
 
 headers {
@@ -16,15 +16,15 @@ headers {
 
 docs {
   ## Me — Get authenticated user profile
-
+  
   Protected endpoint. Requires a valid JWT token in the `Authorization` header.
   The token is automatically injected from the `authToken` variable (set by Login or Signup).
-
+  
   ### Headers
   | Header        | Value               | Required |
   |---------------|---------------------|----------|
   | Authorization | Bearer {{authToken}}| ✅       |
-
+  
   ### Success Response (200)
   ```json
   {
@@ -42,7 +42,7 @@ docs {
     }
   }
   ```
-
+  
   ### Error Responses
   - **401** — Missing/invalid/expired token
   - **404** — Profile not found

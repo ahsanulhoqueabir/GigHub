@@ -15,6 +15,9 @@ export interface CategoryTree extends Category {
   subCategories: CategoryTree[];
 }
 
-export interface CategoryForm extends Omit<CategoryCore, "parent"> {
+export interface CategoryForm extends Omit<
+  CategoryCore,
+  "parent" | "ordering"
+> {
   parent: string | null;
 }
