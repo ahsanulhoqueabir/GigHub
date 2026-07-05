@@ -1,0 +1,33 @@
+meta {
+  name: Create - Gig - Own Gig
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/order
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "gig": "OWN_GIG_UUID",
+    "package": "BASIC",
+    "deadline": "2026-08-06T00:00:00Z"
+  }
+}
+
+docs {
+  ## Create Gig Order — Own Gig
+
+  Tests the edge case where the buyer is also the seller of the gig.
+  Replace `OWN_GIG_UUID` with a gig owned by the authenticated user.
+
+  Expected: 400 Bad Request — "You cannot purchase your own gig"
+}

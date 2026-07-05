@@ -1,0 +1,38 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/api/order/ORDER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Order By ID — Participant or Admin
+
+  Returns a single order by ID.
+  Replace `ORDER_UUID` with an actual order ID where the caller is a participant.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "...",
+      "code": "GG-...",
+      "buyer": { "id": "...", "name": "..." },
+      "seller": { "id": "...", "name": "..." },
+      "source": "GIG",
+      "total_price": 50.00,
+      "status": "PENDING"
+    }
+  }
+  ```
+}

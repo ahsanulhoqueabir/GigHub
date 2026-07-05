@@ -1,0 +1,32 @@
+meta {
+  name: Delete - Pending
+  type: http
+  seq: 26
+}
+
+delete {
+  url: {{baseUrl}}/api/order/PENDING_ORDER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Order — Pending
+
+  Permanently deletes a PENDING order.
+  Replace `PENDING_ORDER_UUID` with an order in PENDING status where the
+  caller is a participant.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Order deleted successfully",
+    "data": { "deleted_id": "..." }
+  }
+  ```
+}

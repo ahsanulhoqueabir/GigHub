@@ -1,0 +1,31 @@
+meta {
+  name: Cancel - Already Cancelled
+  type: http
+  seq: 23
+}
+
+patch {
+  url: {{baseUrl}}/api/order/CANCELLED_ORDER_UUID/cancel
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "reason": "Trying to cancel again"
+  }
+}
+
+docs {
+  ## Cancel Order — Already Cancelled
+
+  Tests cancelling an already CANCELLED order.
+  Replace `CANCELLED_ORDER_UUID` with an order that is already CANCELLED.
+
+  Expected: 400 Bad Request — "Order is already cancelled"
+}

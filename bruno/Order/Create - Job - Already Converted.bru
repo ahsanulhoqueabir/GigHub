@@ -1,0 +1,32 @@
+meta {
+  name: Create - Job - Already Converted
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/order/job
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "proposal": "ALREADY_CONVERTED_PROPOSAL_UUID"
+  }
+}
+
+docs {
+  ## Create Job Order — Proposal Already Converted
+
+  Tests that a proposal can only generate one order.
+  Replace `ALREADY_CONVERTED_PROPOSAL_UUID` with a proposal that already
+  has an associated order.
+
+  Expected: 400 Bad Request — "This proposal has already been converted"
+}

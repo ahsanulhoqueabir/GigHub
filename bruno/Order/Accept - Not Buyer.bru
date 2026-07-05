@@ -1,0 +1,25 @@
+meta {
+  name: Accept - Not Buyer
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ORDER_UUID/accept
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Accept Order — Not the Buyer
+
+  Tests that only the buyer can accept an order.
+  Replace `ORDER_UUID` with an order where the caller is the seller (not buyer).
+
+  Expected: 400 Bad Request — "Only the buyer can accept this order"
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Delete - Active
+  type: http
+  seq: 27
+}
+
+delete {
+  url: {{baseUrl}}/api/order/ACTIVE_ORDER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Order — Active
+
+  Tests deleting an ACTIVE order (not allowed).
+  Replace `ACTIVE_ORDER_UUID` with an order in ACTIVE status.
+
+  Expected: 400 Bad Request — "Only pending orders can be deleted"
+}

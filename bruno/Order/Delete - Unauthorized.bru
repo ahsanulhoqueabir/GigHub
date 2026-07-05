@@ -1,0 +1,18 @@
+meta {
+  name: Delete - Unauthorized
+  type: http
+  seq: 29
+}
+
+delete {
+  url: {{baseUrl}}/api/order/ORDER_UUID
+  body: none
+  auth: none
+}
+
+docs {
+  ## Delete Order — Unauthorized
+
+  Tests that deleting an order requires authentication.
+  Expected: 401 Unauthorized.
+}

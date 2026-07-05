@@ -1,0 +1,31 @@
+meta {
+  name: Cancel - By Seller
+  type: http
+  seq: 22
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ORDER_UUID/cancel
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "reason": "Cannot fulfill this order at this time"
+  }
+}
+
+docs {
+  ## Cancel Order — By Seller
+
+  Seller cancels a PENDING or ACTIVE order.
+  Replace `ORDER_UUID` with an order where the caller is the seller.
+
+  Expected: 200 — sellers can also cancel orders.
+}

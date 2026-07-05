@@ -1,0 +1,32 @@
+meta {
+  name: Accept
+  type: http
+  seq: 16
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ORDER_UUID/accept
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Accept Order — Buyer Only
+
+  Accepts a PENDING order. Only the buyer can accept.
+  Replace `ORDER_UUID` with an order where the caller is the buyer.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Order accepted successfully",
+    "data": { "order_id": "..." }
+  }
+  ```
+}

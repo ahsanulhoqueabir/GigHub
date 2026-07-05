@@ -1,0 +1,47 @@
+meta {
+  name: Create - Job
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/order/job
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "proposal": "APPROVED_PROPOSAL_UUID",
+    "note": "Looking forward to working together!"
+  }
+}
+
+docs {
+  ## Create Job Order — Authenticated
+
+  Creates a new Job order from an approved proposal.
+  The order and chat room are created atomically.
+  No escrow is created for job orders.
+
+  Replace `APPROVED_PROPOSAL_UUID` with an actual approved proposal ID.
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Job order created successfully",
+    "data": {
+      "id": "...",
+      "code": "JB-260706-592m",
+      "source": "JOB",
+      "status": "PENDING"
+    }
+  }
+  ```
+}

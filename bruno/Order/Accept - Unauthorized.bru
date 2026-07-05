@@ -1,0 +1,18 @@
+meta {
+  name: Accept - Unauthorized
+  type: http
+  seq: 20
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ORDER_UUID/accept
+  body: none
+  auth: none
+}
+
+docs {
+  ## Accept Order — Unauthorized
+
+  Tests that accepting an order requires authentication.
+  Expected: 401 Unauthorized.
+}

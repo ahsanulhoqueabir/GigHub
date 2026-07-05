@@ -1,0 +1,22 @@
+meta {
+  name: Get By ID - Not Found
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/api/order/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Order By ID — Not Found
+
+  Tests fetching a non-existent order.
+  Expected: 404 Not Found.
+}

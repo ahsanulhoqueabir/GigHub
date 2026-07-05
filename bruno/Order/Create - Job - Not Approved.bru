@@ -1,0 +1,31 @@
+meta {
+  name: Create - Job - Not Approved
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/order/job
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "proposal": "PENDING_PROPOSAL_UUID"
+  }
+}
+
+docs {
+  ## Create Job Order — Proposal Not Approved
+
+  Tests that only approved proposals can create orders.
+  Replace `PENDING_PROPOSAL_UUID` with a non-approved proposal.
+
+  Expected: 400 Bad Request — "Proposal is not approved"
+}

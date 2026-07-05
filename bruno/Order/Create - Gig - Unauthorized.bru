@@ -1,0 +1,30 @@
+meta {
+  name: Create - Gig - Unauthorized
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/order
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "gig": "GIG_UUID",
+    "package": "BASIC",
+    "deadline": "2026-08-06T00:00:00Z"
+  }
+}
+
+docs {
+  ## Create Gig Order — Unauthorized
+
+  Tests that creating an order requires authentication.
+  Expected: 401 Unauthorized.
+}

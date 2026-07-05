@@ -1,0 +1,31 @@
+meta {
+  name: Create - Gig - Invalid Package
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/order
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "gig": "GIG_UUID",
+    "package": "INVALID_TIER",
+    "deadline": "2026-08-06T00:00:00Z"
+  }
+}
+
+docs {
+  ## Create Gig Order — Invalid Package Tier
+
+  Tests validation when an invalid package tier is provided.
+  Expected: 400 Bad Request — validation error for invalid enum value.
+}

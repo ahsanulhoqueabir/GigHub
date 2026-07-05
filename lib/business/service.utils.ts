@@ -1,3 +1,5 @@
+import { OrderSource } from "@/types/db/order.types";
+
 /**
  * Generate a username from the user's name.
  * Takes the last word of the name + 6 random digits.
@@ -47,4 +49,39 @@ export function slugify(title: string, date: Date = new Date()): string {
   const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
   return `${clean}-${timestamp}`;
+}
+
+const ORDER_CODE_PREFIX: Record<OrderSource, string> = {
+  GIG: "GG",
+  JOB: "JB",
+};
+
+/**
+ * Generates a unique-looking order code.
+ *
+ * Pattern:
+ * PREFIX-YYMMDD-MNOQ
+ *
+ * Examples:
+ * GG-260706-483k
+ * JB-260706-127m
+ */
+export function generateOrderCode(source: OrderSource): string {
+  const prefix = ORDER_CODE_PREFIX[source];
+
+  const now = new Date();
+
+  const date = [
+    String(now.getFullYear()).slice(-2),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("");
+
+  // Random 3-digit number (100-999)
+  const number = Math.floor(Math.random() * 900) + 100;
+
+  // Random lowercase letter (a-z)
+  const letter = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+
+  return `${prefix}-${date}-${number}${letter}`;
 }

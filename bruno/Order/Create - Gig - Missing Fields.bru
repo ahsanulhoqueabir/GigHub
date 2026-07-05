@@ -1,0 +1,29 @@
+meta {
+  name: Create - Gig - Missing Fields
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/order
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "package": "BASIC"
+  }
+}
+
+docs {
+  ## Create Gig Order — Missing Fields
+
+  Tests validation when required fields (`gig`) are missing.
+  Expected: 400 Bad Request with validation error.
+}

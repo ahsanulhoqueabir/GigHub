@@ -1,0 +1,25 @@
+meta {
+  name: Accept - Cancelled
+  type: http
+  seq: 19
+}
+
+patch {
+  url: {{baseUrl}}/api/order/CANCELLED_ORDER_UUID/accept
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Accept Order — Cancelled
+
+  Tests accepting a CANCELLED order.
+  Replace `CANCELLED_ORDER_UUID` with an order that is already CANCELLED.
+
+  Expected: 400 Bad Request — "Order cannot be accepted because it is CANCELLED"
+}

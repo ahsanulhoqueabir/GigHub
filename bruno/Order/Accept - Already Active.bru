@@ -1,0 +1,25 @@
+meta {
+  name: Accept - Already Active
+  type: http
+  seq: 18
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ACTIVE_ORDER_UUID/accept
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Accept Order — Already Active
+
+  Tests accepting an already ACTIVE order.
+  Replace `ACTIVE_ORDER_UUID` with an order that is already in ACTIVE status.
+
+  Expected: 400 Bad Request — "Order cannot be accepted because it is ACTIVE"
+}

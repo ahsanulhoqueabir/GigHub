@@ -1,0 +1,24 @@
+meta {
+  name: Delete - Cancelled
+  type: http
+  seq: 28
+}
+
+delete {
+  url: {{baseUrl}}/api/order/CANCELLED_ORDER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Order — Cancelled
+
+  Tests deleting a CANCELLED order (not allowed).
+  Replace `CANCELLED_ORDER_UUID` with an order in CANCELLED status.
+
+  Expected: 400 Bad Request — "Only pending orders can be deleted"
+}

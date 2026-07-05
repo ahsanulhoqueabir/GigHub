@@ -1,0 +1,22 @@
+meta {
+  name: List - By Source
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/order?source=GIG
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Orders — Filtered by Source
+
+  Tests filtering orders by source (GIG or JOB).
+  Expected: 200 with only GIG orders.
+}

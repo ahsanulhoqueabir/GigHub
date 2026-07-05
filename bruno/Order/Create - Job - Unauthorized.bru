@@ -1,0 +1,28 @@
+meta {
+  name: Create - Job - Unauthorized
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/order/job
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "proposal": "PROPOSAL_UUID"
+  }
+}
+
+docs {
+  ## Create Job Order — Unauthorized
+
+  Tests that creating a job order requires authentication.
+  Expected: 401 Unauthorized.
+}

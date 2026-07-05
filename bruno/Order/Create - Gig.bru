@@ -1,0 +1,53 @@
+meta {
+  name: Create - Gig
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/order
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "gig": "GIG_UUID",
+    "package": "BASIC",
+    "deadline": "2026-08-06T00:00:00Z",
+    "description": "I would like to order this gig",
+    "note": "Please start as soon as possible"
+  }
+}
+
+docs {
+  ## Create Gig Order — Authenticated Buyer
+
+  Creates a new Gig order. The order, chat room, and escrow are created
+  atomically in a single database transaction.
+
+  Replace `GIG_UUID` with an actual gig ID (must be owned by a different user).
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Gig order created successfully",
+    "data": {
+      "id": "...",
+      "code": "GG-260706-381k",
+      "buyer": { "id": "...", "name": "...", "username": "...", "avatar": "..." },
+      "seller": { "id": "...", "name": "...", "username": "...", "avatar": "..." },
+      "source": "GIG",
+      "total_price": 50.00,
+      "title": "...",
+      "status": "PENDING"
+    }
+  }
+  ```
+}

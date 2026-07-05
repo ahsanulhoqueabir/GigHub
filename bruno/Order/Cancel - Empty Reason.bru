@@ -1,0 +1,29 @@
+meta {
+  name: Cancel - Empty Reason
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseUrl}}/api/order/ORDER_UUID/cancel
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "reason": ""
+  }
+}
+
+docs {
+  ## Cancel Order — Empty Reason
+
+  Tests cancelling with an empty reason.
+  Expected: 400 Bad Request — validation error.
+}

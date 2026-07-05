@@ -1,0 +1,22 @@
+meta {
+  name: List - By Status
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/order?status=PENDING
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Orders — Filtered by Status
+
+  Tests filtering orders by status (e.g., PENDING).
+  Expected: 200 with only PENDING orders.
+}
