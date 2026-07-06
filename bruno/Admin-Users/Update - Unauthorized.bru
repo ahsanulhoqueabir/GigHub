@@ -1,0 +1,35 @@
+meta {
+  name: Update - Unauthorized
+  type: http
+  seq: 17
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Hacked Name"
+  }
+}
+
+docs {
+  ## Update User — No Token
+
+  Tests that updating a user without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

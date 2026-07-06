@@ -1,0 +1,51 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get User By ID — Admin only
+
+  Returns a single user's profile details. Password is stripped from the response.
+  Replace `USER_UUID` with the actual user ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "John Doe",
+      "username": "john-doe",
+      "email": "john@example.com",
+      "role": "USER",
+      "phone": null,
+      "bio": null,
+      "avatar": null,
+      "cover": null,
+      "skills": [],
+      "website": null,
+      "portfolio": null,
+      "google": null,
+      "socials": {},
+      "verified": false,
+      "student_id": "2024-001",
+      "department": { "id": "uuid", "name": "CSE", "acronym": "CSE" },
+      "status": "ACTIVE",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  }
+  ```
+}

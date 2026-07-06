@@ -4,5 +4,5 @@
   "type": "collection",
   "ignore": ["node_modules", ".git"],
   "preserveFolderStructure": true,
-  "folders": ["Auth", "Category", "Gig", "Job"]
+  "folders": ["Admin-Users", "Auth", "Category", "Gig", "Job"]
 }

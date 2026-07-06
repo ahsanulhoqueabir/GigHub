@@ -1,0 +1,36 @@
+meta {
+  name: Create - Missing Fields
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "email": "incomplete@example.com"
+  }
+}
+
+docs {
+  ## Create User — Missing Required Fields
+
+  Tests validation: name, email, username, password, and student_id are all required.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Name is required"
+  }
+  ```
+}

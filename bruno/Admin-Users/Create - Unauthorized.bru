@@ -1,0 +1,39 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Unauthorized User",
+    "email": "unauth@example.com",
+    "username": "unauth-user",
+    "password": "password123",
+    "student_id": "2024-666"
+  }
+}
+
+docs {
+  ## Create User — No Token
+
+  Tests that creating a user without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

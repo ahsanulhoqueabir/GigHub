@@ -1,0 +1,64 @@
+meta {
+  name: Create
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "New User",
+    "email": "newuser@example.com",
+    "username": "newuser",
+    "password": "password123",
+    "student_id": "2024-999",
+    "department": "DEPARTMENT_UUID"
+  }
+}
+
+docs {
+  ## Create User — Admin only
+
+  Creates a new user profile directly. Password is hashed via argon2 before storing.
+  Requires ADMIN role.
+
+  ### Request Body
+  | Field       | Type   | Required | Description                     |
+  |-------------|--------|----------|---------------------------------|
+  | name        | string | ✅       | Full name                       |
+  | email       | string | ✅       | Unique email address            |
+  | username    | string | ✅       | Unique username                 |
+  | password    | string | ✅       | Plain-text password (min 6)     |
+  | student_id  | string | ✅       | Student ID                      |
+  | department  | string | ❌       | Department UUID                 |
+  | role        | string | ❌       | `USER` or `ADMIN` (default: USER) |
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "User created successfully",
+    "data": {
+      "id": "uuid",
+      "name": "New User",
+      "email": "newuser@example.com",
+      "username": "newuser",
+      "role": "USER",
+      "student_id": "2024-999",
+      "status": "ACTIVE",
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  }
+  ```
+}

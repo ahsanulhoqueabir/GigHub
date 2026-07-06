@@ -1,0 +1,36 @@
+meta {
+  name: List - Search
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  search: siam
+}
+
+docs {
+  ## List Users — Search by keyword
+
+  Tests searching users by name, email, or username (case-insensitive partial match).
+
+  ### Expected Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}

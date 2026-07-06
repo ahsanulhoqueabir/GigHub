@@ -1,0 +1,40 @@
+meta {
+  name: Create - Duplicate Email
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/admin/users
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Duplicate User",
+    "email": "existing@example.com",
+    "username": "duplicate-user",
+    "password": "password123",
+    "student_id": "2024-888"
+  }
+}
+
+docs {
+  ## Create User — Duplicate Email
+
+  Tests that creating a user with an already-used email is rejected.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "duplicate key value violates unique constraint ..."
+  }
+  ```
+}

@@ -1,0 +1,29 @@
+meta {
+  name: Get By ID - Not Found
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get User By ID — Not Found
+
+  Tests that requesting a non-existent user ID returns a 404 error.
+
+  ### Expected Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Profile not found"
+  }
+  ```
+}

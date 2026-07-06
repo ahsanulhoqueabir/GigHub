@@ -1,0 +1,29 @@
+meta {
+  name: List - Unauthorized
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  ## List Users — No Token
+
+  Tests that listing users without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

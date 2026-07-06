@@ -1,0 +1,36 @@
+meta {
+  name: Update - Not Found
+  type: http
+  seq: 16
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/00000000-0000-0000-0000-000000000000
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Ghost User"
+  }
+}
+
+docs {
+  ## Update User — Not Found
+
+  Tests that updating a non-existent user ID returns a 404 error.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Profile not found"
+  }
+  ```
+}

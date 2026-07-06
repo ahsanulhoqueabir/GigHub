@@ -1,0 +1,29 @@
+meta {
+  name: Delete - Unauthorized
+  type: http
+  seq: 20
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: none
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+docs {
+  ## Delete User — No Token
+
+  Tests that deleting a user without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

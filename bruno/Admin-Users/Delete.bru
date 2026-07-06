@@ -1,0 +1,34 @@
+meta {
+  name: Delete
+  type: http
+  seq: 18
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete User — Admin only
+
+  Soft-deletes a user profile by setting its status to `DELETED`.
+  The row is NOT removed from the database.
+  Replace `USER_UUID` with the actual user ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "User deleted successfully",
+    "data": {
+      "deleted_id": "uuid"
+    }
+  }
+  ```
+}

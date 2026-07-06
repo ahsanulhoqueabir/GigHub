@@ -1,0 +1,63 @@
+meta {
+  name: Update
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Updated Name",
+    "phone": "+880-1700000000",
+    "bio": "Updated bio text",
+    "verified": true
+  }
+}
+
+docs {
+  ## Update User — Admin only
+
+  Updates a user's profile fields. All fields are optional — only provided fields are updated.
+  If `password` is provided, it is hashed via argon2 before storing.
+  Replace `USER_UUID` with the actual user ID.
+
+  ### Request Body (all optional)
+  | Field       | Type    | Description                          |
+  |-------------|---------|--------------------------------------|
+  | name        | string  | Full name                            |
+  | email       | string  | Email address                        |
+  | username    | string  | Username                             |
+  | password    | string  | New password (min 6, hashed before storing) |
+  | phone       | string  | Phone number                         |
+  | bio         | string  | Biography                            |
+  | avatar      | string  | Avatar URL                           |
+  | cover       | string  | Cover image URL                      |
+  | skills      | array   | Array of skill strings               |
+  | website     | string  | Website URL                          |
+  | portfolio   | string  | Portfolio URL                        |
+  | google      | string  | Google profile link                  |
+  | socials     | object  | Social links (github, linkedin, etc) |
+  | department  | string  | Department UUID (null to unset)      |
+  | student_id  | string  | Student ID                           |
+  | verified    | boolean | Email verification status            |
+  | role        | string  | `USER` or `ADMIN`                    |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "User updated successfully",
+    "data": { ... }
+  }
+  ```
+}

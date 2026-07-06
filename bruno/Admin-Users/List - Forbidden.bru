@@ -1,0 +1,30 @@
+meta {
+  name: List - Forbidden
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Users — Non-Admin Token
+
+  Tests that a regular USER role token cannot access admin endpoints.
+  Replace `{{authToken}}` with a USER token before running.
+
+  ### Expected Response (403)
+  ```json
+  {
+    "success": false,
+    "error": "Forbidden: Insufficient permissions"
+  }
+  ```
+}

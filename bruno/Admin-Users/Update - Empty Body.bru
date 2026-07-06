@@ -1,0 +1,34 @@
+meta {
+  name: Update - Empty Body
+  type: http
+  seq: 14
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/USER_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {}
+}
+
+docs {
+  ## Update User — Empty Body
+
+  Tests that sending an empty JSON body returns a validation error.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "At least one field must be provided for update"
+  }
+  ```
+}

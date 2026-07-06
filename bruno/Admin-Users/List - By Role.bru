@@ -1,0 +1,36 @@
+meta {
+  name: List - By Role
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  role: ADMIN
+}
+
+docs {
+  ## List Users — Filter by Role
+
+  Tests filtering users by the `role` query parameter.
+
+  ### Expected Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}
