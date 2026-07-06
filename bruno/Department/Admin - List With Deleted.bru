@@ -1,0 +1,41 @@
+meta {
+  name: Admin - List With Deleted
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/api/admin/departments?includeDeleted=true
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  includeDeleted: true
+}
+
+docs {
+  ## List Departments Including Deleted — Admin only
+
+  Returns all departments including soft-deleted ones.
+
+  ### Query Parameters
+  | Parameter      | Type    | Description                      |
+  |----------------|---------|----------------------------------|
+  | includeDeleted | boolean | Set to `true`                    |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}

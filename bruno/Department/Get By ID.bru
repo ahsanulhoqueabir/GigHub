@@ -1,0 +1,40 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/department/DEPARTMENT_UUID
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Department by ID — Public
+
+  Returns a single department by its UUID (only if ACTIVE).
+  Replace `DEPARTMENT_UUID` with the actual department ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "Computer Science",
+      "acronym": "CSE",
+      "code": "CSE",
+      ...
+    }
+  }
+  ```
+
+  ### Error Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Department not found"
+  }
+  ```
+}

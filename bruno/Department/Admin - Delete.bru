@@ -1,0 +1,43 @@
+meta {
+  name: Admin - Delete
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/departments/DEPARTMENT_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Department — Admin only
+
+  Soft-deletes a department (sets status to DELETED). Requires ADMIN role.
+  Replace `DEPARTMENT_UUID` with the actual department ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Department deleted successfully",
+    "data": {
+      "id": "uuid",
+      "status": "DELETED",
+      ...
+    }
+  }
+  ```
+
+  ### Error Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Department not found"
+  }
+  ```
+}

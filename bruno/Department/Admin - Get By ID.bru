@@ -1,0 +1,35 @@
+meta {
+  name: Admin - Get By ID
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/admin/departments/DEPARTMENT_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Department by ID — Admin only
+
+  Returns a department by its UUID (no status filter — can see DELETED too).
+  Replace `DEPARTMENT_UUID` with the actual department ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "Computer Science",
+      "status": "ACTIVE",
+      ...
+    }
+  }
+  ```
+}

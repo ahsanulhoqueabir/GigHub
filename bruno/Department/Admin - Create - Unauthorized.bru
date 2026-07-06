@@ -1,0 +1,36 @@
+meta {
+  name: Admin - Create - Unauthorized
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/admin/departments
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Test Department",
+    "code": "TEST"
+  }
+}
+
+docs {
+  ## Create Department — No Token
+
+  Tests that creating a department without authentication is rejected.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

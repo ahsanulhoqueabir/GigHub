@@ -1,0 +1,56 @@
+meta {
+  name: Admin - Create
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/admin/departments
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Computer Science and Engineering",
+    "acronym": "CSE",
+    "description": "Department of Computer Science and Engineering",
+    "code": "CSE",
+    "image": null,
+    "id_pattern": "CSE-####"
+  }
+}
+
+docs {
+  ## Create Department — Admin only
+
+  Creates a new department. Requires ADMIN role.
+
+  ### Request Body
+  | Field      | Type   | Required | Description                        |
+  |------------|--------|----------|------------------------------------|
+  | name       | string | ✅       | Department name                    |
+  | code       | string | ✅       | Short code (max 20 chars)          |
+  | acronym    | string | ❌       | Acronym (e.g. CSE)                 |
+  | description| string | ❌       | Optional description               |
+  | image      | string | ❌       | Optional image URL                 |
+  | id_pattern | string | ❌       | Optional ID pattern (e.g. CSE-####)|
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Department created successfully",
+    "data": {
+      "id": "uuid",
+      "name": "Computer Science and Engineering",
+      ...
+    }
+  }
+  ```
+}

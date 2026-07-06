@@ -1,0 +1,41 @@
+meta {
+  name: Admin - List By Status
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/admin/departments?status=DRAFT
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  status: DRAFT
+}
+
+docs {
+  ## List Departments by Status — Admin only
+
+  Returns departments filtered by a specific status (e.g. DRAFT, ACTIVE, ON_HOLD).
+
+  ### Query Parameters
+  | Parameter | Type   | Description                      |
+  |-----------|--------|----------------------------------|
+  | status    | string | Filter: `DRAFT`, `ACTIVE`, etc.  |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}

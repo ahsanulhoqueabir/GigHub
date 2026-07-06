@@ -1,0 +1,51 @@
+meta {
+  name: Admin - Update
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/departments/DEPARTMENT_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "name": "Computer Science and Engineering (Updated)",
+    "description": "Updated description",
+    "acronym": "CSE"
+  }
+}
+
+docs {
+  ## Update Department — Admin only
+
+  Partially updates a department. Requires ADMIN role.
+  Replace `DEPARTMENT_UUID` with the actual department ID.
+  Only send the fields you want to change.
+
+  ### Request Body (all optional)
+  | Field      | Type   | Description                        |
+  |------------|--------|------------------------------------|
+  | name       | string | Department name                    |
+  | code       | string | Short code (max 20 chars)          |
+  | acronym    | string | Acronym                            |
+  | description| string | Optional description               |
+  | image      | string | Optional image URL                 |
+  | id_pattern | string | Optional ID pattern                |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Department updated successfully",
+    "data": { ... }
+  }
+  ```
+}

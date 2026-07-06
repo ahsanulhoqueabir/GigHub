@@ -1,0 +1,36 @@
+meta {
+  name: Admin - Create - Missing Fields
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/admin/departments
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "description": "Missing name and code"
+  }
+}
+
+docs {
+  ## Create Department — Missing Required Fields
+
+  Tests validation: name and code are required.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Name is required"
+  }
+  ```
+}
