@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import axios from "axios";
 
 interface SuccessResponseOptions {
   data?: unknown;
@@ -80,4 +81,18 @@ export async function parseBody<T>(
   } catch {
     return fail({ error: "Invalid JSON body" });
   }
+}
+
+export function getErrorMessage(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    return (
+      error.response?.data?.error ?? error.message ?? "Something went wrong"
+    );
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Something went wrong";
 }
