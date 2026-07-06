@@ -19,6 +19,7 @@
 index.md
 .env.local
 .env
+docs/
 
 # production
 /build

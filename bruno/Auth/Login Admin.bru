@@ -1,0 +1,74 @@
+meta {
+  name: Login Admin
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "emailOrUsername": "hasan-773892",
+    "password": "password123"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.token) {
+    bru.setVar("authToken", res.body.data.token);
+  }
+}
+
+tests {
+  test("after login set token", function () {
+    const data = res.getBody();
+   const token = data.data.token;
+    console.log(token)
+    bru.setEnvVar("authToken", token, { persist: true });
+  });
+}
+
+docs {
+  ## Login — Authenticate with email
+  
+  Accepts either email or username in the `emailOrUsername` field.
+  If the value contains `@`, it's treated as email; otherwise as username.
+  
+  ### Request Body
+  | Field          | Type   | Required | Description                          |
+  |----------------|--------|----------|--------------------------------------|
+  | emailOrUsername| string | ✅       | Email (with @) or username           |
+  | password       | string | ✅       | Account password                     |
+  
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Login successful",
+    "data": {
+      "user": {
+        "id": "uuid",
+        "email": "abir@example.com",
+        "name": "Abir Hasan",
+        "username": "hasan-452187",
+        "role": "USER",
+        "student_id": "2023-123-456",
+        "department": "uuid"
+      },
+      "token": "eyJhbGciOiJIUzI1NiJ9..."
+    }
+  }
+  ```
+  
+  ### Error Responses
+  - **401** — Invalid email/username or password
+  - **400** — Missing fields
+}
