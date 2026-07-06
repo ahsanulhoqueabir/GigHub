@@ -1,0 +1,27 @@
+meta {
+  name: Manage - By Job
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/manage?job=JOB_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+params:query {
+  job: JOB_UUID
+}
+
+docs {
+  ## Manage Job Proposals — Filtered by Job
+
+  Returns the caller's proposals for a specific job.
+  Useful for checking if you have already applied to a job.
+  Replace `JOB_UUID` with an actual job ID.
+}

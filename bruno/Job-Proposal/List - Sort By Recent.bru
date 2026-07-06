@@ -1,0 +1,17 @@
+meta {
+  name: List - Sort By Recent
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal?sortBy=created_at&sortOrder=desc
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Job Proposals Sorted by Recent — Public
+
+  Returns job proposals sorted by creation date in descending order (newest first).
+}

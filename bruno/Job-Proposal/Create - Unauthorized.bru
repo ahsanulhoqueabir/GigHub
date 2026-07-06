@@ -1,0 +1,29 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/job-proposal
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "job": "JOB_UUID",
+    "description": "I am interested in this job. I have the required skills and experience."
+  }
+}
+
+docs {
+  ## Create Job Proposal — Unauthorized (No Token)
+
+  Tests that creating a job proposal without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

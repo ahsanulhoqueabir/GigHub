@@ -1,0 +1,32 @@
+meta {
+  name: Delete
+  type: http
+  seq: 13
+}
+
+delete {
+  url: {{baseUrl}}/api/job-proposal/PROPOSAL_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Delete Job Proposal — Applicant or Admin
+
+  Safely deletes a job proposal. Only the applicant or an admin can delete.
+  Checks for active order references before deletion (hard delete).
+  Replace `PROPOSAL_UUID` with the actual proposal ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Job proposal deleted successfully",
+    "data": { "deleted_id": "..." }
+  }
+  ```
+}

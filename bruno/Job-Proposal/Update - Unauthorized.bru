@@ -1,0 +1,28 @@
+meta {
+  name: Update - Unauthorized
+  type: http
+  seq: 11
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/PROPOSAL_UUID
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "description": "Hacked proposal description"
+  }
+}
+
+docs {
+  ## Update Job Proposal — Unauthorized (No Token)
+
+  Tests that updating a job proposal without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

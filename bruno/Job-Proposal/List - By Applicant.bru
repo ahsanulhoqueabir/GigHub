@@ -1,0 +1,23 @@
+meta {
+  name: List - By Applicant
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal?applicant=PROFILE_UUID
+  body: none
+  auth: none
+}
+
+params:query {
+  applicant: PROFILE_UUID
+}
+
+docs {
+  ## List Job Proposals by Applicant — Public
+
+  Filters job proposals by applicant UUID.
+  Returns all proposals submitted by a specific user.
+  Replace `PROFILE_UUID` with an actual profile ID.
+}

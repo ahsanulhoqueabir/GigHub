@@ -1,0 +1,52 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/PROPOSAL_UUID
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Job Proposal by ID — Public
+
+  Returns a single job proposal by its UUID with job and applicant profile data.
+  Replace `PROPOSAL_UUID` with the actual proposal ID.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "...",
+      "description": "...",
+      "attachments": [...],
+      "status": "PENDING",
+      "created_at": "...",
+      "updated_at": "...",
+      "job": {
+        "id": "...",
+        "title": "...",
+        "slug": "...",
+        "status": "ACTIVE",
+        "description": "...",
+        "budget": "$3000 - $5000",
+        "type": "FULLTIME",
+        "deadline": "2026-08-15T00:00:00Z"
+      },
+      "applicant": {
+        "id": "...",
+        "name": "...",
+        "username": "...",
+        "avatar": null,
+        "verified": false,
+        "department": "...",
+        "created_at": "..."
+      }
+    }
+  }
+  ```
+}

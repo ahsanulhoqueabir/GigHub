@@ -1,0 +1,18 @@
+meta {
+  name: Manage - Unauthorized
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/manage
+  body: none
+  auth: none
+}
+
+docs {
+  ## Manage Job Proposals — Unauthorized (No Token)
+
+  Tests that accessing manage endpoint without authentication returns 401.
+  Expected: 401 Unauthorized.
+}

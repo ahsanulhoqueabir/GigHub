@@ -1,0 +1,48 @@
+meta {
+  name: Update
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/PROPOSAL_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "description": "Updated proposal with more detailed experience. I have worked on similar projects and can deliver high-quality results within the timeline.",
+    "attachments": [
+      "https://example.com/updated-portfolio.pdf",
+      "https://example.com/new-certificate.pdf"
+    ]
+  }
+}
+
+docs {
+  ## Update Job Proposal — Applicant or Admin
+
+  Partially updates a job proposal. Only the applicant or an admin can update.
+  Only `description` and `attachments` can be changed.
+  `job` and `applicant` are immutable after creation.
+  Replace `PROPOSAL_UUID` with the actual proposal ID.
+
+  ### Requirements
+  - At least one field (`description` or `attachments`) must be provided
+  - No extra fields allowed beyond `description` and `attachments`
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Job proposal updated successfully",
+    "data": { ... }
+  }
+  ```
+}

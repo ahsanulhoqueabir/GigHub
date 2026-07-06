@@ -1,0 +1,30 @@
+meta {
+  name: Update - Forbidden
+  type: http
+  seq: 12
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/ANOTHER_USERS_PROPOSAL_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "description": "Trying to update someone else's proposal"
+  }
+}
+
+docs {
+  ## Update Job Proposal — Forbidden (Not Owner)
+
+  Tests that updating another user's proposal without being the applicant or admin returns 403.
+  Expected: 403 Forbidden.
+  Replace `ANOTHER_USERS_PROPOSAL_UUID` with a proposal ID owned by a different user.
+}

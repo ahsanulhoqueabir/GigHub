@@ -1,0 +1,49 @@
+meta {
+  name: Create
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/job-proposal
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "job": "0a8bd596-4616-4d7d-8e96-88952a7564c4",
+    "description": "I have 5+ years of experience in full-stack development. I can complete this project within the given deadline. My tech stack includes React, Node.js, and PostgreSQL.",
+    "attachments": [
+      "https://example.com/portfolio.pdf",
+      "https://example.com/resume.pdf"
+    ]
+  }
+}
+
+docs {
+  ## Create Job Proposal — Authenticated User
+  
+  Creates a new job proposal. The applicant is extracted from the JWT token.
+  Replace `JOB_UUID` with an actual job ID.
+  
+  ### Requirements
+  - `job` is required (valid UUID of an existing job)
+  - `description` is required (min 20 chars, max 5000 chars)
+  - `attachments` is optional (array of URLs, max 10 items)
+  - `applicant` is extracted from JWT, never from request body
+  
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Job proposal created successfully",
+    "data": { ... }
+  }
+  ```
+}
