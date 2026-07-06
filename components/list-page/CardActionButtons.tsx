@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { IconEye, IconEdit, IconTrash } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { DeleteConfirmDialog } from "@/components/shared/delete-confirm-dialog";
 
 interface CardActionButtonsProps {
   onEdit?: () => void;
@@ -12,6 +14,8 @@ interface CardActionButtonsProps {
   deleteLabel?: string;
   detailsLabel?: string;
   className?: string;
+  /** Name of the item being deleted (shown in confirmation dialog) */
+  itemName?: string;
 }
 
 export function CardActionButtons({
@@ -22,7 +26,22 @@ export function CardActionButtons({
   deleteLabel = "Delete",
   detailsLabel = "Details",
   className,
+  itemName,
 }: CardActionButtonsProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeleteDialogOpen(true);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (onDelete) {
+      await onDelete();
+    }
+    setDeleteDialogOpen(false);
+  }, [onDelete]);
+
   const buttons = [];
 
   if (onDetails) {
@@ -67,10 +86,7 @@ export function CardActionButtons({
         key="delete"
         variant="destructive"
         size="lg"
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
+        onClick={handleDeleteClick}
         className="w-full justify-center gap-1.5 h-10 text-xs font-semibold"
       >
         <IconTrash className="h-4 w-4" />
@@ -82,18 +98,27 @@ export function CardActionButtons({
   if (buttons.length === 0) return null;
 
   return (
-    <div
-      className={cn(
-        "grid gap-2 w-full",
-        buttons.length === 1
-          ? "grid-cols-1"
-          : buttons.length === 2
-            ? "grid-cols-2"
-            : "grid-cols-3",
-        className,
-      )}
-    >
-      {buttons}
-    </div>
+    <>
+      <div
+        className={cn(
+          "grid gap-2 w-full",
+          buttons.length === 1
+            ? "grid-cols-1"
+            : buttons.length === 2
+              ? "grid-cols-2"
+              : "grid-cols-3",
+          className,
+        )}
+      >
+        {buttons}
+      </div>
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        itemName={itemName || deleteLabel.toLowerCase()}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 }

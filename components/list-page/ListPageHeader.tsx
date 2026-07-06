@@ -224,7 +224,7 @@ export function ListPageHeader({
     buttons.push(
       <Button
         key="refresh"
-        variant="outline"
+        variant="refresh"
         size="lg"
         onClick={handleRefresh}
         disabled={isRefreshing}

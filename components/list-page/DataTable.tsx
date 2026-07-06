@@ -47,9 +47,15 @@ export function DataTable<T extends { id: string }>({
   onDelete,
   emptyMessage = "No data available",
 }: DataTableProps<T>) {
-  const hasSelection = onToggleSelection !== undefined;
+  const hasSelection =
+    onToggleSelection !== undefined && actions?.bulk?.enableSelection === true;
   const hasActions =
-    actions && (actions.default?.length || actions.additional?.length);
+    onEdit !== undefined ||
+    onDelete !== undefined ||
+    (actions &&
+      (actions.default?.length ||
+        actions.additional?.length ||
+        actions.pageActions?.length));
 
   // Handle sort click
   const handleSort = (columnKey: string) => {

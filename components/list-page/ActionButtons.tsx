@@ -1,12 +1,13 @@
-import { IconEdit, IconTrash, IconDotsVertical } from "@tabler/icons-react";
+import { useState, useCallback } from "react";
+import { IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ActionConfig } from "./types";
+import { DeleteConfirmDialog } from "@/components/shared/delete-confirm-dialog";
 
 interface ActionButtonsProps<T> {
   item: T;
@@ -21,6 +22,9 @@ export function ActionButtons<T extends { id: string }>({
   onEdit,
   onDelete,
 }: ActionButtonsProps<T>) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
   const defaultActions = actions?.default || [];
   const additionalActions = actions?.additional || [];
 
@@ -33,54 +37,100 @@ export function ActionButtons<T extends { id: string }>({
   const canEdit = actions?.canEdit ? actions.canEdit(item) : true;
   const canDelete = actions?.canDelete ? actions.canDelete(item) : true;
 
+  const handleDeleteClick = useCallback(() => {
+    setPendingDeleteId(item.id);
+    setDeleteDialogOpen(true);
+  }, [item.id]);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (pendingDeleteId && onDelete) {
+      await onDelete(pendingDeleteId);
+    }
+    setDeleteDialogOpen(false);
+    setPendingDeleteId(null);
+  }, [pendingDeleteId, onDelete]);
+
+  // Collect all visible actions into a single list
+  const allActions: {
+    label: string;
+    icon?: React.ElementType;
+    onClick: () => void;
+    disabled?: boolean;
+    className?: string;
+    variant?: "default" | "destructive";
+  }[] = [];
+
+  // Edit action
+  if (defaultActions.includes("edit") && onEdit && canEdit) {
+    allActions.push({
+      label: "Edit",
+      icon: undefined,
+      onClick: () => onEdit(item),
+    });
+  }
+
+  // Delete action
+  if (defaultActions.includes("delete") && onDelete && canDelete) {
+    allActions.push({
+      label: "Delete",
+      icon: undefined,
+      onClick: handleDeleteClick,
+      className: "text-destructive",
+    });
+  }
+
+  // Additional actions
+  for (const action of visibleAdditionalActions) {
+    allActions.push({
+      label: action.label,
+      icon: action.icon,
+      onClick: () => action.onClick(item),
+      disabled: action.disabled ? action.disabled(item) : false,
+      className: action.className,
+    });
+  }
+
+  // Don't render anything if there are no actions
+  if (allActions.length === 0) return null;
+
+  const itemName = String(item["name" as keyof T] || item.id);
+
   return (
-    <div className="flex items-center gap-1">
-      {/* Default Actions */}
-      {defaultActions.includes("edit") && onEdit && canEdit && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onEdit(item)}
-          className="h-8 w-8"
-        >
-          <IconEdit className="h-4 w-4" />
-        </Button>
-      )}
+    <>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <IconDotsVertical className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="end" sideOffset={4} className="w-40 p-1 gap-0">
+          {allActions.map((action, index) => (
+            <button
+              key={index}
+              type="button"
+              disabled={action.disabled}
+              onClick={action.onClick}
+              className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors
+                ${
+                  action.disabled
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer hover:bg-muted"
+                }
+                ${action.className || ""}`}
+            >
+              {action.icon && <action.icon className="h-4 w-4" />}
+              {action.label}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
 
-      {defaultActions.includes("delete") && onDelete && canDelete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => onDelete(item.id)}
-          className="h-8 w-8 text-destructive hover:bg-destructive hover:text-background"
-        >
-          <IconTrash className="h-4 w-4" />
-        </Button>
-      )}
-
-      {/* Additional Actions Dropdown */}
-      {visibleAdditionalActions.length > 0 && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <IconDotsVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {visibleAdditionalActions.map((action, index) => (
-              <DropdownMenuItem
-                key={index}
-                onClick={() => action.onClick(item)}
-                disabled={action.disabled ? action.disabled(item) : false}
-                className={action.className}
-              >
-                {action.icon && <action.icon className="h-4 w-4 mr-2" />}
-                {action.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </div>
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        itemName={itemName}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 }

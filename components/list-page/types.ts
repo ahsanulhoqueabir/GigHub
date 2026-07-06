@@ -1,5 +1,6 @@
 import { ReactNode, type ElementType } from "react";
 import { QueryFilter } from "@/types/generic.types";
+import { ButtonSize, ButtonVariant } from "../ui/button";
 
 // Column Configuration
 export interface ColumnConfig<T> {
@@ -39,14 +40,8 @@ export interface SearchConfig<T> {
 export interface ActionButton<T> {
   label: string;
   icon?: ElementType;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
-  size?: "default" | "sm" | "lg" | "icon";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   onClick: (item: T) => void;
   disabled?: (item: T) => boolean;
   hidden?: (item: T) => boolean;
@@ -56,13 +51,7 @@ export interface ActionButton<T> {
 export interface BulkAction {
   label: string;
   icon?: ElementType;
-  variant?:
-    | "default"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
+  variant?: ButtonVariant;
   onClick: (selectedIds: string[]) => Promise<void> | void;
   confirmMessage?: string;
   requireSelection?: boolean;
@@ -74,29 +63,27 @@ export interface BulkActionConfig {
   enabled?: boolean;
   position?: "bottom" | "top" | "inline";
   showClearButton?: boolean;
+  /** Enable row-level selection checkboxes (default: false) */
+  enableSelection?: boolean;
   actions?: BulkAction[];
 }
 
 export interface ActionConfig<T> {
   default?: ("edit" | "delete")[];
   additional?: ActionButton<T>[];
-  pageActions?: {
-    label: string;
-    icon?: ElementType;
-    variant?:
-      | "default"
-      | "destructive"
-      | "outline"
-      | "secondary"
-      | "ghost"
-      | "link";
-
-    onClick: () => void;
-    className?: string;
-  }[];
+  pageActions?: PageAction[];
   bulk?: BulkActionConfig;
   canEdit?: (item: T) => boolean;
   canDelete?: (item: T) => boolean;
+}
+
+export interface PageAction {
+  label: string;
+  icon?: ElementType;
+  variant?: ButtonVariant;
+
+  onClick: () => void;
+  className?: string;
 }
 
 // Export Configuration

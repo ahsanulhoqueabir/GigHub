@@ -242,9 +242,13 @@ export function ListPage<T extends { id: string }>({
         bulkActions={
           bulkPosition === "inline" ? filteredBulkActions : undefined
         }
-        selectedCount={state.selectedItems.length}
-        selectedIds={state.selectedItems}
-        onClearSelection={() => selectAll([])}
+        {...(bulkConfig?.enableSelection
+          ? {
+              selectedCount: state.selectedItems.length,
+              selectedIds: state.selectedItems,
+              onClearSelection: () => selectAll([]),
+            }
+          : {})}
         isRefreshing={state.isRefreshing}
         filters={config.filters}
         activeFilters={state.activeFilters}
@@ -262,28 +266,30 @@ export function ListPage<T extends { id: string }>({
                 columns={config.columns}
                 loading={loading}
                 error={error}
-                selectedItems={state.selectedItems}
-                onToggleSelection={(id) => {
-                  toggleSelection(id);
-                  // Notify parent of selection change
-                  if (onSelectionChange) {
-                    const newSelection = state.selectedItems.includes(
-                      String(id),
-                    )
-                      ? state.selectedItems.filter(
-                          (item) => item !== String(id),
-                        )
-                      : [...state.selectedItems, String(id)];
-                    onSelectionChange(newSelection);
-                  }
-                }}
-                onSelectAll={(ids) => {
-                  selectAll(ids);
-                  // Notify parent of selection change
-                  if (onSelectionChange) {
-                    onSelectionChange(ids);
-                  }
-                }}
+                {...(bulkConfig?.enableSelection
+                  ? {
+                      selectedItems: state.selectedItems,
+                      onToggleSelection: (id) => {
+                        toggleSelection(id);
+                        if (onSelectionChange) {
+                          const newSelection = state.selectedItems.includes(
+                            String(id),
+                          )
+                            ? state.selectedItems.filter(
+                                (item) => item !== String(id),
+                              )
+                            : [...state.selectedItems, String(id)];
+                          onSelectionChange(newSelection);
+                        }
+                      },
+                      onSelectAll: (ids) => {
+                        selectAll(ids);
+                        if (onSelectionChange) {
+                          onSelectionChange(ids);
+                        }
+                      },
+                    }
+                  : {})}
                 onSort={setSorting}
                 sortBy={state.sortBy}
                 sortDirection={state.sortDirection}
@@ -333,24 +339,30 @@ export function ListPage<T extends { id: string }>({
             columns={config.columns}
             loading={loading}
             error={error}
-            selectedItems={state.selectedItems}
-            onToggleSelection={(id) => {
-              toggleSelection(id);
-              // Notify parent of selection change
-              if (onSelectionChange) {
-                const newSelection = state.selectedItems.includes(String(id))
-                  ? state.selectedItems.filter((item) => item !== String(id))
-                  : [...state.selectedItems, String(id)];
-                onSelectionChange(newSelection);
-              }
-            }}
-            onSelectAll={(ids) => {
-              selectAll(ids);
-              // Notify parent of selection change
-              if (onSelectionChange) {
-                onSelectionChange(ids);
-              }
-            }}
+            {...(bulkConfig?.enableSelection
+              ? {
+                  selectedItems: state.selectedItems,
+                  onToggleSelection: (id) => {
+                    toggleSelection(id);
+                    if (onSelectionChange) {
+                      const newSelection = state.selectedItems.includes(
+                        String(id),
+                      )
+                        ? state.selectedItems.filter(
+                            (item) => item !== String(id),
+                          )
+                        : [...state.selectedItems, String(id)];
+                      onSelectionChange(newSelection);
+                    }
+                  },
+                  onSelectAll: (ids) => {
+                    selectAll(ids);
+                    if (onSelectionChange) {
+                      onSelectionChange(ids);
+                    }
+                  },
+                }
+              : {})}
             onSort={setSorting}
             sortBy={state.sortBy}
             sortDirection={state.sortDirection}
