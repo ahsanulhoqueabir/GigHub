@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { UserForm } from "@/components/admin/users/UserForm";
 import { useUsersStore } from "@/store/users.store";
 import { Profile } from "@/types/db/profile.types";
+import { FormSkeleton } from "@/components/shared/form-skeleton";
 
 function UpdateUserContent() {
   const params = useParams();
@@ -27,9 +28,7 @@ function UpdateUserContent() {
   return (
     <div className="flex-1  mx-auto">
       {loading ? (
-        <div className="p-6 text-center text-muted-foreground animate-pulse">
-          Loading user data...
-        </div>
+        <FormSkeleton />
       ) : initialData ? (
         <UserForm initialData={initialData} isUpdate />
       ) : (
@@ -43,13 +42,7 @@ function UpdateUserContent() {
 
 export default function UpdateUserPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="p-6 text-center text-muted-foreground animate-pulse">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={<FormSkeleton />}>
       <UpdateUserContent />
     </Suspense>
   );

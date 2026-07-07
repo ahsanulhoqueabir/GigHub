@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 import { ActionButtons } from "./ActionButtons";
 import { ColumnConfig, ActionConfig } from "./types";
 import { cn } from "@/lib/utils";
@@ -49,13 +49,14 @@ export function DataTable<T extends { id: string }>({
 }: DataTableProps<T>) {
   const hasSelection =
     onToggleSelection !== undefined && actions?.bulk?.enableSelection === true;
-  const hasActions =
+  const hasActions = !!(
     onEdit !== undefined ||
     onDelete !== undefined ||
     (actions &&
-      (actions.default?.length ||
-        actions.additional?.length ||
-        actions.pageActions?.length));
+      (!!actions.default?.length ||
+        !!actions.additional?.length ||
+        !!actions.pageActions?.length))
+  );
 
   // Handle sort click
   const handleSort = (columnKey: string) => {
@@ -90,53 +91,28 @@ export function DataTable<T extends { id: string }>({
 
   if (loading) {
     return (
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {hasSelection && (
-                <TableHead
-                  style={{ width: `${selectionColumnWidth}%` }}
-                ></TableHead>
-              )}
-              {columns.map((column, index) => (
-                <TableHead
-                  key={index}
-                  style={{ width: `${adjustedColumns[index].width}%` }}
-                >
-                  <Skeleton className="h-4 w-20" />
-                </TableHead>
-              ))}
-              {hasActions && (
-                <TableHead
-                  style={{ width: `${actionColumnWidth}%` }}
-                ></TableHead>
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {[...Array(5)].map((_, index) => (
-              <TableRow key={index}>
-                {hasSelection && (
-                  <TableCell>
-                    <Skeleton className="h-4 w-4" />
-                  </TableCell>
-                )}
-                {columns.map((_, colIndex) => (
-                  <TableCell key={colIndex}>
-                    <Skeleton className="h-4 w-full" />
-                  </TableCell>
-                ))}
-                {hasActions && (
-                  <TableCell>
-                    <Skeleton className="h-8 w-20" />
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <TableSkeleton
+        rows={5}
+        columns={columns.length}
+        columnWidths={columns.map((c) => c.width)}
+        hasSelection={hasSelection}
+        hasActions={hasActions}
+        columnConfig={columns.map((col) => {
+          const colIndex = columns.indexOf(col);
+          const isFirst = colIndex === 0;
+          return {
+            width: isFirst ? 40 : 60,
+            height: 16,
+            align: col.className?.includes("text-left")
+              ? "left"
+              : col.className?.includes("text-right")
+                ? "right"
+                : isFirst
+                  ? "left"
+                  : "center",
+          };
+        })}
+      />
     );
   }
 

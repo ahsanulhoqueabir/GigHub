@@ -6,6 +6,7 @@ import { useListPageState } from "./useListPageState";
 import { ListPageProps } from "./types";
 import { DataTable } from "./DataTable";
 import { FloatingBulkActionBar } from "./FloatingBulkActionBar";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 
 type SortableValue = string | number | boolean | Date | null | undefined;
 
@@ -301,18 +302,7 @@ export function ListPage<T extends { id: string }>({
             </div>
             <div className="block md:hidden space-y-4">
               {loading ? (
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, index) => (
-                    <div
-                      key={index}
-                      className="p-5 border border-border/80 rounded-xl animate-pulse bg-muted/10 space-y-3"
-                    >
-                      <div className="h-5 bg-muted rounded w-1/3"></div>
-                      <div className="h-4 bg-muted rounded w-2/3"></div>
-                      <div className="h-8 bg-muted rounded w-full mt-4"></div>
-                    </div>
-                  ))}
-                </div>
+                <TableSkeleton variant="card" rows={3} />
               ) : error ? (
                 <div className="rounded-md border p-8 text-center bg-card">
                   <div className="text-destructive font-medium">Error</div>

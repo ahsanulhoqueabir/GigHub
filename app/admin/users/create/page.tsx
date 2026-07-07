@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { UserForm } from "@/components/admin/users/UserForm";
+import { FormSkeleton } from "@/components/shared/form-skeleton";
 
 function CreateUserContent() {
   return (
@@ -13,13 +14,7 @@ function CreateUserContent() {
 
 export default function CreateUserPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="p-6 text-center text-muted-foreground animate-pulse">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={<FormSkeleton />}>
       <CreateUserContent />
     </Suspense>
   );

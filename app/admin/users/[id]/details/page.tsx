@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { useReturnTo } from "@/hooks/use-return-to";
+import { DetailsSkeleton } from "@/components/shared/details-skeleton";
 import { Profile } from "@/types/db/profile.types";
 
 function UserDetailsContent() {
@@ -75,9 +76,7 @@ function UserDetailsContent() {
 
       <div className="max-w-3xl">
         {loading ? (
-          <div className="p-6 text-center text-muted-foreground animate-pulse">
-            Loading user details...
-          </div>
+          <DetailsSkeleton rows={3} columns={2} showHeader={false} />
         ) : user ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-200 bg-gray-50/50">
@@ -153,13 +152,7 @@ function UserDetailsContent() {
 
 export default function UserDetailsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="p-6 text-center text-muted-foreground animate-pulse">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={<DetailsSkeleton />}>
       <UserDetailsContent />
     </Suspense>
   );
