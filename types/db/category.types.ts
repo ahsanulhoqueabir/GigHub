@@ -5,7 +5,7 @@ export interface CategoryCore {
   description: string | null;
   slug: string;
   image: string | null;
-  parent: string | null;
+  parent: string | Category | null;
   ordering: number;
 }
 
