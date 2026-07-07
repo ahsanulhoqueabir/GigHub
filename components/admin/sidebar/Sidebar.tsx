@@ -106,25 +106,34 @@ export function Sidebar() {
                   </Link>
                 )}
 
-                {hasChildren && isOpen && (
-                  <div className="grid gap-1 pl-8 pr-2">
-                    {item.children?.map((child) => {
-                      const isChildActive = pathname === child.href;
-                      return (
-                        <Link
-                          key={child.id}
-                          href={child.href}
-                          className={cn(
-                            "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
-                            isChildActive
-                              ? "bg-accent text-accent-foreground"
-                              : "transparent text-muted-foreground",
-                          )}
-                        >
-                          {child.label}
-                        </Link>
-                      );
-                    })}
+                {hasChildren && (
+                  <div
+                    className={cn(
+                      "grid gap-1 pl-8 pr-2 overflow-hidden transition-all duration-200 ease-in-out",
+                      isOpen
+                        ? "grid-rows-[1fr] opacity-100"
+                        : "grid-rows-[0fr] opacity-0",
+                    )}
+                  >
+                    <div className="min-h-0">
+                      {item.children?.map((child) => {
+                        const isChildActive = pathname === child.href;
+                        return (
+                          <Link
+                            key={child.id}
+                            href={child.href}
+                            className={cn(
+                              "flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
+                              isChildActive
+                                ? "bg-accent text-accent-foreground"
+                                : "transparent text-muted-foreground",
+                            )}
+                          >
+                            {child.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>

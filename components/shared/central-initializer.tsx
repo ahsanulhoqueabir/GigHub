@@ -2,14 +2,17 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
+import { useCategoriesStore } from "@/store/categories.store";
+import { useDepartmentsStore } from "@/store/departments.store";
 
 /**
- * CentralDataInitializer — re-validates the stored auth token on mount.
+ * CentralDataInitializer — fetches site-wide data on mount.
  *
- * On every client-side navigation it checks whether a persisted token
- * is still valid by calling `initAuth()` (which hits `GET /api/auth/me`).
- * If the token is expired the store is cleared and the user is treated
- * as logged-out.
+ * Responsibilities (in order):
+ * 1. Re-validates the stored auth token (if any) via `initAuth()`.
+ * 2. Fetches **categories** (limit=40) — cached in Zustand so every
+ *    component reads from the same state.
+ * 3. Fetches **departments** (limit=40) — same caching pattern.
  *
  * Place this component once in your root layout, inside `<body>`.
  */
@@ -18,6 +21,12 @@ export function CentralDataInitializer() {
 
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
   const initAuth = useAuthStore((s) => s.initAuth);
+
+  const catHasFetched = useCategoriesStore((s) => s.hasFetched);
+  const fetchCategories = useCategoriesStore((s) => s.fetchCategories);
+
+  const deptHasFetched = useDepartmentsStore((s) => s.hasFetched);
+  const fetchDepartments = useDepartmentsStore((s) => s.fetchDepartments);
 
   useEffect(() => {
     if (!hasHydrated || hasInitialized.current) return;
@@ -32,6 +41,18 @@ export function CentralDataInitializer() {
       initAuth();
     }
   }, [hasHydrated, initAuth]);
+
+  // ── Fetch categories once ──────────────────────────────────────
+  useEffect(() => {
+    if (catHasFetched) return;
+    fetchCategories(1, 40);
+  }, [catHasFetched, fetchCategories]);
+
+  // ── Fetch departments once ─────────────────────────────────────
+  useEffect(() => {
+    if (deptHasFetched) return;
+    fetchDepartments(1, 40);
+  }, [deptHasFetched, fetchDepartments]);
 
   return null;
 }

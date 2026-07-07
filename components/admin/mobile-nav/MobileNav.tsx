@@ -51,10 +51,7 @@ export function MobileNav() {
           <span className="sr-only">Toggle navigation menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent
-        side="left"
-        className="w-full sm:max-w-md p-0 flex flex-col"
-      >
+      <SheetContent side="left" className="sm:max-w-md p-0 flex flex-col">
         {/* User Info */}
         <div className="flex items-start gap-3 px-6 py-8 border-b">
           <Avatar className="h-16 w-16">
@@ -121,26 +118,35 @@ export function MobileNav() {
                     </Link>
                   )}
 
-                  {hasChildren && isOpen && (
-                    <div className="grid gap-2 pl-9 pr-2 mt-1">
-                      {item.children?.map((child) => {
-                        const isChildActive = pathname === child.href;
-                        return (
-                          <Link
-                            key={child.id}
-                            href={child.href}
-                            onClick={() => setOpen(false)}
-                            className={cn(
-                              "flex items-center rounded-md px-3 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
-                              isChildActive
-                                ? "bg-accent text-accent-foreground"
-                                : "transparent text-muted-foreground",
-                            )}
-                          >
-                            {child.label}
-                          </Link>
-                        );
-                      })}
+                  {hasChildren && (
+                    <div
+                      className={cn(
+                        "grid gap-2 pl-9 pr-2 mt-1 overflow-hidden transition-all duration-200 ease-in-out",
+                        isOpen
+                          ? "grid-rows-[1fr] opacity-100"
+                          : "grid-rows-[0fr] opacity-0",
+                      )}
+                    >
+                      <div className="min-h-0">
+                        {item.children?.map((child) => {
+                          const isChildActive = pathname === child.href;
+                          return (
+                            <Link
+                              key={child.id}
+                              href={child.href}
+                              onClick={() => setOpen(false)}
+                              className={cn(
+                                "flex items-center rounded-md px-3 py-2.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors",
+                                isChildActive
+                                  ? "bg-accent text-accent-foreground"
+                                  : "transparent text-muted-foreground",
+                              )}
+                            >
+                              {child.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
