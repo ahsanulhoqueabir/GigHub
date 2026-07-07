@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { UserForm } from "@/components/admin/users/UserForm";
 import { useUsersStore } from "@/store/users.store";
 import { Profile } from "@/types/db/profile.types";
 
-export default function UpdateUserPage() {
+function UpdateUserContent() {
   const params = useParams();
   const id = params.id as string;
   const { getUser } = useUsersStore();
@@ -38,5 +38,19 @@ export default function UpdateUserPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function UpdateUserPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 text-center text-muted-foreground animate-pulse">
+          Loading...
+        </div>
+      }
+    >
+      <UpdateUserContent />
+    </Suspense>
   );
 }

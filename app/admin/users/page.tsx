@@ -10,9 +10,11 @@ import { formatDateInTimezone } from "@/lib/date.utils";
 import { useUsersStore } from "@/store/users.store";
 import type { Profile } from "@/types/db/profile.types";
 import { IconPlus } from "@tabler/icons-react";
+import { useReturnTo } from "@/hooks/use-return-to";
 
 export default function UsersListPage() {
   const router = useRouter();
+  const { withReturnTo } = useReturnTo();
   const {
     users,
     pagination,
@@ -36,7 +38,7 @@ export default function UsersListPage() {
         await fetchUsers(currentPage, pageSize);
       },
       onEdit: (user: Profile) => {
-        router.push(`/admin/users/${user.id}/update`);
+        router.push(withReturnTo(`/admin/users/${user.id}/update`));
       },
       onDelete: async (id: string) => {
         await deleteUser(id);
@@ -49,7 +51,7 @@ export default function UsersListPage() {
             label: "Create User",
             icon: IconPlus,
             variant: "success" as const,
-            onClick: () => router.push("/admin/users/create"),
+            onClick: () => router.push(withReturnTo("/admin/users/create")),
           },
         ],
         additional: [
@@ -57,7 +59,7 @@ export default function UsersListPage() {
             id: "user-details",
             label: "View Details",
             onClick: (user: Profile) => {
-              router.push(`/admin/users/${user.id}/details`);
+              router.push(withReturnTo(`/admin/users/${user.id}/details`));
             },
           },
         ],
@@ -165,7 +167,7 @@ export default function UsersListPage() {
         placeholder: "Search by name, email, username, phone or student ID...",
       },
     };
-  }, [router, fetchUsers, deleteUser, currentPage, pageSize]);
+  }, [router, withReturnTo, fetchUsers, deleteUser, currentPage, pageSize]);
 
   return (
     <ListPage

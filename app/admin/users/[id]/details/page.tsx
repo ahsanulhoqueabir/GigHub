@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Suspense, useEffect, useState, useCallback } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useUsersStore } from "@/store/users.store";
 import { IconArrowLeft, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { Profile } from "@/types/db/profile.types";
 
-export default function UserDetailsPage() {
+function UserDetailsContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const id = params.id as string;
+  const { returnTo } = useReturnTo();
+  const returnUrl = searchParams?.get("returnTo") || returnTo;
   const { getUser, deleteUser } = useUsersStore();
   const [user, setUser] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,15 +37,15 @@ export default function UserDetailsPage() {
     const confirmed = await confirmDelete(user?.name || "this user");
     if (!confirmed) return;
     await deleteUser(id);
-    router.push("/admin/users");
-  }, [user, confirmDelete, deleteUser, id, router]);
+    router.push(returnUrl);
+  }, [user, confirmDelete, deleteUser, id, router, returnUrl]);
 
   return (
     <div className="flex-1 space-y-6">
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center space-x-4">
           <Button variant="ghost" size="icon" asChild>
-            <Link href="/admin/users">
+            <Link href={returnUrl}>
               <IconArrowLeft className="h-5 w-5" />
             </Link>
           </Button>
@@ -59,7 +63,11 @@ export default function UserDetailsPage() {
               Delete
             </Button>
             <Button asChild size="lg" variant="accent">
-              <Link href={`/admin/users/${id}/update`}>Edit User</Link>
+              <Link
+                href={`/admin/users/${id}/update?returnTo=${encodeURIComponent(returnUrl)}`}
+              >
+                Edit User
+              </Link>
             </Button>
           </div>
         )}
@@ -140,5 +148,19 @@ export default function UserDetailsPage() {
 
       {deleteDialog}
     </div>
+  );
+}
+
+export default function UserDetailsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 text-center text-muted-foreground animate-pulse">
+          Loading...
+        </div>
+      }
+    >
+      <UserDetailsContent />
+    </Suspense>
   );
 }
