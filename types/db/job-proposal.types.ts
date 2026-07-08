@@ -8,7 +8,7 @@ export interface JobProposalCore {
   job: string | Partial<Job>;
   applicant: string | Partial<Profile>;
   description: string;
-  attachments: string[];
+  attachments: string[] | undefined;
 }
 
 // ─── Entity ────────────────────────────────────────────────────────────────
