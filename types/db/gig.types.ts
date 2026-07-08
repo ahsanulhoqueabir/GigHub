@@ -69,7 +69,13 @@ export type GigPackageSummary = Pick<GigPackage, "tier" | "price" | "title">;
 /** Package detail for order page — subset of GigPackage */
 export type GigPackageOrderInfo = Pick<
   GigPackage,
-  "tier" | "title" | "price" | "delivery_days"
+  | "tier"
+  | "title"
+  | "price"
+  | "delivery_days"
+  | "description"
+  | "revisions"
+  | "features"
 >;
 
 /** List item shape — fields from GigCore + resolved relations */
