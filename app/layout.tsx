@@ -1,10 +1,10 @@
+import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import { CentralDataInitializer } from "@/components/shared/central-initializer";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
-import { CentralDataInitializer } from "@/components/shared/central-initializer";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -28,8 +28,8 @@ export const metadata: Metadata = {
   alternates: branding.alternates,
 };
 
-import { branding } from "@/config/brand.config";
 import { Toaster } from "@/components/ui/sonner";
+import { branding } from "@/config/brand.config";
 
 export default function RootLayout({
   children,
@@ -52,7 +52,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CentralDataInitializer />
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1 px-4 lg:px-10 py-5">{children}</main>
         <Footer />
         <Toaster />
       </body>
