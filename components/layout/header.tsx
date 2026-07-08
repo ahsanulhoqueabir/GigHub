@@ -14,10 +14,8 @@ import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import {
   IconBriefcase,
-  IconFileDescription,
   IconLogout,
   IconMenu2,
-  IconSettings,
   IconShoppingCart,
   IconUser,
   IconX,
@@ -35,12 +33,6 @@ const navItems = [
 
 const profileMenuItems = [
   { label: "Profile", href: "/profile", icon: IconUser },
-  { label: "Edit Profile", href: "/profile/edit", icon: IconSettings },
-  {
-    label: "Change Password",
-    href: "/profile/change-password",
-    icon: IconFileDescription,
-  },
   { label: "Applied Jobs", href: "/profile/applied-jobs", icon: IconBriefcase },
   { label: "Orders", href: "/profile/orders", icon: IconShoppingCart },
 ];

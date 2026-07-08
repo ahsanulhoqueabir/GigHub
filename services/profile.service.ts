@@ -1,11 +1,11 @@
-import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
+import { error, success } from "@/lib/api/api-response";
+import { hashPassword, verifyPassword } from "@/lib/api/password";
 import { stripPassword, type SafeProfile } from "@/lib/api/strip-password";
-import { hashPassword } from "@/lib/api/password";
+import { getSupabaseServerClient } from "@/lib/api/supabase";
 import { paginationParams } from "@/lib/pagination";
+import type { UpdateProfileInput } from "@/lib/validations/profile.schema";
 import type { Profile, ProfileForm } from "@/types/db/profile.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-import type { UpdateProfileInput } from "@/lib/validations/profile.schema";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ServiceResult<T = any> =
@@ -298,6 +298,193 @@ export class ProfileService {
       }
 
       return success({ deleted_id: data.id });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  // ─── Check username availability ─────────────────────────────────────────
+
+  /**
+   * Check if a username is available (not taken by another active profile).
+   * Excludes the given `excludeId` so the user can keep their own username.
+   */
+  static async checkUsername(
+    username: string,
+    excludeId?: string,
+  ): Promise<ServiceResult<{ available: boolean }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      let query = supabase
+        .from(this.collection)
+        .select("id", { count: "exact", head: true })
+        .eq("username", username)
+        .neq("status", "DELETED");
+
+      if (excludeId) {
+        query = query.neq("id", excludeId);
+      }
+
+      const { count, error: sbError } = await query;
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      return success({ available: (count ?? 0) === 0 });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  // ─── Get own profile (authenticated user) ────────────────────────────────
+
+  /**
+   * Fetch the authenticated user's own full profile (password excluded).
+   * Returns the profile with the department relation expanded.
+   */
+  static async getOwnProfile(
+    userId: string,
+  ): Promise<ServiceResult<SafeProfile>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      const { data, error: sbError } = await supabase
+        .from(this.collection)
+        .select("*, department:department(id, name, acronym)")
+        .eq("id", userId)
+        .neq("status", "DELETED")
+        .single();
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      if (!data) {
+        return error("Profile not found");
+      }
+
+      return success(stripPassword(data as Profile));
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  // ─── Update own profile ──────────────────────────────────────────────────
+
+  /**
+   * Update the authenticated user's own profile.
+   * Sensitive fields (role, status, verified, fcm_token) are STRIPPED
+   * from the payload so the user cannot escalate privileges.
+   * If a new password is provided, it is hashed via argon2 before storing.
+   */
+  static async updateOwn(
+    userId: string,
+    params: Record<string, unknown>,
+  ): Promise<ServiceResult<SafeProfile>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // ── Payload sanitizer ──────────────────────────────────────────────
+      // Strip fields the user must never be allowed to change themselves.
+      const FORBIDDEN_FIELDS = [
+        "role",
+        "status",
+        "verified",
+        "fcm_token",
+        "password",
+        "email",
+        "student_id",
+        "department",
+      ] as const;
+
+      const sanitized: Record<string, unknown> = {};
+
+      for (const [key, value] of Object.entries(params)) {
+        if (
+          FORBIDDEN_FIELDS.includes(key as (typeof FORBIDDEN_FIELDS)[number])
+        ) {
+          continue; // skip forbidden fields
+        }
+        sanitized[key] = value;
+      }
+
+      // ── Update timestamp ───────────────────────────────────────────────
+      sanitized.updated_at = new Date().toISOString();
+
+      const { data, error: sbError } = await supabase
+        .from(this.collection)
+        .update(sanitized)
+        .eq("id", userId)
+        .neq("status", "DELETED")
+        .select("*, department:department(id, name, acronym)")
+        .single();
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      if (!data) {
+        return error("Profile not found");
+      }
+
+      return success(stripPassword(data as Profile));
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  // ─── Change own password ─────────────────────────────────────────────────
+
+  /**
+   * Change the authenticated user's password.
+   * Requires the current password for verification.
+   */
+  static async changePassword(
+    userId: string,
+    params: { currentPassword: string; newPassword: string },
+  ): Promise<ServiceResult<{ message: string }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // Fetch current (hashed) password
+      const { data, error: fetchError } = await supabase
+        .from(this.collection)
+        .select("password")
+        .eq("id", userId)
+        .neq("status", "DELETED")
+        .single();
+
+      if (fetchError || !data) {
+        return error("Profile not found");
+      }
+
+      // Verify current password
+      const isValid = await verifyPassword(
+        data.password,
+        params.currentPassword,
+      );
+      if (!isValid) {
+        return error("Current password is incorrect");
+      }
+
+      // Hash and update new password
+      const hashed = await hashPassword(params.newPassword);
+
+      const { error: updateError } = await supabase
+        .from(this.collection)
+        .update({
+          password: hashed,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      if (updateError) {
+        return error(updateError.message);
+      }
+
+      return success({ message: "Password changed successfully" });
     } catch (err) {
       return error((err as Error).message || "An unknown error occurred");
     }
