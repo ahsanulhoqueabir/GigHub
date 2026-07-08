@@ -90,6 +90,11 @@ BEGIN
     );
   END IF;
 
+   -- Update the view count for the gig 
+  UPDATE job
+  SET views = views + 1
+  WHERE id = (v_job->>'id')::UUID;
+
   RETURN jsonb_build_object(
     'success', true,
     'data', v_job
