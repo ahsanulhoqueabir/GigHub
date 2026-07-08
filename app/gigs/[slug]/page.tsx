@@ -1,26 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
+import { DetailsSkeleton } from "@/components/shared/details-skeleton";
 import {
-  IconEye,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BackButton } from "@/components/ui/back-button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCurrency } from "@/hooks/use-currency";
+import { formatDateInTimezone } from "@/lib/date.utils";
+import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
+import { useGigsStore } from "@/store/gigs.store";
+import {
   IconCalendar,
   IconCheck,
-  IconArrowLeft,
-  IconShoppingCart,
+  IconClock,
+  IconEye,
   IconMessageQuestion,
+  IconRefresh,
+  IconShoppingCart,
 } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { DetailsSkeleton } from "@/components/shared/details-skeleton";
-import { formatDateInTimezone } from "@/lib/date.utils";
-import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
-import { useGigsStore } from "@/store/gigs.store";
-import { useCurrency } from "@/hooks/use-currency";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function GigDetailPage() {
   const params = useParams();
@@ -60,23 +69,21 @@ export default function GigDetailPage() {
     );
   }
 
-  const currentPkg =
-    gig.packages?.find((p) => p.tier === selectedPackage) ?? gig.packages?.[0];
   const isOwner = user?.id === gig.seller.id;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Back Button */}
-      <Button asChild variant="ghost" size="sm" className="mb-4">
-        <Link href="/gigs">
-          <IconArrowLeft className="mr-1 size-4" />
-          Back to Gigs
-        </Link>
-      </Button>
-
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div className="">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
         {/* Left Column — Images + Details */}
-        <div className="space-y-6 lg:col-span-2">
+        <div className="space-y-6 lg:col-span-3">
+          {/* Back Button (Left) + Title */}
+          <div className="flex items-start gap-3">
+            <BackButton href="/gigs" />
+            <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
+              {gig.title}
+            </h1>
+          </div>
+
           {/* Image Gallery */}
           {gig.images && gig.images.length > 0 && (
             <div className="space-y-3">
@@ -116,7 +123,7 @@ export default function GigDetailPage() {
             </div>
           )}
 
-          {/* Title & Meta */}
+          {/* Meta */}
           <div>
             <div className="flex flex-wrap items-center gap-2">
               {gig.category && (
@@ -129,9 +136,6 @@ export default function GigDetailPage() {
                 {gig.status}
               </Badge>
             </div>
-            <h1 className="mt-3 text-2xl font-semibold text-foreground sm:text-3xl">
-              {gig.title}
-            </h1>
             <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Avatar size="sm">
@@ -187,94 +191,106 @@ export default function GigDetailPage() {
             </div>
           )}
 
-          {/* FAQ */}
+          {/* FAQ — Accordion */}
           {gig.faq && gig.faq.length > 0 && (
             <div>
               <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-foreground">
                 <IconMessageQuestion className="size-5" />
                 FAQ
               </h2>
-              <div className="space-y-3">
+              <Accordion type="single" collapsible className="w-full">
                 {gig.faq.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-lg border border-border bg-muted/30 p-4"
-                  >
-                    <p className="text-sm font-medium text-foreground">
-                      Q: {item.question}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      A: {item.answer}
-                    </p>
-                  </div>
+                  <AccordionItem key={idx} value={`faq-${idx}`}>
+                    <AccordionTrigger className="text-sm font-medium text-foreground">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
             </div>
           )}
         </div>
 
         {/* Right Column — Packages + CTA */}
-        <div className="space-y-6">
-          {/* Package Selector */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Package Selector — Tab based */}
           <div className="rounded-xl border border-border bg-card p-4">
-            <h2 className="mb-3 text-base font-semibold text-foreground">
+            <h2 className="mb-4 text-base font-semibold text-foreground">
               Select Package
             </h2>
-            <div className="space-y-2">
+
+            <Tabs
+              value={selectedPackage}
+              onValueChange={(v) => setSelectedPackage(v)}
+            >
+              <TabsList className="grid w-full grid-cols-3">
+                {gig.packages?.map((pkg) => (
+                  <TabsTrigger key={pkg.tier} value={pkg.tier}>
+                    {pkg.tier}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
               {gig.packages?.map((pkg) => (
-                <button
-                  key={pkg.tier}
-                  onClick={() => setSelectedPackage(pkg.tier)}
-                  className={`w-full rounded-lg border-2 p-3 text-left transition-colors ${
-                    selectedPackage === pkg.tier
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-muted-foreground/30"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground">
-                      {pkg.title}
-                    </span>
-                    {pkg.price != null && (
-                      <span className="text-sm font-bold text-foreground">
-                        {format(pkg.price)}
+                <TabsContent key={pkg.tier} value={pkg.tier} className="mt-4">
+                  <h3 className="mb-3 text-lg font-semibold text-foreground">
+                    {pkg.title}
+                  </h3>
+                  {/* Price & Delivery Row */}
+                  <div className="mb-4 ">
+                    <div>
+                      <span className="text-2xl font-bold text-foreground">
+                        {pkg.price != null ? format(pkg.price) : "—"}
                       </span>
-                    )}
+                      {pkg.delivery_days && (
+                        <span className="ml-2 text-xs text-muted-foreground">
+                          one-time payment
+                        </span>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs ">
+                      {pkg.delivery_days && (
+                        <span className="flex items-center gap-1">
+                          <IconClock className="size-3.5" />
+                          {pkg.delivery_days} days
+                        </span>
+                      )}
+                      {pkg.revisions && (
+                        <span className="flex items-center gap-1">
+                          <IconRefresh className="size-3.5" />
+                          {pkg.revisions} revisions
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
+
+                  <p className="mb-4 text-sm text-muted-foreground">
                     {pkg.description}
                   </p>
-                  {pkg.delivery_days && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Delivery: {pkg.delivery_days} days
-                    </p>
-                  )}
-                  {pkg.revisions && (
-                    <p className="text-xs text-muted-foreground">
-                      Revisions: {pkg.revisions}
-                    </p>
-                  )}
-                </button>
-              ))}
-            </div>
 
-            {/* Features */}
-            {currentPkg?.features && currentPkg.features.length > 0 && (
-              <div className="mt-4 space-y-1.5">
-                <p className="text-xs font-medium text-foreground">
-                  What&apos;s included:
-                </p>
-                {currentPkg.features.map((feat, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-2 text-xs text-muted-foreground"
-                  >
-                    <IconCheck className="mt-0.5 size-3.5 shrink-0 text-primary" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+                  {/* Features */}
+                  {pkg.features && pkg.features.length > 0 && (
+                    <div className="space-y-2 rounded-lg bg-muted/30 p-3">
+                      <p className="text-xs font-medium text-foreground">
+                        What&apos;s included:
+                      </p>
+                      {pkg.features.map((feat, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                        >
+                          <IconCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
           </div>
 
           {/* CTA */}
