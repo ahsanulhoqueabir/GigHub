@@ -10,6 +10,7 @@ import {
   Inter,
   Noto_Sans,
 } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
@@ -70,7 +71,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <CentralDataInitializer />
-        <Header />
+        <Suspense fallback={null}>
+          <Header />
+        </Suspense>
         <main className="flex-1 px-4 lg:px-10 py-5">{children}</main>
         <Footer />
         <Toaster />
