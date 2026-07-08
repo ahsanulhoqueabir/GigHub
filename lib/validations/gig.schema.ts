@@ -92,6 +92,13 @@ export const faqField = z
   .array(faqSchema)
   .max(20, "Maximum 20 FAQ items allowed")
   .optional();
+
+// ─── Status ───────────────────────────────────────────────────────
+
+export const statusField = z.enum(["active", "draft"], {
+  error: "Status must be 'active' or 'draft'",
+});
+
 // ─── Create Gig ───────────────────────────────────────────────────
 
 export const createGigSchema = z
@@ -103,6 +110,7 @@ export const createGigSchema = z
     tags: tagsField,
     packages: packagesField,
     faq: faqField,
+    status: statusField.optional().default("active"),
   })
   .strict();
 
@@ -119,6 +127,7 @@ export const updateGigSchema = z
     tags: tagsField,
     packages: packagesField.optional(),
     faq: faqField,
+    status: statusField.optional(),
   })
   .strict();
 

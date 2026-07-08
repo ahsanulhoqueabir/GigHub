@@ -1,4 +1,3 @@
-// Main component
 export { ListPage } from "./ListPage";
 
 // Individual components

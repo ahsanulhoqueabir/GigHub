@@ -1,13 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { IconSelector, IconX } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -16,7 +9,14 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { IconSelector, IconX } from "@tabler/icons-react";
+import * as React from "react";
 
 interface SearchComboboxProps<T> {
   /** The list of items to display */
@@ -98,7 +98,7 @@ export function SearchCombobox<T>({
           aria-expanded={open}
           disabled={disabled || loading}
           className={cn(
-            "w-full justify-between font-normal",
+            "w-full justify-between font-normal h-9",
             !selected && "text-muted-foreground",
             hasError && "border-destructive ring-1 ring-destructive",
             className,
@@ -138,7 +138,7 @@ export function SearchCombobox<T>({
           <CommandInput placeholder={searchPlaceholder} />
           <CommandList>
             <CommandEmpty>{emptyMessage}</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="space-y-2">
               {safeItems.map((item) => {
                 const itemValue = getItemValue(item);
                 const isSelected = value === itemValue;
@@ -151,6 +151,7 @@ export function SearchCombobox<T>({
                     key={itemValue}
                     value={searchValue}
                     data-checked={isSelected || undefined}
+                    className={cn(isSelected && "bg-accent")}
                     onSelect={() => {
                       onChange(
                         clearable && isSelected ? undefined : itemValue,

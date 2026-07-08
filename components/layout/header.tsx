@@ -19,11 +19,13 @@ import {
   IconShoppingCart,
   IconUser,
   IconX,
+  IconPlus,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { useReturnTo } from "@/hooks/use-return-to";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -35,12 +37,15 @@ const profileMenuItems = [
   { label: "Profile", href: "/profile", icon: IconUser },
   { label: "Applied Jobs", href: "/profile/applied-jobs", icon: IconBriefcase },
   { label: "Orders", href: "/profile/orders", icon: IconShoppingCart },
+  { label: "Create Gig", href: "/profile/gigs/create", icon: IconPlus },
+  { label: "Manage Gigs", href: "/profile/gigs", icon: IconBriefcase },
 ];
 
 export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const { withReturnTo } = useReturnTo();
 
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
@@ -114,7 +119,7 @@ export function Header() {
                     {profileMenuItems.map((item) => (
                       <Link
                         key={item.href}
-                        href={item.href}
+                        href={item.href === "/profile/gigs/create" ? withReturnTo(item.href) : item.href}
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
                       >
@@ -222,7 +227,7 @@ export function Header() {
                       {profileMenuItems.map((item) => (
                         <SheetClose key={item.href} asChild>
                           <Link
-                            href={item.href}
+                            href={item.href === "/profile/gigs/create" ? withReturnTo(item.href) : item.href}
                             className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           >
                             <item.icon className="size-4" />

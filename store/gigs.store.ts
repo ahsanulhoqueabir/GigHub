@@ -11,6 +11,7 @@ import type {
 } from "@/types/db/gig.types";
 import { PaginationMeta } from "@/types/pagination.types";
 import { create } from "zustand";
+import type { CreateGigInput, UpdateGigInput } from "@/lib/validations/gig.schema";
 
 // ─── State ─────────────────────────────────────────────────────────────────
 
@@ -44,11 +45,17 @@ interface GigsActions {
     page?: number,
     limit?: number,
   ) => Promise<void>;
+  fetchManageGigs: (
+    filters?: GigListFilters,
+    page?: number,
+    limit?: number,
+  ) => Promise<void>;
   setListFilters: (filters: GigListFilters) => void;
   clearListError: () => void;
 
   // Detail
   fetchGigBySlug: (slug: string) => Promise<void>;
+  fetchGigById: (id: string) => Promise<void>;
   clearDetail: () => void;
 
   // Order page detail
@@ -57,6 +64,11 @@ interface GigsActions {
 
   // Orders
   createGigOrder: (params: CreateGigOrderParams) => Promise<void>;
+
+  // Mutations
+  createGig: (payload: CreateGigInput) => Promise<GigDetail>;
+  updateGig: (id: string, payload: UpdateGigInput) => Promise<GigDetail>;
+  deleteGig: (id: string) => Promise<void>;
 
   // Reset
   reset: () => void;
@@ -119,6 +131,33 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
     }
   },
 
+  fetchManageGigs: async (filters, page = 1, limit = 20) => {
+    set({ isLoadingList: true, listError: null });
+
+    try {
+      const mergedFilters = { ...get().listFilters, ...filters };
+      if (filters) set({ listFilters: mergedFilters });
+
+      const params: Record<string, unknown> = {
+        page,
+        limit,
+        sortBy: mergedFilters.sortBy ?? "created_at",
+        sortOrder: mergedFilters.sortOrder ?? "desc",
+      };
+      if (mergedFilters.search) params.search = mergedFilters.search;
+      if (mergedFilters.category) params.category = mergedFilters.category;
+
+      const { data } = await api_client.get("/gig/manage", { params });
+      set({
+        gigs: data.data?.items ?? [],
+        listPagination: data.data?.pagination ?? defaultPagination(),
+        isLoadingList: false,
+      });
+    } catch (err: unknown) {
+      set({ isLoadingList: false, listError: getErrorMessage(err) });
+    }
+  },
+
   setListFilters: (filters) => {
     set({ listFilters: { ...get().listFilters, ...filters } });
   },
@@ -130,6 +169,16 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
     set({ isLoadingDetail: true, detailError: null, currentGig: null });
     try {
       const { data } = await apiPublic.get(`/gig?slug=${slug}`);
+      set({ currentGig: data.data ?? null, isLoadingDetail: false });
+    } catch (err: unknown) {
+      set({ isLoadingDetail: false, detailError: getErrorMessage(err) });
+    }
+  },
+
+  fetchGigById: async (id) => {
+    set({ isLoadingDetail: true, detailError: null, currentGig: null });
+    try {
+      const { data } = await apiPublic.get(`/gig/${id}`);
       set({ currentGig: data.data ?? null, isLoadingDetail: false });
     } catch (err: unknown) {
       set({ isLoadingDetail: false, detailError: getErrorMessage(err) });
@@ -181,6 +230,45 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
       set({ isMutating: false });
     } catch (err: unknown) {
       set({ isMutating: false, mutationError: getErrorMessage(err) });
+      throw err;
+    }
+  },
+
+  /* ── Mutations ─────────────────────────────────────────────── */
+  createGig: async (payload) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      const { data } = await api_client.post("/gig", payload);
+      set({ isMutating: false });
+      return data.data;
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
+      throw err;
+    }
+  },
+
+  updateGig: async (id, payload) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      const { data } = await api_client.patch(`/gig/${id}`, payload);
+      set({ isMutating: false });
+      return data.data;
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
+      throw err;
+    }
+  },
+
+  deleteGig: async (id) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      await api_client.delete(`/gig/${id}`);
+      set({ isMutating: false });
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
       throw err;
     }
   },
