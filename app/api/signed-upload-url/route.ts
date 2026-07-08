@@ -1,7 +1,6 @@
-import { R2Service } from "@/services/r2.service";
-import type { SignedUploadRequest } from "@/services/r2.service";
+import { fail, ok } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { ok, fail } from "@/lib/api/api-response";
+import { R2Service, SignedUploadRequest } from "@/services/r2.service";
 
 /**
  * POST /api/r2/signed-upload-urls
@@ -21,7 +20,7 @@ import { ok, fail } from "@/lib/api/api-response";
  * }
  */
 export const POST = withAuth({
-  handler: async ({ req }) => {
+  handler: async ({ req, user }) => {
     try {
       const body = (await req.json()) as {
         files: SignedUploadRequest[];
@@ -43,9 +42,11 @@ export const POST = withAuth({
         }
       }
 
+      const folder = `${user.profile}/${body.folder}`;
+
       const results = await R2Service.generateSignedUploadUrls(
         body.files,
-        body.folder || "",
+        folder,
         1800, // 30 minutes
       );
 

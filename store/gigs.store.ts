@@ -1,16 +1,16 @@
-import { create } from "zustand";
 import { api_client } from "@/lib/api/api-client";
 import { apiPublic } from "@/lib/api/api-public";
-import { PaginationMeta } from "@/types/pagination.types";
-import { defaultPagination } from "@/lib/pagination";
 import { getErrorMessage } from "@/lib/api/api-response";
+import { defaultPagination } from "@/lib/pagination";
 import type {
-  GigListItem,
-  GigDetail,
-  GigOrderDetail,
-  GigListFilters,
   CreateGigOrderParams,
+  GigDetail,
+  GigListFilters,
+  GigListItem,
+  GigOrderDetail,
 } from "@/types/db/gig.types";
+import { PaginationMeta } from "@/types/pagination.types";
+import { create } from "zustand";
 
 // ─── State ─────────────────────────────────────────────────────────────────
 
@@ -142,7 +142,7 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
   fetchOrderGig: async (slug) => {
     set({ isLoadingOrderGig: true, orderGigError: null, orderGig: null });
     try {
-      const { data } = await apiPublic.get(`/gig/${slug}`);
+      const { data } = await apiPublic.get(`/gig?slug=${slug}`);
       const gig = data.data as GigDetail | null;
       if (gig) {
         set({

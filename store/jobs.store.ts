@@ -1,14 +1,14 @@
-import { create } from "zustand";
 import { apiPublic } from "@/lib/api/api-public";
-import { PaginationMeta } from "@/types/pagination.types";
-import { defaultPagination } from "@/lib/pagination";
 import { getErrorMessage } from "@/lib/api/api-response";
+import { defaultPagination } from "@/lib/pagination";
 import type {
-  JobListItem,
-  JobDetail,
   JobApplyDetail,
+  JobDetail,
   JobListFilters,
+  JobListItem,
 } from "@/types/db/job.types";
+import { PaginationMeta } from "@/types/pagination.types";
+import { create } from "zustand";
 
 // ─── State ─────────────────────────────────────────────────────────────────
 
@@ -138,7 +138,7 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
   fetchApplyJob: async (slug) => {
     set({ isLoadingApplyJob: true, applyJobError: null, applyJob: null });
     try {
-      const { data } = await apiPublic.get(`/job/${slug}`);
+      const { data } = await apiPublic.get(`/job?slug=${slug}`);
       const job = data.data as JobDetail | null;
       if (job) {
         set({

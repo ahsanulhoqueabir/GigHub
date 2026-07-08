@@ -1,25 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { api_client } from "@/lib/api/api-client";
+import { useJobProposalsStore } from "@/store/job-proposals.store";
+import { useJobsStore } from "@/store/jobs.store";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   IconArrowLeft,
-  IconSend,
+  IconFile,
   IconInfoCircle,
-  IconPlus,
+  IconLoader2,
+  IconPaperclip,
+  IconSend,
   IconX,
 } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useJobsStore } from "@/store/jobs.store";
-import { useJobProposalsStore } from "@/store/job-proposals.store";
+import { z } from "zod";
 
 const applySchema = z.object({
   description: z
@@ -42,8 +44,11 @@ export default function JobApplyPage() {
   const isCreating = useJobProposalsStore((s) => s.isCreating);
   const createProposal = useJobProposalsStore((s) => s.createProposal);
 
-  const [attachmentUrls, setAttachmentUrls] = useState<string[]>([]);
-  const [newAttachment, setNewAttachment] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [attachmentFiles, setAttachmentFiles] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
   const {
     register,
@@ -60,29 +65,84 @@ export default function JobApplyPage() {
     if (slug) fetchApplyJob(slug);
   }, [slug, fetchApplyJob]);
 
-  const addAttachment = () => {
-    const url = newAttachment.trim();
-    if (!url) return;
-    if (attachmentUrls.length >= 10) {
-      toast.error("Maximum 10 attachments allowed");
+  // ── File picker ────────────────────────────────────────────────
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    const remaining = 10 - attachmentFiles.length;
+    if (files.length > remaining) {
+      toast.error(`Maximum 10 attachments allowed (${remaining} remaining)`);
       return;
     }
-    setAttachmentUrls((prev) => [...prev, url]);
-    setNewAttachment("");
+    setAttachmentFiles((prev) => [...prev, ...files]);
+    // Reset input so re-selecting the same file triggers onChange
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const removeAttachment = (idx: number) => {
-    setAttachmentUrls((prev) => prev.filter((_, i) => i !== idx));
+  const removeFile = (idx: number) => {
+    setAttachmentFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // ── Upload files → R2 → get public URLs ────────────────────────
+  const uploadToR2 = async (): Promise<string[]> => {
+    if (attachmentFiles.length === 0) return [];
+
+    setUploadingFiles(true);
+    try {
+      // 1. Get signed URLs
+      const filesPayload = attachmentFiles.map((f) => ({
+        fileName: f.name,
+        contentType: f.type || "application/octet-stream",
+      }));
+
+      const { data: signedData } = await api_client.post("/signed-upload-url", {
+        files: filesPayload,
+        folder: "job-proposals",
+      });
+
+      const signedResults: {
+        signedUrl: string;
+        publicUrl: string;
+      }[] = signedData.data;
+
+      // 2. Upload each file directly to R2 using the signed URL
+      await Promise.all(
+        signedResults.map((item, i) =>
+          fetch(item.signedUrl, {
+            method: "PUT",
+            body: attachmentFiles[i],
+            headers: { "Content-Type": attachmentFiles[i].type },
+          }),
+        ),
+      );
+
+      // 3. Return public URLs
+      return signedResults.map((r) => r.publicUrl);
+    } finally {
+      setUploadingFiles(false);
+    }
+  };
+
+  // ── Submit ─────────────────────────────────────────────────────
   const onSubmit = async (formData: ApplyForm) => {
     if (!job) return;
+
+    let urls = uploadedUrls;
+
+    // Only upload if there are new files not yet uploaded
+    if (attachmentFiles.length > 0 && uploadedUrls.length === 0) {
+      urls = await uploadToR2();
+      if (urls.length === 0) {
+        toast.error("File upload failed. Please try again.");
+        return;
+      }
+      setUploadedUrls(urls);
+    }
 
     try {
       await createProposal({
         job: job.id,
         description: formData.description,
-        attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
+        attachments: urls.length > 0 ? urls : undefined,
       });
 
       toast.success("Proposal submitted successfully!");
@@ -181,25 +241,30 @@ export default function JobApplyPage() {
           <label className="mb-1.5 block text-sm font-medium text-foreground">
             Attachments{" "}
             <span className="text-muted-foreground font-normal">
-              (optional — URLs to portfolio, resume, etc.)
+              (optional — portfolio, resume, images, etc.)
             </span>
           </label>
 
-          {/* Attachment list */}
-          {attachmentUrls.length > 0 && (
+          {/* Selected files list */}
+          {attachmentFiles.length > 0 && (
             <div className="mb-2 space-y-1.5">
-              {attachmentUrls.map((url, idx) => (
+              {attachmentFiles.map((file, idx) => (
                 <div
                   key={idx}
                   className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm"
                 >
-                  <span className="flex-1 truncate text-muted-foreground">
-                    {url}
+                  <IconFile className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="flex-1 truncate text-foreground">
+                    {file.name}
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {(file.size / 1024).toFixed(0)} KB
                   </span>
                   <button
                     type="button"
-                    onClick={() => removeAttachment(idx)}
-                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => removeFile(idx)}
+                    disabled={uploadingFiles}
+                    className="text-muted-foreground hover:text-destructive disabled:opacity-40"
                   >
                     <IconX className="size-4" />
                   </button>
@@ -208,31 +273,31 @@ export default function JobApplyPage() {
             </div>
           )}
 
-          {/* Add attachment input */}
-          <div className="flex gap-2">
-            <Input
-              placeholder="Paste a URL (e.g. portfolio link)"
-              value={newAttachment}
-              onChange={(e) => setNewAttachment(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  addAttachment();
-                }
-              }}
+          {/* File picker button */}
+          <div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*,.pdf,.doc,.docx,.txt"
+              onChange={handleFileSelect}
+              className="hidden"
             />
             <Button
               type="button"
               variant="outline"
-              size="icon"
-              onClick={addAttachment}
-              disabled={!newAttachment.trim()}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={attachmentFiles.length >= 10 || uploadingFiles}
+              className="w-full"
             >
-              <IconPlus className="size-4" />
+              <IconPaperclip className="mr-1.5 size-4" />
+              {attachmentFiles.length >= 10
+                ? "Maximum 10 files"
+                : "Choose Files"}
             </Button>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Max 10 attachments. Press Enter or click + to add.
+            Max 10 files. Supported: images, PDF, DOC, TXT.
           </p>
         </div>
 
@@ -250,9 +315,14 @@ export default function JobApplyPage() {
           type="submit"
           className="w-full"
           size="lg"
-          disabled={isCreating}
+          disabled={isCreating || uploadingFiles}
         >
-          {isCreating ? (
+          {uploadingFiles ? (
+            <>
+              <IconLoader2 className="mr-1.5 size-4 animate-spin" />
+              Uploading Files...
+            </>
+          ) : isCreating ? (
             "Submitting Proposal..."
           ) : (
             <>
