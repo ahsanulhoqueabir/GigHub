@@ -1,62 +1,167 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { IconArrowRight, IconSchool } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { GigCard } from "@/components/home/gig-card";
+import { JobCard } from "@/components/home/job-card";
+import { useGeneralStore } from "@/store/general.store";
+
+export default function HomePage() {
+  const homepageData = useGeneralStore((s) => s.homepageData);
+  const isLoading = useGeneralStore((s) => s.isLoadingHomepage);
+
+  const gigs = homepageData?.gigs ?? [];
+  const jobs = homepageData?.jobs ?? [];
+  const tuitions = homepageData?.tuitions ?? [];
+  const gigsLoading = isLoading;
+  const jobsLoading = isLoading;
+  const tuitionsLoading = isLoading;
+
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-zinc-50 dark:bg-black font-sans">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-10 px-6 py-24 text-center sm:text-left sm:items-start">
-        {/* Logo */}
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={24}
-          priority
-        />
+    <div className="min-h-full">
+      {/* Latest Tuitions — highlighted section */}
+      <section className="mx-auto  px-4 py-12 sm:px-6 lg:px-8">
+        <div className="">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+                  <IconSchool className="size-3.5" />
+                  HIGHLIGHTED
+                </span>
+              </div>
+              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+                Tuition & Tutoring
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Find tuition jobs and tutoring opportunities near you
+              </p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/jobs?type=TUTION">
+                View All
+                <IconArrowRight className="ml-1 size-4" />
+              </Link>
+            </Button>
+          </div>
 
-        {/* Heading */}
-        <h1 className="text-4xl font-semibold tracking-tight text-black dark:text-white">
-          Next.js Starter Template
-        </h1>
-
-        {/* Description */}
-        <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-xl">
-          This project is a ready-to-use starter built with{" "}
-          <span className="font-medium text-black dark:text-white">
-            Next.js
-          </span>
-          ,{" "}
-          <span className="font-medium text-black dark:text-white">
-            Supabase
-          </span>
-          , and{" "}
-          <span className="font-medium text-black dark:text-white">
-            shadcn/ui
-          </span>
-          . It provides a solid foundation for building modern web applications.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <a
-            href="https://nextjs.org/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 h-11 flex items-center justify-center rounded-full bg-black text-white dark:bg-white dark:text-black hover:opacity-80 transition"
-          >
-            Get Started
-          </a>
-
-          <a
-            href="https://supabase.com/docs"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 h-11 flex items-center justify-center rounded-full border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition"
-          >
-            Docs
-          </a>
+          {tuitionsLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="space-y-3 rounded-xl border border-border bg-background p-4"
+                >
+                  <Skeleton className="h-5 w-16" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-3 w-3/4" />
+                  <Skeleton className="h-8 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : tuitions.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {tuitions.map((tuition) => (
+                <JobCard key={tuition.id} job={tuition} />
+              ))}
+            </div>
+          ) : (
+            <p className="py-12 text-center text-sm text-muted-foreground">
+              No tuition opportunities available yet.
+            </p>
+          )}
         </div>
-      </main>
+      </section>
+
+      {/* Latest Gigs */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+              Latest Gigs
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Discover services offered by talented students
+            </p>
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/gigs">
+              View All
+              <IconArrowRight className="ml-1 size-4" />
+            </Link>
+          </Button>
+        </div>
+
+        {gigsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="aspect-16/10 rounded-xl" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : gigs.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {gigs.map((gig) => (
+              <GigCard key={gig.id} gig={gig} />
+            ))}
+          </div>
+        ) : (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            No gigs available yet.
+          </p>
+        )}
+      </section>
+
+      {/* Latest Jobs */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+              Latest Jobs
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Find work opportunities posted by peers
+            </p>
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/jobs">
+              View All
+              <IconArrowRight className="ml-1 size-4" />
+            </Link>
+          </Button>
+        </div>
+
+        {jobsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="space-y-3 rounded-xl border border-border p-4"
+              >
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : jobs.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {jobs.map((job) => (
+              <JobCard key={job.id} job={job} />
+            ))}
+          </div>
+        ) : (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            No jobs available yet.
+          </p>
+        )}
+      </section>
     </div>
   );
 }
