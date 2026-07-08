@@ -159,7 +159,7 @@ export default function JobApplyPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         <Skeleton className="mb-6 h-6 w-32" />
         <Skeleton className="mb-4 h-8 w-72" />
         <div className="grid gap-4 sm:grid-cols-3">

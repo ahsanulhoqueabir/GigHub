@@ -35,6 +35,7 @@ begin
                     on s.id = g.seller
                 join category c
                     on c.id = g.category
+                where g.status = 'ACTIVE'
                 order by g.created_at desc
                 limit p_gig_limit
             ) g
@@ -65,6 +66,7 @@ begin
                 join category c
                     on c.id = j.category
                 where j.type <> 'TUTION'
+                  and j.status = 'ACTIVE'
                 order by j.created_at desc
                 limit p_job_limit
             ) j
@@ -95,6 +97,7 @@ begin
                 join category c
                     on c.id = j.category
                 where j.type = 'TUTION'
+                  and j.status = 'ACTIVE'
                 order by j.created_at desc
                 limit p_tuition_limit
             ) t

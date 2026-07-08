@@ -26,61 +26,59 @@ export default function HomePage() {
       <HeroBanner />
 
       {/* Latest Tuitions — highlighted section */}
-      <section className="">
-        <div className="">
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
-                  <IconSchool className="size-3.5" />
-                  HIGHLIGHTED
-                </span>
-              </div>
-              <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
-                Tuition & Tutoring
-              </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Find tuition jobs and tutoring opportunities near you
-              </p>
+      <div className="">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-3 py-1 text-xs font-semibold text-primary">
+                <IconSchool className="size-3.5" />
+                HIGHLIGHTED
+              </span>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/jobs?type=TUTION">
-                View All
-                <IconArrowRight className="ml-1 size-4" />
-              </Link>
-            </Button>
-          </div>
-
-          {tuitionsLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="space-y-3 rounded-xl border border-border bg-background p-4"
-                >
-                  <Skeleton className="h-5 w-16" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-3 w-3/4" />
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              ))}
-            </div>
-          ) : tuitions.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {tuitions.map((tuition) => (
-                <JobCard key={tuition.id} job={tuition} />
-              ))}
-            </div>
-          ) : (
-            <p className="py-12 text-center text-sm text-muted-foreground">
-              No tuition opportunities available yet.
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+              Tuition & Tutoring
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Find tuition jobs and tutoring opportunities near you
             </p>
-          )}
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/jobs?type=TUTION">
+              View All
+              <IconArrowRight className="ml-1 size-4" />
+            </Link>
+          </Button>
         </div>
-      </section>
+
+        {tuitionsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="space-y-3 rounded-xl border border-border bg-background p-4"
+              >
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : tuitions.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {tuitions.map((tuition) => (
+              <JobCard key={tuition.id} job={tuition} />
+            ))}
+          </div>
+        ) : (
+          <p className="py-12 text-center text-sm text-muted-foreground">
+            No tuition opportunities available yet.
+          </p>
+        )}
+      </div>
 
       {/* Latest Gigs */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <section>
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
@@ -122,7 +120,7 @@ export default function HomePage() {
       </section>
 
       {/* Latest Jobs */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <section>
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-foreground sm:text-2xl">

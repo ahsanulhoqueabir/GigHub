@@ -40,7 +40,7 @@ export default function JobDetailPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div>
         <DetailsSkeleton />
       </div>
     );
@@ -48,7 +48,7 @@ export default function JobDetailPage() {
 
   if (!job) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 lg:px-8">
+      <div className="">
         <p className="text-muted-foreground">Job not found.</p>
         <Button asChild variant="outline" className="mt-4">
           <Link href="/jobs">Back to Jobs</Link>
