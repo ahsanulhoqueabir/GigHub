@@ -275,8 +275,8 @@ export class CategoryService {
     // Second pass: link children to parents
     for (const cat of categories) {
       const node = map.get(cat.id)!;
-      if (cat.parent && map.has(cat.parent)) {
-        map.get(cat.parent)!.subCategories.push(node);
+      if (cat.parent && map.has(cat.parent as string)) {
+        map.get(cat.parent as string)!.subCategories.push(node);
       } else if (!cat.parent) {
         roots.push(node);
       }
