@@ -12,9 +12,9 @@ get {
 
 docs {
   ## List Gigs — Public
-
+  
   Returns a paginated list of active gigs with seller and category relations.
-
+  
   ### Query Parameters
   | Parameter  | Type    | Description                                      |
   |-----------|---------|--------------------------------------------------|
@@ -27,13 +27,105 @@ docs {
   | search    | string  | Search in title and description                  |
   | tags      | string  | Comma-separated tag filter                       |
   | status    | string  | Filter by status (default: ACTIVE)               |
-
+  
   ### Success Response (200)
   ```json
   {
     "success": true,
     "data": {
-      "items": [...],
+      "items": [
+       {
+          "id": "7714e4ae-6697-4d86-bff7-fb8a25332416",
+          "created_at": "2026-07-06T08:17:45.693872+00:00",
+          "updated_at": "2026-07-06T08:17:45.693872+00:00",
+          "status": "ACTIVE",
+          "seller": {
+            "id": "fd1404c3-ff08-4c44-8cfa-f9bb26923cd2",
+            "name": "Mahadi Hasan",
+            "avatar": null,
+            "username": "mahadi-402193",
+            "verified": false,
+            "department": "2acbc219-42d9-4d18-83e1-40fabf13fcdc"
+          },
+          "category": {
+            "id": "a5c6f3ab-cd04-4dcb-88cf-947d73509d78",
+            "name": "Legal Services",
+            "slug": "legal-services"
+          },
+          "title": "Legal Document Drafting",
+          "slug": "legal-document-drafting",
+          "description": "Professional legal document drafting and contract review. Contracts, agreements, NDAs, and legal research services.",
+          "images": [
+            "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600",
+            "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600"
+          ],
+          "tags": [
+            "legal",
+            "contract",
+            "drafting",
+            "compliance"
+          ],
+          "views": 38,
+          "packages": [
+            {
+              "tier": "BASIC",
+              "price": 120,
+              "title": "Basic Contract",
+              "features": [
+                "1 contract",
+                "Standard clauses",
+                "Basic review"
+              ],
+              "revisions": 2,
+              "description": "Basic legal contract",
+              "delivery_days": 5
+            },
+            {
+              "tier": "STANDARD",
+              "price": 300,
+              "title": "Complete Agreement",
+              "features": [
+                "3 contracts",
+                "Custom clauses",
+                "Comprehensive review",
+                "Compliance check",
+                "Legal research"
+              ],
+              "revisions": 5,
+              "description": "Complete legal documents",
+              "delivery_days": 12
+            },
+            {
+              "tier": "PREMIUM",
+              "price": 650,
+              "title": "Legal Package",
+              "features": [
+                "5+ contracts",
+                "Custom clauses",
+                "Comprehensive review",
+                "Compliance check",
+                "Legal research",
+                "Negotiation support",
+                "Template development",
+                "Ongoing support"
+              ],
+              "revisions": 10,
+              "description": "Full legal document package",
+              "delivery_days": 25
+            }
+          ],
+          "faq": [
+            {
+              "answer": "I need your contract purpose, parties involved, and specific requirements.",
+              "question": "What should I provide?"
+            },
+            {
+              "answer": "Yes, I can handle various types of contracts and legal documents.",
+              "question": "What types of documents do you draft?"
+            }
+          ]
+        },
+      ],
       "pagination": {
         "currentPage": 1,
         "pageSize": 20,
