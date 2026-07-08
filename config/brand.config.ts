@@ -1,7 +1,7 @@
 export const branding = {
   title: "GigHub",
   name: "Campus Freelance & Task Marketplace for Jagannath University",
-  logo: "/logo.png",
+  logo: "/brand/gighub.svg",
   description:
     "GigHub is a closed, campus-exclusive freelance and task marketplace for the students of Jagannath University (JnU), Dhaka. Buy and sell services, post jobs, hire skilled peers, collaborate through real-time chat, and complete secure escrow-protected transactions while building a verified campus portfolio.",
   keywords: [

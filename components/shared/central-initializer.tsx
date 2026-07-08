@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
 import { useCategoriesStore } from "@/store/categories.store";
 import { useDepartmentsStore } from "@/store/departments.store";
+import { useGeneralStore } from "@/store/general.store";
 
 /**
  * CentralDataInitializer — fetches site-wide data on mount.
@@ -13,6 +14,8 @@ import { useDepartmentsStore } from "@/store/departments.store";
  * 2. Fetches **categories** (limit=40) — cached in Zustand so every
  *    component reads from the same state.
  * 3. Fetches **departments** (limit=40) — same caching pattern.
+ * 4. Fetches **latest gigs** (limit=8) — for homepage hero/preview.
+ * 5. Fetches **latest jobs** (limit=6) — for homepage hero/preview.
  *
  * Place this component once in your root layout, inside `<body>`.
  */
@@ -27,6 +30,9 @@ export function CentralDataInitializer() {
 
   const deptHasFetched = useDepartmentsStore((s) => s.hasFetched);
   const fetchDepartments = useDepartmentsStore((s) => s.fetchDepartments);
+
+  const homepageData = useGeneralStore((s) => s.homepageData);
+  const fetchHomepageData = useGeneralStore((s) => s.fetchHomepageData);
 
   useEffect(() => {
     if (!hasHydrated || hasInitialized.current) return;
@@ -53,6 +59,12 @@ export function CentralDataInitializer() {
     if (deptHasFetched) return;
     fetchDepartments(1, 40);
   }, [deptHasFetched, fetchDepartments]);
+
+  // ── Fetch homepage data once ───────────────────────────────────
+  useEffect(() => {
+    if (homepageData) return;
+    fetchHomepageData();
+  }, [homepageData, fetchHomepageData]);
 
   return null;
 }

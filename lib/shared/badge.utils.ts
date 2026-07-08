@@ -122,6 +122,68 @@ export function getRoleBadgeColors(role: string): {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Job-type badge helpers                                            */
+/* ------------------------------------------------------------------ */
+
+import type { JobType } from "@/types/db/job.types";
+
+export const JOB_TYPE_BADGE_COLORS: Record<
+  JobType,
+  { bg: string; text: string; ring: string }
+> = {
+  FULLTIME: {
+    bg: "bg-sky-200 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300",
+    text: "text-sky-900 dark:text-sky-300",
+    ring: "ring-sky-500/30",
+  },
+
+  PARTTIME: {
+    bg: "bg-lime-200 text-lime-900 dark:bg-lime-500/20 dark:text-lime-300",
+    text: "text-lime-900 dark:text-lime-300",
+    ring: "ring-lime-500/30",
+  },
+
+  CONTRACT: {
+    bg: "bg-fuchsia-200 text-fuchsia-900 dark:bg-fuchsia-500/20 dark:text-fuchsia-300",
+    text: "text-fuchsia-900 dark:text-fuchsia-300",
+    ring: "ring-fuchsia-500/30",
+  },
+
+  TUTION: {
+    bg: "bg-amber-200 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300",
+    text: "text-amber-900 dark:text-amber-300",
+    ring: "ring-amber-500/30",
+  },
+
+  VOLUNTEER: {
+    bg: "bg-teal-200 text-teal-900 dark:bg-teal-500/20 dark:text-teal-300",
+    text: "text-teal-900 dark:text-teal-300",
+    ring: "ring-teal-500/30",
+  },
+
+  OTHER: {
+    bg: "bg-slate-200 text-slate-900 dark:bg-slate-500/20 dark:text-slate-300",
+    text: "text-slate-900 dark:text-slate-300",
+    ring: "ring-slate-500/30",
+  },
+};
+
+export const JOB_TYPE_BADGE_FALLBACK = {
+  bg: "bg-gray-50",
+  text: "text-gray-700",
+  ring: "ring-gray-500/10",
+};
+
+/** Get colour classes for a given job type. */
+export function getJobTypeBadgeColors(type: string): {
+  bg: string;
+  text: string;
+  ring: string;
+} {
+  return JOB_TYPE_BADGE_COLORS[type as JobType] ?? JOB_TYPE_BADGE_FALLBACK;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Boolean badge helpers                                             */
 /* ------------------------------------------------------------------ */
 

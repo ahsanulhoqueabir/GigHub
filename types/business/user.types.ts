@@ -27,6 +27,7 @@ export interface AuthUser {
   role: string;
   student_id: string | null;
   department: string | null;
+  avatar: string | null;
 }
 
 export interface LoginResponseData {
