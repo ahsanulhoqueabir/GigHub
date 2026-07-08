@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { IconArrowRight, IconSchool } from "@tabler/icons-react";
+import { GigCard } from "@/components/home/gig-card";
+import { HeroBanner } from "@/components/home/hero-banner";
+import { JobCard } from "@/components/home/job-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { GigCard } from "@/components/home/gig-card";
-import { JobCard } from "@/components/home/job-card";
 import { useGeneralStore } from "@/store/general.store";
+import { IconArrowRight, IconSchool } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function HomePage() {
   const homepageData = useGeneralStore((s) => s.homepageData);
@@ -21,8 +22,11 @@ export default function HomePage() {
 
   return (
     <div className="min-h-full">
+      {/* Hero Banner */}
+      <HeroBanner />
+
       {/* Latest Tuitions — highlighted section */}
-      <section className="mx-auto  px-4 py-12 sm:px-6 lg:px-8">
+      <section className="">
         <div className="">
           <div className="mb-6 flex items-center justify-between">
             <div>

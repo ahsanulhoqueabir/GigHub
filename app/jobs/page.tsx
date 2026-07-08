@@ -32,7 +32,7 @@ export default function JobsPage() {
   }, [debouncedSearch, fetchJobs]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="">
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">

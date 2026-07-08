@@ -132,34 +132,39 @@ export const JOB_TYPE_BADGE_COLORS: Record<
   { bg: string; text: string; ring: string }
 > = {
   FULLTIME: {
-    bg: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    text: "text-blue-700 dark:text-blue-400",
-    ring: "ring-blue-600/20",
+    bg: "bg-sky-200 text-sky-900 dark:bg-sky-500/20 dark:text-sky-300",
+    text: "text-sky-900 dark:text-sky-300",
+    ring: "ring-sky-500/30",
   },
+
   PARTTIME: {
-    bg: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    text: "text-green-700 dark:text-green-400",
-    ring: "ring-green-600/20",
+    bg: "bg-lime-200 text-lime-900 dark:bg-lime-500/20 dark:text-lime-300",
+    text: "text-lime-900 dark:text-lime-300",
+    ring: "ring-lime-500/30",
   },
+
   CONTRACT: {
-    bg: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-    text: "text-purple-700 dark:text-purple-400",
-    ring: "ring-purple-600/20",
+    bg: "bg-fuchsia-200 text-fuchsia-900 dark:bg-fuchsia-500/20 dark:text-fuchsia-300",
+    text: "text-fuchsia-900 dark:text-fuchsia-300",
+    ring: "ring-fuchsia-500/30",
   },
+
   TUTION: {
-    bg: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
-    text: "text-orange-700 dark:text-orange-400",
-    ring: "ring-orange-600/20",
+    bg: "bg-amber-200 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300",
+    text: "text-amber-900 dark:text-amber-300",
+    ring: "ring-amber-500/30",
   },
+
   VOLUNTEER: {
-    bg: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
-    text: "text-pink-700 dark:text-pink-400",
-    ring: "ring-pink-600/20",
+    bg: "bg-teal-200 text-teal-900 dark:bg-teal-500/20 dark:text-teal-300",
+    text: "text-teal-900 dark:text-teal-300",
+    ring: "ring-teal-500/30",
   },
+
   OTHER: {
-    bg: "bg-zinc-100 text-zinc-700 dark:bg-zinc-900/30 dark:text-zinc-400",
-    text: "text-zinc-700 dark:text-zinc-400",
-    ring: "ring-zinc-600/20",
+    bg: "bg-slate-200 text-slate-900 dark:bg-slate-500/20 dark:text-slate-300",
+    text: "text-slate-900 dark:text-slate-300",
+    ring: "ring-slate-500/30",
   },
 };
 

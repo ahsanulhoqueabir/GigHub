@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { GigCard } from "@/components/home/gig-card";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGigsStore } from "@/store/gigs.store";
 import {
   IconAdjustmentsHorizontal,
   IconSearch,
   IconX,
 } from "@tabler/icons-react";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
-import { GigCard } from "@/components/home/gig-card";
-import { useGigsStore } from "@/store/gigs.store";
+import { useEffect, useState } from "react";
 
 export default function GigsPage() {
   const gigs = useGigsStore((s) => s.gigs);
@@ -36,7 +36,7 @@ export default function GigsPage() {
   }, [debouncedSearch, fetchGigs]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="">
       {/* Page Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-foreground sm:text-3xl">
