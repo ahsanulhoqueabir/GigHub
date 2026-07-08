@@ -3,7 +3,13 @@ import { Header } from "@/components/layout/header";
 import { CentralDataInitializer } from "@/components/shared/central-initializer";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans } from "next/font/google";
+import {
+  Fraunces,
+  Geist,
+  Geist_Mono,
+  Inter,
+  Noto_Sans,
+} from "next/font/google";
 import "./globals.css";
 
 const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
@@ -16,6 +22,17 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  variable: "--font-fraunces",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -46,6 +63,8 @@ export default function RootLayout({
         geistMono.variable,
         "font-sans",
         notoSans.variable,
+        fraunces.variable,
+        inter.variable,
       )}
       suppressHydrationWarning
     >
