@@ -1,6 +1,10 @@
 "use client";
 
+import { BackButton } from "@/components/ui/back-button";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { api_client } from "@/lib/api/api-client";
@@ -8,12 +12,13 @@ import { useJobProposalsStore } from "@/store/job-proposals.store";
 import { useJobsStore } from "@/store/jobs.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  IconArrowLeft,
   IconFile,
   IconInfoCircle,
   IconLoader2,
+  IconMapPin,
   IconPaperclip,
   IconSend,
+  IconTools,
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -154,9 +159,15 @@ export default function JobApplyPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="mb-4 h-8 w-48" />
-        <Skeleton className="h-64 w-full rounded-xl" />
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <Skeleton className="mb-6 h-6 w-32" />
+        <Skeleton className="mb-4 h-8 w-72" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
+        </div>
+        <Skeleton className="mt-6 h-48 w-full rounded-xl" />
       </div>
     );
   }
@@ -173,165 +184,215 @@ export default function JobApplyPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <Button asChild variant="ghost" size="sm" className="mb-6">
-        <Link href={`/jobs/${slug}`}>
-          <IconArrowLeft className="mr-1 size-4" />
-          Back to Job
-        </Link>
-      </Button>
-
-      <h1 className="text-2xl font-semibold text-foreground">Apply for Job</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Submit your proposal for &quot;{job.title}&quot;
-      </p>
-
-      {/* Job Summary */}
-      <div className="mt-6 rounded-xl border border-border bg-card p-4">
-        <h2 className="text-sm font-semibold text-foreground">Job Summary</h2>
-        <div className="mt-3 space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Title</span>
+    <div className="">
+      {/* Job header with inline back button */}
+      <div className="mb-8 flex items-center gap-3">
+        <BackButton href={`/jobs/${slug}`} />
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Apply for Job</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Submit your proposal for{" "}
             <span className="font-medium text-foreground">{job.title}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Type</span>
-            <span className="font-medium text-foreground">{job.type}</span>
-          </div>
-          {job.budget && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Budget</span>
-              <span className="font-medium text-foreground">{job.budget}</span>
-            </div>
-          )}
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Posted by</span>
-            <span className="font-medium text-foreground">
-              {job.owner.name}
-            </span>
-          </div>
+          </p>
         </div>
       </div>
 
-      {/* Application Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-5">
-        {/* Description */}
-        <div>
-          <label
-            htmlFor="description"
-            className="mb-1.5 block text-sm font-medium text-foreground"
-          >
-            Why are you a good fit? <span className="text-destructive">*</span>
-          </label>
-          <Textarea
-            id="description"
-            placeholder="Describe your experience, skills, and why you're the right candidate for this job..."
-            rows={6}
-            {...register("description")}
-          />
-          {errors.description && (
-            <p className="mt-1 text-sm text-destructive">
-              {errors.description.message}
-            </p>
-          )}
-        </div>
-
-        {/* Attachments */}
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
-            Attachments{" "}
-            <span className="text-muted-foreground font-normal">
-              (optional — portfolio, resume, images, etc.)
-            </span>
-          </label>
-
-          {/* Selected files list */}
-          {attachmentFiles.length > 0 && (
-            <div className="mb-2 space-y-1.5">
-              {attachmentFiles.map((file, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm"
-                >
-                  <IconFile className="size-4 shrink-0 text-muted-foreground" />
-                  <span className="flex-1 truncate text-foreground">
-                    {file.name}
-                  </span>
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {(file.size / 1024).toFixed(0)} KB
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(idx)}
-                    disabled={uploadingFiles}
-                    className="text-muted-foreground hover:text-destructive disabled:opacity-40"
-                  >
-                    <IconX className="size-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* File picker button */}
-          <div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,.pdf,.doc,.docx,.txt"
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={attachmentFiles.length >= 10 || uploadingFiles}
-              className="w-full"
+      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+        {/* ─── Left column: Form ────────────────────────────────── */}
+        <div className="space-y-8">
+          {/* Proposal Form */}
+          <section>
+            <h2 className="mb-3 text-base font-semibold text-foreground">
+              Your Proposal
+            </h2>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-5"
+              id="apply-form"
             >
-              <IconPaperclip className="mr-1.5 size-4" />
-              {attachmentFiles.length >= 10
-                ? "Maximum 10 files"
-                : "Choose Files"}
-            </Button>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Max 10 files. Supported: images, PDF, DOC, TXT.
-          </p>
+              {/* Description */}
+              <div>
+                <Label htmlFor="description">
+                  Why are you a good fit?{" "}
+                  <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  id="description"
+                  placeholder="Describe your experience, skills, and why you're the right candidate for this job..."
+                  rows={6}
+                  className="mt-1.5"
+                  {...register("description")}
+                />
+                {errors.description && (
+                  <p className="mt-1 text-sm text-destructive">
+                    {errors.description.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Attachments */}
+              <div>
+                <Label>
+                  Attachments{" "}
+                  <span className="text-muted-foreground font-normal">
+                    (optional — portfolio, resume, images, etc.)
+                  </span>
+                </Label>
+
+                {/* Selected files list */}
+                {attachmentFiles.length > 0 && (
+                  <div className="mb-2 mt-1.5 space-y-1.5">
+                    {attachmentFiles.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-sm"
+                      >
+                        <IconFile className="size-4 shrink-0 text-muted-foreground" />
+                        <span className="flex-1 truncate text-foreground">
+                          {file.name}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {(file.size / 1024).toFixed(0)} KB
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(idx)}
+                          disabled={uploadingFiles}
+                          className="text-muted-foreground hover:text-destructive disabled:opacity-40"
+                        >
+                          <IconX className="size-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* File picker button */}
+                <div className="mt-1.5">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*,.pdf,.doc,.docx,.txt"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={attachmentFiles.length >= 10 || uploadingFiles}
+                    className="w-full"
+                  >
+                    <IconPaperclip className="mr-1.5 size-4" />
+                    {attachmentFiles.length >= 10
+                      ? "Maximum 10 files"
+                      : "Choose Files"}
+                  </Button>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Max 10 files. Supported: images, PDF, DOC, TXT.
+                </p>
+              </div>
+            </form>
+          </section>
         </div>
 
-        {/* Info */}
-        <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-          <IconInfoCircle className="mt-0.5 size-4 shrink-0" />
-          <span>
-            Your proposal will be sent to the job poster. You can track your
-            application status from your profile.
-          </span>
-        </div>
+        {/* ─── Right column: Order summary sidebar ────────────── */}
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <Card>
+            <CardHeader>
+              <CardTitle>Job Summary</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Job highlight */}
+              <div className="rounded-lg bg-muted/50 p-3">
+                <p className="text-sm font-medium text-foreground">
+                  {job.title}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <Badge variant="secondary">{job.type}</Badge>
+                  {job.budget && <Badge variant="outline">{job.budget}</Badge>}
+                </div>
+              </div>
 
-        {/* Submit */}
-        <Button
-          type="submit"
-          className="w-full"
-          size="lg"
-          disabled={isCreating || uploadingFiles}
-        >
-          {uploadingFiles ? (
-            <>
-              <IconLoader2 className="mr-1.5 size-4 animate-spin" />
-              Uploading Files...
-            </>
-          ) : isCreating ? (
-            "Submitting Proposal..."
-          ) : (
-            <>
-              <IconSend className="mr-1.5 size-4" />
-              Submit Proposal
-            </>
-          )}
-        </Button>
-      </form>
+              {/* Job details */}
+              <div className="space-y-1.5 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Posted by</span>
+                  <span className="font-medium text-foreground">
+                    {job.owner.name}
+                  </span>
+                </div>
+                {job.location && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Location</span>
+                    <span className="flex items-center gap-1 font-medium text-foreground">
+                      <IconMapPin className="size-3.5" />
+                      {job.location}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {job.required_skills && job.required_skills.length > 0 && (
+                <div>
+                  <span className="text-xs text-muted-foreground">
+                    Required Skills
+                  </span>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {job.required_skills.map((skill, i) => (
+                      <Badge
+                        key={i}
+                        variant="secondary"
+                        className="gap-1 text-xs"
+                      >
+                        <IconTools className="size-3" />
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="border-t border-border" />
+
+              {/* Info notice */}
+              <div className="flex items-start gap-2 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+                <IconInfoCircle className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  Your proposal will be sent to the job poster. You can track
+                  your application status from your profile.
+                </span>
+              </div>
+
+              {/* Submit */}
+              <Button
+                type="submit"
+                form="apply-form"
+                className="w-full"
+                size="lg"
+                disabled={isCreating || uploadingFiles}
+              >
+                {uploadingFiles ? (
+                  <>
+                    <IconLoader2 className="mr-1.5 size-4 animate-spin" />
+                    Uploading Files...
+                  </>
+                ) : isCreating ? (
+                  "Submitting Proposal..."
+                ) : (
+                  <>
+                    <IconSend className="mr-1.5 size-4" />
+                    Submit Proposal
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

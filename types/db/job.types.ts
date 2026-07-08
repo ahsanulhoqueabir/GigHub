@@ -1,6 +1,6 @@
 import { SystemFields } from "../generic.types";
-import { Profile } from "./profile.types";
 import { Category } from "./category.types";
+import { Profile } from "./profile.types";
 
 // ─── Core ──────────────────────────────────────────────────────────────────
 
@@ -109,7 +109,7 @@ export interface JobDetail extends Pick<
 /** Minimal info for the apply page */
 export interface JobApplyDetail extends Pick<
   Job,
-  "id" | "title" | "slug" | "budget" | "type"
+  "id" | "title" | "slug" | "budget" | "type" | "location" | "required_skills"
 > {
   owner: Pick<JobOwnerInfo, "id" | "name" | "username">;
 }

@@ -148,6 +148,8 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
             slug: job.slug,
             budget: job.budget,
             type: job.type,
+            location: job.location,
+            required_skills: job.required_skills,
             owner: job.owner,
           },
           isLoadingApplyJob: false,
