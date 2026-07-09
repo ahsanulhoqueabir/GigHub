@@ -1,13 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import { IconEye } from "@tabler/icons-react";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCurrency } from "@/hooks/use-currency";
 import { GigListItem } from "@/types/db/gig.types";
+import { IconEye } from "@tabler/icons-react";
+import Image from "next/image";
+import Link from "next/link";
 
 interface GigCardProps {
   gig: GigListItem;
@@ -26,7 +26,7 @@ export function GigCard({ gig }: GigCardProps) {
     <Link href={`/gigs/${gig.slug}`} className="block group">
       <Card className="overflow-hidden transition-shadow hover:shadow-md">
         {/* Thumbnail */}
-        <div className="relative aspect-16/10 overflow-hidden bg-muted">
+        <div className="relative aspect-16/10 overflow-hidden bg-accent/10">
           {thumbnail ? (
             <Image
               src={thumbnail}
