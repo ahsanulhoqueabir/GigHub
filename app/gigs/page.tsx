@@ -9,15 +9,19 @@ import {
   IconSearch,
   IconX,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export default function GigsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const gigs = useGigsStore((s) => s.gigs);
   const loading = useGigsStore((s) => s.isLoadingList);
   const fetchGigs = useGigsStore((s) => s.fetchGigs);
 
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
 
   // Debounce search
   useEffect(() => {
@@ -25,15 +29,53 @@ export default function GigsPage() {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // Read filters from URL query params
+  const urlFilters = useMemo(() => {
+    const filters: Record<string, string> = {};
+    const category = searchParams.get("category");
+    const seller = searchParams.get("seller");
+    const tags = searchParams.get("tags");
+    const searchVal = searchParams.get("search");
+    if (category) filters.category = category;
+    if (seller) filters.seller = seller;
+    if (tags) filters.tags = tags;
+    if (searchVal) filters.search = searchVal;
+    return filters;
+  }, [searchParams]);
+
+  // Fetch gigs when URL filters or debounced search change
   useEffect(() => {
+    const filters = { ...urlFilters };
+    if (debouncedSearch) {
+      filters.search = debouncedSearch;
+    } else if (!urlFilters.search) {
+      delete filters.search;
+    }
     fetchGigs(
-      debouncedSearch
-        ? { search: debouncedSearch }
+      Object.keys(filters).length > 0
+        ? filters
         : { sortBy: "created_at", sortOrder: "desc" },
       1,
       20,
     );
-  }, [debouncedSearch, fetchGigs]);
+  }, [debouncedSearch, urlFilters, fetchGigs]);
+
+  // Sync search input with URL ?search= param
+  useEffect(() => {
+    const current = new URL(window.location.href);
+    if (debouncedSearch) {
+      current.searchParams.set("search", debouncedSearch);
+    } else {
+      current.searchParams.delete("search");
+    }
+    router.replace(current.pathname + current.search, { scroll: false });
+  }, [debouncedSearch, router]);
+
+  const clearAllFilters = useCallback(() => {
+    window.location.href = "/gigs";
+  }, []);
+
+  const hasActiveFilters = Object.keys(urlFilters).length > 0;
 
   return (
     <div className="">
@@ -68,6 +110,18 @@ export default function GigsPage() {
         </div>
       </div>
 
+      {/* Active Filters */}
+      {hasActiveFilters && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <button
+            onClick={clearAllFilters}
+            className="text-xs text-primary hover:underline"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+
       {/* Results */}
       {loading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -89,10 +143,18 @@ export default function GigsPage() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <IconAdjustmentsHorizontal className="size-10 text-muted-foreground/40" />
           <p className="mt-3 text-sm text-muted-foreground">
-            {debouncedSearch
-              ? `No gigs found matching "${debouncedSearch}"`
+            {hasActiveFilters || debouncedSearch
+              ? `No gigs found matching your filters.`
               : "No gigs available yet."}
           </p>
+          {hasActiveFilters && (
+            <button
+              onClick={clearAllFilters}
+              className="mt-2 text-sm text-primary hover:underline"
+            >
+              Clear all filters
+            </button>
+          )}
         </div>
       )}
     </div>

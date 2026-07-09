@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrency } from "@/hooks/use-currency";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import { useGigsStore } from "@/store/gigs.store";
@@ -34,6 +35,7 @@ import { useEffect, useState } from "react";
 export default function GigDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const { withReturnTo } = useReturnTo();
 
   const gig = useGigsStore((s) => s.currentGig);
   const loading = useGigsStore((s) => s.isLoadingDetail);
@@ -127,7 +129,14 @@ export default function GigDetailPage() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               {gig.category && (
-                <Badge variant="secondary">{gig.category.name}</Badge>
+                <Link href={`/gigs?category=${gig.category.id}`} scroll={false}>
+                  <Badge
+                    variant="secondary"
+                    className="cursor-pointer hover:opacity-80"
+                  >
+                    {gig.category.name}
+                  </Badge>
+                </Link>
               )}
               <Badge
                 variant="outline"
@@ -145,12 +154,16 @@ export default function GigDetailPage() {
                   />
                   <AvatarFallback>{gig.seller.name.charAt(0)}</AvatarFallback>
                 </Avatar>
-                <span>
+                <Link
+                  href={`/gigs?seller=${gig.seller.username}`}
+                  scroll={false}
+                  className="hover:text-foreground transition-colors"
+                >
                   {gig.seller.name}
                   {gig.seller.verified && (
                     <span className="ml-1 text-primary">✓</span>
                   )}
-                </span>
+                </Link>
               </div>
               <span className="flex items-center gap-1">
                 <IconCalendar className="size-3.5" />
@@ -183,9 +196,14 @@ export default function GigDetailPage() {
               </h2>
               <div className="flex flex-wrap gap-1.5">
                 {gig.tags.map((tag) => (
-                  <Badge key={tag} variant="outline">
-                    {tag}
-                  </Badge>
+                  <Link key={tag} href={`/gigs?tags=${tag}`} scroll={false}>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      {tag}
+                    </Badge>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -305,7 +323,7 @@ export default function GigDetailPage() {
                 href={
                   isAuthenticated
                     ? `/gigs/${gig.slug}/order?package=${selectedPackage}`
-                    : "/login"
+                    : withReturnTo("/login")
                 }
               >
                 <IconShoppingCart className="mr-1.5 size-4" />
@@ -341,9 +359,13 @@ export default function GigDetailPage() {
                 <p className="text-sm font-medium text-foreground">
                   {gig.seller.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <Link
+                  href={`/gigs?seller=${gig.seller.id}`}
+                  scroll={false}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
                   @{gig.seller.username}
-                </p>
+                </Link>
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">

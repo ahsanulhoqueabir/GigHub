@@ -3,6 +3,10 @@ import { apiPublic } from "@/lib/api/api-public";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { defaultPagination } from "@/lib/pagination";
 import type {
+  CreateGigInput,
+  UpdateGigInput,
+} from "@/lib/validations/gig.schema";
+import type {
   CreateGigOrderParams,
   GigDetail,
   GigListFilters,
@@ -11,7 +15,6 @@ import type {
 } from "@/types/db/gig.types";
 import { PaginationMeta } from "@/types/pagination.types";
 import { create } from "zustand";
-import type { CreateGigInput, UpdateGigInput } from "@/lib/validations/gig.schema";
 
 // ─── State ─────────────────────────────────────────────────────────────────
 
@@ -119,6 +122,7 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
       if (mergedFilters.search) params.search = mergedFilters.search;
       if (mergedFilters.category) params.category = mergedFilters.category;
       if (mergedFilters.seller) params.seller = mergedFilters.seller;
+      if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await apiPublic.get("/gig", { params });
       set({
@@ -146,6 +150,8 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
       };
       if (mergedFilters.search) params.search = mergedFilters.search;
       if (mergedFilters.category) params.category = mergedFilters.category;
+      if (mergedFilters.seller) params.seller = mergedFilters.seller;
+      if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await api_client.get("/gig/manage", { params });
       set({

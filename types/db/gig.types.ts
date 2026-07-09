@@ -121,6 +121,7 @@ export interface GigListFilters {
   search?: string;
   category?: string;
   seller?: string;
+  tags?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

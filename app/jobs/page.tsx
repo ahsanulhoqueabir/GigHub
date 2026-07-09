@@ -70,9 +70,8 @@ export default function JobsPage() {
   }, [debouncedSearch, router]);
 
   const clearAllFilters = useCallback(() => {
-    router.push("/jobs");
-    setSearch("");
-  }, [router]);
+    window.location.href = "/jobs";
+  }, []);
 
   const hasActiveFilters = Object.keys(urlFilters).length > 0;
 
