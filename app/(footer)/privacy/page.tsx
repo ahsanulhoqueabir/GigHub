@@ -56,7 +56,7 @@ const sections = [
   {
     title: "10. Contact Us",
     content:
-      "For questions about this Privacy Policy or data practices, contact our Data Protection Officer at support@gighub.ahsanull.com. You can also write to us at Jagannath University, 9-10 Chittaranjan Avenue, Dhaka 1100, Bangladesh.",
+      "For questions about this Privacy Policy or data practices, contact our Data Protection Officer at contact.gighub@gmail.com. You can also write to us at Jagannath University, 9-10 Chittaranjan Avenue, Dhaka 1100, Bangladesh.",
   },
 ];
 

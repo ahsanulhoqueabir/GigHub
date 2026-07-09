@@ -61,7 +61,7 @@ export const branding = {
 
   contacts: {
     phone: "",
-    email: "support@gighub.ahsanull.com",
+    email: "contact.gighub@gmail.com",
     address:
       "Jagannath University, 9-10 Chittaranjan Avenue, Dhaka 1100, Bangladesh",
     license: "GigHub",

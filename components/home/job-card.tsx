@@ -1,14 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { IconEye, IconMapPin, IconClock } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import { getJobTypeBadgeColors } from "@/lib/shared/badge.utils";
+import { cn } from "@/lib/utils";
 import { JobListItem } from "@/types/db/job.types";
+import { IconClock, IconEye, IconMapPin } from "@tabler/icons-react";
+import Link from "next/link";
 
 interface JobCardProps {
   job: JobListItem;
@@ -16,6 +17,7 @@ interface JobCardProps {
 
 export function JobCard({ job }: JobCardProps) {
   const typeColors = getJobTypeBadgeColors(job.type);
+  const { symbol } = useCurrency();
 
   return (
     <Link href={`/jobs/${job.slug}`} className="block group">
@@ -40,6 +42,7 @@ export function JobCard({ job }: JobCardProps) {
             </Badge>
             {job.budget && (
               <span className="shrink-0 text-sm font-semibold text-foreground">
+                {symbol}
                 {job.budget}
               </span>
             )}

@@ -20,9 +20,9 @@ export function HeroBanner() {
           />
         </div>
 
-        {/* Second banner — half width area */}
+        {/* Second banner — half width area (hidden on mobile) */}
         {banners.length > 1 && (
-          <div className="relative aspect-21/9 w-full overflow-hidden rounded-2xl bg-muted sm:aspect-21/9 lg:aspect-auto">
+          <div className="relative aspect-21/9 w-full overflow-hidden rounded-2xl bg-muted sm:aspect-21/9 lg:aspect-auto max-lg:hidden">
             <Image
               src={banners[1].path}
               alt={banners[1].title}

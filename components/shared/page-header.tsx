@@ -22,14 +22,14 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <div className="flex items-center justify-between gap-4 ">
-      <div className="flex items-center gap-4 min-w-0">
+      <div className="flex items-center gap-2 md:gap-4 min-w-0">
         <BackButton href={backHref} />
         <div className="min-w-0">
-          <h2 className="text-2xl font-bold tracking-tight text-foreground truncate">
+          <h2 className="text-lg md:text-2xl font-bold tracking-tight text-foreground truncate">
             {title}
           </h2>
           {description && (
-            <p className="text-muted-foreground text-sm truncate">
+            <p className="text-muted-foreground text-xs sm:text-sm text-wrap">
               {description}
             </p>
           )}

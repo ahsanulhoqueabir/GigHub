@@ -2,6 +2,7 @@
 
 import { ListPage } from "@/components/list-page";
 import type { ColumnConfig } from "@/components/list-page/types";
+import { GigManageCard } from "@/components/profile/gigs/GigManageCard";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/hooks/use-currency";
@@ -167,6 +168,18 @@ function ManageGigsContent() {
         },
       ],
     },
+    renderCard: (item: GigListItem) => (
+      <GigManageCard
+        gig={item}
+        onEdit={(gig) =>
+          router.push(withReturnTo(`/profile/gigs/${gig.id}/edit`))
+        }
+        onDelete={(id) => handleDelete(id)}
+        onDetails={(gig) =>
+          router.push(withReturnTo(`/profile/gigs/${gig.id}/details`))
+        }
+      />
+    ),
   };
 
   return (

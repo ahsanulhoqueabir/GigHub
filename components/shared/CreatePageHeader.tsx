@@ -22,8 +22,10 @@ export function CreatePageHeader({
   return (
     <div className="flex flex-col gap-4 mb-6 md:flex-row md:justify-between md:items-start">
       <div>
-        <h1 className="text-xl font-bold">{title}</h1>
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <h1 className=" text-lg md:text-xl font-bold">{title}</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">
+          {description}
+        </p>
       </div>
 
       {/* Action Buttons */}

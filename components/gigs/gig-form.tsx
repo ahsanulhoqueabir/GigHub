@@ -806,7 +806,6 @@ export function GigForm({
                     variant="destructive"
                     size="sm"
                     onClick={() => removeFAQ(idx)}
-                    className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10 px-2.5 gap-1.5"
                   >
                     <IconTrash className="size-4" />
                     Remove
