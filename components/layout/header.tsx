@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { branding } from "@/config/brand.config";
 import { useReturnTo } from "@/hooks/use-return-to";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import {
@@ -19,6 +20,7 @@ import {
   IconLogout,
   IconMenu2,
   IconPlus,
+  IconShield,
   IconShoppingCart,
   IconUser,
 } from "@tabler/icons-react";
@@ -52,6 +54,7 @@ export function Header() {
 
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
+  const { isAdmin } = useAdminRole();
   const logout = useAuthStore((s) => s.logout);
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? "U";
@@ -146,6 +149,16 @@ export function Header() {
                     onClick={() => setProfileDropdownOpen(false)}
                   />
                   <div className="absolute right-0 top-full z-50 mt-1.5 w-56 rounded-xl border border-border bg-card p-1.5 shadow-lg">
+                    {isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
+                      >
+                        <IconShield className="size-4 text-muted-foreground" />
+                        Admin Panel
+                      </Link>
+                    )}
                     {profileMenuItems.map((item) => (
                       <Link
                         key={item.href}

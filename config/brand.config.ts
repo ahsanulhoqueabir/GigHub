@@ -75,3 +75,18 @@ export const branding = {
     github: "https://github.com/ahsanulhoqueabir/gighub",
   },
 } as const;
+
+export const team = [
+  {
+    name: "Md. Ahsanul Hoque Abir",
+    role: "Founder & Developer",
+    dept: "Department of Computer Science and Engineering",
+    image: null,
+  },
+  {
+    name: "Maisha Binte Monir",
+    role: "Co-Founder & Designer",
+    dept: "Department of Computer Science and Engineering",
+    image: null,
+  },
+];
