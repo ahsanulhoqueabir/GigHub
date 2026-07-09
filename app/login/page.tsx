@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { branding } from "@/config/brand.config";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth.schema";
 import { useAuthStore } from "@/store/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ import { useForm } from "react-hook-form";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { returnTo } = useReturnTo("/");
 
   const login = useAuthStore((s) => s.login);
   const isProcessing = useAuthStore((s) => s.isProcessing);
@@ -35,7 +37,7 @@ export default function LoginPage() {
 
     try {
       await login(data);
-      router.push("/");
+      router.push(returnTo);
     } catch {
       // error is already set in the store
     }

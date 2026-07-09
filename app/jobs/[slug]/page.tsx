@@ -6,6 +6,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import { getJobTypeBadgeColors } from "@/lib/shared/badge.utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
@@ -26,6 +27,7 @@ import { useEffect } from "react";
 export default function JobDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
+  const { withReturnTo } = useReturnTo();
 
   const job = useJobsStore((s) => s.currentJob);
   const loading = useJobsStore((s) => s.isLoadingDetail);
@@ -75,9 +77,22 @@ export default function JobDetailPage() {
 
           {/* Badges Row */}
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className={typeColors.bg}>{job.type}</Badge>
+            <Link href={`/jobs?type=${job.type}`} scroll={false}>
+              <Badge
+                className={`${typeColors.bg} cursor-pointer hover:opacity-80`}
+              >
+                {job.type}
+              </Badge>
+            </Link>
             {job.category && (
-              <Badge variant="secondary">{job.category.name}</Badge>
+              <Link href={`/jobs?category=${job.category.id}`} scroll={false}>
+                <Badge
+                  variant="secondary"
+                  className="cursor-pointer hover:opacity-80"
+                >
+                  {job.category.name}
+                </Badge>
+              </Link>
             )}
             <Badge
               variant="outline"
@@ -97,12 +112,16 @@ export default function JobDetailPage() {
                 />
                 <AvatarFallback>{job.owner.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <span>
+              <Link
+                href={`/jobs?owner=${job.owner.username}`}
+                scroll={false}
+                className="hover:text-foreground transition-colors"
+              >
                 {job.owner.name}
                 {job.owner.verified && (
                   <span className="ml-1 text-primary">✓</span>
                 )}
-              </span>
+              </Link>
             </div>
             <span className="flex items-center gap-1">
               <IconCalendar className="size-3.5" />
@@ -175,9 +194,14 @@ export default function JobDetailPage() {
               </h2>
               <div className="flex flex-wrap gap-1.5">
                 {job.tags.map((tag) => (
-                  <Badge key={tag} variant="outline">
-                    {tag}
-                  </Badge>
+                  <Link key={tag} href={`/jobs?tags=${tag}`} scroll={false}>
+                    <Badge
+                      variant="outline"
+                      className="cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      {tag}
+                    </Badge>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -197,7 +221,13 @@ export default function JobDetailPage() {
               {/* Type */}
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Type</span>
-                <Badge className={typeColors.bg}>{job.type}</Badge>
+                <Link href={`/jobs?type=${job.type}`} scroll={false}>
+                  <Badge
+                    className={`${typeColors.bg} cursor-pointer hover:opacity-80`}
+                  >
+                    {job.type}
+                  </Badge>
+                </Link>
               </div>
 
               {/* Budget */}
@@ -247,7 +277,11 @@ export default function JobDetailPage() {
               disabled={!isAuthenticated}
             >
               <Link
-                href={isAuthenticated ? `/jobs/${job.slug}/apply` : "/login"}
+                href={
+                  isAuthenticated
+                    ? `/jobs/${job.slug}/apply`
+                    : withReturnTo("/login")
+                }
               >
                 <IconSend className="mr-1.5 size-4" />
                 {isAuthenticated ? "Apply for this Job" : "Sign in to Apply"}
@@ -282,9 +316,13 @@ export default function JobDetailPage() {
                 <p className="text-sm font-medium text-foreground">
                   {job.owner.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <Link
+                  href={`/jobs?owner=${job.owner.id}`}
+                  scroll={false}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
                   @{job.owner.username}
-                </p>
+                </Link>
               </div>
             </div>
             <p className="mt-2 text-xs text-muted-foreground">

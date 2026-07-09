@@ -2,7 +2,10 @@ import { api_client } from "@/lib/api/api-client";
 import { apiPublic } from "@/lib/api/api-public";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { defaultPagination } from "@/lib/pagination";
-import type { CreateJobInput, UpdateJobInput } from "@/lib/validations/job.schema";
+import type {
+  CreateJobInput,
+  UpdateJobInput,
+} from "@/lib/validations/job.schema";
 import type {
   JobApplyDetail,
   JobDetail,
@@ -117,6 +120,7 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
       if (mergedFilters.category) params.category = mergedFilters.category;
       if (mergedFilters.owner) params.owner = mergedFilters.owner;
       if (mergedFilters.type) params.type = mergedFilters.type;
+      if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await apiPublic.get("/job", { params });
       set({
@@ -145,7 +149,9 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
       };
       if (mergedFilters.search) params.search = mergedFilters.search;
       if (mergedFilters.category) params.category = mergedFilters.category;
+      if (mergedFilters.owner) params.owner = mergedFilters.owner;
       if (mergedFilters.type) params.type = mergedFilters.type;
+      if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await api_client.get("/job/manage", { params });
       set({

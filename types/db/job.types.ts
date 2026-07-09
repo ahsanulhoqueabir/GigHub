@@ -120,6 +120,7 @@ export interface JobListFilters {
   category?: string;
   owner?: string;
   type?: string;
+  tags?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
 }

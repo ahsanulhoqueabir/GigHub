@@ -1,15 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { signUpSchema, type SignUpInput } from "@/lib/validations/auth.schema";
 import { useAuthStore } from "@/store/auth.store";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { returnTo } = useReturnTo("/");
 
   const signUp = useAuthStore((s) => s.signUp);
   const isProcessing = useAuthStore((s) => s.isProcessing);
@@ -42,7 +44,7 @@ export default function SignUpPage() {
         student_id: data.student_id,
         department: data.department,
       });
-      router.push("/");
+      router.push(returnTo);
     } catch {
       // error is already set in the store
     }
