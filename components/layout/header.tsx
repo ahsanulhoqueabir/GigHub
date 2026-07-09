@@ -17,16 +17,17 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import {
+  IconChevronDown,
   IconHome,
   IconLogout,
   IconMenu2,
   IconShield,
 } from "@tabler/icons-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navItems: NavItem[] = [
   { id: "home", label: "Home", href: "/", icon: IconHome },
@@ -38,6 +39,7 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { withReturnTo } = useReturnTo();
 
   const user = useAuthStore((s) => s.user);
@@ -47,6 +49,13 @@ export function Header() {
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() ?? "U";
 
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  // ── Mobile animation variants ──────────────────────────────────────────────
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -75,9 +84,14 @@ export function Header() {
   } as const;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md transition-all duration-300",
+        scrolled ? "border-border shadow-sm" : "border-transparent",
+      )}
+    >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
+        {/* ── Logo ──────────────────────────────────────────────────────────── */}
         <Link
           href="/"
           className="flex items-center gap-2 text-lg font-semibold tracking-tight text-foreground"
@@ -95,89 +109,157 @@ export function Header() {
           )}
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-                pathname === item.href
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* ── Desktop Navigation ─────────────────────────────────────────────
+             Signature element: a spring-animated pill slides between active
+             nav items, giving the nav a polished "selected track" feel.      */}
+        <nav className="hidden md:flex">
+          <div className="flex items-center gap-0.5 rounded-xl bg-muted/60 p-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative rounded-lg px-4 py-1.5 text-sm font-medium transition-colors duration-150",
+                  pathname === item.href
+                    ? "text-foreground "
+                    : "text-muted-foreground hover:text-foreground",
+                  "min-w-30 text-center",
+                )}
+              >
+                {pathname === item.href && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-lg bg-accent/30 shadow-sm"
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30,
+                    }}
+                  />
+                )}
+                <span className="relative z-10">{item.label}</span>
+              </Link>
+            ))}
+          </div>
         </nav>
 
-        {/* Desktop Auth Section */}
+        {/* ── Desktop Auth Section ───────────────────────────────────────────── */}
         <div className="hidden items-center gap-3 md:flex">
           {isAuthenticated && user ? (
             <div className="relative">
+              {/* Profile trigger button */}
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-muted"
+                className={cn(
+                  "flex items-center gap-2 rounded-lg border px-2 py-1.5 text-sm font-medium transition-all duration-150",
+                  profileDropdownOpen
+                    ? "border-border bg-muted text-foreground"
+                    : "border-transparent text-foreground hover:border-border hover:bg-muted",
+                )}
               >
                 <Avatar size="sm">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                   <AvatarFallback>{userInitial}</AvatarFallback>
                 </Avatar>
-                <span className="max-w-30 truncate text-sm font-medium text-foreground">
-                  {user.name}
-                </span>
+                <span className="max-w-28 truncate">{user.name}</span>
+                <motion.div
+                  animate={{ rotate: profileDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                >
+                  <IconChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+                </motion.div>
               </button>
 
-              {profileDropdownOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setProfileDropdownOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full z-50 mt-1.5 w-56 rounded-xl border border-border bg-card p-1.5 shadow-lg">
-                    {isAdmin && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
-                      >
-                        <IconShield className="size-4 text-muted-foreground" />
-                        Admin Panel
-                      </Link>
-                    )}
-                    {profileNavConfig.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={
-                          item.href === "/profile/gigs/create"
-                            ? withReturnTo(item.href)
-                            : item.href
-                        }
-                        onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
-                      >
-                        {item.icon && (
-                          <item.icon className="size-4 text-muted-foreground" />
-                        )}
-                        {item.label}
-                      </Link>
-                    ))}
-                    <Separator className="my-1" />
-                    <button
-                      onClick={() => {
-                        setProfileDropdownOpen(false);
-                        logout();
+              {/* Dropdown */}
+              <AnimatePresence>
+                {profileDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.96, y: -6 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96, y: -6 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 30,
                       }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+                      className="absolute right-0 top-full z-50 mt-2 w-60 origin-top-right rounded-xl border border-border bg-card p-1.5 shadow-lg"
                     >
-                      <IconLogout className="size-4" />
-                      Logout
-                    </button>
-                  </div>
-                </>
-              )}
+                      {/* User info header inside dropdown */}
+                      <div className="mb-1.5 flex items-center gap-3 rounded-lg bg-muted/60 px-3 py-2.5">
+                        <Avatar size="sm">
+                          <AvatarImage
+                            src={user.avatar ?? undefined}
+                            alt={user.name}
+                          />
+                          <AvatarFallback>{userInitial}</AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground">
+                            {user.name}
+                          </p>
+                          {user.username && (
+                            <p className="truncate text-xs text-muted-foreground">
+                              @{user.username}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      <Separator className="my-1" />
+
+                      {/* Admin link */}
+                      {isAdmin && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
+                        >
+                          <IconShield className="size-4 text-muted-foreground" />
+                          Admin Panel
+                        </Link>
+                      )}
+
+                      {/* Profile nav items */}
+                      {profileNavConfig.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={
+                            item.href === "/profile/gigs/create"
+                              ? withReturnTo(item.href)
+                              : item.href
+                          }
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
+                        >
+                          {item.icon && (
+                            <item.icon className="size-4 text-muted-foreground" />
+                          )}
+                          {item.label}
+                        </Link>
+                      ))}
+
+                      <Separator className="my-1" />
+
+                      {/* Logout */}
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          logout();
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
+                      >
+                        <IconLogout className="size-4" />
+                        Sign out
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <Button asChild variant="default" size="sm">
@@ -186,7 +268,7 @@ export function Header() {
           )}
         </div>
 
-        {/* Mobile Menu Trigger */}
+        {/* ── Mobile Menu Trigger ────────────────────────────────────────────── */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="icon" aria-label="Open menu">
@@ -198,15 +280,15 @@ export function Header() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.2 }}
-              className="flex flex-col h-full"
+              className="flex h-full flex-col"
             >
-              {/* Mobile Auth Info */}
+              {/* Mobile user info */}
               {isAuthenticated && user ? (
                 <motion.div
                   variants={avatarVariants}
                   initial="hidden"
                   animate="visible"
-                  className="py-3 px-4"
+                  className="px-4 py-3"
                 >
                   <div className="flex items-center gap-3">
                     <motion.div
@@ -248,7 +330,7 @@ export function Header() {
                 </motion.div>
               ) : null}
 
-              {/* Mobile Nav Items */}
+              {/* Mobile nav items */}
               <div className="flex-1 overflow-y-auto px-2 py-3">
                 <motion.div
                   variants={containerVariants}
@@ -268,15 +350,15 @@ export function Header() {
                           <Link
                             href={item.href}
                             className={cn(
-                              "flex items-center gap-2 border relative rounded-lg px-3 py-5 text-sm font-medium transition-colors",
+                              "relative flex items-center gap-2 overflow-hidden rounded-lg border px-3 py-5 text-sm font-medium transition-colors",
                               pathname === item.href
-                                ? "bg-primary/10 text-primary"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                                ? "bg-primary/10 text-primary border-primary/20"
+                                : "border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground",
                             )}
                           >
                             {item.label}
                             {item.icon && (
-                              <item.icon className="size-12 opacity-10 absolute bottom-0 right-0" />
+                              <item.icon className="absolute bottom-0 right-0 size-12 opacity-10" />
                             )}
                           </Link>
                         </SheetClose>
@@ -285,7 +367,7 @@ export function Header() {
                   </div>
                 </motion.div>
 
-                {/* Mobile Profile Menu (when authenticated) */}
+                {/* Mobile profile nav */}
                 {isAuthenticated && user ? (
                   <motion.div
                     variants={containerVariants}
@@ -332,7 +414,7 @@ export function Header() {
                           className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
                         >
                           <IconLogout className="size-4 shrink-0" />
-                          Logout
+                          Sign out
                         </button>
                       </motion.div>
                     </div>
