@@ -1,12 +1,13 @@
+import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
-import { paginationParams } from "@/lib/pagination";
 import { slugify } from "@/lib/business/service.utils";
-import type { Job } from "@/types/db/job.types";
+import { paginationParams } from "@/lib/pagination";
+import { sanitizeBudgetInput } from "@/lib/shared/regex.utils";
 import type {
   CreateJobInput,
   UpdateJobInput,
 } from "@/lib/validations/job.schema";
+import type { Job } from "@/types/db/job.types";
 import type { PaginationOptions } from "@/types/pagination.types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -54,6 +55,10 @@ export class JobService {
       const supabase = getSupabaseServerClient();
       const slug = slugify(params.title);
 
+      const budget = params.budget
+        ? sanitizeBudgetInput(params.budget)
+        : params.budget;
+
       const { data, error: sbError } = await supabase
         .from(this.collection)
         .insert({
@@ -63,7 +68,7 @@ export class JobService {
           slug,
           description: params.description,
           type: params.type,
-          budget: params.budget,
+          budget,
           deadline: params.deadline,
           location: params.location ?? null,
           required_skills: params.required_skills ?? [],
@@ -324,6 +329,10 @@ export class JobService {
         slug = slugify(params.title);
       }
 
+      const budget = params.budget
+        ? sanitizeBudgetInput(params.budget)
+        : params.budget;
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error: rpcError } = await (supabase as any).rpc(
         "update_job_if_owner_or_admin",
@@ -336,7 +345,7 @@ export class JobService {
           p_slug: slug ?? null,
           p_description: params.description ?? null,
           p_type: params.type ?? null,
-          p_budget: params.budget ?? null,
+          p_budget: budget,
           p_deadline: params.deadline ?? null,
           p_location: params.location ?? null,
           p_required_skills: params.required_skills ?? null,

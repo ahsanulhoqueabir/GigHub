@@ -1,51 +1,51 @@
 "use client";
 
-import { GigForm } from "@/components/gigs/gig-form";
+import { JobForm } from "@/components/jobs/job-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { Button } from "@/components/ui/button";
 import { useReturnTo } from "@/hooks/use-return-to";
-import type { CreateGigInput } from "@/lib/validations/gig.schema";
-import { useGigsStore } from "@/store/gigs.store";
+import type { CreateJobInput } from "@/lib/validations/job.schema";
+import { useJobsStore } from "@/store/jobs.store";
 import { useRouter } from "next/navigation";
 import { Suspense, useCallback } from "react";
 import { toast } from "sonner";
 
-function CreateGigContent() {
+function CreateJobContent() {
   const router = useRouter();
-  const { returnTo } = useReturnTo("/profile/gigs");
-  const { createGig, isMutating } = useGigsStore();
+  const { returnTo } = useReturnTo("/profile/jobs");
+  const { createJob, isMutating } = useJobsStore();
 
   const handleSubmit = useCallback(
-    async (formData: CreateGigInput) => {
+    async (formData: CreateJobInput) => {
       try {
-        await createGig(formData);
-        toast.success("Gig created successfully!");
+        await createJob(formData);
+        toast.success("Job created successfully!");
         router.push(returnTo);
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Failed to create Gig";
+        const msg = err instanceof Error ? err.message : "Failed to create Job";
         toast.error(msg);
       }
     },
-    [createGig, router, returnTo],
+    [createJob, router, returnTo],
   );
 
   return (
     <div className="space-y-6">
       <PageHeader
         backHref={returnTo}
-        title="Create a New Gig"
-        description="Fill in the details to publish a new service listing for buyers."
+        title="Create a New Job"
+        description="Fill in the details to publish a new job listing for applicants."
         actions={
-          <Button type="submit" form="gig-form" disabled={isMutating}>
-            {isMutating ? "Creating..." : "Create Gig"}
+          <Button type="submit" form="job-form" disabled={isMutating}>
+            {isMutating ? "Creating..." : "Create Job"}
           </Button>
         }
       />
 
       <div className="mt-6">
-        <GigForm
-          formId="gig-form"
+        <JobForm
+          formId="job-form"
           onSubmit={handleSubmit}
           isEdit={false}
           isSubmitting={isMutating}
@@ -55,10 +55,10 @@ function CreateGigContent() {
   );
 }
 
-export default function CreateGigPage() {
+export default function CreateJobPage() {
   return (
     <Suspense fallback={<PageSkeleton variant="form" fields={6} columns={1} />}>
-      <CreateGigContent />
+      <CreateJobContent />
     </Suspense>
   );
 }

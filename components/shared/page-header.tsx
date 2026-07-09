@@ -21,7 +21,7 @@ export function PageHeader({
   actions,
 }: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-4 ">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
       <div className="flex items-center gap-2 md:gap-4 min-w-0">
         <BackButton href={backHref} />
         <div className="min-w-0">
@@ -37,7 +37,9 @@ export function PageHeader({
       </div>
 
       {actions && (
-        <div className="flex items-center gap-3 shrink-0">{actions}</div>
+        <div className="flex items-stretch sm:items-center gap-3 w-full sm:w-auto *:flex-1 sm:*:flex-none">
+          {actions}
+        </div>
       )}
     </div>
   );

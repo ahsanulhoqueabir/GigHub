@@ -1,6 +1,8 @@
+import { api_client } from "@/lib/api/api-client";
 import { apiPublic } from "@/lib/api/api-public";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { defaultPagination } from "@/lib/pagination";
+import type { CreateJobInput, UpdateJobInput } from "@/lib/validations/job.schema";
 import type {
   JobApplyDetail,
   JobDetail,
@@ -36,8 +38,14 @@ interface JobsState {
 }
 
 interface JobsActions {
-  // List
+  // List (public)
   fetchJobs: (
+    filters?: JobListFilters,
+    page?: number,
+    limit?: number,
+  ) => Promise<void>;
+  // List (manage — authenticated)
+  fetchManageJobs: (
     filters?: JobListFilters,
     page?: number,
     limit?: number,
@@ -47,11 +55,17 @@ interface JobsActions {
 
   // Detail
   fetchJobBySlug: (slug: string) => Promise<void>;
+  fetchJobById: (id: string) => Promise<void>;
   clearDetail: () => void;
 
   // Apply page detail
   fetchApplyJob: (slug: string) => Promise<void>;
   clearApplyJob: () => void;
+
+  // Mutations
+  createJob: (payload: CreateJobInput) => Promise<JobDetail>;
+  updateJob: (id: string, payload: UpdateJobInput) => Promise<JobDetail>;
+  deleteJob: (id: string) => Promise<void>;
 
   // Reset
   reset: () => void;
@@ -85,7 +99,7 @@ const initialState: JobsState = {
 export const useJobsStore = create<JobsStore>()((set, get) => ({
   ...initialState,
 
-  /* ── List ──────────────────────────────────────────────────── */
+  /* ── Public List ────────────────────────────────────────────── */
   fetchJobs: async (filters, page = 1, limit = 20) => {
     set({ isLoadingList: true, listError: null });
 
@@ -115,6 +129,35 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
     }
   },
 
+  /* ── Manage List (authenticated) ────────────────────────────── */
+  fetchManageJobs: async (filters, page = 1, limit = 20) => {
+    set({ isLoadingList: true, listError: null });
+
+    try {
+      const mergedFilters = { ...get().listFilters, ...filters };
+      if (filters) set({ listFilters: mergedFilters });
+
+      const params: Record<string, unknown> = {
+        page,
+        limit,
+        sortBy: mergedFilters.sortBy ?? "created_at",
+        sortOrder: mergedFilters.sortOrder ?? "desc",
+      };
+      if (mergedFilters.search) params.search = mergedFilters.search;
+      if (mergedFilters.category) params.category = mergedFilters.category;
+      if (mergedFilters.type) params.type = mergedFilters.type;
+
+      const { data } = await api_client.get("/job/manage", { params });
+      set({
+        jobs: data.data?.items ?? [],
+        listPagination: data.data?.pagination ?? defaultPagination(),
+        isLoadingList: false,
+      });
+    } catch (err: unknown) {
+      set({ isLoadingList: false, listError: getErrorMessage(err) });
+    }
+  },
+
   setListFilters: (filters) => {
     set({ listFilters: { ...get().listFilters, ...filters } });
   },
@@ -126,6 +169,16 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
     set({ isLoadingDetail: true, detailError: null, currentJob: null });
     try {
       const { data } = await apiPublic.get(`/job?slug=${slug}`);
+      set({ currentJob: data.data ?? null, isLoadingDetail: false });
+    } catch (err: unknown) {
+      set({ isLoadingDetail: false, detailError: getErrorMessage(err) });
+    }
+  },
+
+  fetchJobById: async (id) => {
+    set({ isLoadingDetail: true, detailError: null, currentJob: null });
+    try {
+      const { data } = await api_client.get(`/job/${id}/details`);
       set({ currentJob: data.data ?? null, isLoadingDetail: false });
     } catch (err: unknown) {
       set({ isLoadingDetail: false, detailError: getErrorMessage(err) });
@@ -163,6 +216,45 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
   },
 
   clearApplyJob: () => set({ applyJob: null, applyJobError: null }),
+
+  /* ── Mutations ─────────────────────────────────────────────── */
+  createJob: async (payload) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      const { data } = await api_client.post("/job", payload);
+      set({ isMutating: false });
+      return data.data;
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
+      throw err;
+    }
+  },
+
+  updateJob: async (id, payload) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      const { data } = await api_client.patch(`/job/${id}`, payload);
+      set({ isMutating: false });
+      return data.data;
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
+      throw err;
+    }
+  },
+
+  deleteJob: async (id) => {
+    set({ isMutating: true, mutationError: null });
+    try {
+      await api_client.delete(`/job/${id}`);
+      set({ isMutating: false });
+    } catch (err: unknown) {
+      const errMsg = getErrorMessage(err);
+      set({ isMutating: false, mutationError: errMsg });
+      throw err;
+    }
+  },
 
   /* ── Reset ─────────────────────────────────────────────────── */
   reset: () => set({ ...initialState }),

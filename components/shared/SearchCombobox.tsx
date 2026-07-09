@@ -98,7 +98,7 @@ export function SearchCombobox<T>({
           aria-expanded={open}
           disabled={disabled || loading}
           className={cn(
-            "w-full justify-between font-normal h-9",
+            "w-full justify-between font-normal h-8",
             !selected && "text-muted-foreground",
             hasError && "border-destructive ring-1 ring-destructive",
             className,

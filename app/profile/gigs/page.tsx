@@ -4,6 +4,7 @@ import { ListPage } from "@/components/list-page";
 import type { ColumnConfig } from "@/components/list-page/types";
 import { GigManageCard } from "@/components/profile/gigs/GigManageCard";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
+import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useCurrency } from "@/hooks/use-currency";
 import { useReturnTo } from "@/hooks/use-return-to";
@@ -206,7 +207,7 @@ function ManageGigsContent() {
 
 export default function ManageGigsPage() {
   return (
-    <Suspense fallback={<div>Loading Gigs...</div>}>
+    <Suspense fallback={<PageSkeleton variant="list" rows={5} asCards />}>
       <ManageGigsContent />
     </Suspense>
   );

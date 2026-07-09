@@ -40,6 +40,8 @@ const profileMenuItems = [
   { label: "Orders", href: "/profile/orders", icon: IconShoppingCart },
   { label: "Create Gig", href: "/profile/gigs/create", icon: IconPlus },
   { label: "Manage Gigs", href: "/profile/gigs", icon: IconBriefcase },
+  { label: "Create Job", href: "/profile/jobs/create", icon: IconPlus },
+  { label: "Manage Jobs", href: "/profile/jobs", icon: IconBriefcase },
 ];
 
 export function Header() {

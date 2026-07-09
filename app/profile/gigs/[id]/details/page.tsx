@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrency } from "@/hooks/use-currency";
 import { useReturnTo } from "@/hooks/use-return-to";
+import { STATUS_BADGE_COLORS } from "@/lib/shared/badge.utils";
 import { useGigsStore } from "@/store/gigs.store";
 import {
   IconCheck,
@@ -85,6 +86,10 @@ function GigDetailsContent() {
   const standardPkg = packages.find((p) => p.tier === "STANDARD");
   const premiumPkg = packages.find((p) => p.tier === "PREMIUM");
   const images = currentGig.images || [];
+  const status =
+    (currentGig as typeof currentGig & { status?: string }).status || "ACTIVE";
+  const statusColor =
+    STATUS_BADGE_COLORS[status] ?? STATUS_BADGE_COLORS["ACTIVE"];
 
   return (
     <div className="space-y-6">
@@ -94,8 +99,7 @@ function GigDetailsContent() {
           <div className="flex items-center gap-2 flex-wrap">
             <span>Gig Overview</span>
             <Badge
-              variant="outline"
-              className="bg-emerald-500/10 text-emerald-500 border-none px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+              className={`bg-${statusColor.bg} text-${statusColor.text} border-none px-2.5 py-0.5 rounded-full text-[10px] font-bold`}
             >
               {currentGig.status || "ACTIVE"}
             </Badge>
@@ -103,17 +107,12 @@ function GigDetailsContent() {
         }
         description="Manage and view package definitions for this listing."
         actions={
-          <div className="flex items-center gap-3">
-            <Button
-              variant="destructive"
-              size="sm"
-              className="h-9"
-              onClick={handleDelete}
-            >
+          <div className="flex items-center gap-3 *:flex-1 sm:*:flex-none">
+            <Button variant="destructive" onClick={handleDelete}>
               <IconTrash className="h-4 w-4 mr-1.5" />
               Delete
             </Button>
-            <Button asChild size="sm" className="h-9">
+            <Button asChild>
               <Link href={withReturnTo(`/profile/gigs/${id}/edit`)}>
                 <IconEdit className="h-4 w-4 mr-1.5" />
                 Edit Gig
@@ -172,7 +171,7 @@ function GigDetailsContent() {
           )}
 
           {/* Description */}
-          <Card className="shadow-sm border-border bg-card">
+          <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 About This Gig
@@ -186,7 +185,7 @@ function GigDetailsContent() {
           </Card>
 
           {/* Category & Tags */}
-          <Card className="shadow-sm border-border bg-card">
+          <Card>
             <CardContent className="py-5 space-y-4">
               {currentGig.category && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -219,7 +218,7 @@ function GigDetailsContent() {
 
           {/* FAQs */}
           {currentGig.faq && currentGig.faq.length > 0 && (
-            <Card className="shadow-sm border-border bg-card">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-base font-semibold">
                   Frequently Asked Questions

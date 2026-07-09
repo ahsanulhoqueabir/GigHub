@@ -1,6 +1,7 @@
 "use client";
 
 import { BooleanField } from "@/components/shared/BooleanField";
+import { FileUploadDropzone } from "@/components/shared/FileUploadDropzone";
 import { SearchCombobox } from "@/components/shared/SearchCombobox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,20 +19,21 @@ import { NumberInput } from "@/components/ui/number-input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCurrency } from "@/hooks/use-currency";
-import { api_client } from "@/lib/api/api-client";
 import type { CreateGigInput } from "@/lib/validations/gig.schema";
 import { createGigSchema, updateGigSchema } from "@/lib/validations/gig.schema";
 import { useCategoriesStore } from "@/store/categories.store";
+import { useFileUploadStore } from "@/store/file-upload.store";
 import type { GigDetail } from "@/types/db/gig.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   IconCheck,
+  IconLoader,
   IconPlus,
   IconQuestionMark,
   IconTrash,
-  IconUpload,
   IconX,
 } from "@tabler/icons-react";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { Resolver } from "react-hook-form";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
@@ -42,6 +44,8 @@ interface GigFormProps {
   onSubmit: (data: CreateGigInput) => Promise<void>;
   isEdit?: boolean;
   formId?: string;
+  /** External loading state (e.g. from parent's isMutating) */
+  isSubmitting?: boolean;
 }
 
 const PACKAGE_TIERS = ["BASIC", "STANDARD", "PREMIUM"] as const;
@@ -51,6 +55,7 @@ export function GigForm({
   onSubmit,
   isEdit = false,
   formId,
+  isSubmitting = false,
 }: GigFormProps) {
   const { categories, fetchCategories } = useCategoriesStore();
   const { symbol } = useCurrency();
@@ -155,110 +160,51 @@ export function GigForm({
   const packagesValue =
     useWatch({ control: form.control, name: "packages" }) || [];
 
-  // Local state for uploading progress and lists
+  // Local state for tag & feature inputs
   const [tagInput, setTagInput] = useState("");
   const [featureInputs, setFeatureInputs] = useState<Record<number, string>>({
     0: "",
     1: "",
     2: "",
   });
-  const [uploadingFiles, setUploadingFiles] = useState<File[]>([]);
-  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
-    {},
-  );
 
-  // ── Image Upload logic ───────────────────────────────────────────────────
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    if (files.length === 0) return;
-
-    // Check limit
-    if (imagesValue.length + files.length > 10) {
-      toast.error("Maximum 10 images allowed");
-      return;
-    }
-
-    setUploadingFiles(files);
-    // Initialize progress for each file
-    const progressMap: Record<string, number> = {};
-    files.forEach((file) => {
-      progressMap[file.name] = 0;
-    });
-    setUploadProgress(progressMap);
-
-    try {
-      // 1. Request presigned URLs from API
-      const filesPayload = files.map((file) => ({
-        fileName: file.name,
-        contentType: file.type || "application/octet-stream",
-      }));
-
-      const { data: response } = await api_client.post("/signed-upload-url", {
-        files: filesPayload,
-        folder: "gig-images",
-      });
-
-      const signedResults: {
-        fileName: string;
-        signedUrl: string;
-        publicUrl: string;
-      }[] = response.data;
-
-      // 2. Upload each file directly to R2 using XMLHttpRequest to monitor progress
-      const uploadPromises = files.map((file, index) => {
-        const signedInfo = signedResults[index];
-        if (!signedInfo) return Promise.reject(new Error("Upload mismatch"));
-
-        return new Promise<string>((resolve, reject) => {
-          const xhr = new XMLHttpRequest();
-          xhr.open("PUT", signedInfo.signedUrl);
-          xhr.setRequestHeader(
-            "Content-Type",
-            file.type || "application/octet-stream",
-          );
-
-          xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-              const pct = Math.round((event.loaded / event.total) * 100);
-              setUploadProgress((prev) => ({
-                ...prev,
-                [file.name]: pct,
-              }));
-            }
-          };
-
-          xhr.onload = () => {
-            if (xhr.status >= 200 && xhr.status < 300) {
-              resolve(signedInfo.publicUrl);
-            } else {
-              reject(new Error(`Upload failed with status ${xhr.status}`));
-            }
-          };
-
-          xhr.onerror = () => reject(new Error("Network error during upload"));
-          xhr.send(file);
-        });
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
-
-      // Append successfully uploaded images to form state
-      form.setValue("images", [...imagesValue, ...uploadedUrls]);
-      toast.success("Images uploaded successfully");
-    } catch (err: unknown) {
-      toast.error("Failed to upload images");
-      console.error(err);
-    } finally {
-      setUploadingFiles([]);
-      setUploadProgress({});
-    }
-  };
+  // Files selected via FileUploadDropzone but not yet uploaded
+  const [pendingImages, setPendingImages] = useState<File[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const { uploadFiles } = useFileUploadStore();
 
   const removeImage = (index: number) => {
     form.setValue(
       "images",
       imagesValue.filter((_, i) => i !== index),
     );
+  };
+
+  /**
+   * Form submit handler: uploads pending images first, then calls parent onSubmit.
+   */
+  const handleFormSubmit = async (data: CreateGigInput) => {
+    try {
+      // Upload any pending files first
+      let allImages = [...(data.images ?? [])];
+
+      if (pendingImages.length > 0) {
+        setIsUploadingImages(true);
+        const uploadedUrls = await uploadFiles(pendingImages, "gig-images");
+        allImages = [...allImages, ...uploadedUrls];
+        setPendingImages([]);
+        setIsUploadingImages(false);
+      }
+
+      // Call parent with the complete data (including newly uploaded URLs)
+      await onSubmit({ ...data, images: allImages } as CreateGigInput);
+    } catch (err) {
+      setIsUploadingImages(false);
+      const msg =
+        err instanceof Error ? err.message : "Failed to upload images";
+      toast.error(msg);
+      throw err;
+    }
   };
 
   // ── Tag Handlers ──────────────────────────────────────────────────────────
@@ -315,83 +261,32 @@ export function GigForm({
     );
   };
 
-  return (
-    <Form {...form}>
-      <form
-        id={formId}
-        onSubmit={form.handleSubmit((data) => onSubmit(data as CreateGigInput))}
-        className="space-y-8"
-      >
-        <Card className="shadow-sm border-border bg-card">
-          <CardHeader>
-            <CardTitle>
-              {isEdit ? "Edit Gig Details" : "Create a New Gig"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Title & Category — same row on large screens */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Title */}
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">
-                      Gig Title <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="e.g. I will design a modern Next.js web application"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+  // ── Left Column (Basic Info) ────────────────────────────────────────────
 
-              {/* Category selection */}
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel className="text-sm font-semibold">
-                      Category <span className="text-destructive">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <SearchCombobox
-                        items={categories}
-                        value={field.value ?? ""}
-                        onChange={(val) => field.onChange(val || "")}
-                        getItemValue={(cat) => cat.id}
-                        getItemLabel={(cat) => cat.name}
-                        placeholder="Select a Category"
-                        searchPlaceholder="Search categories..."
-                        clearable={false}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Description */}
+  const leftColumn = (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {isEdit ? "Edit Gig Details" : "Create a New Gig"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Title & Category — same row on large screens */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Title */}
             <FormField
               control={form.control}
-              name="description"
+              name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-semibold">
-                    Description <span className="text-destructive">*</span>
+                    Gig Title <span className="text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Textarea
+                    <Input
                       {...field}
-                      placeholder="Write a detailed description explaining what services are offered in this gig..."
-                      rows={6}
+                      placeholder="e.g. I will design a modern Next.js web application"
                     />
                   </FormControl>
                   <FormMessage />
@@ -399,89 +294,219 @@ export function GigForm({
               )}
             />
 
-            {/* Status & Tags — same row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Status — BooleanField buttons variant */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <BooleanField
-                        label="Status"
-                        description="Set gig visibility — Active gigs are publicly visible"
-                        value={field.value === "active"}
-                        onChange={(val: boolean) =>
-                          field.onChange(val ? "active" : "draft")
-                        }
-                        variant="checkbox"
-                        trueLabel="Active"
-                        falseLabel="Draft"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            {/* Category selection */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-sm font-semibold">
+                    Category <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <SearchCombobox
+                      items={categories}
+                      value={field.value ?? ""}
+                      onChange={(val) => field.onChange(val || "")}
+                      getItemValue={(cat) => cat.id}
+                      getItemLabel={(cat) => cat.name}
+                      placeholder="Select a Category"
+                      searchPlaceholder="Search categories..."
+                      clearable={false}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-              {/* Tags */}
-              <FormField
-                control={form.control}
-                name="tags"
-                render={() => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-semibold">
-                      Tags
-                    </FormLabel>
-                    <div className="space-y-3">
-                      {tagsValue.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {tagsValue.map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="gap-1 pr-1 pl-2 h-7 text-xs"
-                            >
-                              {tag}
-                              <button
-                                type="button"
-                                onClick={() => removeTag(tag)}
-                                className="rounded-full p-0.5 hover:bg-muted transition-colors"
-                              >
-                                <IconX className="size-3" />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                      <div className="flex gap-2 max-w-md">
-                        <Input
-                          value={tagInput}
-                          onChange={(e) => setTagInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              addTag();
-                            }
-                          }}
-                          placeholder="Add a search tag and press Enter"
-                        />
-                        <Button type="button" onClick={addTag}>
-                          Add
-                        </Button>
-                      </div>
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-semibold">
+                  Description <span className="text-destructive">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Write a detailed description explaining what services are offered in this gig..."
+                    rows={6}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Tags */}
+          <FormField
+            control={form.control}
+            name="tags"
+            render={() => (
+              <FormItem>
+                <FormLabel className="text-sm font-semibold">Tags</FormLabel>
+                <div className="space-y-3">
+                  {tagsValue.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {tagsValue.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="gap-1 pr-1 pl-2 h-7 text-xs"
+                        >
+                          {tag}
+                          <button
+                            type="button"
+                            onClick={() => removeTag(tag)}
+                            className="rounded-full p-0.5 hover:bg-muted transition-colors"
+                          >
+                            <IconX className="size-3" />
+                          </button>
+                        </Badge>
+                      ))}
                     </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CardContent>
-        </Card>
+                  )}
+                  <div className="flex gap-2 max-w-md">
+                    <Input
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          addTag();
+                        }
+                      }}
+                      placeholder="Add a search tag and press Enter"
+                    />
+                    <Button type="button" onClick={addTag}>
+                      Add
+                    </Button>
+                  </div>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
 
-        {/* Dynamic Package Forms inside Tab view */}
-        <Card className="shadow-sm border-border bg-card">
+  // ── Right Column ────────────────────────────────────────────────────────
+
+  const rightColumn = (
+    <div className="space-y-6">
+      {/* Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-semibold">Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <BooleanField
+                    label="Visibility"
+                    description="Active gigs are publicly visible to buyers"
+                    value={field.value === "active"}
+                    onChange={(val: boolean) =>
+                      field.onChange(val ? "active" : "draft")
+                    }
+                    variant="card"
+                    trueLabel="Active"
+                    falseLabel="Draft"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Gallery / Images Upload */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Gig Images</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {imagesValue.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+              {imagesValue.map((url, idx) => (
+                <div
+                  key={idx}
+                  className="relative aspect-video rounded-lg overflow-hidden border border-border group"
+                >
+                  <Image
+                    src={url}
+                    alt={`Gig Upload ${idx + 1}`}
+                    className="object-cover w-full h-full"
+                    fill
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(idx)}
+                    className="absolute top-1.5 right-1.5 p-1 bg-destructive hover:bg-destructive/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <IconTrash className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {(isUploadingImages || isSubmitting) && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg px-4 py-3 border border-border">
+              <IconLoader className="size-4 animate-spin" />
+              {isUploadingImages
+                ? "Uploading images&hellip;"
+                : "Saving&hellip;"}
+            </div>
+          )}
+
+          {!isUploadingImages && !isSubmitting && (
+            <FileUploadDropzone
+              onFilesSelected={(files) =>
+                setPendingImages((prev) => [...prev, ...files])
+              }
+              accept="image/*"
+              maxFiles={10}
+              currentCount={imagesValue.length + pendingImages.length}
+              variant="dropzone"
+              existingUrls={imagesValue}
+              onRemove={(url) => removeImage(imagesValue.indexOf(url))}
+              selectedFiles={pendingImages}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  // ── Render ─────────────────────────────────────────────────────────────
+
+  return (
+    <Form {...form}>
+      <form
+        id={formId}
+        onSubmit={form.handleSubmit(handleFormSubmit)}
+        className="space-y-8"
+      >
+        {/* 2-column: Basic Info (left) + Gig Images (right) */}
+        <div className="flex flex-col lg:flex-row lg:gap-6">
+          <div className="flex-6 min-w-0">{leftColumn}</div>
+          <div className="flex-4 min-w-0">{rightColumn}</div>
+        </div>
+
+        {/* Full width: Pricing & Packages */}
+        <Card className="">
           <CardHeader>
             <CardTitle>Pricing & Packages</CardTitle>
           </CardHeader>
@@ -679,93 +704,8 @@ export function GigForm({
           </CardContent>
         </Card>
 
-        {/* Gallery / Images Upload */}
-        <Card className="shadow-sm border-border bg-card">
-          <CardHeader>
-            <CardTitle>Gig Images</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {imagesValue.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                {imagesValue.map((url, idx) => (
-                  <div
-                    key={idx}
-                    className="relative aspect-video rounded-lg overflow-hidden border border-border group"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={url}
-                      alt={`Gig Upload ${idx + 1}`}
-                      className="object-cover w-full h-full"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className="absolute top-1.5 right-1.5 p-1 bg-destructive hover:bg-destructive/90 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <IconTrash className="size-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* File drop area */}
-            <div className="relative border-2 border-dashed border-border hover:border-primary/50 transition-colors rounded-xl p-8 text-center flex flex-col items-center justify-center cursor-pointer">
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={uploadingFiles.length > 0}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
-              <IconUpload className="size-8 text-muted-foreground mb-2" />
-              <p className="text-sm font-medium text-foreground">
-                Click or drag images here to upload
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Upload up to 10 images (max size 5MB each)
-              </p>
-            </div>
-
-            {/* Upload progress bars */}
-            {uploadingFiles.length > 0 && (
-              <div className="space-y-2 max-w-md">
-                <p className="text-xs font-semibold text-muted-foreground">
-                  Uploading files...
-                </p>
-                {uploadingFiles.map((file, idx) => {
-                  const pct = uploadProgress[file.name] || 0;
-                  return (
-                    <div
-                      key={idx}
-                      className="flex flex-col space-y-1.5 bg-muted/40 p-2.5 rounded-lg border border-border text-xs"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium truncate max-w-50">
-                          {file.name}
-                        </span>
-                        <span className="text-muted-foreground font-semibold">
-                          {pct}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-secondary rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="bg-primary h-1.5 transition-all duration-300"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* FAQs */}
-        <Card className="shadow-sm border-border bg-card">
+        {/* Full width: FAQs */}
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle>FAQ</CardTitle>
             <Button
