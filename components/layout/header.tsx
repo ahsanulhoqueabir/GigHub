@@ -10,19 +10,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { branding } from "@/config/brand.config";
+import type { NavItem } from "@/config/nav-config";
+import { profileNavConfig } from "@/config/nav-config";
 import { useReturnTo } from "@/hooks/use-return-to";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { cn } from "@/lib/utils";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import {
-  IconBriefcase,
   IconHome,
   IconLogout,
   IconMenu2,
-  IconPlus,
   IconShield,
-  IconShoppingCart,
-  IconUser,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import Image from "next/image";
@@ -30,20 +28,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const navItems = [
-  { label: "Home", href: "/", icon: IconHome },
-  { label: "Gigs", href: "/gigs", icon: IconBriefcase },
-  { label: "Jobs", href: "/jobs", icon: IconBriefcase },
-];
-
-const profileMenuItems = [
-  { label: "Profile", href: "/profile", icon: IconUser },
-  { label: "Applied Jobs", href: "/profile/applied-jobs", icon: IconBriefcase },
-  { label: "Orders", href: "/profile/orders", icon: IconShoppingCart },
-  { label: "Create Gig", href: "/profile/gigs/create", icon: IconPlus },
-  { label: "Manage Gigs", href: "/profile/gigs", icon: IconBriefcase },
-  { label: "Create Job", href: "/profile/jobs/create", icon: IconPlus },
-  { label: "Manage Jobs", href: "/profile/jobs", icon: IconBriefcase },
+const navItems: NavItem[] = [
+  { id: "home", label: "Home", href: "/", icon: IconHome },
+  { id: "gigs", label: "Gigs", href: "/gigs", icon: IconHome },
+  { id: "jobs", label: "Jobs", href: "/jobs", icon: IconHome },
 ];
 
 export function Header() {
@@ -159,7 +147,7 @@ export function Header() {
                         Admin Panel
                       </Link>
                     )}
-                    {profileMenuItems.map((item) => (
+                    {profileNavConfig.map((item) => (
                       <Link
                         key={item.href}
                         href={
@@ -170,7 +158,9 @@ export function Header() {
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-card-foreground transition-colors hover:bg-muted"
                       >
-                        <item.icon className="size-4 text-muted-foreground" />
+                        {item.icon && (
+                          <item.icon className="size-4 text-muted-foreground" />
+                        )}
                         {item.label}
                       </Link>
                     ))}
@@ -285,7 +275,9 @@ export function Header() {
                             )}
                           >
                             {item.label}
-                            <item.icon className="size-12 opacity-10 absolute bottom-0 right-0" />
+                            {item.icon && (
+                              <item.icon className="size-12 opacity-10 absolute bottom-0 right-0" />
+                            )}
                           </Link>
                         </SheetClose>
                       </motion.div>
@@ -309,7 +301,7 @@ export function Header() {
                       </p>
                     </motion.div>
                     <div className="grid grid-cols-2 gap-1">
-                      {profileMenuItems.map((item) => (
+                      {profileNavConfig.map((item) => (
                         <motion.div key={item.href} variants={itemVariants}>
                           <SheetClose asChild>
                             <Link
@@ -320,7 +312,9 @@ export function Header() {
                               }
                               className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                             >
-                              <item.icon className="size-4 shrink-0" />
+                              {item.icon && (
+                                <item.icon className="size-4 shrink-0" />
+                              )}
                               <span className="truncate">{item.label}</span>
                             </Link>
                           </SheetClose>
