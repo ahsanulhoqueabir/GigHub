@@ -18,7 +18,10 @@ BEGIN
     SELECT unnest(ARRAY[
       'department', 'category', 'profile', 'gig', 'job',
       'job_proposal', 'order', 'chat_room', 'chat_message',
-      'wallet', 'wallet_record'
+      'wallet', 'wallet_record','system_config',
+      'hero_banners',
+      'ad_banners',
+      'announcements'
     ])
   LOOP
     EXECUTE format(

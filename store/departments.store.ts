@@ -1,9 +1,9 @@
-import { create } from "zustand";
 import { api_client } from "@/lib/api/api-client";
+import { getErrorMessage } from "@/lib/api/api-response";
+import { defaultPagination } from "@/lib/pagination";
 import { Department } from "@/types/db/department.types";
 import { PaginationMeta } from "@/types/pagination.types";
-import { defaultPagination } from "@/lib/pagination";
-import { getErrorMessage } from "@/lib/api/api-response";
+import { create } from "zustand";
 
 export interface DepartmentsState {
   departments: Department[];
@@ -17,6 +17,8 @@ export interface DepartmentsState {
 }
 
 interface DepartmentsActions {
+  /** Hydrate from server-fetched data */
+  hydrate: (departments: Department[]) => void;
   fetchDepartments: (page?: number, limit?: number) => Promise<void>;
   getDepartment: (id: string) => Promise<Department | null>;
   createDepartment: (data: Partial<Department>) => Promise<void>;
@@ -40,6 +42,15 @@ const initialState: DepartmentsState = {
 
 export const useDepartmentsStore = create<DepartmentsStore>()((set, get) => ({
   ...initialState,
+
+  /** Hydrate from server-fetched data */
+  hydrate: (departments: Department[]) =>
+    set({
+      departments,
+      isLoading: false,
+      error: null,
+      hasFetched: true,
+    }),
 
   fetchDepartments: async (page = 1, limit = 20) => {
     set({ isLoading: true, error: null, currentPage: page, pageSize: limit });

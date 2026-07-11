@@ -1,9 +1,9 @@
-import { create } from "zustand";
 import { api_client } from "@/lib/api/api-client";
+import { getErrorMessage } from "@/lib/api/api-response";
+import { defaultPagination } from "@/lib/pagination";
 import { Category } from "@/types/db/category.types";
 import { PaginationMeta } from "@/types/pagination.types";
-import { defaultPagination } from "@/lib/pagination";
-import { getErrorMessage } from "@/lib/api/api-response";
+import { create } from "zustand";
 
 export interface CategoriesState {
   categories: Category[];
@@ -17,6 +17,8 @@ export interface CategoriesState {
 }
 
 interface CategoriesActions {
+  /** Hydrate from server-fetched data */
+  hydrate: (categories: Category[]) => void;
   fetchCategories: (page?: number, limit?: number) => Promise<void>;
   getCategory: (id: string) => Promise<Category | null>;
   createCategory: (data: Partial<Category>) => Promise<void>;
@@ -40,6 +42,15 @@ const initialState: CategoriesState = {
 
 export const useCategoriesStore = create<CategoriesStore>()((set, get) => ({
   ...initialState,
+
+  /** Hydrate from server-fetched data */
+  hydrate: (categories: Category[]) =>
+    set({
+      categories,
+      isLoading: false,
+      error: null,
+      hasFetched: true,
+    }),
 
   fetchCategories: async (page = 1, limit = 20) => {
     set({ isLoading: true, error: null, currentPage: page, pageSize: limit });

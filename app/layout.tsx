@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
-import { CentralDataInitializer } from "@/components/shared/central-initializer";
+import { SiteDataHydrator } from "@/components/shared/site-data-hydrator";
+import { fetchAllInitialSiteData } from "@/lib/server/site-data-fetcher";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import {
@@ -49,11 +50,14 @@ export const metadata: Metadata = {
 import { Toaster } from "@/components/ui/sonner";
 import { branding } from "@/config/brand.config";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch all initial site data on the server — no client-side round-trip
+  const initialData = await fetchAllInitialSiteData();
+
   return (
     <html
       lang="en"
@@ -70,11 +74,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <CentralDataInitializer />
+        <SiteDataHydrator initialData={initialData} />
         <Suspense fallback={null}>
           <Header />
         </Suspense>
-        <main className="flex-1 px-4 lg:px-10 py-5">{children}</main>
+        <main className="flex-1 px-4 lg:px-10">{children}</main>
         <Footer />
         <Toaster />
       </body>

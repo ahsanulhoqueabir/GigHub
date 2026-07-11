@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
+import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import { useCategoriesStore } from "@/store/categories.store";
 import { useDepartmentsStore } from "@/store/departments.store";
 import { useGeneralStore } from "@/store/general.store";
+import { useSiteDataStore } from "@/store/site-data.store";
+import { useEffect, useRef } from "react";
 
 /**
  * CentralDataInitializer — fetches site-wide data on mount.
  *
  * Responsibilities (in order):
  * 1. Re-validates the stored auth token (if any) via `initAuth()`.
- * 2. Fetches **categories** (limit=40) — cached in Zustand so every
+ * 2. Fetches **public site data** (system config, hero banners, ad banners, announcements).
+ * 3. Fetches **categories** (limit=40) — cached in Zustand so every
  *    component reads from the same state.
- * 3. Fetches **departments** (limit=40) — same caching pattern.
- * 4. Fetches **latest gigs** (limit=8) — for homepage hero/preview.
- * 5. Fetches **latest jobs** (limit=6) — for homepage hero/preview.
+ * 4. Fetches **departments** (limit=40) — same caching pattern.
+ * 5. Fetches **latest gigs** (limit=8) — for homepage hero/preview.
+ * 6. Fetches **latest jobs** (limit=6) — for homepage hero/preview.
  *
  * Place this component once in your root layout, inside `<body>`.
  */
@@ -24,6 +26,9 @@ export function CentralDataInitializer() {
 
   const hasHydrated = useAuthStore((s) => s.hasHydrated);
   const initAuth = useAuthStore((s) => s.initAuth);
+
+  const siteHasFetched = useSiteDataStore((s) => s.hasFetched);
+  const fetchSiteData = useSiteDataStore((s) => s.fetchSiteData);
 
   const catHasFetched = useCategoriesStore((s) => s.hasFetched);
   const fetchCategories = useCategoriesStore((s) => s.fetchCategories);
@@ -47,6 +52,12 @@ export function CentralDataInitializer() {
       initAuth();
     }
   }, [hasHydrated, initAuth]);
+
+  // ── Fetch public site data once (system config, banners, announcements) ──
+  useEffect(() => {
+    if (siteHasFetched) return;
+    fetchSiteData();
+  }, [siteHasFetched, fetchSiteData]);
 
   // ── Fetch categories once ──────────────────────────────────────
   useEffect(() => {

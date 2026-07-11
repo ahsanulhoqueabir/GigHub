@@ -1,9 +1,13 @@
 import {
+  IconAd,
+  IconBell,
   IconBriefcase,
   IconBuilding,
   IconCategory,
   IconHome,
+  IconPhoto,
   IconPlus,
+  IconSettings,
   IconShoppingCart,
   IconUser,
   IconUsers,
@@ -61,6 +65,66 @@ export const adminNavConfig: NavItem[] = [
         id: "departments-create",
         label: "Create",
         href: "/admin/departments/create",
+      },
+    ],
+  },
+  {
+    id: "system",
+    label: "System",
+    href: "/admin/system",
+    icon: IconSettings,
+  },
+  {
+    id: "hero-banners",
+    label: "Hero Banners",
+    href: "/admin/hero-banners",
+    icon: IconPhoto,
+    children: [
+      {
+        id: "hero-banners-list",
+        label: "List",
+        href: "/admin/hero-banners",
+      },
+      {
+        id: "hero-banners-create",
+        label: "Create",
+        href: "/admin/hero-banners/create",
+      },
+    ],
+  },
+  {
+    id: "ad-banners",
+    label: "Ad Banners",
+    href: "/admin/ad-banners",
+    icon: IconAd,
+    children: [
+      {
+        id: "ad-banners-list",
+        label: "List",
+        href: "/admin/ad-banners",
+      },
+      {
+        id: "ad-banners-create",
+        label: "Create",
+        href: "/admin/ad-banners/create",
+      },
+    ],
+  },
+  {
+    id: "announcements",
+    label: "Announcements",
+    href: "/admin/announcements",
+    icon: IconBell,
+    children: [
+      {
+        id: "announcements-list",
+        label: "List",
+        href: "/admin/announcements",
+      },
+      {
+        id: "announcements-create",
+        label: "Create",
+        href: "/admin/announcements/create",
       },
     ],
   },

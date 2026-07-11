@@ -18,6 +18,12 @@ export const r2 = {
   publicUrl: process.env.R2_PUBLIC_URL!,
 };
 
+export const cloudinaryConfig = {
+  cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
+  apiKey: process.env.CLOUDINARY_API_KEY!,
+  apiSecret: process.env.CLOUDINARY_API_SECRET!,
+};
+
 export const fb = {
   projectId: process.env.FCM_PROJECT_ID!,
   clientEmail: process.env.FCM_CLIENT_EMAIL!,
