@@ -9,9 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const { returnTo } = useReturnTo("/");
 
@@ -226,5 +227,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

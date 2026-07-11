@@ -10,9 +10,9 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
-export default function GigsPage() {
+function GigsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -157,6 +157,39 @@ export default function GigsPage() {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+export default function GigsPage() {
+  return (
+    <Suspense fallback={<GigsPageSkeleton />}>
+      <GigsPageContent />
+    </Suspense>
+  );
+}
+
+function GigsPageSkeleton() {
+  return (
+    <div className="">
+      <div className="mb-6">
+        <div className="h-9 w-24 bg-muted rounded animate-pulse" />
+        <div className="mt-1 h-5 w-64 bg-muted rounded animate-pulse" />
+      </div>
+      <div className="mb-6 flex items-center gap-3">
+        <div className="relative flex-1 max-w-md">
+          <div className="h-10 w-full bg-muted rounded-lg animate-pulse" />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i} className="space-y-3">
+            <div className="aspect-16/10 rounded-xl bg-muted animate-pulse" />
+            <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+            <div className="h-3 w-1/2 bg-muted rounded animate-pulse" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

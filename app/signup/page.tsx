@@ -7,9 +7,10 @@ import { useAuthStore } from "@/store/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 import { useForm } from "react-hook-form";
 
-export default function SignUpPage() {
+function SignUpPageContent() {
   const router = useRouter();
   const { returnTo } = useReturnTo("/");
 
@@ -208,5 +209,13 @@ export default function SignUpPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <SignUpPageContent />
+    </Suspense>
   );
 }

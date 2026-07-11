@@ -22,7 +22,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -61,7 +61,7 @@ const orderSchema = z.object({
 
 type OrderForm = z.infer<typeof orderSchema>;
 
-export default function GigOrderPage() {
+function GigOrderPageContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -411,5 +411,13 @@ export default function GigOrderPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GigOrderPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GigOrderPageContent />
+    </Suspense>
   );
 }
