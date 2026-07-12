@@ -1,12 +1,12 @@
-import { useMemo, useCallback } from "react";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 import { cn } from "@/lib/utils";
-import { ListPageHeader } from "./ListPageHeader";
-import { TablePagination } from "./TablePagination";
-import { useListPageState } from "./useListPageState";
-import { ListPageProps } from "./types";
+import { useCallback, useMemo } from "react";
 import { DataTable } from "./DataTable";
 import { FloatingBulkActionBar } from "./FloatingBulkActionBar";
-import { TableSkeleton } from "@/components/shared/table-skeleton";
+import { ListPageHeader } from "./ListPageHeader";
+import { TablePagination } from "./TablePagination";
+import { ListPageProps } from "./types";
+import { useListPageState } from "./useListPageState";
 
 type SortableValue = string | number | boolean | Date | null | undefined;
 
@@ -230,35 +230,39 @@ export function ListPage<T extends { id: string }>({
   const filteredBulkActions = bulkConfig?.actions;
 
   return (
-    <div className={cn("flex flex-col h-full min-h-0", className)}>
+    <div
+      className={cn("flex flex-col h-full min-h-0 bg-background", className)}
+    >
       {/* Header */}
-      <ListPageHeader
-        title={config.title}
-        description={config.description}
-        searchQuery={state.searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={searchPlaceholder}
-        onRefresh={config.onRefresh ? handleRefresh : undefined}
-        pageActions={filteredPageActions}
-        bulkActions={
-          bulkPosition === "inline" ? filteredBulkActions : undefined
-        }
-        {...(bulkConfig?.enableSelection
-          ? {
-              selectedCount: state.selectedItems.length,
-              selectedIds: state.selectedItems,
-              onClearSelection: () => selectAll([]),
-            }
-          : {})}
-        isRefreshing={state.isRefreshing}
-        filters={config.filters}
-        activeFilters={state.activeFilters}
-        onFilterChange={setFilter}
-        onClearFilters={clearFilters}
-      />
+      <div className="shrink-0">
+        <ListPageHeader
+          title={config.title}
+          description={config.description}
+          searchQuery={state.searchQuery}
+          onSearchChange={setSearchQuery}
+          searchPlaceholder={searchPlaceholder}
+          onRefresh={config.onRefresh ? handleRefresh : undefined}
+          pageActions={filteredPageActions}
+          bulkActions={
+            bulkPosition === "inline" ? filteredBulkActions : undefined
+          }
+          {...(bulkConfig?.enableSelection
+            ? {
+                selectedCount: state.selectedItems.length,
+                selectedIds: state.selectedItems,
+                onClearSelection: () => selectAll([]),
+              }
+            : {})}
+          isRefreshing={state.isRefreshing}
+          filters={config.filters}
+          activeFilters={state.activeFilters}
+          onFilterChange={setFilter}
+          onClearFilters={clearFilters}
+        />
+      </div>
 
-      {/* Scrollable Data Table / Cards area with integrated pagination */}
-      <div className="flex-1 min-h-0 mt-4 overflow-y-auto">
+      {/* Scrollable Data Table / Cards area */}
+      <div className="flex-1 min-h-0 mt-4 overflow-y-auto pb-2">
         {config.renderCard ? (
           <>
             <div className="hidden md:block">
@@ -304,14 +308,14 @@ export function ListPage<T extends { id: string }>({
               {loading ? (
                 <TableSkeleton variant="card" rows={3} />
               ) : error ? (
-                <div className="rounded-md border p-8 text-center bg-card">
+                <div className="rounded-xl border border-destructive/20 p-8 text-center bg-destructive/5">
                   <div className="text-destructive font-medium">Error</div>
                   <div className="text-sm text-muted-foreground mt-1">
                     {error}
                   </div>
                 </div>
               ) : paginatedData.length === 0 ? (
-                <div className="rounded-md border p-8 text-center bg-card">
+                <div className="rounded-xl border border-border/80 p-8 text-center bg-card">
                   <div className="text-muted-foreground">{`No ${config.title.toLowerCase()} found`}</div>
                 </div>
               ) : (
@@ -362,23 +366,27 @@ export function ListPage<T extends { id: string }>({
             emptyMessage={`No ${config.title.toLowerCase()} found`}
           />
         )}
-
-        {/* Pagination — inside the scrollable area so it stays with the content */}
-        <TablePagination
-          currentPage={displayPage}
-          pageSize={displayPageSize}
-          totalItems={displayTotalItems}
-          onPageChange={handlePageChange}
-          onPageSizeChange={
-            config.pagination?.showPageSizeSelector
-              ? handlePageSizeChange
-              : undefined
-          }
-          pageSizeOptions={config.pagination?.pageSizeOptions}
-          showPageSizeSelector={config.pagination?.showPageSizeSelector}
-          showQuickJumper={config.pagination?.showQuickJumper}
-        />
       </div>
+
+      {/* Sticky Table Pagination at the bottom */}
+      {!loading && !error && displayTotalItems > 0 && (
+        <div className="shrink-0 border-t border-border/60 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 py-3 mt-2">
+          <TablePagination
+            currentPage={displayPage}
+            pageSize={displayPageSize}
+            totalItems={displayTotalItems}
+            onPageChange={handlePageChange}
+            onPageSizeChange={
+              config.pagination?.showPageSizeSelector
+                ? handlePageSizeChange
+                : undefined
+            }
+            pageSizeOptions={config.pagination?.pageSizeOptions}
+            showPageSizeSelector={config.pagination?.showPageSizeSelector}
+            showQuickJumper={config.pagination?.showQuickJumper}
+          />
+        </div>
+      )}
 
       {/* Floating Bulk Action Bar */}
       {showBulkActions && bulkPosition !== "inline" && (

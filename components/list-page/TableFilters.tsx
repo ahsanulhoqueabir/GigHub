@@ -20,7 +20,9 @@ import { FilterConfig } from "./types";
 
 interface TableFiltersProps<T> {
   filters?: FilterConfig<T>[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   activeFilters: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onFilterChange: (key: string, value: any) => void;
   onClearFilters: () => void;
 }

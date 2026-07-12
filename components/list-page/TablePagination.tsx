@@ -49,7 +49,7 @@ export function TablePagination({
   if (totalItems === 0) return null;
 
   return (
-    <div className="flex flex-col items-center justify-between gap-3 py-4">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 w-full">
       {/* Items Info - hidden on mobile */}
       <div className="hidden sm:block text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
         Showing {startItem} to {endItem} of {totalItems} results

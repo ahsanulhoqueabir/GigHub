@@ -1,5 +1,4 @@
 import { IconChevronUp, IconChevronDown } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
@@ -79,15 +78,21 @@ export function DataTable<T extends { id: string }>({
     onSelectAll(isAllSelected ? [] : allIds);
   };
 
-  // Calculate column widths
-  const actionColumnWidth = hasActions ? 10 : 0;
-  const selectionColumnWidth = hasSelection ? 5 : 0;
+  // Calculate column widths proportionally
+  const totalCustomWidth = columns.reduce((sum, col) => sum + (col.width || 0), 0);
+  const actionColumnWidth = hasActions ? 8 : 0;
+  const selectionColumnWidth = hasSelection ? 4 : 0;
   const contentColumnWidth = 100 - actionColumnWidth - selectionColumnWidth;
 
-  const adjustedColumns = columns.map((col) => ({
-    ...col,
-    width: (col.width / 100) * contentColumnWidth,
-  }));
+  const adjustedColumns = columns.map((col) => {
+    const relativeWidth = totalCustomWidth > 0
+      ? ((col.width || 0) / totalCustomWidth) * contentColumnWidth
+      : contentColumnWidth / columns.length;
+    return {
+      ...col,
+      width: relativeWidth,
+    };
+  });
 
   if (loading) {
     return (
@@ -118,7 +123,7 @@ export function DataTable<T extends { id: string }>({
 
   if (error) {
     return (
-      <div className="rounded-md border p-8 text-center">
+      <div className="rounded-xl border border-destructive/20 p-8 text-center bg-destructive/5">
         <div className="text-destructive font-medium">Error</div>
         <div className="text-sm text-muted-foreground mt-1">{error}</div>
       </div>
@@ -127,87 +132,101 @@ export function DataTable<T extends { id: string }>({
 
   if (data.length === 0) {
     return (
-      <div className="rounded-md border p-8 text-center">
+      <div className="rounded-xl border border-border/80 p-8 text-center bg-card">
         <div className="text-muted-foreground">{emptyMessage}</div>
       </div>
     );
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
+    <div className="rounded-xl border border-border/80 shadow-sm overflow-hidden bg-card">
+      <Table className="border-collapse">
+        <TableHeader className="bg-muted/40 border-b border-border/60">
+          <TableRow className="hover:bg-transparent">
             {/* Selection Column */}
             {hasSelection && (
               <TableHead
                 style={{ width: `${selectionColumnWidth}%` }}
-                className="w-12"
+                className="w-12 text-center p-3"
               >
-                <Checkbox
-                  checked={
-                    selectedItems.length === data.length && data.length > 0
-                      ? true
-                      : selectedItems.length > 0
-                        ? "indeterminate"
-                        : false
-                  }
-                  onCheckedChange={handleSelectAll}
-                />
+                <div className="flex items-center justify-center">
+                  <Checkbox
+                    checked={
+                      selectedItems.length === data.length && data.length > 0
+                        ? true
+                        : selectedItems.length > 0
+                          ? "indeterminate"
+                          : false
+                    }
+                    onCheckedChange={handleSelectAll}
+                  />
+                </div>
               </TableHead>
             )}
 
             {/* Data Columns */}
-            {adjustedColumns.map((column, index) => (
-              <TableHead
-                key={index}
-                style={{ width: `${column.width}%` }}
-                className={column.className}
-              >
-                <div
+            {adjustedColumns.map((column, index) => {
+              const isSortable = column.sortable && onSort;
+              const alignClass = column.className?.includes("text-right")
+                ? "text-right"
+                : column.className?.includes("text-center")
+                  ? "text-center"
+                  : "text-left";
+              return (
+                <TableHead
+                  key={index}
+                  style={{
+                    width: column.width ? `${column.width}%` : undefined,
+                    minWidth: column.width ? `${column.width * 8}px` : "100px",
+                  }}
                   className={cn(
-                    "flex items-center gap-1",
-                    {
-                      "justify-center": index > 0,
-                    },
-                    column.className,
+                    "p-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground/80 transition-colors select-none",
+                    isSortable && "cursor-pointer hover:bg-muted/30 hover:text-foreground",
+                    alignClass,
                   )}
+                  onClick={isSortable ? () => handleSort(column.key as string) : undefined}
                 >
-                  <span>{column.label}</span>
-                  {column.sortable && onSort && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-auto p-0 ml-1 hover:bg-transparent group"
-                      onClick={() => handleSort(column.key as string)}
-                    >
-                      <div className="flex flex-col">
+                  <div
+                    className={cn(
+                      "flex items-center gap-1.5",
+                      alignClass === "text-right"
+                        ? "justify-end"
+                        : alignClass === "text-center"
+                          ? "justify-center"
+                          : "justify-start",
+                    )}
+                  >
+                    <span>{column.label}</span>
+                    {isSortable && (
+                      <div className="flex flex-col shrink-0 text-muted-foreground/45">
                         <IconChevronUp
-                          className={`h-3 w-3 transition-all ${
+                          className={cn(
+                            "h-3 w-3 -mb-0.5 transition-all",
                             sortBy === column.key && sortDirection === "asc"
                               ? "text-primary opacity-100 scale-110"
-                              : "text-muted-foreground opacity-30 group-hover:opacity-60"
-                          }`}
+                              : "opacity-50"
+                          )}
                         />
                         <IconChevronDown
-                          className={`h-3 w-3 -mt-1 transition-all ${
+                          className={cn(
+                            "h-3 w-3 transition-all",
                             sortBy === column.key && sortDirection === "desc"
                               ? "text-primary opacity-100 scale-110"
-                              : "text-muted-foreground opacity-30 group-hover:opacity-60"
-                          }`}
+                              : "opacity-50"
+                          )}
                         />
                       </div>
-                    </Button>
-                  )}
-                </div>
-              </TableHead>
-            ))}
+                    )}
+                  </div>
+                </TableHead>
+              );
+            })}
 
             {/* Actions Column */}
             {hasActions && (
               <TableHead
                 style={{ width: `${actionColumnWidth}%` }}
-                className="text-left"
+                className="w-20 text-right p-3 pr-6 text-xs uppercase tracking-wider font-semibold text-muted-foreground/80"
               >
                 Actions
               </TableHead>
@@ -217,47 +236,60 @@ export function DataTable<T extends { id: string }>({
 
         <TableBody>
           {data.map((item) => (
-            <TableRow key={String(item.id)}>
+            <TableRow
+              key={String(item.id)}
+              className="border-b border-border/40 hover:bg-muted/30 transition-colors"
+            >
               {/* Selection Cell */}
               {hasSelection && (
-                <TableCell className="w-12">
-                  <Checkbox
-                    checked={selectedItems.includes(String(item.id))}
-                    onCheckedChange={() => onToggleSelection?.(String(item.id))}
-                  />
+                <TableCell className="w-12 text-center p-3">
+                  <div className="flex items-center justify-center">
+                    <Checkbox
+                      checked={selectedItems.includes(String(item.id))}
+                      onCheckedChange={() => onToggleSelection?.(String(item.id))}
+                    />
+                  </div>
                 </TableCell>
               )}
 
               {/* Data Cells */}
-              {adjustedColumns.map((column, colIndex) => (
-                <TableCell
-                  key={colIndex}
-                  className={`${column.className || ""} ${colIndex > 0 ? "text-center" : ""}`}
-                >
-                  <div
+              {adjustedColumns.map((column, colIndex) => {
+                const alignClass = column.className?.includes("text-right")
+                  ? "text-right"
+                  : column.className?.includes("text-center")
+                    ? "text-center"
+                    : "text-left";
+                return (
+                  <TableCell
+                    key={colIndex}
+                    style={{
+                      width: column.width ? `${column.width}%` : undefined,
+                      minWidth: column.width ? `${column.width * 8}px` : "100px",
+                    }}
                     className={cn(
-                      {
-                        "text-center": colIndex > 0,
-                      },
+                      "p-3.5 align-middle text-sm transition-colors",
+                      alignClass,
                       column.className,
                     )}
                   >
                     {column.render
                       ? column.render(item[column.key], item)
                       : String(item[column.key] || "")}
-                  </div>
-                </TableCell>
-              ))}
+                  </TableCell>
+                );
+              })}
 
               {/* Actions Cell */}
               {hasActions && (
-                <TableCell className="text-center">
-                  <ActionButtons
-                    item={item}
-                    actions={actions}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
+                <TableCell className="w-20 text-right p-3 pr-6">
+                  <div className="flex justify-end">
+                    <ActionButtons
+                      item={item}
+                      actions={actions}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                    />
+                  </div>
                 </TableCell>
               )}
             </TableRow>

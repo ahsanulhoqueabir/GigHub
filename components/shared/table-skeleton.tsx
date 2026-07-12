@@ -113,12 +113,12 @@ export function TableSkeleton({
   const totalColumns = columns + (hasSelection ? 1 : 0) + (hasActions ? 1 : 0);
 
   return (
-    <div className={cn("rounded-md border", className)}>
+    <div className={cn("rounded-xl border border-border/80 shadow-sm overflow-hidden bg-card", className)}>
       {/* Screen reader accessible table */}
       <div role="table" aria-label="Loading data" className="w-full">
         {/* Header */}
         {showHeader && (
-          <div role="row" className="flex border-b bg-muted/30">
+          <div role="row" className="flex border-b border-border/60 bg-muted/40">
             {hasSelection && (
               <div
                 role="columnheader"

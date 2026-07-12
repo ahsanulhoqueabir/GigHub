@@ -66,6 +66,11 @@ export const STATUS_BADGE_COLORS: Record<
     text: "text-orange-700",
     ring: "ring-orange-600/20",
   },
+  ACCEPTED: {
+    bg: "bg-green-700",
+    text: "text-white",
+    ring: "ring-green-700/20",
+  },
 };
 
 /** Fallback colour for unknown / unexpected status values. */
