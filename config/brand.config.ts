@@ -22,12 +22,23 @@ export const branding = {
     "student portfolio platform",
   ],
 
+  ogImage:
+    "https://res.cloudinary.com/hvbrllbm/image/upload/v1783877833/og_cewnuz.png",
+
   openGraph: {
     title: "GigHub | Campus Freelance Marketplace for Jagannath University",
     description:
       "Connect with talented JnU students, offer services, hire peers, post projects, and complete secure escrow-protected transactions within a trusted campus ecosystem.",
     type: "website",
     locale: "en_BD",
+    images: [
+      {
+        url: "https://res.cloudinary.com/hvbrllbm/image/upload/v1783877833/og_cewnuz.png",
+        width: 1200,
+        height: 630,
+        alt: "GigHub — Campus Freelance Marketplace for Jagannath University",
+      },
+    ],
   },
 
   twitter: {
@@ -35,6 +46,9 @@ export const branding = {
     title: "GigHub | JnU Campus Freelance Marketplace",
     description:
       "The exclusive freelance and task marketplace for Jagannath University students. Find gigs, hire peers, and build your professional portfolio.",
+    images: [
+      "https://res.cloudinary.com/hvbrllbm/image/upload/v1783877833/og_cewnuz.png",
+    ],
   },
 
   robots: {

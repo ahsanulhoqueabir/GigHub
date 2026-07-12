@@ -41,8 +41,14 @@ export const metadata: Metadata = {
   title: branding.title,
   description: branding.description,
   keywords: [...branding.keywords],
-  openGraph: branding.openGraph,
-  twitter: branding.twitter,
+  openGraph: {
+    ...branding.openGraph,
+    images: [...branding.openGraph.images],
+  },
+  twitter: {
+    ...branding.twitter,
+    images: [...branding.twitter.images],
+  },
   robots: branding.robots,
   alternates: branding.alternates,
 };
