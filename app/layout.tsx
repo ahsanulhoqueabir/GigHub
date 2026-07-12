@@ -84,7 +84,7 @@ export default async function RootLayout({
         <Suspense fallback={null}>
           <Header />
         </Suspense>
-        <main className="flex-1 px-4 lg:px-10">{children}</main>
+        <main className="flex-1 px-4 lg:px-10 pb-5">{children}</main>
         <Footer />
         <Toaster />
       </body>

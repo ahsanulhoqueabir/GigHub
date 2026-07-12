@@ -23,8 +23,8 @@ export function GigCard({ gig }: GigCardProps) {
   const thumbnail = gig.images?.[0];
 
   return (
-    <Link href={`/gigs/${gig.slug}`} className="block group">
-      <Card className="overflow-hidden transition-shadow hover:shadow-md">
+    <Link href={`/gigs/${gig.slug}`} className="block group h-full">
+      <Card className="overflow-hidden transition-shadow hover:shadow-md h-full flex flex-col">
         {/* Thumbnail */}
         <div className="relative aspect-16/10 overflow-hidden bg-accent/10">
           {thumbnail ? (
@@ -50,7 +50,7 @@ export function GigCard({ gig }: GigCardProps) {
           )}
         </div>
 
-        <CardContent className="space-y-2.5">
+        <CardContent className="space-y-2.5 flex-1 flex flex-col">
           {/* Seller */}
           <div className="flex items-center gap-2">
             <Avatar size="sm">
@@ -85,7 +85,7 @@ export function GigCard({ gig }: GigCardProps) {
           )}
 
           {/* Bottom Row: Views + Price */}
-          <div className="flex items-center justify-between pt-1">
+          <div className="flex items-center justify-between pt-1 mt-auto">
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <IconEye className="size-3" />
               <span>{gig.views}</span>
