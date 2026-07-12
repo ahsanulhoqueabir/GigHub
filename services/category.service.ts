@@ -1,17 +1,13 @@
+import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
 import { paginationParams } from "@/lib/pagination";
-import type { Category, CategoryTree } from "@/types/db/category.types";
 import type {
   CreateCategoryInput,
   UpdateCategoryInput,
 } from "@/lib/validations/category.schema";
+import type { Category, CategoryTree } from "@/types/db/category.types";
+import type { ServiceResult } from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 export class CategoryService {
   private static collection = "category";

@@ -1,5 +1,6 @@
 "use client";
 
+import { AttachmentChip } from "@/components/shared/attachment-chip";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
 import { PageHeader } from "@/components/shared/page-header";
@@ -8,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReturnTo } from "@/hooks/use-return-to";
 import { STATUS_BADGE_COLORS } from "@/lib/shared/badge.utils";
-import { getDisplayFilename } from "@/lib/shared/regex.utils";
 import { useJobsStore } from "@/store/jobs.store";
 import {
   IconBriefcase,
@@ -202,22 +202,11 @@ function JobDetailsContent() {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {currentJob.attachments.map((url, idx) => (
-                    <Button
+                    <AttachmentChip
                       key={idx}
-                      variant="outline"
-                      size="sm"
-                      className="whitespace-normal h-auto min-h-9 py-1.5 text-left text-wrap"
-                      asChild
-                    >
-                      <a
-                        className="truncate max-w-62.5 md:max-w-75 text-xs"
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {getDisplayFilename(url, idx + 1)}
-                      </a>
-                    </Button>
+                      url={url}
+                      fallbackIndex={idx + 1}
+                    />
                   ))}
                 </div>
               </CardContent>

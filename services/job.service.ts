@@ -8,16 +8,11 @@ import type {
   UpdateJobInput,
 } from "@/lib/validations/job.schema";
 import type { Job } from "@/types/db/job.types";
+import type {
+  ServiceResult,
+  ServiceResultWithReferences,
+} from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
-
-type ServiceResultWithReferences<T = any> = ServiceResult<T> & {
-  references?: { orders: number };
-};
 
 /**
  * JobService — handles all Job CRUD operations.

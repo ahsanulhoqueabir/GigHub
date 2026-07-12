@@ -1,0 +1,25 @@
+meta {
+  name: List - Unauthorized
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/applied-jobs
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Applied Jobs — Unauthorized (No Auth)
+
+  Expects a 401 response when no Authorization header is provided.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

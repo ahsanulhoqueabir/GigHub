@@ -2,11 +2,7 @@ import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
 import { GigListItem } from "@/types/db/gig.types";
 import { JobListItem } from "@/types/db/job.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ServiceResult } from "@/types/generic.types";
 
 export interface HomepageData {
   gigs: GigListItem[];

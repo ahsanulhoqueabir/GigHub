@@ -1,18 +1,14 @@
+import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
-import { paginationParams } from "@/lib/pagination";
 import { generateOrderCode } from "@/lib/business/service.utils";
-import type { Order, OrderSource } from "@/types/db/order.types";
+import { paginationParams } from "@/lib/pagination";
 import type {
   CreateGigOrderInput,
   CreateJobOrderInput,
 } from "@/lib/validations/order.schema";
+import type { Order, OrderSource } from "@/types/db/order.types";
+import type { ServiceResult } from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 const MAX_CODE_RETRIES = 3;
 

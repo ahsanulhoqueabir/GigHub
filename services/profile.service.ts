@@ -5,12 +5,8 @@ import { getSupabaseServerClient } from "@/lib/api/supabase";
 import { paginationParams } from "@/lib/pagination";
 import type { UpdateProfileInput } from "@/lib/validations/profile.schema";
 import type { Profile, ProfileForm } from "@/types/db/profile.types";
+import type { ServiceResult } from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 export class ProfileService {
   private static collection = "profile";

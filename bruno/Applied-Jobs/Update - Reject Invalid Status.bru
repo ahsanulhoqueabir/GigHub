@@ -1,0 +1,37 @@
+meta {
+  name: Update - Reject Invalid Status
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "status": "ACTIVE"
+  }
+}
+
+docs {
+  ## Update Applied Job — Reject Invalid Status
+
+  Sending a status value other than "DRAFT" or "PENDING" should
+  return a 400 validation error from the Zod schema.
+
+  ### Expected Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "..."
+  }
+  ```
+}

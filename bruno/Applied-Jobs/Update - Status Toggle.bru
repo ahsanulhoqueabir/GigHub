@@ -1,0 +1,45 @@
+meta {
+  name: Update - Status Toggle
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "status": "PENDING"
+  }
+}
+
+docs {
+  ## Update Applied Job — Status Toggle (DRAFT ↔ PENDING)
+
+  Toggles the proposal status between DRAFT and PENDING.
+  Replace `PROPOSAL_UUID` with a real proposal ID.
+
+  - Use `"status": "PENDING"` to mark a DRAFT proposal as ready.
+  - Use `"status": "DRAFT"` to revert a PENDING proposal for editing.
+
+  ### Validation
+  - Only "DRAFT" or "PENDING" are valid status values.
+  - Any other value (e.g. "ACTIVE", "DECLINED") will be rejected with 400.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Proposal updated successfully",
+    "data": { ...proposal with updated status }
+  }
+  ```
+}

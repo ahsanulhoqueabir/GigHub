@@ -1,0 +1,59 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/applied-jobs
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Applied Jobs — Protected (Authenticated User)
+
+  Returns a paginated list of the caller's own applied job proposals.
+  Each item contains slim job info (id + title only).
+
+  ### Query Parameters
+  | Parameter | Type   | Description                           |
+  |-----------|--------|---------------------------------------|
+  | page      | number | Page number (default: 1)              |
+  | limit     | number | Items per page (default: 20, max: 50) |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "id": "...",
+          "status": "PENDING",
+          "description": "...",
+          "attachments": [],
+          "created_at": "...",
+          "updated_at": "...",
+          "job": {
+            "id": "...",
+            "title": "Senior React Developer"
+          }
+        }
+      ],
+      "pagination": {
+        "currentPage": 1,
+        "pageSize": 20,
+        "totalPages": 1,
+        "total": 3,
+        "hasNext": false,
+        "hasPrev": false
+      }
+    }
+  }
+  ```
+}

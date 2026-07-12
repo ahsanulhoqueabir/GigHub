@@ -1,21 +1,17 @@
+import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
 import { paginationParams } from "@/lib/pagination";
-import type { JobProposal } from "@/types/db/job-proposal.types";
 import type {
   CreateJobProposalInput,
+  UpdateAppliedJobProposalInput,
   UpdateJobProposalInput,
 } from "@/lib/validations/job-proposal.schema";
+import type { JobProposal } from "@/types/db/job-proposal.types";
+import type {
+  ServiceResult,
+  ServiceResultWithReferences,
+} from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
-
-type ServiceResultWithReferences<T = any> = ServiceResult<T> & {
-  references?: { orders: number };
-};
 
 /**
  * JobProposalService — handles all Job Proposal CRUD operations.
@@ -350,6 +346,197 @@ export class JobProposalService {
         items: (data as unknown as JobProposal[]) ?? [],
         total: count ?? 0,
       });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Get paginated list of the caller's own applied jobs.
+   *
+   * Returns proposals with slim job info (id, title, slug, type, budget, status).
+   * Filtered by applicant = callerProfileId.
+   */
+  static async getAppliedJobs(
+    callerProfileId: string,
+    params: PaginationOptions & {
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    },
+  ): Promise<ServiceResult<{ items: JobProposal[]; total: number }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+      const { limit, offset } = paginationParams(params);
+      const { sortBy = "created_at", sortOrder = "desc" } = params;
+
+      let query = supabase.from(this.collection).select(
+        `
+          id, created_at, updated_at, status, description, attachments,
+          job:job!job_proposal_job_fkey (
+            id, title
+          )
+        `,
+        { count: "exact", head: false },
+      );
+
+      // Always filter by caller's profile
+      query = query.eq("applicant", callerProfileId);
+
+      // Apply sorting — whitelist allowed sort fields
+      const allowedSortFields = ["created_at", "updated_at"];
+      const actualSortBy = allowedSortFields.includes(sortBy)
+        ? sortBy
+        : "created_at";
+
+      query = query.order(actualSortBy, {
+        ascending: sortOrder === "asc",
+        nullsFirst: false,
+      });
+
+      // Apply pagination
+      query = query.range(offset, offset + limit - 1);
+
+      const { data, error: sbError, count } = await query;
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      return success({
+        items: (data as unknown as JobProposal[]) ?? [],
+        total: count ?? 0,
+      });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Get a single applied job proposal by ID via RPC.
+   *
+   * Access is enforced at DB level: returns data only if the caller
+   * is the proposal applicant OR the job owner.
+   */
+  static async getAppliedJobById(
+    proposalId: string,
+    callerProfileId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<ServiceResult<any>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "get_applied_job_details",
+        {
+          p_proposal_id: proposalId,
+          p_caller_profile: callerProfileId,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as {
+        success: boolean;
+        data?: unknown;
+        error?: string;
+      };
+
+      if (!result.success) {
+        return error(result.error ?? "Not found");
+      }
+
+      return success(result.data);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Update an applied job proposal (applicant or admin only).
+   *
+   * Rules:
+   * - Only the applicant (or ADMIN) can update.
+   * - description/attachments editable only when status is DRAFT or PENDING.
+   * - status can only be toggled between DRAFT and PENDING.
+   */
+  static async updateAppliedJob(
+    proposalId: string,
+    callerProfileId: string,
+    callerRole: string,
+    params: UpdateAppliedJobProposalInput,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<ServiceResult<any>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // Fetch existing proposal to check ownership and status
+      const { data: existing, error: fetchError } = await supabase
+        .from(this.collection)
+        .select("id, applicant, status")
+        .eq("id", proposalId)
+        .single();
+
+      if (fetchError || !existing) {
+        return error("Job proposal not found");
+      }
+
+      // Authorization: only applicant or ADMIN
+      if (existing.applicant !== callerProfileId && callerRole !== "ADMIN") {
+        return error("Forbidden: You are not the applicant of this proposal");
+      }
+
+      const currentStatus = existing.status as string;
+
+      // Status gate: edits only allowed when DRAFT or PENDING
+      if (!["DRAFT", "PENDING"].includes(currentStatus)) {
+        return error(
+          `Cannot edit proposal with status: ${currentStatus}. Only DRAFT or PENDING proposals can be edited.`,
+        );
+      }
+
+      // Build sanitized update object (whitelist only)
+      const updateData: Record<string, unknown> = {};
+      if (params.description !== undefined) {
+        updateData.description = params.description;
+      }
+      if (params.attachments !== undefined) {
+        updateData.attachments = params.attachments;
+      }
+      if (params.status !== undefined) {
+        // Double-check: only DRAFT ↔ PENDING toggle allowed
+        if (!["DRAFT", "PENDING"].includes(params.status)) {
+          return error("Status can only be toggled between DRAFT and PENDING");
+        }
+        updateData.status = params.status;
+      }
+
+      // Perform the update and return updated proposal with full join data
+      const { data: updatedData, error: updateError } = await supabase
+        .from(this.collection)
+        .update(updateData)
+        .eq("id", proposalId)
+        .select(
+          `
+          id, created_at, updated_at, status, description, attachments,
+          job:job!job_proposal_job_fkey (
+            id, title, slug, status, description, budget, type, deadline,
+            location, required_skills, attachments, tags
+          ),
+          applicant:profile!job_proposal_applicant_fkey (
+            id, name, username, avatar, verified
+          )
+        `,
+        )
+        .single();
+
+      if (updateError) {
+        return error(updateError.message);
+      }
+
+      return success(updatedData);
     } catch (err) {
       return error((err as Error).message || "An unknown error occurred");
     }

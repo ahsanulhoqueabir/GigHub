@@ -2,11 +2,7 @@ import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
 import type { UpdateSystemConfigInput } from "@/lib/validations/system-config.schema";
 import type { SystemConfig } from "@/types/db/system-config.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ServiceResult } from "@/types/generic.types";
 
 export class SystemConfigService {
   private static collection = "system_config";

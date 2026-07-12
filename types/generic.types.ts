@@ -29,5 +29,15 @@ export type RecordContext =
   | Record<string, string>
   | Promise<Record<string, string>>;
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export type ServiceResult<T = any> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+export type ServiceResultWithReferences<T = any> = ServiceResult<T> & {
+  references?: { orders: number };
+};
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export type QueryParams = Record<string, unknown>;
 export type QueryFilter = Record<string, unknown>;

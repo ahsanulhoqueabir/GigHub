@@ -4,11 +4,7 @@ import type { AdBanner } from "@/types/db/ad-banner.types";
 import type { Announcement } from "@/types/db/announcement.types";
 import type { HeroBanner } from "@/types/db/hero-banner.types";
 import type { SystemConfig } from "@/types/db/system-config.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
+import type { ServiceResult } from "@/types/generic.types";
 
 export interface PublicSiteData {
   system_config: SystemConfig | null;

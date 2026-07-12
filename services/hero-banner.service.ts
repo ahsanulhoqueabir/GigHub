@@ -7,14 +7,10 @@ import type {
   UpdateHeroBannerInput,
 } from "@/lib/validations/hero-banner.schema";
 import type { HeroBanner } from "@/types/db/hero-banner.types";
+import type { ServiceResult } from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
 
 const CLOUDINARY_FOLDER = "gighub/hero-banners";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 export class HeroBannerService {
   private static collection = "hero_banners";

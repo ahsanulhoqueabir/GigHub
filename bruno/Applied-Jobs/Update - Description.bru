@@ -1,0 +1,47 @@
+meta {
+  name: Update - Description
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+}
+
+body:json {
+  {
+    "description": "Updated proposal text with additional context. I have 3+ years of experience in this domain and have delivered similar projects on time."
+  }
+}
+
+docs {
+  ## Update Applied Job — Description Only
+
+  Updates the description of a proposal with status DRAFT or PENDING.
+  Replace `PROPOSAL_UUID` with a real proposal ID.
+
+  ### Allowed Fields
+  - `description` (optional)
+  - `attachments` (optional)
+  - `status`: only "DRAFT" or "PENDING" (optional)
+
+  ### Business Rules
+  - Must be the applicant (or ADMIN).
+  - Proposal status must be DRAFT or PENDING; otherwise 400.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Proposal updated successfully",
+    "data": { ... updated proposal }
+  }
+  ```
+}

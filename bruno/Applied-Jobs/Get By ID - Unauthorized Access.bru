@@ -1,0 +1,33 @@
+meta {
+  name: Get By ID - Unauthorized Access
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{unrelatedUserAuthToken}}
+}
+
+docs {
+  ## Get Applied Job Detail — Unauthorized Access (Unrelated User)
+
+  A valid authenticated user who is neither the applicant nor the job owner
+  should receive a 404 (not found / access denied).
+
+  Replace `{{unrelatedUserAuthToken}}` with the JWT of a user who has no
+  connection to this proposal.
+
+  ### Expected Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Not found"
+  }
+  ```
+}

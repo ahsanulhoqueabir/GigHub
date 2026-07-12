@@ -1,23 +1,18 @@
+import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
-import { success, error } from "@/lib/api/api-response";
-import { paginationParams } from "@/lib/pagination";
 import { slugify } from "@/lib/business/service.utils";
-import type { Gig } from "@/types/db/gig.types";
-import type { Review } from "@/types/db/reviews.types";
+import { paginationParams } from "@/lib/pagination";
 import type {
   CreateGigInput,
   UpdateGigInput,
 } from "@/lib/validations/gig.schema";
+import type { Gig } from "@/types/db/gig.types";
+import type { Review } from "@/types/db/reviews.types";
+import type {
+  ServiceResult,
+  ServiceResultWithReferences,
+} from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
-
-type ServiceResultWithReferences<T = any> = ServiceResult<T> & {
-  references?: { orders: number };
-};
 
 /**
  * GigService — handles all Gig CRUD operations.

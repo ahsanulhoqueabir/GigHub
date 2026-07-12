@@ -1,0 +1,35 @@
+meta {
+  name: Update - Unauthorized
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "description": "This update should fail without auth."
+  }
+}
+
+docs {
+  ## Update Applied Job — Unauthorized (No Auth)
+
+  Expects a 401 response when no Authorization header is provided.
+
+  ### Expected Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Missing or invalid Authorization header"
+  }
+  ```
+}

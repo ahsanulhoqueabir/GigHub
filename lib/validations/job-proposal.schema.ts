@@ -39,3 +39,20 @@ export const updateJobProposalSchema = z
   });
 
 export type UpdateJobProposalInput = z.infer<typeof updateJobProposalSchema>;
+
+// ─── Update Applied Job Proposal (description, attachments, status toggle) ─
+
+export const updateAppliedJobProposalSchema = z
+  .object({
+    description: descriptionField.optional(),
+    attachments: attachmentsField,
+    status: z.enum(["DRAFT", "PENDING"]).optional(),
+  })
+  .strict()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided",
+  });
+
+export type UpdateAppliedJobProposalInput = z.infer<
+  typeof updateAppliedJobProposalSchema
+>;

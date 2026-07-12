@@ -1,0 +1,64 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Applied Job Detail — As Applicant
+
+  Returns full proposal + job details.
+  Replace `PROPOSAL_UUID` with a real proposal ID where the caller is the applicant.
+
+  ### Access Rules
+  - Returns 200 if the caller is the applicant OR the job owner.
+  - Returns 404 if access is denied or proposal does not exist.
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "...",
+      "status": "PENDING",
+      "description": "...",
+      "attachments": [],
+      "created_at": "...",
+      "updated_at": "...",
+      "job": {
+        "id": "...",
+        "title": "...",
+        "slug": "...",
+        "status": "ACTIVE",
+        "description": "...",
+        "budget": "$3000 - $5000",
+        "type": "FULLTIME",
+        "deadline": "2026-08-15T00:00:00Z",
+        "location": "Dhaka, Bangladesh",
+        "required_skills": ["React", "TypeScript"],
+        "attachments": [],
+        "tags": ["remote", "frontend"],
+        "owner": {
+          "id": "...", "name": "...", "username": "...",
+          "avatar": null, "verified": true
+        },
+        "category": { "id": "...", "name": "Technology", "slug": "technology" }
+      },
+      "applicant": {
+        "id": "...", "name": "...", "username": "...",
+        "avatar": null, "verified": false
+      }
+    }
+  }
+  ```
+}

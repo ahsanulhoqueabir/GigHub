@@ -6,12 +6,8 @@ import type {
   UpdateAnnouncementInput,
 } from "@/lib/validations/announcement.schema";
 import type { Announcement } from "@/types/db/announcement.types";
+import type { ServiceResult } from "@/types/generic.types";
 import type { PaginationOptions } from "@/types/pagination.types";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ServiceResult<T = any> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 export class AnnouncementService {
   private static collection = "announcements";

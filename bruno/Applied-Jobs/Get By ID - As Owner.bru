@@ -1,0 +1,27 @@
+meta {
+  name: Get By ID - As Owner
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/applied-jobs/PROPOSAL_UUID
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{ownerAuthToken}}
+}
+
+docs {
+  ## Get Applied Job Detail — As Job Owner
+
+  Returns full proposal + job details.
+  Replace `PROPOSAL_UUID` with a real proposal ID.
+  Replace `{{ownerAuthToken}}` with the JWT of the **job owner** (not the applicant).
+
+  The job owner is also allowed access to the proposal under the same endpoint.
+
+  ### Expected Response (200) — same shape as Get By ID
+}
