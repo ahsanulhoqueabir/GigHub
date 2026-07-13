@@ -46,9 +46,12 @@ function IncomingProposalsContent() {
       width: 25,
       render: (_, item) => (
         <div className="flex flex-col min-w-0">
-          <span className="font-semibold text-sm line-clamp-1">
+          <button
+            onClick={() => handleViewDetails(item.id)}
+            className="font-semibold text-sm line-clamp-1 text-left hover:underline hover:text-primary transition-colors cursor-pointer"
+          >
             {(item.job as { title?: string })?.title || "N/A"}
-          </span>
+          </button>
           {(item.job as { budget?: string })?.budget && (
             <span className="text-xs text-muted-foreground">
               Budget: {(item.job as { budget?: string })?.budget}

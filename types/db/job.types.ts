@@ -1,6 +1,6 @@
 import { SystemFields } from "../generic.types";
-import { Category } from "./category.types";
-import { Profile } from "./profile.types";
+import { Category, CategoryMinimal } from "./category.types";
+import { Profile, ProfileMinimal } from "./profile.types";
 
 // ─── Core ──────────────────────────────────────────────────────────────────
 
@@ -50,19 +50,13 @@ export interface JobForm extends Omit<
 // ─── UI / View helpers (reused by stores & components) ────────────────────
 
 /** Minimal owner info — subset of Profile fields used in lists */
-export type JobOwnerInfo = Pick<
-  Profile,
-  "id" | "name" | "username" | "avatar" | "verified"
->;
+export type JobOwnerInfo = ProfileMinimal & "verified";
 
 /** Extended owner info for detail pages */
-export interface JobOwnerDetail extends JobOwnerInfo {
+export type JobOwnerDetail = JobOwnerInfo & {
   created_at: string;
   department?: string;
-}
-
-/** Minimal category info — subset of Category fields */
-export type JobCategoryInfo = Pick<Category, "id" | "name" | "slug">;
+};
 
 /** List item shape — fields from JobCore + resolved relations */
 export interface JobListItem extends Pick<
@@ -80,7 +74,7 @@ export interface JobListItem extends Pick<
 > {
   id: string;
   owner: JobOwnerInfo;
-  category?: JobCategoryInfo;
+  category?: CategoryMinimal;
 }
 
 /** Detail shape — full job with resolved relations */
@@ -103,7 +97,7 @@ export interface JobDetail extends Pick<
   | "updated_at"
 > {
   owner: JobOwnerDetail;
-  category?: JobCategoryInfo;
+  category?: CategoryMinimal;
 }
 
 /** Minimal info for the apply page */

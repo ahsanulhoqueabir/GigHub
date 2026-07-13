@@ -65,9 +65,12 @@ function AppliedJobsContent() {
       label: "Job Title",
       width: 35,
       render: (_, item) => (
-        <span className="font-semibold text-sm line-clamp-1">
+        <button
+          onClick={() => handleViewDetails(item.id)}
+          className="font-semibold text-sm line-clamp-1 text-left hover:underline hover:text-primary transition-colors cursor-pointer"
+        >
           {item.job?.title || "N/A"}
-        </span>
+        </button>
       ),
     },
     {

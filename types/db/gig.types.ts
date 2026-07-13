@@ -1,6 +1,6 @@
 import { SystemFields } from "../generic.types";
-import { Category } from "./category.types";
-import { Profile } from "./profile.types";
+import { Category, CategoryMinimal } from "./category.types";
+import { Profile, ProfileMinimal } from "./profile.types";
 
 // ─── Core ──────────────────────────────────────────────────────────────────
 
@@ -49,19 +49,13 @@ export interface GigForm extends Omit<
 // ─── UI / View helpers ─────────────────────────────────────────────────────
 
 /** Minimal seller info — subset of Profile fields used in lists */
-export type GigSellerInfo = Pick<
-  Profile,
-  "id" | "name" | "username" | "avatar" | "verified"
->;
+export type GigSellerInfo = ProfileMinimal & "verified";
 
 /** Extended seller info for detail pages */
-export interface GigSellerDetail extends GigSellerInfo {
+export type GigSellerDetail = GigSellerInfo & {
   created_at: string;
   department?: string;
-}
-
-/** Minimal category info — subset of Category fields */
-export type GigCategoryInfo = Pick<Category, "id" | "name" | "slug">;
+};
 
 /** Package summary for list items — subset of GigPackage */
 export type GigPackageSummary = Pick<GigPackage, "tier" | "price" | "title">;
@@ -86,7 +80,7 @@ export interface GigListItem extends Pick<
   id: string;
   packages: GigPackageSummary[];
   seller: GigSellerInfo;
-  category?: GigCategoryInfo;
+  category?: CategoryMinimal;
 }
 
 /** Detail shape (full gig with seller detail) */
@@ -106,14 +100,14 @@ export interface GigDetail extends Pick<
   packages: GigPackage[];
   faq?: FAQ[];
   seller: GigSellerDetail;
-  category?: GigCategoryInfo;
+  category?: CategoryMinimal;
   reviews?: unknown[];
 }
 
 /** Minimal info for the order page */
 export interface GigOrderDetail extends Pick<Gig, "id" | "title" | "slug"> {
   packages: GigPackageOrderInfo[];
-  seller: Pick<GigSellerInfo, "id" | "name" | "username" | "avatar">;
+  seller: ProfileMinimal;
 }
 
 /** Filters used in gig listing */

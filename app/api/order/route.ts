@@ -1,23 +1,29 @@
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { OrderService } from "@/services/order.service";
-import { createGigOrderSchema } from "@/lib/validations/order.schema";
 import { parsePagination, parseSorting } from "@/lib/api/request-payload";
 import { paginationMeta } from "@/lib/pagination";
+import { createGigOrderSchema } from "@/lib/validations/order.schema";
+import { OrderService } from "@/services/order.service";
 
 // ─── GET /api/order (participant or admin) ────────────────────────
-// Returns paginated list of orders visible to the caller (via RLS).
+// Returns paginated list of orders for the authenticated user.
+//
+// - **Non-admin users**: automatically filtered to orders where the user
+//   is the buyer OR seller. Explicit `buyer`/`seller` query params are
+//   ignored for security — users can only see their own orders.
+// - **Admin users**: can optionally specify `buyer`/`seller` to view any
+//   participant's orders, or omit them to see all orders.
 //
 // Query parameters:
 //   page, limit          — pagination
 //   sortBy, sortOrder    — sorting (created_at, updated_at, total_price, status)
 //   status               — filter by status (PENDING, ACTIVE, CANCELLED)
 //   source               — filter by source (GIG, JOB)
-//   buyer                — filter by buyer UUID
-//   seller               — filter by seller UUID
+//   buyer                — (admin only) filter by buyer UUID
+//   seller               — (admin only) filter by seller UUID
 //   search               — search in order code or title
 export const GET = withAuth({
-  handler: async ({ req }) => {
+  handler: async ({ req, user }) => {
     try {
       const searchParams = req.nextUrl.searchParams;
       const { page, limit } = parsePagination(searchParams);
@@ -30,9 +36,18 @@ export const GET = withAuth({
 
       const status = searchParams.get("status") || undefined;
       const source = searchParams.get("source") || undefined;
-      const buyer = searchParams.get("buyer") || undefined;
-      const seller = searchParams.get("seller") || undefined;
       const search = searchParams.get("search") || undefined;
+
+      // ── Non-admin: only see your own orders ──────────────────────
+      // Automatically filter by the user's profile UUID as buyer OR seller.
+      // Explicit buyer/seller params from non-admin users are ignored.
+      const isAdmin = user.role === "ADMIN";
+      const buyer = isAdmin
+        ? searchParams.get("buyer") || undefined
+        : user.profile;
+      const seller = isAdmin
+        ? searchParams.get("seller") || undefined
+        : user.profile;
 
       const result = await OrderService.list({
         page,

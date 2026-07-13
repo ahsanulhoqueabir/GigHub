@@ -11,6 +11,8 @@ export interface CategoryCore {
 
 export interface Category extends CategoryCore, SystemFields {}
 
+export type CategoryMinimal = Pick<Category, "id" | "name" | "slug">;
+
 export interface CategoryTree extends Category {
   subCategories: CategoryTree[];
 }

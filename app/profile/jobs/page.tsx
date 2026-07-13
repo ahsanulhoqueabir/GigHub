@@ -45,6 +45,13 @@ function ManageJobsContent() {
     fetchManageJobs();
   }, [fetchManageJobs]);
 
+  const handleViewDetails = useCallback(
+    (id: string) => {
+      router.push(withReturnTo(`/profile/jobs/${id}/details`));
+    },
+    [router, withReturnTo],
+  );
+
   const handleDelete = useCallback(
     async (id: string) => {
       const job = jobs.find((j) => j.id === id);
@@ -66,8 +73,13 @@ function ManageJobsContent() {
       key: "title",
       label: "Job Title",
       width: 40,
-      render: (val) => (
-        <span className="font-medium text-sm line-clamp-2">{String(val)}</span>
+      render: (val, row) => (
+        <button
+          onClick={() => handleViewDetails(row.id)}
+          className="font-medium text-sm line-clamp-2 text-left hover:underline hover:text-primary transition-colors cursor-pointer"
+        >
+          {String(val)}
+        </button>
       ),
     },
     {

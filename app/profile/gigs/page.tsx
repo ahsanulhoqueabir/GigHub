@@ -39,6 +39,13 @@ function ManageGigsContent() {
     fetchManageGigs();
   }, [fetchManageGigs]);
 
+  const handleViewDetails = useCallback(
+    (id: string) => {
+      router.push(withReturnTo(`/profile/gigs/${id}/details`));
+    },
+    [router, withReturnTo],
+  );
+
   const handleDelete = useCallback(
     async (id: string) => {
       const gig = gigs.find((g) => g.id === id);
@@ -82,8 +89,13 @@ function ManageGigsContent() {
       key: "title",
       label: "Gig Title",
       width: 45,
-      render: (val) => (
-        <span className="font-medium text-sm line-clamp-2">{String(val)}</span>
+      render: (val, row) => (
+        <button
+          onClick={() => handleViewDetails(row.id)}
+          className="font-medium text-sm line-clamp-2 text-left hover:underline hover:text-primary transition-colors cursor-pointer"
+        >
+          {String(val)}
+        </button>
       ),
     },
     {

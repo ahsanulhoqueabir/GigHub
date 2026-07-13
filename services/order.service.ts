@@ -253,13 +253,12 @@ export class OrderService {
         query = query.eq("source", source);
       }
 
-      // Optional buyer filter
-      if (buyer) {
+      // Buyer/seller filter — if both provided, use OR so either match works
+      if (buyer && seller) {
+        query = query.or(`buyer.eq.${buyer},seller.eq.${seller}`);
+      } else if (buyer) {
         query = query.eq("buyer", buyer);
-      }
-
-      // Optional seller filter
-      if (seller) {
+      } else if (seller) {
         query = query.eq("seller", seller);
       }
 
@@ -322,6 +321,19 @@ export class OrderService {
           ),
           seller:profile!order_seller_fkey (
             id, name, username, avatar
+          ),
+          gig:gig!order_gig_fkey (
+            id, title, slug, description, images, tags, packages, views
+          ),
+          job:job!order_job_fkey (
+            id, title, slug, description, type, budget, deadline, location,
+            required_skills, tags, views
+          ),
+          proposal:job_proposal!order_proposal_fkey (
+            id, created_at, status, description, attachments,
+            applicant:profile!job_proposal_applicant_fkey (
+              id, name, username, avatar
+            )
           )
         `,
         )

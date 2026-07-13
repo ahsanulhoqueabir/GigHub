@@ -158,11 +158,11 @@ function GigDetailsContent() {
                           : "border-border hover:border-primary/50"
                       }`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={url}
                         alt={`Thumbnail ${idx + 1}`}
                         className="object-cover w-full h-full"
+                        fill
                       />
                     </button>
                   ))}

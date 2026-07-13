@@ -34,6 +34,11 @@ export interface Socials {
 
 export interface Profile extends ProfileCore, SystemFields {}
 
+export type ProfileMinimal = Pick<
+  Profile,
+  "id" | "name" | "username" | "avatar"
+>;
+
 export interface ProfileForm extends Omit<
   ProfileCore,
   "department" | "verified" | "fcm_token" | "role"
