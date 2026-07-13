@@ -154,7 +154,7 @@ BEGIN
         LEFT JOIN profile b ON b.id = o.buyer
         LEFT JOIN profile s ON s.id = o.seller
         ORDER BY o.created_at DESC
-        LIMIT 10
+        LIMIT 5
       ) o
     ),
 

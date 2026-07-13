@@ -223,29 +223,40 @@ export function RecentOrders({
           {orders.map((order) => (
             <div
               key={order.id}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/20"
+              className="rounded-lg border p-3 space-y-1.5 hover:bg-accent/20"
             >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-muted-foreground">
-                    #{order.code}
-                  </span>
-                  <p className="text-sm font-medium truncate">{order.title}</p>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {order.buyer?.name || "Unknown"} →{" "}
-                  {order.seller?.name || "Unknown"}
-                  {" · "}
-                  {formatDateInTimezone(order.created_at)}
-                </p>
-              </div>
-              <div className="flex items-center gap-2 ml-3">
-                <span className="text-sm font-semibold">
+              {/* Row 1 */}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-mono text-[11px] text-muted-foreground truncate">
+                  #{order.code}
+                </span>
+
+                <span className="text-sm font-semibold shrink-0">
                   {currencySymbol}
                   {Number(order.total_price).toLocaleString()}
                 </span>
-                <StatusBadge status={order.status} />
               </div>
+
+              {/* Row 2 */}
+              <p className="truncate text-xs text-wrap font-medium">
+                {order.title}
+              </p>
+
+              {/* Row 3 */}
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground overflow-hidden">
+                <StatusBadge status={order.status} />
+
+                <span>•</span>
+
+                <span className="shrink-0">
+                  {formatDateInTimezone(order.created_at)}
+                </span>
+
+                <span>•</span>
+              </div>
+              <span className="truncate">
+                {order.buyer?.name} → {order.seller?.name}
+              </span>
             </div>
           ))}
         </div>
