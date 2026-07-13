@@ -1,11 +1,14 @@
 "use client";
 
+import { AuthSidebar } from "@/components/shared/auth-sidebar";
 import { Button } from "@/components/ui/button";
 import { branding } from "@/config/brand.config";
 import { useReturnTo } from "@/hooks/use-return-to";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth.schema";
 import { useAuthStore } from "@/store/auth.store";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { IconArrowUpRight, IconLock, IconMail } from "@tabler/icons-react";
+import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,187 +48,171 @@ function LoginPageContent() {
   };
 
   return (
-    <div
-      className={` min-h-screen font-sans lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[7fr_5fr]`}
-    >
-      <style>{`
-        .threshold-path {
-          stroke-dasharray: 620;
-          stroke-dashoffset: 620;
-          animation: draw-threshold 1.8s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
-        }
-        .threshold-dot {
-          opacity: 0;
-          animation: fade-dot 0.6s ease-out 1.9s forwards;
-        }
-        @keyframes draw-threshold {
-          to { stroke-dashoffset: 0; }
-        }
-        @keyframes fade-dot {
-          to { opacity: 1; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .threshold-path { animation: none; stroke-dashoffset: 0; }
-          .threshold-dot { animation: none; opacity: 1; }
-        }
-      `}</style>
+    <div className="relative min-h-screen w-full flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-background overflow-hidden font-sans">
+      {/* Immersive mesh gradients */}
+      <div
+        className="absolute left-1/4 top-1/4 -z-10 h-75 sm:h-112.5 w-75 sm:w-112.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/5 blur-[100px] sm:blur-[130px] animate-pulse"
+        style={{ animationDuration: "12s" }}
+      />
+      <div
+        className="absolute right-1/4 bottom-1/4 -z-10 h-75 sm:h-112.5 w-75 sm:w-112.5 rounded-full bg-blue-500/10 dark:bg-blue-500/5 blur-[100px] sm:blur-[130px] animate-pulse"
+        style={{ animationDuration: "16s" }}
+      />
+      <div className="absolute left-1/2 top-1/2 -z-10 h-62.5 sm:h-87.5 w-62.5 sm:w-87.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary/10 dark:bg-secondary/5 blur-[80px] sm:blur-[100px]" />
 
-      {/* Threshold panel — full on desktop, collapses to a strip on mobile */}
-      <div className="relative flex items-center justify-between bg-primary/20 px-6 py-5 lg:flex-col lg:items-stretch lg:justify-between lg:px-14 lg:py-12">
-        <Image
-          src={branding.logo}
-          alt=""
-          className="h-16 w-auto "
-          height={40}
-          width={40}
+      {/* Subtle math/grid backdrop */}
+      <div className="absolute inset-0 -z-20 bg-[linear-gradient(to_right,rgba(128,128,128,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(128,128,128,0.02)_1px,transparent_1px)] bg-size-[32px_32px]" />
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_800px_at_100%_200px,rgba(16,185,129,0.03),transparent)]" />
+
+      {/* Glassmorphic Portal Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-md lg:max-w-5xl rounded-none border-none bg-transparent backdrop-blur-none shadow-none lg:rounded-3xl lg:border lg:border-border/40 lg:bg-card/35 lg:backdrop-blur-md lg:shadow-2xl overflow-hidden grid lg:grid-cols-12 relative"
+      >
+        {/* Left Side: Immersive Brand DNA Column (Desktop Only) */}
+        <AuthSidebar
+          defaultTitle="Good to see you again."
+          defaultDesc="Sign in to pick up exactly where you left off. Every completed task builds your verified portfolio."
         />
 
-        {/* Mobile-only compact tagline */}
-        <p className="font-serif text-sm text-primary lg:hidden">
-          Good to see you again.
-        </p>
+        {/* Right Side: High-Fidelity Form Column */}
+        <div className="lg:col-span-6 flex flex-col justify-between p-2 sm:p-6 lg:p-12 lg:bg-background/25">
+          {/* Mobile Header */}
+          <div className="lg:hidden flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <div className="size-8 flex items-center justify-center rounded-lg bg-card border border-border/40">
+                <Image
+                  src={branding.logo}
+                  alt="Logo"
+                  width={16}
+                  height={16}
+                  className="size-4"
+                />
+              </div>
+              <span className="text-sm font-bold tracking-tight text-foreground">
+                {branding.title}
+              </span>
+            </div>
+            <p className="font-serif text-xs text-primary">
+              Good to see you again.
+            </p>
+          </div>
 
-        {/* Desktop content */}
-        <div className="hidden lg:block">
-          <h1
-            className="max-w-md text-[2.75rem] font-medium leading-[1.08] tracking-tight text-primary"
-            style={{ fontFamily: "var(--font-fraunces)" }}
-          >
-            Good to see you again.
-          </h1>
-          <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-[#5B6D63]">
-            Sign in to pick up exactly where you left off.
-          </p>
-        </div>
-
-        {/* Signature line art — decorative threshold motif */}
-        <svg
-          viewBox="0 0 320 200"
-          fill="none"
-          aria-hidden="true"
-          className="hidden h-auto w-full max-w-xs text-[#C79A4C] lg:block"
-        >
-          <path
-            className="threshold-path"
-            d="M20 180 C 20 100, 60 40, 160 40 C 260 40, 300 100, 300 180"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <line
-            className="threshold-path"
-            x1="20"
-            y1="180"
-            x2="300"
-            y2="180"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            style={{ strokeDasharray: 280, strokeDashoffset: 280 }}
-          />
-          <circle
-            className="threshold-dot"
-            cx="160"
-            cy="40"
-            r="4"
-            fill="currentColor"
-          />
-        </svg>
-
-        <span className="hidden text-xs text-[#5B6D63] lg:block">
-          Members only, no exceptions.
-        </span>
-      </div>
-
-      {/* Form panel */}
-      <div className="flex flex-1 items-center justify-center px-6 py-12 lg:px-16">
-        <div className="w-full max-w-sm">
+          {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-xl font-semibold tracking-tight text-[#1C1C1A]">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground bg-linear-to-r from-foreground to-foreground/80 bg-clip-text">
               Sign in
             </h2>
-            <p className="mt-1.5 text-sm text-[#1C1C1A]/60">
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
               Enter your credentials to continue.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Email or Username */}
-            <div>
+            <div className="space-y-1.5">
               <label
                 htmlFor="emailOrUsername"
-                className="mb-1.5 block text-sm font-medium text-[#1C1C1A]/80"
+                className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground/80"
               >
                 Email or Username
               </label>
-              <input
-                id="emailOrUsername"
-                type="text"
-                autoComplete="username"
-                placeholder="you@example.com or username"
-                {...register("emailOrUsername")}
-                className="block w-full rounded-md border border-[#E2DED3] bg-white px-3.5 py-2.5 text-sm text-[#1C1C1A] placeholder-[#1C1C1A]/35 outline-none transition-colors focus:border-[#C79A4C] focus:ring-2 focus:ring-[#C79A4C]/25"
-              />
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground/60 transition-colors group-focus-within:text-primary">
+                  <IconMail className="size-4.5" />
+                </span>
+                <input
+                  id="emailOrUsername"
+                  type="text"
+                  autoComplete="username"
+                  placeholder="you@example.com or username"
+                  {...register("emailOrUsername")}
+                  className="block w-full rounded-xl border border-border bg-background/40 pl-11 pr-4 py-3 text-sm text-foreground placeholder-muted-foreground/40 outline-hidden transition-all focus:border-primary focus:ring-3 focus:ring-primary/10"
+                />
+              </div>
               {errors.emailOrUsername && (
-                <p className="mt-1 text-sm text-red-600">
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-destructive mt-1.5 font-medium pl-1"
+                >
                   {errors.emailOrUsername.message}
-                </p>
+                </motion.p>
               )}
             </div>
 
             {/* Password */}
-            <div>
-              <label
-                htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-[#1C1C1A]/80"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Enter your password"
-                {...register("password")}
-                className="block w-full rounded-md border border-[#E2DED3] bg-white px-3.5 py-2.5 text-sm text-[#1C1C1A] placeholder-[#1C1C1A]/35 outline-none transition-colors focus:border-[#C79A4C] focus:ring-2 focus:ring-[#C79A4C]/25"
-              />
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground/80"
+                >
+                  Password
+                </label>
+              </div>
+              <div className="relative group">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground/60 transition-colors group-focus-within:text-primary">
+                  <IconLock className="size-4.5" />
+                </span>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Enter your password"
+                  {...register("password")}
+                  className="block w-full rounded-xl border border-border bg-background/40 pl-11 pr-4 py-3 text-sm text-foreground placeholder-muted-foreground/40 outline-hidden transition-all focus:border-primary focus:ring-3 focus:ring-primary/10"
+                />
+              </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-xs text-destructive mt-1.5 font-medium pl-1"
+                >
                   {errors.password.message}
-                </p>
+                </motion.p>
               )}
             </div>
 
             {/* Auth Error */}
             {authError && (
-              <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+              >
                 {authError}
-              </p>
+              </motion.div>
             )}
 
-            {/* Submit */}
+            {/* Submit Button */}
             <Button
               type="submit"
               disabled={isProcessing}
               size="lg"
-              className="w-full bg-[#C79A4C] text-[#14261F] hover:bg-[#B98A3C] focus-visible:ring-[#C79A4C]/40"
+              className="w-full relative overflow-hidden bg-linear-to-r from-primary to-[#2C6A4F] hover:from-[#2C6A4F] hover:to-primary text-white border-none shadow-md shadow-primary/10 active:scale-[0.98] transition-all duration-300 py-6 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold tracking-wide"
             >
-              {isProcessing ? "Signing in…" : "Sign in"}
+              <span>{isProcessing ? "Signing in…" : "Sign in"}</span>
+              {!isProcessing && <IconArrowUpRight className="size-4" />}
             </Button>
           </form>
 
           {/* Footer */}
-          <p className="mt-6 text-center text-sm text-[#1C1C1A]/60">
+          <div className="mt-8 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link
               href="/signup"
-              className="font-medium text-[#1C1C1A] underline-offset-2 hover:underline"
+              className="font-semibold text-foreground underline decoration-primary/40 underline-offset-4 hover:decoration-primary transition-colors"
             >
               Create one
             </Link>
-          </p>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

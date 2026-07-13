@@ -1,4 +1,5 @@
 import { api_client } from "@/lib/api/api-client";
+import { apiPublic } from "@/lib/api/api-public";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { defaultPagination } from "@/lib/pagination";
 import { Department } from "@/types/db/department.types";
@@ -57,7 +58,7 @@ export const useDepartmentsStore = create<DepartmentsStore>()((set, get) => ({
     try {
       // Public API: GET /api/department?page=1&limit=40
       // Response: { success, data: { items: [...], pagination: { ... } } }
-      const { data } = await api_client.get(`/department`, {
+      const { data } = await apiPublic.get(`/department`, {
         params: { page, limit },
       });
       set({
