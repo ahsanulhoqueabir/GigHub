@@ -24,6 +24,7 @@ const quickLinks = [
   { label: "Jobs", href: "/jobs" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "Logo Story", href: "/logo-story" },
 ];
 
 const supportLinks = [

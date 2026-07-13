@@ -108,7 +108,10 @@ export default function AboutPage() {
             build their professional portfolios while earning and learning.
           </p>
         </div>
-        <div className="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-xl p-8">
+        <Link
+          href="/logo-story"
+          className="relative flex aspect-4/3 items-center justify-center overflow-hidden rounded-xl p-8"
+        >
           <div className="space-y-4 text-center">
             <Image
               src="/brand/logo.svg"
@@ -117,7 +120,7 @@ export default function AboutPage() {
               fill
             />
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Stats */}
