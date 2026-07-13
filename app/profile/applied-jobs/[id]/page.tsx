@@ -1,6 +1,7 @@
 "use client";
 
 import { AttachmentChip } from "@/components/shared/attachment-chip";
+import { ErrorState } from "@/components/shared/error-state";
 import { FileUploadDropzone } from "@/components/shared/FileUploadDropzone";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { formatDateInTimezone, formatDateTime } from "@/lib/date.utils";
 import { getJobTypeBadgeColors } from "@/lib/shared/badge.utils";
 import { cn } from "@/lib/utils";
 import { useFileUploadStore } from "@/store/file-upload.store";
@@ -29,7 +31,6 @@ import {
   IconLoader2,
   IconMapPin,
   IconPaperclip,
-  IconRefresh,
   IconShieldCheck,
   IconTag,
   IconUser,
@@ -38,28 +39,6 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr?: string | null) {
-  if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatDateTime(dateStr?: string | null) {
-  if (!dateStr) return "N/A";
-  return new Date(dateStr).toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -217,41 +196,23 @@ function AppliedJobDetailContent({ id }: { id: string }) {
   // ── Error state
   if (detailError) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-        <div className="p-4 rounded-full bg-destructive/10">
-          <IconAlertTriangle className="size-8 text-destructive" />
-        </div>
-        <div>
-          <h2 className="font-semibold text-lg">Something went wrong</h2>
-          <p className="text-muted-foreground text-sm mt-1">{detailError}</p>
-        </div>
-        <div className="flex gap-2">
-          <BackButton onClick={() => router.back()} />
-          <Button onClick={() => fetchAppliedJobDetail(id)} size="sm">
-            <IconRefresh size={14} />
-            Retry
-          </Button>
-        </div>
-      </div>
+      <ErrorState
+        message={detailError}
+        onRetry={() => fetchAppliedJobDetail(id)}
+        onBack={() => router.back()}
+      />
     );
   }
 
   // ── Not found
   if (!proposal) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-        <div className="p-4 rounded-full bg-muted">
-          <IconBriefcase className="size-8 text-muted-foreground" />
-        </div>
-        <div>
-          <h2 className="font-semibold text-lg">Proposal not found</h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            This proposal may have been deleted or you don&apos;t have access to
-            it.
-          </p>
-        </div>
-        <BackButton onClick={() => router.back()} />
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Proposal not found"
+        message="This proposal may have been deleted or you don't have access to it."
+        onBack={() => router.back()}
+      />
     );
   }
 
@@ -270,9 +231,9 @@ function AppliedJobDetailContent({ id }: { id: string }) {
               {job?.title || "Applied Job Proposal"}
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Applied on {formatDate(proposal.created_at)}
+              Applied on {formatDateInTimezone(proposal.created_at)}
               {proposal.updated_at !== proposal.created_at && (
-                <> · Updated {formatDate(proposal.updated_at)}</>
+                <> · Updated {formatDateInTimezone(proposal.updated_at)}</>
               )}
             </p>
           </div>
@@ -336,7 +297,7 @@ function AppliedJobDetailContent({ id }: { id: string }) {
                   <InfoRow
                     icon={IconCalendar}
                     label="Deadline"
-                    value={formatDate(job.deadline)}
+                    value={formatDateInTimezone(job.deadline)}
                   />
                   {job.location && (
                     <InfoRow
@@ -726,7 +687,7 @@ function AppliedJobDetailContent({ id }: { id: string }) {
                 <div>
                   <p className="text-xs text-muted-foreground">Job Deadline</p>
                   <p className="text-sm font-medium mt-0.5">
-                    {formatDate(job.deadline)}
+                    {formatDateInTimezone(job.deadline)}
                   </p>
                 </div>
               )}

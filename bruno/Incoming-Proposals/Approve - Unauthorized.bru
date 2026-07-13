@@ -1,0 +1,27 @@
+meta {
+  name: Approve - Unauthorized
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/incoming/{{proposalId}}
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body {
+  {
+    "action": "approve"
+  }
+}
+
+docs {
+  ## Approve Proposal — Unauthorized
+
+  Expects 401 response when no auth token is provided.
+}

@@ -1,0 +1,22 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/incoming
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Incoming Proposals — Protected (Job Owner)
+
+  Returns a paginated list of proposals for jobs owned by the caller.
+  Includes applicant profile data and job details.
+}

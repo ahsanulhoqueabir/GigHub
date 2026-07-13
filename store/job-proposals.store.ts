@@ -67,6 +67,50 @@ export interface UpdateAppliedJobParams {
   status?: Extract<Status, "DRAFT" | "PENDING">;
 }
 
+// ─── Incoming Proposals Types ────────────────────────────────────────────────
+
+/** Incoming proposal list item — includes nested job + applicant info. */
+export type IncomingProposalItem = {
+  id: string;
+  job:
+    | (Pick<Job, "id" | "title" | "slug" | "status"> & {
+        budget?: number;
+        type?: string;
+        deadline?: string;
+      })
+    | null;
+  applicant:
+    | {
+        id: string;
+        name: string;
+        username: string;
+        avatar?: string;
+        verified?: boolean;
+        department?: string;
+      }
+    | string
+    | null;
+  description: string;
+  attachments: string[];
+  created_at: string;
+  updated_at: string;
+  status: string;
+};
+
+/** Result of approving a proposal — includes updated proposal + created order. */
+export interface ApproveProposalResult {
+  proposal: {
+    id: string;
+    status: string;
+    updated_at: string;
+  };
+  order: {
+    id: string;
+    code: string;
+    status: string;
+  };
+}
+
 // ─── State ─────────────────────────────────────────────────────────────────
 
 interface JobProposalsState {
@@ -100,6 +144,22 @@ interface JobProposalsState {
   // Update Applied Job
   isUpdatingApplied: boolean;
   updateAppliedError: string | null;
+
+  // Incoming Proposals (job owner's perspective)
+  incomingProposals: IncomingProposalItem[];
+  isLoadingIncoming: boolean;
+  incomingError: string | null;
+  incomingPagination: PaginationMeta;
+
+  // Incoming Proposal Detail
+  selectedIncomingProposal: AppliedJobDetail | null;
+  isLoadingIncomingDetail: boolean;
+  incomingDetailError: string | null;
+
+  // Approve Proposal
+  isApproving: boolean;
+  approveError: string | null;
+  approveResult: ApproveProposalResult | null;
 }
 
 interface JobProposalsActions {
@@ -129,6 +189,16 @@ interface JobProposalsActions {
     params: UpdateAppliedJobParams,
   ) => Promise<void>;
   clearUpdateAppliedError: () => void;
+
+  // Incoming Proposals (job owner's perspective)
+  fetchIncomingProposals: (
+    filters?: { job?: string },
+    page?: number,
+    limit?: number,
+  ) => Promise<void>;
+  fetchIncomingProposalDetail: (id: string) => Promise<void>;
+  approveProposal: (id: string) => Promise<void>;
+  clearApproveError: () => void;
 
   // Delete
   deleteProposal: (id: string) => Promise<void>;
@@ -166,6 +236,19 @@ const initialState: JobProposalsState = {
 
   isUpdatingApplied: false,
   updateAppliedError: null,
+
+  incomingProposals: [],
+  isLoadingIncoming: false,
+  incomingError: null,
+  incomingPagination: defaultPagination(),
+
+  selectedIncomingProposal: null,
+  isLoadingIncomingDetail: false,
+  incomingDetailError: null,
+
+  isApproving: false,
+  approveError: null,
+  approveResult: null,
 };
 
 // ─── Store ─────────────────────────────────────────────────────────────────
@@ -284,6 +367,88 @@ export const useJobProposalsStore = create<JobProposalsStore>()((set) => ({
   },
 
   clearUpdateAppliedError: () => set({ updateAppliedError: null }),
+
+  /* ── Incoming Proposals (job owner) ────────────────────── */
+  fetchIncomingProposals: async (filters, page = 1, limit = 20) => {
+    set({ isLoadingIncoming: true, incomingError: null });
+    try {
+      const params: Record<string, unknown> = { page, limit };
+      if (filters?.job) params.job = filters.job;
+
+      const { data } = await api_client.get("/job-proposal/incoming", {
+        params,
+      });
+      set({
+        incomingProposals: data.data?.items ?? [],
+        incomingPagination: data.data?.pagination ?? defaultPagination(),
+        isLoadingIncoming: false,
+      });
+    } catch (err: unknown) {
+      set({
+        isLoadingIncoming: false,
+        incomingError: getErrorMessage(err),
+      });
+    }
+  },
+
+  fetchIncomingProposalDetail: async (id) => {
+    set({
+      isLoadingIncomingDetail: true,
+      incomingDetailError: null,
+      selectedIncomingProposal: null,
+    });
+    try {
+      const { data } = await api_client.get(`/job-proposal/incoming/${id}`);
+      set({
+        selectedIncomingProposal: data.data ?? null,
+        isLoadingIncomingDetail: false,
+      });
+    } catch (err: unknown) {
+      set({
+        isLoadingIncomingDetail: false,
+        incomingDetailError: getErrorMessage(err),
+      });
+    }
+  },
+
+  approveProposal: async (id) => {
+    set({ isApproving: true, approveError: null, approveResult: null });
+    try {
+      const { data } = await api_client.patch(`/job-proposal/incoming/${id}`, {
+        action: "approve",
+      });
+      const result = data.data;
+      set({
+        isApproving: false,
+        approveResult: result ?? null,
+        // Update the detail view if open
+        selectedIncomingProposal: result?.proposal
+          ? {
+              ...(useJobProposalsStore.getState()
+                .selectedIncomingProposal as AppliedJobDetail),
+              status: result.proposal.status,
+            }
+          : (useJobProposalsStore.getState()
+              .selectedIncomingProposal as AppliedJobDetail),
+        // Update the list item status
+        incomingProposals: useJobProposalsStore
+          .getState()
+          .incomingProposals.map((p) =>
+            p.id === id
+              ? { ...p, status: result?.proposal?.status ?? p.status }
+              : p,
+          ),
+      });
+    } catch (err: unknown) {
+      set({
+        isApproving: false,
+        approveError: getErrorMessage(err),
+      });
+      throw err;
+    }
+  },
+
+  clearApproveError: () => set({ approveError: null, approveResult: null }),
 
   /* ── Delete ────────────────────────────────────────────── */
   deleteProposal: async (id) => {

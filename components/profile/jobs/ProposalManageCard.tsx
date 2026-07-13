@@ -55,9 +55,7 @@ export function AppliedJobCard({
       {/* Applied date */}
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <IconCalendar className="size-3.5 shrink-0" />
-        <span>
-          Applied {new Date(proposal.created_at).toLocaleDateString()}
-        </span>
+        <span>Applied {formatShortDate(proposal.created_at)}</span>
       </div>
 
       {/* Action buttons */}
@@ -91,6 +89,7 @@ export function AppliedJobCard({
 
 // ─── Legacy card kept for backward compat ────────────────────────────────────
 
+import { formatShortDate } from "@/lib/date.utils";
 import { getJobTypeBadgeColors } from "@/lib/shared/badge.utils";
 import type { ManageJobProposalItem } from "@/store/job-proposals.store";
 import { IconCurrencyDollar } from "@tabler/icons-react";
@@ -151,7 +150,7 @@ export function ProposalManageCard({
         )}
         <span className="flex items-center gap-1">
           <IconCalendar className="size-3.5" />
-          {new Date(proposal.created_at).toLocaleDateString()}
+          {formatShortDate(proposal.created_at)}
         </span>
       </div>
 

@@ -1,0 +1,33 @@
+meta {
+  name: Approve
+  type: http
+  seq: 5
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/incoming/{{proposalId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body {
+  {
+    "action": "approve"
+  }
+}
+
+docs {
+  ## Approve Proposal — Protected (Job Owner)
+
+  Approves a PENDING proposal and atomically creates an order + chat room.
+  Only the job owner can perform this action.
+
+  Returns:
+  - Updated proposal with status APPROVED
+  - Created order with code, id, status
+}

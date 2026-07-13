@@ -1,0 +1,22 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/incoming/{{proposalId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Incoming Proposal By ID — Protected (Job Owner)
+
+  Returns full proposal detail with job, owner, category & applicant info.
+  Access-gated: only the proposal applicant OR job owner can view.
+}

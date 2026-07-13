@@ -1,0 +1,28 @@
+meta {
+  name: Approve - Invalid Action
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{baseUrl}}/api/job-proposal/incoming/{{proposalId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body {
+  {
+    "action": "reject"
+  }
+}
+
+docs {
+  ## Approve Proposal — Invalid Action
+
+  Expects 400 response when action is not "approve".
+}

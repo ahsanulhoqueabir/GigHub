@@ -541,4 +541,168 @@ export class JobProposalService {
       return error((err as Error).message || "An unknown error occurred");
     }
   }
+
+  /**
+   * Get paginated list of proposals for jobs owned by the caller.
+   *
+   * Uses an `!inner` join on the job relation to filter proposals
+   * by `job.owner` directly — no separate job-ID fetch needed.
+   * Only returns proposals with PENDING or APPROVED status.
+   *
+   * Returns raw `{ items, total }` — pagination meta is built by the API layer.
+   */
+  static async getIncomingProposals(
+    callerProfileId: string,
+    params: PaginationOptions & {
+      job?: string;
+      sortBy?: string;
+      sortOrder?: "asc" | "desc";
+    },
+  ): Promise<ServiceResult<{ items: JobProposal[]; total: number }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+      const { limit, offset } = paginationParams(params);
+      const { sortBy = "created_at", sortOrder = "desc" } = params;
+
+      // Use !inner join on job so that `job.owner` filter works as an
+      // INNER JOIN — proposals for jobs not owned by caller are excluded.
+      let query = supabase.from(this.collection).select(
+        `
+          *,
+          job:job!job_proposal_job_fkey!inner (
+            id, title, slug, status, budget, type, deadline
+          ),
+          applicant:profile!job_proposal_applicant_fkey (
+            id, name, username, avatar, verified, department
+          )
+        `,
+        { count: "exact", head: false },
+      );
+
+      // Filter via inner join: only proposals for jobs owned by caller
+      query = query.eq("job.owner", callerProfileId);
+
+      // Only return PENDING or APPROVED proposals
+      query = query.in("status", ["PENDING", "APPROVED"]);
+
+      // Apply sorting
+      const allowedSortFields = ["created_at", "updated_at"];
+      const actualSortBy = allowedSortFields.includes(sortBy)
+        ? sortBy
+        : "created_at";
+
+      query = query.order(actualSortBy, {
+        ascending: sortOrder === "asc",
+        nullsFirst: false,
+      });
+
+      // Apply pagination
+      query = query.range(offset, offset + limit - 1);
+
+      const { data, error: sbError, count } = await query;
+
+      if (sbError) {
+        return error(sbError.message);
+      }
+
+      return success({
+        items: (data as unknown as JobProposal[]) ?? [],
+        total: count ?? 0,
+      });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Get a single incoming proposal by ID.
+   *
+   * Uses the existing RPC which enforces access control at DB level:
+   * caller must be proposal applicant OR job owner.
+   */
+  static async getIncomingProposalById(
+    proposalId: string,
+    callerProfileId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<ServiceResult<any>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "get_applied_job_details",
+        {
+          p_proposal_id: proposalId,
+          p_caller_profile: callerProfileId,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as {
+        success: boolean;
+        data?: unknown;
+        error?: string;
+      };
+
+      if (!result.success) {
+        return error(result.error ?? "Not found");
+      }
+
+      return success(result.data);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Approve a PENDING job proposal and atomically create an order.
+   *
+   * Calls the `approve_job_proposal` RPC which:
+   *   1. Validates proposal exists and is PENDING
+   *   2. Validates caller is the job owner
+   *   3. Updates proposal status to APPROVED
+   *   4. Creates order + chat room
+   *   5. Returns updated proposal + created order
+   *
+   * Only the job owner can approve. Admin cannot approve on behalf.
+   */
+  static async approveProposal(
+    proposalId: string,
+    callerProfileId: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<ServiceResult<any>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "approve_job_proposal",
+        {
+          p_proposal_id: proposalId,
+          p_caller_profile: callerProfileId,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as {
+        success: boolean;
+        data?: { proposal: unknown; order: unknown };
+        error?: string;
+      };
+
+      if (!result.success) {
+        return error(result.error ?? "Failed to approve proposal");
+      }
+
+      return success(result.data);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
 }

@@ -6,6 +6,7 @@ import { AppliedJobCard } from "@/components/profile/jobs/ProposalManageCard";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { formatShortDate } from "@/lib/date.utils";
 import type { AppliedJobItem } from "@/store/job-proposals.store";
 import { useJobProposalsStore } from "@/store/job-proposals.store";
 import { IconArrowRight } from "@tabler/icons-react";
@@ -94,7 +95,7 @@ function AppliedJobsContent() {
       sortable: true,
       render: (val) => (
         <span className="text-xs text-muted-foreground">
-          {val ? new Date(String(val)).toLocaleDateString() : "N/A"}
+          {formatShortDate(val as string)}
         </span>
       ),
     },
@@ -104,7 +105,7 @@ function AppliedJobsContent() {
       width: 8,
       render: (val) => (
         <span className="text-xs text-muted-foreground">
-          {val ? new Date(String(val)).toLocaleDateString() : "N/A"}
+          {formatShortDate(val as string)}
         </span>
       ),
     },

@@ -1,0 +1,17 @@
+meta {
+  name: List - Unauthorized
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/job-proposal/incoming
+  body: none
+  auth: none
+}
+
+docs {
+  ## List Incoming Proposals — Unauthorized
+
+  Expects 401 response when no auth token is provided.
+}
