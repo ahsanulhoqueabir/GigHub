@@ -1,8 +1,9 @@
 import { api_client } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { defaultPagination } from "@/lib/pagination";
+import { CategoryMinimal } from "@/types/db/category.types";
 import type { CreateJobProposalParams } from "@/types/db/job-proposal.types";
-import type { Job, JobCategoryInfo, JobOwnerInfo } from "@/types/db/job.types";
+import type { Job, JobOwnerInfo } from "@/types/db/job.types";
 import type { Status, SystemFields } from "@/types/generic.types";
 import { PaginationMeta } from "@/types/pagination.types";
 import { create } from "zustand";
@@ -54,7 +55,7 @@ export type AppliedJobDetail = {
         | "tags"
       > & {
         owner: JobOwnerInfo;
-        category: JobCategoryInfo;
+        category: CategoryMinimal;
       })
     | null;
   applicant: JobOwnerInfo | null;

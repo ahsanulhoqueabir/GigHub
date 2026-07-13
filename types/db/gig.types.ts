@@ -49,7 +49,7 @@ export interface GigForm extends Omit<
 // ─── UI / View helpers ─────────────────────────────────────────────────────
 
 /** Minimal seller info — subset of Profile fields used in lists */
-export type GigSellerInfo = ProfileMinimal & "verified";
+export type GigSellerInfo = ProfileMinimal & { verified: boolean };
 
 /** Extended seller info for detail pages */
 export type GigSellerDetail = GigSellerInfo & {

@@ -50,7 +50,7 @@ export interface JobForm extends Omit<
 // ─── UI / View helpers (reused by stores & components) ────────────────────
 
 /** Minimal owner info — subset of Profile fields used in lists */
-export type JobOwnerInfo = ProfileMinimal & "verified";
+export type JobOwnerInfo = ProfileMinimal & { verified: boolean };
 
 /** Extended owner info for detail pages */
 export type JobOwnerDetail = JobOwnerInfo & {
