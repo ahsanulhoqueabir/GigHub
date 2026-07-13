@@ -82,7 +82,7 @@ function AppliedJobsContent() {
       label: "Proposal",
       width: 30,
       render: (val) => (
-        <span className="text-xs text-muted-foreground line-clamp-2">
+        <span className="text-xs text-muted-foreground line-clamp-2 max-w-xs">
           {String(val || "—")}
         </span>
       ),

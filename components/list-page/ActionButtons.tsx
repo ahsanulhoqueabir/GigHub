@@ -1,13 +1,13 @@
-import { useState, useCallback } from "react";
-import { IconDotsVertical } from "@tabler/icons-react";
+import { DeleteConfirmDialog } from "@/components/shared/delete-confirm-dialog";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react";
+import { useCallback, useState } from "react";
 import { ActionConfig } from "./types";
-import { DeleteConfirmDialog } from "@/components/shared/delete-confirm-dialog";
 
 interface ActionButtonsProps<T> {
   item: T;
@@ -64,7 +64,7 @@ export function ActionButtons<T extends { id: string }>({
   if (defaultActions.includes("edit") && onEdit && canEdit) {
     allActions.push({
       label: "Edit",
-      icon: undefined,
+      icon: IconEdit,
       onClick: () => onEdit(item),
     });
   }
@@ -73,7 +73,7 @@ export function ActionButtons<T extends { id: string }>({
   if (defaultActions.includes("delete") && onDelete && canDelete) {
     allActions.push({
       label: "Delete",
-      icon: undefined,
+      icon: IconTrash,
       onClick: handleDeleteClick,
       className: "text-destructive",
     });

@@ -48,14 +48,16 @@ export function AppliedJobCard({
       {proposal.description && (
         <div className="flex items-start gap-2 text-xs text-muted-foreground">
           <IconFileDescription className="size-3.5 mt-0.5 shrink-0" />
-          <p className="line-clamp-2">{proposal.description}</p>
+          <p>{proposal.description}</p>
         </div>
       )}
 
       {/* Applied date */}
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <IconCalendar className="size-3.5 shrink-0" />
-        <span>Applied {new Date(proposal.created_at).toLocaleDateString()}</span>
+        <span>
+          Applied {new Date(proposal.created_at).toLocaleDateString()}
+        </span>
       </div>
 
       {/* Action buttons */}
@@ -89,10 +91,8 @@ export function AppliedJobCard({
 
 // ─── Legacy card kept for backward compat ────────────────────────────────────
 
+import { getJobTypeBadgeColors } from "@/lib/shared/badge.utils";
 import type { ManageJobProposalItem } from "@/store/job-proposals.store";
-import {
-  getJobTypeBadgeColors,
-} from "@/lib/shared/badge.utils";
 import { IconCurrencyDollar } from "@tabler/icons-react";
 
 interface ProposalManageCardProps {
