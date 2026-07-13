@@ -3,6 +3,13 @@
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import type {
   RecentGig,
@@ -20,33 +27,29 @@ interface RecentGigsProps {
 export function RecentGigs({ gigs }: RecentGigsProps) {
   if (gigs.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Recent Gigs
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No gigs yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Gigs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No gigs yet.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-3">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Recent Gigs
-        </h3>
-        <p className="text-sm text-muted-foreground">Latest 10 gigs</p>
-      </div>
-      <div className="px-6 pb-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Gigs</CardTitle>
+        <CardDescription>Latest 10 gigs</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-2">
           {gigs.map((gig) => (
             <div
               key={gig.id}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50"
+              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/20"
             >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium truncate">{gig.title}</p>
@@ -58,8 +61,8 @@ export function RecentGigs({ gigs }: RecentGigsProps) {
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -72,33 +75,29 @@ interface RecentJobsProps {
 export function RecentJobs({ jobs }: RecentJobsProps) {
   if (jobs.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Recent Jobs
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No jobs yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Jobs</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No jobs yet.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-3">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Recent Jobs
-        </h3>
-        <p className="text-sm text-muted-foreground">Latest 10 jobs</p>
-      </div>
-      <div className="px-6 pb-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Jobs</CardTitle>
+        <CardDescription>Latest 10 jobs</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-2">
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50"
+              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/20"
             >
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium truncate">{job.title}</p>
@@ -110,8 +109,8 @@ export function RecentJobs({ jobs }: RecentJobsProps) {
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -124,30 +123,24 @@ interface RecentSignupsProps {
 export function RecentSignups({ signups }: RecentSignupsProps) {
   if (signups.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            New Signups
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No signups yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>New Signups</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No signups yet.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-3">
-        <h3 className="font-semibold leading-none tracking-tight">
-          New Signups
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Latest 10 registered users
-        </p>
-      </div>
-      <div className="px-6 pb-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>New Signups</CardTitle>
+        <CardDescription>Latest 10 registered users</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-3">
           {signups.map((user) => {
             const initials =
@@ -190,8 +183,8 @@ export function RecentSignups({ signups }: RecentSignupsProps) {
             );
           })}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -208,33 +201,29 @@ export function RecentOrders({
 }: RecentOrdersProps) {
   if (orders.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Recent Orders
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No orders yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No orders yet.</p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-3">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Recent Orders
-        </h3>
-        <p className="text-sm text-muted-foreground">Latest 10 orders</p>
-      </div>
-      <div className="px-6 pb-6">
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent Orders</CardTitle>
+        <CardDescription>Latest 10 orders</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div className="space-y-2">
           {orders.map((order) => (
             <div
               key={order.id}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/50"
+              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-accent/20"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -260,7 +249,7 @@ export function RecentOrders({
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

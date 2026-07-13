@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type {
   CategoryDistribution,
   DepartmentDistribution,
@@ -23,30 +30,26 @@ interface TopGigCategoriesProps {
 export function TopGigCategories({ categories }: TopGigCategoriesProps) {
   if (categories.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Top Gig Categories
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No categories with gigs yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Gig Categories</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            No categories with gigs yet.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-2">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Top Gig Categories
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Categories with most gigs
-        </p>
-      </div>
-      <div className="p-4 pt-0">
+    <Card>
+      <CardHeader>
+        <CardTitle>Top Gig Categories</CardTitle>
+        <CardDescription>Categories with most gigs</CardDescription>
+      </CardHeader>
+      <CardContent>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={categories} layout="vertical">
             <CartesianGrid
@@ -82,8 +85,8 @@ export function TopGigCategories({ categories }: TopGigCategoriesProps) {
             <Bar dataKey="count" fill="#8884d8" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -96,30 +99,26 @@ interface TopJobCategoriesProps {
 export function TopJobCategories({ categories }: TopJobCategoriesProps) {
   if (categories.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Top Job Categories
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No categories with jobs yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Job Categories</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            No categories with jobs yet.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-2">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Top Job Categories
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          Categories with most jobs
-        </p>
-      </div>
-      <div className="p-4 pt-0">
+    <Card>
+      <CardHeader>
+        <CardTitle>Top Job Categories</CardTitle>
+        <CardDescription>Categories with most jobs</CardDescription>
+      </CardHeader>
+      <CardContent>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={categories} layout="vertical">
             <CartesianGrid
@@ -155,8 +154,8 @@ export function TopJobCategories({ categories }: TopJobCategoriesProps) {
             <Bar dataKey="count" fill="#82ca9d" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -169,30 +168,26 @@ interface UsersByDepartmentProps {
 export function UsersByDepartment({ departments }: UsersByDepartmentProps) {
   if (departments.length === 0) {
     return (
-      <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-        <div className="flex flex-col space-y-1.5 p-6">
-          <h3 className="font-semibold leading-none tracking-tight">
-            Users by Department
-          </h3>
-        </div>
-        <div className="p-6 pt-0 text-sm text-muted-foreground">
-          No department data yet.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Users by Department</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            No department data yet.
+          </p>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-      <div className="flex flex-col space-y-1.5 p-6 pb-2">
-        <h3 className="font-semibold leading-none tracking-tight">
-          Users by Department
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          User distribution across departments
-        </p>
-      </div>
-      <div className="p-4 pt-0">
+    <Card>
+      <CardHeader>
+        <CardTitle>Users by Department</CardTitle>
+        <CardDescription>User distribution across departments</CardDescription>
+      </CardHeader>
+      <CardContent>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={departments} layout="vertical">
             <CartesianGrid
@@ -228,7 +223,7 @@ export function UsersByDepartment({ departments }: UsersByDepartmentProps) {
             <Bar dataKey="count" fill="#ffc658" radius={[0, 4, 4, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

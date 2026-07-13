@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { DistributionItem } from "@/types/admin-dashboard.types";
 import { motion } from "motion/react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
@@ -64,19 +71,17 @@ export function PieChartCard({
 
   if (data.length === 0) {
     return (
-      <div className="rounded-2xl border border-border/40 bg-linear-to-b from-card to-card/90 dark:from-card/50 dark:to-card/30 p-6 shadow-sm">
-        <div className="flex flex-col space-y-1.5 pb-2">
-          <h3 className="text-sm font-semibold tracking-wide text-foreground">
-            {title}
-          </h3>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
-        </div>
-        <div className="flex items-center justify-center h-70 text-muted-foreground text-sm">
-          No data available.
-        </div>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+          {subtitle && <CardDescription>{subtitle}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-70 text-muted-foreground text-sm">
+            No data available.
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -94,14 +99,10 @@ export function PieChartCard({
       {/* Decorative background glow */}
       <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full blur-2xl opacity-5 dark:opacity-10 bg-primary transition-opacity duration-300 group-hover:opacity-15 pointer-events-none" />
 
-      <div className="flex flex-col space-y-1 pb-3">
-        <h3 className="text-sm font-semibold tracking-wide text-foreground">
-          {title}
-        </h3>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        )}
-      </div>
+      <CardHeader className="pb-3">
+        <CardTitle>{title}</CardTitle>
+        {subtitle && <CardDescription>{subtitle}</CardDescription>}
+      </CardHeader>
 
       <div className="relative flex items-center justify-center p-2 pt-0">
         <ResponsiveContainer width="100%" height={180}>
