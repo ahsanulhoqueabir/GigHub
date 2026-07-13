@@ -2,6 +2,7 @@
 
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { useReturnTo } from "@/hooks/use-return-to";
@@ -165,9 +166,7 @@ function AdBannerDetailsContent() {
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-red-500 font-medium">
-            Ad banner not found
-          </div>
+          <ErrorState type="not-found" heading="Ad banner not found" compact />
         )}
       </div>
 

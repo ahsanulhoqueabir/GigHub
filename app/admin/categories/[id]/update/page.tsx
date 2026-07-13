@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { CategoryForm } from "@/components/admin/categories/CategoryForm";
-import { useCategoriesStore } from "@/store/categories.store";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
+import { useCategoriesStore } from "@/store/categories.store";
 import { Category } from "@/types/db/category.types";
+import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function UpdateCategoryContent() {
   const params = useParams();
@@ -32,9 +33,7 @@ function UpdateCategoryContent() {
       ) : initialData ? (
         <CategoryForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          Category not found
-        </div>
+        <ErrorState type="not-found" heading="Category not found" compact />
       )}
     </div>
   );

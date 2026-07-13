@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorState } from "@/components/shared/error-state";
 import { BackButton } from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -174,12 +175,17 @@ export default function JobApplyPage() {
 
   if (!job) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 lg:px-8">
-        <p className="text-muted-foreground">Job not found.</p>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/jobs">Back to Jobs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Job not found"
+        message="The job you are applying to does not exist or has been removed."
+        onBack={() => window.history.back()}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/jobs">Browse Jobs</Link>
+          </Button>
+        }
+      />
     );
   }
 

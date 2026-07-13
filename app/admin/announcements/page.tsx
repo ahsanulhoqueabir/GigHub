@@ -3,6 +3,7 @@
 import { ListPage } from "@/components/list-page/ListPage";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useReturnTo } from "@/hooks/use-return-to";
+import { formatShortDate } from "@/lib/date.utils";
 import { useAnnouncementsStore } from "@/store/announcements.store";
 import { Announcement } from "@/types/db/announcement.types";
 import { IconPlus } from "@tabler/icons-react";
@@ -103,7 +104,7 @@ export default function AnnouncementsListPage() {
           sortable: true,
           render: (_: unknown, item: Announcement) => (
             <span className="text-sm text-muted-foreground">
-              {new Date(item.created_at).toLocaleDateString()}
+              {formatShortDate(item.created_at)}
             </span>
           ),
         },

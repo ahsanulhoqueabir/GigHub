@@ -1,6 +1,7 @@
 "use client";
 
 import { AnnouncementForm } from "@/components/admin/announcements/AnnouncementForm";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useAnnouncementsStore } from "@/store/announcements.store";
 import { Announcement } from "@/types/db/announcement.types";
@@ -32,9 +33,7 @@ function UpdateAnnouncementContent() {
       ) : initialData ? (
         <AnnouncementForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          Announcement not found
-        </div>
+        <ErrorState type="not-found" heading="Announcement not found" compact />
       )}
     </div>
   );

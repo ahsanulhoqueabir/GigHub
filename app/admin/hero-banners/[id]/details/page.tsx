@@ -2,6 +2,7 @@
 
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { useReturnTo } from "@/hooks/use-return-to";
@@ -177,9 +178,11 @@ function HeroBannerDetailsContent() {
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-red-500 font-medium">
-            Hero banner not found
-          </div>
+          <ErrorState
+            type="not-found"
+            heading="Hero banner not found"
+            compact
+          />
         )}
       </div>
 

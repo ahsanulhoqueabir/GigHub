@@ -5,6 +5,7 @@ import {
   IconBuilding,
   IconCategory,
   IconHome,
+  IconMail,
   IconPhoto,
   IconPlus,
   IconSettings,
@@ -140,6 +141,12 @@ export const profileNavConfig: NavItem[] = [
     label: "Applied Jobs",
     href: "/profile/applied-jobs",
     icon: IconBriefcase,
+  },
+  {
+    id: "incoming-proposals",
+    label: "Incoming Proposals",
+    href: "/profile/incoming-proposals",
+    icon: IconMail,
   },
   {
     id: "orders",

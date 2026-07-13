@@ -1,6 +1,7 @@
 "use client";
 
 import { GigCard } from "@/components/home/gig-card";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGigsStore } from "@/store/gigs.store";
@@ -140,22 +141,33 @@ function GigsPageContent() {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <IconAdjustmentsHorizontal className="size-10 text-muted-foreground/40" />
-          <p className="mt-3 text-sm text-muted-foreground">
-            {hasActiveFilters || debouncedSearch
-              ? `No gigs found matching your filters.`
-              : "No gigs available yet."}
-          </p>
-          {hasActiveFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="mt-2 text-sm text-primary hover:underline"
-            >
-              Clear all filters
-            </button>
-          )}
-        </div>
+        <EmptyState
+          icon={
+            <div className="p-4 rounded-full bg-muted">
+              <IconAdjustmentsHorizontal className="size-8 text-muted-foreground" />
+            </div>
+          }
+          heading={
+            hasActiveFilters || debouncedSearch
+              ? "No gigs found"
+              : "No gigs available yet"
+          }
+          description={
+            hasActiveFilters || debouncedSearch
+              ? "No gigs found matching your filters."
+              : undefined
+          }
+          actions={
+            hasActiveFilters ? (
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-primary hover:underline"
+              >
+                Clear all filters
+              </button>
+            ) : undefined
+          }
+        />
       )}
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import {
   Accordion,
   AccordionContent,
@@ -62,12 +63,17 @@ export default function GigDetailPage() {
 
   if (!gig) {
     return (
-      <div className="">
-        <p className="text-muted-foreground">Gig not found.</p>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/gigs">Back to Gigs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Gig not found"
+        message="The gig you are looking for does not exist or has been removed."
+        onBack={() => window.history.back()}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/gigs">Browse Gigs</Link>
+          </Button>
+        }
+      />
     );
   }
 

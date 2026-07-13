@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorState } from "@/components/shared/error-state";
 import { BackButton } from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -132,12 +133,17 @@ function GigOrderPageContent() {
 
   if (!gig) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6 lg:px-8">
-        <p className="text-muted-foreground">Gig not found.</p>
-        <Button asChild variant="outline" className="mt-4">
-          <Link href="/gigs">Back to Gigs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Gig not found"
+        message="The gig you are trying to order does not exist or has been removed."
+        onBack={() => window.history.back()}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href="/gigs">Browse Gigs</Link>
+          </Button>
+        }
+      />
     );
   }
 

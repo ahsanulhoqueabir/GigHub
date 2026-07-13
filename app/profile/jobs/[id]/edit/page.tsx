@@ -1,6 +1,7 @@
 "use client";
 
 import { JobForm } from "@/components/jobs/job-form";
+import { ErrorState } from "@/components/shared/error-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 import { Button } from "@/components/ui/button";
@@ -53,16 +54,20 @@ function EditJobContent() {
 
   if (detailError || !currentJob) {
     return (
-      <div className="max-w-3xl mx-auto text-center py-16 px-4">
-        <h2 className="text-2xl font-bold text-destructive">Job Not Found</h2>
-        <p className="text-muted-foreground mt-2">
-          {detailError ||
-            "The job you are trying to edit does not exist or has been deleted."}
-        </p>
-        <Button className="mt-6" asChild>
-          <Link href={returnTo}>Back to Jobs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Job not found"
+        message={
+          detailError ||
+          "The job you are trying to edit does not exist or has been deleted."
+        }
+        onBack={() => router.push(returnTo)}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href={returnTo}>Back to Jobs</Link>
+          </Button>
+        }
+      />
     );
   }
 

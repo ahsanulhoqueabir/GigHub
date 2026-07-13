@@ -1,15 +1,16 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
+import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
+import { Button } from "@/components/ui/button";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { useUsersStore } from "@/store/users.store";
+import { Profile } from "@/types/db/profile.types";
 import { IconArrowLeft, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
-import { useReturnTo } from "@/hooks/use-return-to";
-import { DetailsSkeleton } from "@/components/shared/details-skeleton";
-import { Profile } from "@/types/db/profile.types";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 function UserDetailsContent() {
   const params = useParams();
@@ -139,9 +140,7 @@ function UserDetailsContent() {
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-red-500 font-medium">
-            User not found
-          </div>
+          <ErrorState type="not-found" heading="User not found" compact />
         )}
       </div>
 

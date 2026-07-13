@@ -1,6 +1,7 @@
 "use client";
 
 import { DepartmentForm } from "@/components/admin/departments/DepartmentForm";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useDepartmentsStore } from "@/store/departments.store";
 import { Department } from "@/types/db/department.types";
@@ -32,9 +33,7 @@ function UpdateDepartmentContent() {
       ) : initialData ? (
         <DepartmentForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          Department not found
-        </div>
+        <ErrorState type="not-found" heading="Department not found" compact />
       )}
     </div>
   );

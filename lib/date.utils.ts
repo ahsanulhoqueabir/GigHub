@@ -38,6 +38,46 @@ export function formatDateInTimezone(
   }
 }
 
+// ─── Convenience presets ──────────────────────────────────────────────────────
+
+/** Default short-date options (e.g. "Jun 5, 2026"). */
+const SHORT_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+};
+
+/** Date + time options (e.g. "Jun 5, 2026, 2:30 PM"). */
+const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+};
+
+/**
+ * Format a date string as a short date in the configured timezone.
+ *
+ * @example
+ *   formatShortDate("2026-06-05")          // "Jun 5, 2026"
+ *   formatShortDate(null)                  // "—"
+ */
+export function formatShortDate(dateStr: string | null | undefined): string {
+  return formatDateInTimezone(dateStr, SHORT_DATE_OPTIONS);
+}
+
+/**
+ * Format a date string as a date + time in the configured timezone.
+ *
+ * @example
+ *   formatDateTime("2026-06-05T14:30:00")  // "Jun 5, 2026, 2:30 PM"
+ *   formatDateTime(null)                   // "—"
+ */
+export function formatDateTime(dateStr: string | null | undefined): string {
+  return formatDateInTimezone(dateStr, DATE_TIME_OPTIONS);
+}
+
 /**
  * Get today's date as a YYYY-MM-DD string in the configured timezone.
  * Useful for date-only comparisons (e.g., due_date comparisons).

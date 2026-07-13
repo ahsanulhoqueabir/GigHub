@@ -1,6 +1,7 @@
 "use client";
 
 import { AdBannerForm } from "@/components/admin/ad-banners/AdBannerForm";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useAdBannersStore } from "@/store/ad-banners.store";
 import { AdBanner } from "@/types/db/ad-banner.types";
@@ -32,9 +33,7 @@ function UpdateAdBannerContent() {
       ) : initialData ? (
         <AdBannerForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          Ad banner not found
-        </div>
+        <ErrorState type="not-found" heading="Ad banner not found" compact />
       )}
     </div>
   );

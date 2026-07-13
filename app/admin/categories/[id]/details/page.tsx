@@ -1,15 +1,16 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
+import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
+import { Button } from "@/components/ui/button";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { useCategoriesStore } from "@/store/categories.store";
+import type { Category } from "@/types/db/category.types";
 import { IconArrowLeft, IconTrash } from "@tabler/icons-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
-import { useReturnTo } from "@/hooks/use-return-to";
-import { DetailsSkeleton } from "@/components/shared/details-skeleton";
-import type { Category } from "@/types/db/category.types";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 function CategoryDetailsContent() {
   const params = useParams();
@@ -108,9 +109,7 @@ function CategoryDetailsContent() {
             </div>
           </div>
         ) : (
-          <div className="p-6 text-center text-red-500 font-medium">
-            Category not found
-          </div>
+          <ErrorState type="not-found" heading="Category not found" compact />
         )}
       </div>
 

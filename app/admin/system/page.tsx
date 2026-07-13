@@ -1,6 +1,7 @@
 "use client";
 
 import { SystemConfigForm } from "@/components/admin/system/SystemConfigForm";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useSystemConfigStore } from "@/store/system-config.store";
 import { useEffect } from "react";
@@ -18,9 +19,11 @@ export default function SystemConfigPage() {
 
   if (!config) {
     return (
-      <div className="p-6 text-center text-red-500 font-medium">
-        System configuration not found
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="System configuration not found"
+        compact
+      />
     );
   }
 

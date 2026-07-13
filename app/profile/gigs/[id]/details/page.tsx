@@ -2,6 +2,7 @@
 
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,16 +68,20 @@ function GigDetailsContent() {
 
   if (detailError || !currentGig) {
     return (
-      <div className="max-w-3xl mx-auto text-center py-16 px-4">
-        <h2 className="text-2xl font-bold text-destructive">Gig Not Found</h2>
-        <p className="text-muted-foreground mt-2">
-          {detailError ||
-            "The gig you are trying to view does not exist or has been deleted."}
-        </p>
-        <Button className="mt-6" asChild>
-          <Link href={returnTo}>Back to Gigs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Gig not found"
+        message={
+          detailError ||
+          "The gig you are trying to view does not exist or has been deleted."
+        }
+        onBack={() => router.push(returnTo)}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href={returnTo}>Back to Gigs</Link>
+          </Button>
+        }
+      />
     );
   }
 

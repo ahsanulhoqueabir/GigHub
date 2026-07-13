@@ -1,6 +1,7 @@
 "use client";
 
 import { HeroBannerForm } from "@/components/admin/hero-banners/HeroBannerForm";
+import { ErrorState } from "@/components/shared/error-state";
 import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useHeroBannersStore } from "@/store/hero-banners.store";
 import { HeroBanner } from "@/types/db/hero-banner.types";
@@ -32,9 +33,7 @@ function UpdateHeroBannerContent() {
       ) : initialData ? (
         <HeroBannerForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          Hero banner not found
-        </div>
+        <ErrorState type="not-found" heading="Hero banner not found" compact />
       )}
     </div>
   );

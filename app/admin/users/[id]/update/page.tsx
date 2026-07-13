@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import { UserForm } from "@/components/admin/users/UserForm";
+import { ErrorState } from "@/components/shared/error-state";
+import { FormSkeleton } from "@/components/shared/form-skeleton";
 import { useUsersStore } from "@/store/users.store";
 import { Profile } from "@/types/db/profile.types";
-import { FormSkeleton } from "@/components/shared/form-skeleton";
+import { useParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function UpdateUserContent() {
   const params = useParams();
@@ -32,9 +33,7 @@ function UpdateUserContent() {
       ) : initialData ? (
         <UserForm initialData={initialData} isUpdate />
       ) : (
-        <div className="p-6 text-center text-red-500 font-medium">
-          User not found
-        </div>
+        <ErrorState type="not-found" heading="User not found" compact />
       )}
     </div>
   );

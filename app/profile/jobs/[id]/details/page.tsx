@@ -3,11 +3,13 @@
 import { AttachmentChip } from "@/components/shared/attachment-chip";
 import { useDeleteConfirm } from "@/components/shared/delete-confirm-dialog";
 import { DetailsSkeleton } from "@/components/shared/details-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReturnTo } from "@/hooks/use-return-to";
+import { formatDateInTimezone } from "@/lib/date.utils";
 import { STATUS_BADGE_COLORS } from "@/lib/shared/badge.utils";
 import { useJobsStore } from "@/store/jobs.store";
 import {
@@ -70,16 +72,20 @@ function JobDetailsContent() {
 
   if (detailError || !currentJob) {
     return (
-      <div className="max-w-3xl mx-auto text-center py-16 px-4">
-        <h2 className="text-2xl font-bold text-destructive">Job Not Found</h2>
-        <p className="text-muted-foreground mt-2">
-          {detailError ||
-            "The job you are trying to view does not exist or has been deleted."}
-        </p>
-        <Button className="mt-6" asChild>
-          <Link href={returnTo}>Back to Jobs</Link>
-        </Button>
-      </div>
+      <ErrorState
+        type="not-found"
+        heading="Job not found"
+        message={
+          detailError ||
+          "The job you are trying to view does not exist or has been deleted."
+        }
+        onBack={() => router.push(returnTo)}
+        actions={
+          <Button asChild variant="outline" size="sm">
+            <Link href={returnTo}>Back to Jobs</Link>
+          </Button>
+        }
+      />
     );
   }
 
@@ -266,10 +272,7 @@ function JobDetailsContent() {
                   <div>
                     <p className="text-xs text-muted-foreground">Deadline</p>
                     <p className="font-semibold">
-                      {new Date(currentJob.deadline).toLocaleDateString(
-                        "en-US",
-                        { year: "numeric", month: "short", day: "numeric" },
-                      )}
+                      {formatDateInTimezone(currentJob.deadline)}
                     </p>
                   </div>
                 </div>
