@@ -1,0 +1,173 @@
+erDiagram
+
+    DEPARTMENT {
+        uuid id PK
+        text name
+        text code
+        text acronym
+    }
+
+    CATEGORY {
+        uuid id PK
+        text name
+        text slug
+        uuid parent FK
+        int ordering
+    }
+
+    PROFILE {
+        uuid id PK
+        text name
+        text username
+        text email
+        user_role role
+        uuid department FK
+        text student_id
+    }
+
+    GIG {
+        uuid id PK
+        uuid seller FK
+        uuid category FK
+        text title
+        text slug
+        jsonb packages
+    }
+
+    JOB {
+        uuid id PK
+        uuid owner FK
+        uuid category FK
+        text title
+        job_type type
+        text budget
+        timestamp deadline
+    }
+
+    JOB_PROPOSAL {
+        uuid id PK
+        uuid job FK
+        uuid applicant FK
+        text description
+    }
+
+    ORDER {
+        uuid id PK
+        text code
+        uuid buyer FK
+        uuid seller FK
+        uuid gig FK
+        uuid job FK
+        uuid proposal FK
+        order_source source
+        numeric total_price
+        uuid cancellation_request_by FK
+    }
+
+    CHAT_ROOM {
+        uuid id PK
+        uuid order_id FK
+        uuid buyer FK
+        uuid seller FK
+        text title
+    }
+
+    CHAT_MESSAGE {
+        uuid id PK
+        uuid room FK
+        uuid sender FK
+        text content
+    }
+
+    WALLET {
+        uuid id PK
+        uuid user_id FK
+        numeric balance
+        text currency
+    }
+
+    ESCROW {
+        uuid id PK
+        uuid order_id FK
+        uuid sender FK
+        uuid receiver FK
+        numeric amount
+        numeric platform_fee
+    }
+
+    WALLET_RECORD {
+        uuid id PK
+        uuid wallet FK
+        numeric amount
+        wallet_transaction_type type
+        uuid order_id FK
+        uuid escrow_id FK
+    }
+
+    REVIEWS {
+        uuid id PK
+        uuid reviewer FK
+        uuid gig FK
+        uuid seller FK
+        uuid order_id FK
+        smallint rating
+    }
+
+    SYSTEM_CONFIG {
+        boolean id PK
+        boolean maintenance_mode
+        numeric platform_fee_percent
+    }
+
+    HERO_BANNERS {
+        uuid id PK
+        text title
+        text image_url
+        boolean is_active
+    }
+
+    AD_BANNERS {
+        uuid id PK
+        text name
+        text placement
+        boolean is_active
+    }
+
+    ANNOUNCEMENTS {
+        uuid id PK
+        text title
+        text content
+        boolean is_active
+    }
+
+    %% relationships
+    CATEGORY ||--o{ CATEGORY : "parent"
+    DEPARTMENT ||--o{ PROFILE : "department"
+    PROFILE ||--o{ GIG : "seller"
+    CATEGORY ||--o{ GIG : "category"
+    PROFILE ||--o{ JOB : "owner"
+    CATEGORY ||--o{ JOB : "category"
+    JOB ||--o{ JOB_PROPOSAL : "job"
+    PROFILE ||--o{ JOB_PROPOSAL : "applicant"
+    PROFILE ||--o{ ORDER : "buyer"
+    PROFILE ||--o{ ORDER : "seller"
+    GIG ||--o{ ORDER : "gig"
+    JOB ||--o{ ORDER : "job"
+    JOB_PROPOSAL ||--o{ ORDER : "proposal"
+    PROFILE ||--o{ ORDER : "cancellation_request_by"
+    ORDER ||--o{ CHAT_ROOM : "order_id"
+    PROFILE ||--o{ CHAT_ROOM : "buyer"
+    PROFILE ||--o{ CHAT_ROOM : "seller"
+    CHAT_ROOM ||--o{ CHAT_MESSAGE : "room"
+    PROFILE ||--o{ CHAT_MESSAGE : "sender"
+    PROFILE ||--o{ WALLET : "user_id"
+    ORDER ||--o{ ESCROW : "order_id"
+    PROFILE ||--o{ ESCROW : "sender"
+    PROFILE ||--o{ ESCROW : "receiver"
+    WALLET ||--o{ WALLET_RECORD : "wallet"
+    ORDER ||--o{ WALLET_RECORD : "order_id"
+    ESCROW ||--o{ WALLET_RECORD : "escrow_id"
+    PROFILE ||--o{ REVIEWS : "reviewer"
+    GIG ||--o{ REVIEWS : "gig"
+    PROFILE ||--o{ REVIEWS : "seller"
+    ORDER ||--o{ REVIEWS : "order_id"

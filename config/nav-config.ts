@@ -4,6 +4,7 @@ import {
   IconBriefcase,
   IconBuilding,
   IconCategory,
+  IconDatabase,
   IconHome,
   IconMail,
   IconMessageCircle,
@@ -75,6 +76,12 @@ export const adminNavConfig: NavItem[] = [
     label: "System",
     href: "/admin/system",
     icon: IconSettings,
+  },
+  {
+    id: "visualizer",
+    label: "Schema & Use Case",
+    href: "/admin/visualizer",
+    icon: IconDatabase,
   },
   {
     id: "hero-banners",

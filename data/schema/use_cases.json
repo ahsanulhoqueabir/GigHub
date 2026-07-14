@@ -1,0 +1,108 @@
+{
+  "actors": [
+    { "id": "Guest",     "label": "Guest",     "side": "left",  "parentId": null },
+    { "id": "Buyer",     "label": "Buyer",     "side": "left",  "parentId": "Guest" },
+    { "id": "Seller",    "label": "Seller",    "side": "left",  "parentId": "Guest" },
+    { "id": "JobOwner",  "label": "Job Owner", "side": "left",  "parentId": "Guest" },
+    { "id": "Applicant", "label": "Applicant", "side": "left",  "parentId": "Guest" },
+    { "id": "Admin",     "label": "Admin",     "side": "right", "parentId": null },
+    { "id": "Moderator", "label": "Moderator", "side": "right", "parentId": null }
+  ],
+  "useCases": [
+    { "id": "UC_Auth",              "label": "Register / Login",              "category": "General" },
+    { "id": "UC_Profile",           "label": "Manage Profile",                "category": "General" },
+    { "id": "UC_Browse",            "label": "Browse Categories",             "category": "General" },
+
+    { "id": "UC_ManageGig",         "label": "Create / Manage Gig",           "category": "Gig / Seller" },
+    { "id": "UC_BrowseGigs",        "label": "Browse Gigs",                   "category": "Gig / Seller" },
+    { "id": "UC_OrderGig",          "label": "Place Gig Order",               "category": "Gig / Seller" },
+
+    { "id": "UC_PostJob",           "label": "Post Job",                      "category": "Job" },
+    { "id": "UC_BrowseJobs",        "label": "Browse Jobs",                   "category": "Job" },
+    { "id": "UC_Proposal",          "label": "Submit Job Proposal",           "category": "Job" },
+    { "id": "UC_AcceptProposal",    "label": "Accept Proposal / Create Order","category": "Job" },
+
+    { "id": "UC_TrackOrder",        "label": "Track Order Status",            "category": "Order Lifecycle" },
+    { "id": "UC_CancelOrder",       "label": "Request Order Cancellation",    "category": "Order Lifecycle" },
+    { "id": "UC_Chat",              "label": "Chat with Buyer/Seller",        "category": "Order Lifecycle" },
+    { "id": "UC_SendAttachment",    "label": "Send Attachment",               "category": "Order Lifecycle" },
+
+    { "id": "UC_Payment",           "label": "Make Payment",                  "category": "Payments" },
+    { "id": "UC_Wallet",            "label": "Deposit / Withdraw Wallet",     "category": "Payments" },
+    { "id": "UC_Escrow",            "label": "Fund Escrow",                   "category": "Payments" },
+    { "id": "UC_ReleaseEscrow",     "label": "Release Escrow Payment",        "category": "Payments" },
+    { "id": "UC_WalletRecords",     "label": "View Wallet Records",           "category": "Payments" },
+
+    { "id": "UC_Review",            "label": "Leave Review & Rating",         "category": "Reviews" },
+
+    { "id": "UC_ManageCategories",   "label": "Manage Departments & Categories","category": "Admin / Moderation" },
+    { "id": "UC_ManageHero",         "label": "Manage Hero Banners",           "category": "Admin / Moderation" },
+    { "id": "UC_ManageAds",          "label": "Manage Ad Banners",             "category": "Admin / Moderation" },
+    { "id": "UC_ManageAnnouncements","label": "Manage Announcements",          "category": "Admin / Moderation" },
+    { "id": "UC_SystemConfig",       "label": "Configure System Settings",     "category": "Admin / Moderation" },
+    { "id": "UC_Moderate",           "label": "Moderate Content / Users",      "category": "Admin / Moderation" },
+    { "id": "UC_BanUser",            "label": "Suspend / Ban User",            "category": "Admin / Moderation" }
+  ],
+  "relations": [
+    { "id": "Buyer-inheritance-Guest",     "source": "Buyer",     "target": "Guest", "type": "inheritance" },
+    { "id": "Seller-inheritance-Guest",    "source": "Seller",    "target": "Guest", "type": "inheritance" },
+    { "id": "JobOwner-inheritance-Guest",  "source": "JobOwner",  "target": "Guest", "type": "inheritance" },
+    { "id": "Applicant-inheritance-Guest", "source": "Applicant", "target": "Guest", "type": "inheritance" },
+
+    { "id": "Guest-association-UC_Auth",        "source": "Guest",     "target": "UC_Auth",       "type": "association" },
+    { "id": "Guest-association-UC_Browse",      "source": "Guest",     "target": "UC_Browse",     "type": "association" },
+    { "id": "Guest-association-UC_BrowseGigs",  "source": "Guest",     "target": "UC_BrowseGigs", "type": "association" },
+    { "id": "Guest-association-UC_BrowseJobs",  "source": "Guest",     "target": "UC_BrowseJobs", "type": "association" },
+
+    { "id": "Buyer-association-UC_Profile",     "source": "Buyer", "target": "UC_Profile",    "type": "association" },
+    { "id": "Buyer-association-UC_OrderGig",    "source": "Buyer", "target": "UC_OrderGig",   "type": "association" },
+    { "id": "Buyer-association-UC_TrackOrder",  "source": "Buyer", "target": "UC_TrackOrder", "type": "association" },
+    { "id": "Buyer-association-UC_CancelOrder", "source": "Buyer", "target": "UC_CancelOrder","type": "association" },
+    { "id": "Buyer-association-UC_Chat",        "source": "Buyer", "target": "UC_Chat",       "type": "association" },
+    { "id": "Buyer-association-UC_Wallet",      "source": "Buyer", "target": "UC_Wallet",     "type": "association" },
+    { "id": "Buyer-association-UC_Review",      "source": "Buyer", "target": "UC_Review",     "type": "association" },
+
+    { "id": "Seller-association-UC_Profile",       "source": "Seller", "target": "UC_Profile",      "type": "association" },
+    { "id": "Seller-association-UC_ManageGig",     "source": "Seller", "target": "UC_ManageGig",    "type": "association" },
+    { "id": "Seller-association-UC_TrackOrder",    "source": "Seller", "target": "UC_TrackOrder",   "type": "association" },
+    { "id": "Seller-association-UC_Chat",          "source": "Seller", "target": "UC_Chat",         "type": "association" },
+    { "id": "Seller-association-UC_Wallet",        "source": "Seller", "target": "UC_Wallet",       "type": "association" },
+    { "id": "Seller-association-UC_WalletRecords", "source": "Seller", "target": "UC_WalletRecords","type": "association" },
+
+    { "id": "JobOwner-association-UC_Profile",       "source": "JobOwner", "target": "UC_Profile",       "type": "association" },
+    { "id": "JobOwner-association-UC_PostJob",        "source": "JobOwner", "target": "UC_PostJob",        "type": "association" },
+    { "id": "JobOwner-association-UC_AcceptProposal", "source": "JobOwner", "target": "UC_AcceptProposal", "type": "association" },
+    { "id": "JobOwner-association-UC_Chat",           "source": "JobOwner", "target": "UC_Chat",           "type": "association" },
+    { "id": "JobOwner-association-UC_CancelOrder",    "source": "JobOwner", "target": "UC_CancelOrder",    "type": "association" },
+
+    { "id": "Applicant-association-UC_Profile",  "source": "Applicant", "target": "UC_Profile",  "type": "association" },
+    { "id": "Applicant-association-UC_Proposal", "source": "Applicant", "target": "UC_Proposal", "type": "association" },
+    { "id": "Applicant-association-UC_Chat",     "source": "Applicant", "target": "UC_Chat",     "type": "association" },
+
+    { "id": "Admin-association-UC_ManageCategories",    "source": "Admin", "target": "UC_ManageCategories",   "type": "association" },
+    { "id": "Admin-association-UC_ManageHero",          "source": "Admin", "target": "UC_ManageHero",         "type": "association" },
+    { "id": "Admin-association-UC_ManageAds",           "source": "Admin", "target": "UC_ManageAds",          "type": "association" },
+    { "id": "Admin-association-UC_ManageAnnouncements", "source": "Admin", "target": "UC_ManageAnnouncements","type": "association" },
+    { "id": "Admin-association-UC_SystemConfig",        "source": "Admin", "target": "UC_SystemConfig",       "type": "association" },
+    { "id": "Admin-association-UC_Moderate",            "source": "Admin", "target": "UC_Moderate",           "type": "association" },
+    { "id": "Admin-association-UC_BanUser",             "source": "Admin", "target": "UC_BanUser",            "type": "association" },
+
+    { "id": "Moderator-association-UC_Moderate",            "source": "Moderator", "target": "UC_Moderate",           "type": "association" },
+    { "id": "Moderator-association-UC_ManageAnnouncements", "source": "Moderator", "target": "UC_ManageAnnouncements","type": "association" },
+    { "id": "Moderator-association-UC_BanUser",             "source": "Moderator", "target": "UC_BanUser",            "type": "association" },
+
+    { "id": "UC_OrderGig-include-UC_Payment",           "source": "UC_OrderGig",       "target": "UC_Payment",       "type": "include" },
+    { "id": "UC_AcceptProposal-include-UC_Payment",     "source": "UC_AcceptProposal", "target": "UC_Payment",       "type": "include" },
+    { "id": "UC_Payment-include-UC_Escrow",             "source": "UC_Payment",        "target": "UC_Escrow",        "type": "include" },
+    { "id": "UC_Escrow-include-UC_Wallet",              "source": "UC_Escrow",         "target": "UC_Wallet",        "type": "include" },
+    { "id": "UC_ReleaseEscrow-include-UC_WalletRecords","source": "UC_ReleaseEscrow",  "target": "UC_WalletRecords", "type": "include" },
+    { "id": "UC_ReleaseEscrow-include-UC_Wallet",       "source": "UC_ReleaseEscrow",  "target": "UC_Wallet",        "type": "include" },
+
+    { "id": "UC_SendAttachment-extend-UC_Chat",  "source": "UC_SendAttachment", "target": "UC_Chat",       "type": "extend" },
+    { "id": "UC_CancelOrder-extend-UC_Chat",     "source": "UC_CancelOrder",    "target": "UC_Chat",       "type": "extend" },
+    { "id": "UC_Review-extend-UC_TrackOrder",    "source": "UC_Review",         "target": "UC_TrackOrder", "type": "extend" },
+    { "id": "UC_BanUser-extend-UC_Moderate",     "source": "UC_BanUser",        "target": "UC_Moderate",   "type": "extend" },
+    { "id": "UC_ManageGig-extend-UC_Browse",     "source": "UC_ManageGig",      "target": "UC_Browse",     "type": "extend" },
+    { "id": "UC_PostJob-extend-UC_Browse",       "source": "UC_PostJob",        "target": "UC_Browse",     "type": "extend" }
+  ]
+}

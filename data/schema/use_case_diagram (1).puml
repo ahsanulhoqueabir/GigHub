@@ -1,0 +1,126 @@
+@startuml UseCaseDiagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecase {
+  BackgroundColor White
+  BorderColor Black
+}
+
+' ===== LEFT SIDE ACTORS =====
+actor Guest
+actor Buyer
+actor Seller
+actor "Job Owner" as JobOwner
+actor Applicant
+
+Buyer --|> Guest
+Seller --|> Guest
+JobOwner --|> Guest
+Applicant --|> Guest
+
+rectangle "Marketplace Platform" {
+
+  usecase "Register / Login" as UC_Auth
+  usecase "Manage Profile" as UC_Profile
+  usecase "Browse Categories" as UC_Browse
+
+  ' ---- Gig / Seller ----
+  usecase "Create / Manage Gig" as UC_ManageGig
+  usecase "Browse Gigs" as UC_BrowseGigs
+  usecase "Place Gig Order" as UC_OrderGig
+
+  ' ---- Job ----
+  usecase "Post Job" as UC_PostJob
+  usecase "Browse Jobs" as UC_BrowseJobs
+  usecase "Submit Job Proposal" as UC_Proposal
+  usecase "Accept Proposal / Create Order" as UC_AcceptProposal
+
+  ' ---- Order lifecycle ----
+  usecase "Track Order Status" as UC_TrackOrder
+  usecase "Request Order Cancellation" as UC_CancelOrder
+  usecase "Chat with Buyer/Seller" as UC_Chat
+  usecase "Send Attachment" as UC_SendAttachment
+
+  ' ---- Payments ----
+  usecase "Make Payment" as UC_Payment
+  usecase "Deposit / Withdraw Wallet" as UC_Wallet
+  usecase "Fund Escrow" as UC_Escrow
+  usecase "Release Escrow Payment" as UC_ReleaseEscrow
+  usecase "View Wallet Records" as UC_WalletRecords
+
+  ' ---- Reviews ----
+  usecase "Leave Review & Rating" as UC_Review
+
+  ' ---- Admin/Moderation ----
+  usecase "Manage Departments & Categories" as UC_ManageCategories
+  usecase "Manage Hero Banners" as UC_ManageHero
+  usecase "Manage Ad Banners" as UC_ManageAds
+  usecase "Manage Announcements" as UC_ManageAnnouncements
+  usecase "Configure System Settings" as UC_SystemConfig
+  usecase "Moderate Content / Users" as UC_Moderate
+  usecase "Suspend / Ban User" as UC_BanUser
+}
+
+' ===== LEFT SIDE ASSOCIATIONS =====
+Guest --> UC_Auth
+Guest --> UC_Browse
+Guest --> UC_BrowseGigs
+Guest --> UC_BrowseJobs
+
+Buyer --> UC_Profile
+Buyer --> UC_OrderGig
+Buyer --> UC_TrackOrder
+Buyer --> UC_CancelOrder
+Buyer --> UC_Chat
+Buyer --> UC_Wallet
+Buyer --> UC_Review
+
+Seller --> UC_Profile
+Seller --> UC_ManageGig
+Seller --> UC_TrackOrder
+Seller --> UC_Chat
+Seller --> UC_Wallet
+Seller --> UC_WalletRecords
+
+JobOwner --> UC_Profile
+JobOwner --> UC_PostJob
+JobOwner --> UC_AcceptProposal
+JobOwner --> UC_Chat
+JobOwner --> UC_CancelOrder
+
+Applicant --> UC_Profile
+Applicant --> UC_Proposal
+Applicant --> UC_Chat
+
+' ===== RIGHT SIDE ACTORS =====
+actor Admin
+actor Moderator
+
+Admin --> UC_ManageCategories
+Admin --> UC_ManageHero
+Admin --> UC_ManageAds
+Admin --> UC_ManageAnnouncements
+Admin --> UC_SystemConfig
+Admin --> UC_Moderate
+Admin --> UC_BanUser
+
+Moderator --> UC_Moderate
+Moderator --> UC_ManageAnnouncements
+Moderator --> UC_BanUser
+
+' ===== INCLUDE / EXTEND RELATIONSHIPS =====
+UC_OrderGig .> UC_Payment : <<include>>
+UC_AcceptProposal .> UC_Payment : <<include>>
+UC_Payment .> UC_Escrow : <<include>>
+UC_Escrow .> UC_Wallet : <<include>>
+UC_ReleaseEscrow .> UC_WalletRecords : <<include>>
+UC_ReleaseEscrow .> UC_Wallet : <<include>>
+
+UC_Chat <. UC_SendAttachment : <<extend>>
+UC_CancelOrder .> UC_Chat : <<extend>>
+UC_Review .> UC_TrackOrder : <<extend>>
+UC_BanUser .> UC_Moderate : <<extend>>
+UC_ManageGig .> UC_Browse : <<extend>>
+UC_PostJob .> UC_Browse : <<extend>>
+
+@enduml
