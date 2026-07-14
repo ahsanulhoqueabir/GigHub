@@ -71,6 +71,8 @@ export default function ProfileLayout({
       "applied-jobs",
       "incoming-proposals",
       "orders",
+      "wallet",
+      "escrow",
     ].includes(item.id),
   );
 

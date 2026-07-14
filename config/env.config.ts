@@ -35,3 +35,9 @@ export const sb = {
   secret: process.env.SUPABASE_SECRET_KEY!,
   publish: process.env.NEXT_PUBLIC_PUBLISH_KEY!,
 };
+
+export const sslcmz = {
+  store: process.env.SSLCOMMERZ_STORE_ID!,
+  password: process.env.SSLCOMMERZ_STORE_PASSWORD!,
+  status: process.env.SSLCOMMERZ_IS_LIVE!,
+};

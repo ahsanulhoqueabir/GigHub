@@ -3,13 +3,18 @@ import { withAuth } from "@/lib/api/auth-middleware";
 import { OrderService } from "@/services/order.service";
 
 /**
- * PATCH /api/order/:id/accept
+ * PATCH /api/order/:id/complete
  *
- * Buyer accepts a PENDING order.
- * Transitions: PENDING → ACTIVE
+ * Buyer completes a DELIVERED order, releasing escrow funds to the seller.
  *
- * Note: This accepts the order START (buyer agrees to work with seller).
- * To complete a DELIVERED order and release escrow, use PATCH /api/order/:id/complete.
+ * Transitions: DELIVERED → COMPLETED
+ *
+ * Atomically via the `complete_order` RPC:
+ * 1. Validates caller is buyer & order is DELIVERED
+ * 2. Updates order → COMPLETED
+ * 3. Updates escrow → COMPLETED + released_at
+ * 4. Credits seller wallet: balance += (amount - platform_fee)
+ * 5. Creates CREDIT wallet_record for seller
  */
 export const PATCH = withAuth({
   handler: async ({ user, params }) => {
@@ -19,7 +24,7 @@ export const PATCH = withAuth({
         return fail({ error: "Order ID is required", statusCode: 400 });
       }
 
-      const result = await OrderService.accept(id, user.profile);
+      const result = await OrderService.complete(id, user.profile);
 
       if (!result.success) {
         return fail({ error: result.error, statusCode: 400 });
@@ -27,7 +32,7 @@ export const PATCH = withAuth({
 
       return ok({
         data: result.data,
-        message: "Order accepted successfully",
+        message: "Order completed and payment released to seller",
       });
     } catch (err) {
       return fail({

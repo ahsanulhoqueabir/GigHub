@@ -64,11 +64,26 @@ export type OrderProposalInfo = Pick<
 };
 
 /** Order detail — includes gig/job info for the detail page */
+export type OrderEscrowSnapshot = {
+  id: string;
+  status: string;
+  payment_status: string;
+  amount: number;
+  platform_fee: number;
+  released_at?: string | null;
+  disputed_at?: string | null;
+  resolved_at?: string | null;
+  dispute_reason?: string | null;
+  admin_note?: string | null;
+};
+
+/** Order detail — includes gig/job/escrow info for the detail page */
 export type OrderDetail = OrderListItem & {
   gig?: OrderGigInfo | null;
   job?: OrderJobInfo | null;
   proposal?: OrderProposalInfo | null;
   package?: string | null;
+  escrow?: OrderEscrowSnapshot | null;
 };
 
 interface OrdersState {
@@ -83,6 +98,12 @@ interface OrdersState {
   acceptError: string | null;
   isCancelling: boolean;
   cancelError: string | null;
+  isCompleting: boolean;
+  completeError: string | null;
+  isDisputing: boolean;
+  disputeError: string | null;
+  isInitiatingPayment: boolean;
+  paymentInitiateError: string | null;
 }
 
 interface OrdersActions {
@@ -94,6 +115,9 @@ interface OrdersActions {
   fetchOrderDetail: (id: string) => Promise<void>;
   acceptOrder: (id: string) => Promise<void>;
   cancelOrder: (id: string, reason: string) => Promise<void>;
+  completeOrder: (id: string) => Promise<void>;
+  requestDispute: (orderId: string, reason: string) => Promise<void>;
+  initiatePayment: (orderId: string) => Promise<string | undefined>;
   clearErrors: () => void;
   reset: () => void;
 }
@@ -112,6 +136,12 @@ const initialState: OrdersState = {
   acceptError: null,
   isCancelling: false,
   cancelError: null,
+  isCompleting: false,
+  completeError: null,
+  isDisputing: false,
+  disputeError: null,
+  isInitiatingPayment: false,
+  paymentInitiateError: null,
 };
 
 export const useOrdersStore = create<OrdersStore>()((set, get) => ({
@@ -222,12 +252,87 @@ export const useOrdersStore = create<OrdersStore>()((set, get) => ({
     }
   },
 
+  completeOrder: async (id) => {
+    set({ isCompleting: true, completeError: null });
+    try {
+      await api_client.patch(`/order/${id}/complete`);
+      set({ isCompleting: false });
+
+      const selectedOrder = get().selectedOrder;
+      if (selectedOrder && selectedOrder.id === id) {
+        set({
+          selectedOrder: {
+            ...selectedOrder,
+            status: "COMPLETED",
+            updated_at: new Date().toISOString(),
+          },
+        });
+      }
+
+      set((state) => ({
+        orders: state.orders.map((o) =>
+          o.id === id
+            ? { ...o, status: "COMPLETED", updated_at: new Date().toISOString() }
+            : o,
+        ),
+      }));
+    } catch (err: unknown) {
+      set({ isCompleting: false, completeError: getErrorMessage(err) });
+      throw err;
+    }
+  },
+
+  requestDispute: async (orderId, reason) => {
+    set({ isDisputing: true, disputeError: null });
+    try {
+      await api_client.post("/escrow/dispute", { order_id: orderId, reason });
+      set({ isDisputing: false });
+
+      const selectedOrder = get().selectedOrder;
+      if (selectedOrder && selectedOrder.id === orderId) {
+        set({
+          selectedOrder: {
+            ...selectedOrder,
+            status: "REVIEW",
+            updated_at: new Date().toISOString(),
+          },
+        });
+      }
+
+      set((state) => ({
+        orders: state.orders.map((o) =>
+          o.id === orderId
+            ? { ...o, status: "REVIEW", updated_at: new Date().toISOString() }
+            : o,
+        ),
+      }));
+    } catch (err: unknown) {
+      set({ isDisputing: false, disputeError: getErrorMessage(err) });
+      throw err;
+    }
+  },
+
+  initiatePayment: async (orderId) => {
+    set({ isInitiatingPayment: true, paymentInitiateError: null });
+    try {
+      const { data } = await api_client.post("/payment/initiate", { order_id: orderId });
+      set({ isInitiatingPayment: false });
+      return data.data?.gateway_url;
+    } catch (err: unknown) {
+      set({ isInitiatingPayment: false, paymentInitiateError: getErrorMessage(err) });
+      throw err;
+    }
+  },
+
   clearErrors: () =>
     set({
       error: null,
       detailError: null,
       acceptError: null,
       cancelError: null,
+      completeError: null,
+      disputeError: null,
+      paymentInitiateError: null,
     }),
 
   reset: () => set({ ...initialState }),
