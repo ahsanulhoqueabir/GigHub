@@ -180,10 +180,10 @@ function OrderDetailContent({ id }: { id: string }) {
         {/* Right column: Profiles + timestamps */}
         <div className="space-y-5">
           {order.buyer && (
-            <OrderProfileCard label="Buyer" profile={order.buyer} />
+            <OrderProfileCard label="Buyer" profile={order.buyer} orderId={order.id} />
           )}
           {order.seller && (
-            <OrderProfileCard label="Seller" profile={order.seller} />
+            <OrderProfileCard label="Seller" profile={order.seller} orderId={order.id} />
           )}
           <OrderTimelineCard
             created_at={order.created_at}

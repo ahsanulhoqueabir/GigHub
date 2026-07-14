@@ -1,6 +1,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IconUser } from "@tabler/icons-react";
+import { useAuthStore } from "@/store/auth.store";
+import { IconMessageCircle, IconUser } from "@tabler/icons-react";
+import Link from "next/link";
 
 interface ProfileInfo {
   id: string;
@@ -12,9 +15,17 @@ interface ProfileInfo {
 interface OrderProfileCardProps {
   label: "Buyer" | "Seller";
   profile: ProfileInfo;
+  orderId?: string;
 }
 
-export function OrderProfileCard({ label, profile }: OrderProfileCardProps) {
+export function OrderProfileCard({
+  label,
+  profile,
+  orderId,
+}: OrderProfileCardProps) {
+  const { user } = useAuthStore();
+  const isMe = user?.id === profile.id;
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -31,7 +42,7 @@ export function OrderProfileCard({ label, profile }: OrderProfileCardProps) {
               {profile.name?.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <p className="font-semibold text-sm truncate">{profile.name}</p>
             </div>
@@ -40,6 +51,17 @@ export function OrderProfileCard({ label, profile }: OrderProfileCardProps) {
             </p>
           </div>
         </div>
+
+        {orderId && !isMe && (
+          <div className="mt-4 pt-3 border-t">
+            <Button asChild className="w-full gap-2 cursor-pointer">
+              <Link href={`/chat?orderId=${orderId}`}>
+                <IconMessageCircle className="size-4" />
+                Chat with {label}
+              </Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

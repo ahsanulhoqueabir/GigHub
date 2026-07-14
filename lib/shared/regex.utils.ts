@@ -37,9 +37,23 @@ export function replaceUnderscoreWithSpace(value: string): string {
 }
 
 /**
+ * Sanitizes a filename:
+ * - Replaces hyphens (-), underscores (_), and other special characters (excluding alphanumeric and dots) with spaces.
+ * - Collapses multiple consecutive spaces into a single space.
+ * - Trims leading and trailing spaces.
+ */
+export function sanitizeFilename(filename: string): string {
+  if (!filename) return "";
+  return filename
+    .replace(/[^a-zA-Z0-9.]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
  * Extract a human-readable filename from a URL:
  * - Takes the last path segment (strips query strings).
- * - Replaces underscores with spaces.
+ * - Replaces special characters with spaces and collapses multiple spaces.
  * - Trims extra whitespace.
  *
  * Falls back to "Attachment N" when the URL has no discernible filename.
@@ -47,5 +61,5 @@ export function replaceUnderscoreWithSpace(value: string): string {
 export function getDisplayFilename(url: string, fallbackIndex: number): string {
   const raw = url.split("/").pop()?.split("?")[0]?.trim();
   if (!raw) return `Attachment ${fallbackIndex}`;
-  return replaceUnderscoreWithSpace(raw);
+  return sanitizeFilename(raw);
 }

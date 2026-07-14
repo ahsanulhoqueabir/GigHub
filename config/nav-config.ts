@@ -6,6 +6,7 @@ import {
   IconCategory,
   IconHome,
   IconMail,
+  IconMessageCircle,
   IconPhoto,
   IconPlus,
   IconSettings,
@@ -136,6 +137,12 @@ export const adminNavConfig: NavItem[] = [
  */
 export const profileNavConfig: NavItem[] = [
   { id: "profile", label: "Profile", href: "/profile", icon: IconUser },
+  {
+    id: "chat",
+    label: "Messages",
+    href: "/chat",
+    icon: IconMessageCircle,
+  },
   {
     id: "applied-jobs",
     label: "Applied Jobs",

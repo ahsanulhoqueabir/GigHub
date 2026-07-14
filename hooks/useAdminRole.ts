@@ -3,7 +3,7 @@ import { useAuthStore } from "@/store/auth.store";
 export function useAdminRole() {
   const { user } = useAuthStore();
 
-  const role = user?.role?.toUpperCase();
+  const role = typeof user?.role === "string" ? user.role.toUpperCase() : undefined;
 
   return {
     isAdmin: role === "ADMIN",
