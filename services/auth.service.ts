@@ -1,9 +1,9 @@
-import { success, error } from "@/lib/api/api-response";
-import { signJwt } from "@/lib/jwt.helper";
+import { error, success } from "@/lib/api/api-response";
 import { hashPassword, verifyPassword } from "@/lib/api/password";
 import { stripPassword } from "@/lib/api/strip-password";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
 import { generateUsername } from "@/lib/business/service.utils";
+import { signJwt } from "@/lib/jwt.helper";
 import { ProfileService } from "@/services/profile.service";
 import type {
   JwtPayload,
@@ -116,6 +116,19 @@ export class AuthService {
       const isValid = await verifyPassword(profile.password, password);
       if (!isValid) {
         return error("Invalid email/username or password");
+      }
+
+      // Check if the account is verified and active
+      if (profile.status !== "ACTIVE") {
+        return error(
+          "Your account is not yet active. Please wait for admin approval.",
+        );
+      }
+
+      if (!profile.verified) {
+        return error(
+          "Your account has not been verified yet. Please wait for admin approval.",
+        );
       }
 
       // Strip password before returning

@@ -22,6 +22,7 @@ export const STATUS = {
   REVISION: "REVISION",
   ACCEPTED: "ACCEPTED",
   APPROVED: "APPROVED",
+  SUSPENDED: "SUSPENDED",
 } as const;
 
 export type Status = (typeof STATUS)[keyof typeof STATUS];

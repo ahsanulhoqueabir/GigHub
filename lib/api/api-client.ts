@@ -1,5 +1,5 @@
-import axios, { AxiosInstance, AxiosError } from "axios";
-import { useAuthStore, selectIsAuthenticated } from "@/store/auth.store";
+import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
+import axios, { AxiosError, AxiosInstance } from "axios";
 import { ServerNavigationHelper } from "./server-navigation-helper";
 
 /**
@@ -50,8 +50,13 @@ const createApiClient = (): AxiosInstance => {
         _retry?: boolean;
       };
 
-      // Handle authorization errors (401, 403)
-      if (error.response?.status === 401 || error.response?.status === 403) {
+      // Handle authorization errors (401, 403) — skip for public auth routes
+      const isAuthRoute = error.config?.url?.startsWith("/auth/") ?? false;
+
+      if (
+        !isAuthRoute &&
+        (error.response?.status === 401 || error.response?.status === 403)
+      ) {
         // If error is 401 and we haven't retried yet, try token refresh
         if (error.response?.status === 401 && !original_request?._retry) {
           if (original_request) {

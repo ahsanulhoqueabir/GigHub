@@ -1,6 +1,6 @@
+import { fail, ok } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
 import { ProfileService } from "@/services/profile.service";
-import { fail, ok } from "@/lib/api/api-response";
 
 /**
  * GET /api/auth/me
@@ -18,6 +18,21 @@ export const GET = withAuth({
     }
 
     const profile = result.data;
+
+    // Reject if the account is not active or not verified
+    if (profile.status !== "ACTIVE") {
+      return fail({
+        error: "Your account is not active. Please contact admin.",
+        statusCode: 403,
+      });
+    }
+
+    if (!profile.verified) {
+      return fail({
+        error: "Your account has not been verified yet.",
+        statusCode: 403,
+      });
+    }
 
     return ok({
       data: {

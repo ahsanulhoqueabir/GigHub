@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { ListPage } from "@/components/list-page/ListPage";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { RoleBadge } from "@/components/shared/role-badge";
 import { BooleanBadge } from "@/components/shared/boolean-badge";
+import { RoleBadge } from "@/components/shared/role-badge";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { useReturnTo } from "@/hooks/use-return-to";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import { useUsersStore } from "@/store/users.store";
 import type { Profile } from "@/types/db/profile.types";
-import { IconPlus } from "@tabler/icons-react";
-import { useReturnTo } from "@/hooks/use-return-to";
+import {
+  IconCircleCheck,
+  IconPlayerPause,
+  IconPlus,
+} from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
 export default function UsersListPage() {
   const router = useRouter();
@@ -22,6 +26,8 @@ export default function UsersListPage() {
     error,
     fetchUsers,
     deleteUser,
+    approveUser,
+    suspendUser,
     currentPage,
     pageSize,
   } = useUsersStore();
@@ -61,6 +67,25 @@ export default function UsersListPage() {
             onClick: (user: Profile) => {
               router.push(withReturnTo(`/admin/users/${user.id}/details`));
             },
+          },
+          {
+            id: "approve-user",
+            label: "Approve",
+            icon: IconCircleCheck,
+            onClick: (user: Profile) => {
+              approveUser(user.id);
+            },
+            hidden: (user: Profile) =>
+              user.status === "ACTIVE" && user.verified,
+          },
+          {
+            id: "suspend-user",
+            label: "Suspend",
+            icon: IconPlayerPause,
+            onClick: (user: Profile) => {
+              suspendUser(user.id);
+            },
+            hidden: (user: Profile) => user.status === "SUSPENDED",
           },
         ],
       },
@@ -167,7 +192,16 @@ export default function UsersListPage() {
         placeholder: "Search by name, email, username, phone or student ID...",
       },
     };
-  }, [router, withReturnTo, fetchUsers, deleteUser, currentPage, pageSize]);
+  }, [
+    fetchUsers,
+    currentPage,
+    pageSize,
+    router,
+    withReturnTo,
+    deleteUser,
+    approveUser,
+    suspendUser,
+  ]);
 
   return (
     <ListPage

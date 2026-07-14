@@ -44,11 +44,10 @@ export function CentralDataInitializer() {
 
     hasInitialized.current = true;
 
-    const storedUser = useAuthStore.getState().user;
     const storedToken = useAuthStore.getState().accessToken;
 
-    // Only call initAuth if we have a persisted token to validate
-    if (storedToken && storedUser) {
+    // If a persisted token exists, validate it & fetch fresh user data
+    if (storedToken) {
       initAuth();
     }
   }, [hasHydrated, initAuth]);

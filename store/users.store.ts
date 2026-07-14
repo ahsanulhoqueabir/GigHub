@@ -1,9 +1,9 @@
-import { create } from "zustand";
 import { api_client } from "@/lib/api/api-client";
+import { getErrorMessage } from "@/lib/api/api-response";
+import { defaultPagination } from "@/lib/pagination";
 import type { Profile } from "@/types/db/profile.types";
 import { PaginationMeta } from "@/types/pagination.types";
-import { defaultPagination } from "@/lib/pagination";
-import { getErrorMessage } from "@/lib/api/api-response";
+import { create } from "zustand";
 
 export type { Profile as User };
 
@@ -22,6 +22,8 @@ interface UsersActions {
   createUser: (data: Partial<Profile>) => Promise<void>;
   updateUser: (id: string, data: Partial<Profile>) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
+  approveUser: (id: string) => Promise<void>;
+  suspendUser: (id: string) => Promise<void>;
   setPage: (page: number) => void;
   clearError: () => void;
 }
@@ -107,6 +109,41 @@ export const useUsersStore = create<UsersStore>()((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await api_client.delete(`/admin/users/${id}`);
+      const { currentPage, pageSize } = get();
+      await get().fetchUsers(currentPage, pageSize);
+    } catch (err: unknown) {
+      set({
+        isLoading: false,
+        error: getErrorMessage(err),
+      });
+      throw err;
+    }
+  },
+
+  approveUser: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api_client.patch(`/admin/users/${id}`, {
+        status: "ACTIVE",
+        verified: true,
+      });
+      const { currentPage, pageSize } = get();
+      await get().fetchUsers(currentPage, pageSize);
+    } catch (err: unknown) {
+      set({
+        isLoading: false,
+        error: getErrorMessage(err),
+      });
+      throw err;
+    }
+  },
+
+  suspendUser: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api_client.patch(`/admin/users/${id}`, {
+        status: "SUSPENDED",
+      });
       const { currentPage, pageSize } = get();
       await get().fetchUsers(currentPage, pageSize);
     } catch (err: unknown) {

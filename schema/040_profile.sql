@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS profile (
   id          UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  status      record_status NOT NULL DEFAULT 'ACTIVE',
+  status      record_status NOT NULL DEFAULT 'PENDING',
 
   name        TEXT NOT NULL,
   username    TEXT NOT NULL UNIQUE,

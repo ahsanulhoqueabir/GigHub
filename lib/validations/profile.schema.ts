@@ -4,14 +4,14 @@
  * Shared between frontend and backend for admin profile management.
  */
 
-import { z } from "zod";
 import {
-  nameField,
   emailField,
-  requiredString,
+  nameField,
   nullableOptionalString,
   passwordField,
+  requiredString,
 } from "@/lib/validations/shared.schema";
+import { z } from "zod";
 
 // ─── Update Profile (admin) ────────────────────────────────────────────────
 
@@ -37,6 +37,9 @@ export const updateProfileSchema = z.object({
     .optional(),
   department: nullableOptionalString,
   student_id: nullableOptionalString,
+  status: z
+    .enum(["DRAFT", "PENDING", "ACTIVE", "DELETED", "SUSPENDED", "ON_HOLD"])
+    .optional(),
   verified: z.boolean().optional(),
   role: z.enum(["USER", "ADMIN"]).optional(),
   username: requiredString("Username").optional(),

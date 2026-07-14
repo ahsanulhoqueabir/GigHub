@@ -12,8 +12,9 @@ import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 function LoginPageContent() {
   const router = useRouter();
@@ -23,6 +24,17 @@ function LoginPageContent() {
   const isProcessing = useAuthStore((s) => s.isProcessing);
   const authError = useAuthStore((s) => s.error);
   const clearError = useAuthStore((s) => s.clearError);
+
+  // Fire a toast whenever authError changes
+  const prevErrorRef = useRef(authError);
+  useEffect(() => {
+    if (authError && authError !== prevErrorRef.current) {
+      toast.error(authError, {
+        duration: 5000,
+      });
+    }
+    prevErrorRef.current = authError;
+  }, [authError]);
 
   const {
     register,
@@ -43,7 +55,7 @@ function LoginPageContent() {
       await login(data);
       router.push(returnTo);
     } catch {
-      // error is already set in the store
+      // error is already set in the store — toast fires via useEffect
     }
   };
 
@@ -177,17 +189,6 @@ function LoginPageContent() {
                 </motion.p>
               )}
             </div>
-
-            {/* Auth Error */}
-            {authError && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-              >
-                {authError}
-              </motion.div>
-            )}
 
             {/* Submit Button */}
             <Button

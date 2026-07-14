@@ -36,6 +36,7 @@ export const STATUS_BADGE_COLORS: Record<
   },
   CANCELLED: { bg: "bg-red-50", text: "text-red-700", ring: "ring-red-600/20" },
   DECLINED: { bg: "bg-red-50", text: "text-red-700", ring: "ring-red-600/20" },
+  SUSPENDED: { bg: "bg-red-50", text: "text-red-700", ring: "ring-red-600/20" },
   IN_PROGRESS: {
     bg: "bg-blue-50",
     text: "text-blue-700",
