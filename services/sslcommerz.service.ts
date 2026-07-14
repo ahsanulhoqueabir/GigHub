@@ -234,7 +234,25 @@ export class SSLCommerzService {
       };
     }
 
-    return (await response.json()) as SSLCommerzValidationResponse;
+    const data = await response.json();
+
+    if (
+      data &&
+      data.element &&
+      Array.isArray(data.element) &&
+      data.element.length > 0
+    ) {
+      return data.element[0] as SSLCommerzValidationResponse;
+    }
+
+    if (data && data.status) {
+      return data as SSLCommerzValidationResponse;
+    }
+
+    return {
+      status: "FAILED",
+      error: "Transaction not found or invalid response format",
+    };
   }
 
   /**

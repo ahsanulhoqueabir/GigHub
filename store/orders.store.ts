@@ -100,6 +100,8 @@ interface OrdersState {
   cancelError: string | null;
   isCompleting: boolean;
   completeError: string | null;
+  isDelivering: boolean;
+  deliverError: string | null;
   isDisputing: boolean;
   disputeError: string | null;
   isInitiatingPayment: boolean;
@@ -116,6 +118,7 @@ interface OrdersActions {
   acceptOrder: (id: string) => Promise<void>;
   cancelOrder: (id: string, reason: string) => Promise<void>;
   completeOrder: (id: string) => Promise<void>;
+  deliverOrder: (id: string) => Promise<void>;
   requestDispute: (orderId: string, reason: string) => Promise<void>;
   initiatePayment: (orderId: string) => Promise<string | undefined>;
   clearErrors: () => void;
@@ -138,6 +141,8 @@ const initialState: OrdersState = {
   cancelError: null,
   isCompleting: false,
   completeError: null,
+  isDelivering: false,
+  deliverError: null,
   isDisputing: false,
   disputeError: null,
   isInitiatingPayment: false,
@@ -272,12 +277,50 @@ export const useOrdersStore = create<OrdersStore>()((set, get) => ({
       set((state) => ({
         orders: state.orders.map((o) =>
           o.id === id
-            ? { ...o, status: "COMPLETED", updated_at: new Date().toISOString() }
+            ? {
+                ...o,
+                status: "COMPLETED",
+                updated_at: new Date().toISOString(),
+              }
             : o,
         ),
       }));
     } catch (err: unknown) {
       set({ isCompleting: false, completeError: getErrorMessage(err) });
+      throw err;
+    }
+  },
+
+  deliverOrder: async (id) => {
+    set({ isDelivering: true, deliverError: null });
+    try {
+      await api_client.patch(`/order/${id}/deliver`);
+      set({ isDelivering: false });
+
+      const selectedOrder = get().selectedOrder;
+      if (selectedOrder && selectedOrder.id === id) {
+        set({
+          selectedOrder: {
+            ...selectedOrder,
+            status: "DELIVERED",
+            updated_at: new Date().toISOString(),
+          },
+        });
+      }
+
+      set((state) => ({
+        orders: state.orders.map((o) =>
+          o.id === id
+            ? {
+                ...o,
+                status: "DELIVERED",
+                updated_at: new Date().toISOString(),
+              }
+            : o,
+        ),
+      }));
+    } catch (err: unknown) {
+      set({ isDelivering: false, deliverError: getErrorMessage(err) });
       throw err;
     }
   },
@@ -315,11 +358,16 @@ export const useOrdersStore = create<OrdersStore>()((set, get) => ({
   initiatePayment: async (orderId) => {
     set({ isInitiatingPayment: true, paymentInitiateError: null });
     try {
-      const { data } = await api_client.post("/payment/initiate", { order_id: orderId });
+      const { data } = await api_client.post("/payment/initiate", {
+        order_id: orderId,
+      });
       set({ isInitiatingPayment: false });
       return data.data?.gateway_url;
     } catch (err: unknown) {
-      set({ isInitiatingPayment: false, paymentInitiateError: getErrorMessage(err) });
+      set({
+        isInitiatingPayment: false,
+        paymentInitiateError: getErrorMessage(err),
+      });
       throw err;
     }
   },
@@ -331,6 +379,7 @@ export const useOrdersStore = create<OrdersStore>()((set, get) => ({
       acceptError: null,
       cancelError: null,
       completeError: null,
+      deliverError: null,
       disputeError: null,
       paymentInitiateError: null,
     }),

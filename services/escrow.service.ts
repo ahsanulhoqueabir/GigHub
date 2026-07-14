@@ -221,6 +221,49 @@ export class EscrowService {
   }
 
   /**
+   * Process a successful payment — called after SSLCommerz IPN validation.
+   *
+   * Calls the `process_payment_success` PostgreSQL RPC which atomically:
+   * 1. Updates escrow: payment_status → HOLDING, status → ACTIVE
+   * 2. Creates wallet_record DEBIT for the buyer
+   *
+   * Does NOT change order status — it stays PENDING until seller accepts.
+   */
+  static async processPaymentSuccess(
+    orderId: string,
+    tranId: string,
+    paymentMethod: string = "SSLCOMMERZ",
+  ): Promise<ServiceResult<void>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "process_payment_success",
+        {
+          p_order_id: orderId,
+          p_tran_id: tranId,
+          p_payment_method: paymentMethod,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as { success: boolean; error?: string };
+
+      if (!result.success) {
+        return error(result.error ?? "Payment processing failed");
+      }
+
+      return success(undefined);
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
    * Admin resolves a dispute.
    *
    * Calls the `resolve_dispute` PostgreSQL RPC which atomically:

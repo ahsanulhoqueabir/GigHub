@@ -1,5 +1,7 @@
 export { AcceptOrderDialog } from "./accept-order-dialog";
 export { CancelOrderDialog } from "./cancel-order-dialog";
+export { DeliverOrderDialog } from "./deliver-order-dialog";
+export { DisputeOrderDialog } from "./dispute-order-dialog";
 export { OrderActionCard } from "./order-action-card";
 export { OrderActionError } from "./order-action-error";
 export { OrderAssociatedGigCard } from "./order-associated-gig-card";

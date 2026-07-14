@@ -17,12 +17,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const orderId = formData.get("value_a")?.toString() ?? "";
 
     const redirectUrl = orderId
-      ? `${app.url}/orders/${orderId}?payment=failed`
-      : `${app.url}/orders?payment=failed`;
+      ? `${app.url}/profile/orders/${orderId}?payment=failed`
+      : `${app.url}/profile/orders?payment=failed`;
 
     return NextResponse.redirect(redirectUrl, { status: 303 });
   } catch {
-    return NextResponse.redirect(`${app.url}/orders?payment=failed`, {
+    return NextResponse.redirect(`${app.url}/profile/orders?payment=failed`, {
       status: 303,
     });
   }

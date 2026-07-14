@@ -37,6 +37,7 @@ export const sb = {
 };
 
 export const sslcmz = {
+  name: process.env.SSLCOMMERZ_STORE_NAME!,
   store: process.env.SSLCOMMERZ_STORE_ID!,
   password: process.env.SSLCOMMERZ_STORE_PASSWORD!,
   status: process.env.SSLCOMMERZ_IS_LIVE!,

@@ -3,6 +3,8 @@
 import {
   AcceptOrderDialog,
   CancelOrderDialog,
+  DeliverOrderDialog,
+  DisputeOrderDialog,
   OrderActionError,
   OrderAssociatedGigCard,
   OrderAssociatedJobCard,
@@ -20,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { useAuthStore } from "@/store/auth.store";
 import { useOrdersStore } from "@/store/orders.store";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -28,6 +30,7 @@ import { toast } from "sonner";
 
 function OrderDetailContent({ id }: { id: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { symbol } = useCurrency();
   const { user } = useAuthStore();
 
@@ -39,21 +42,53 @@ function OrderDetailContent({ id }: { id: string }) {
     acceptError,
     isCancelling,
     cancelError,
+    isDelivering,
+    deliverError,
+    isDisputing,
+    disputeError,
     fetchOrderDetail,
     acceptOrder,
     cancelOrder,
+    deliverOrder,
+    requestDispute,
     clearErrors,
   } = useOrdersStore();
 
   const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isDeliverDialogOpen, setIsDeliverDialogOpen] = useState(false);
+  const [isDisputeDialogOpen, setIsDisputeDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [disputeReason, setDisputeReason] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     fetchOrderDetail(id);
     return () => clearErrors();
   }, [id, fetchOrderDetail, clearErrors]);
+
+  useEffect(() => {
+    const paymentStatus = searchParams?.get("payment");
+    const reason = searchParams?.get("reason");
+
+    if (paymentStatus) {
+      if (paymentStatus === "success") {
+        toast.success("Payment successful! Your order is now active.");
+      } else if (paymentStatus === "failed") {
+        toast.error(`Payment failed: ${reason || "Unknown error"}`);
+      } else if (paymentStatus === "cancelled") {
+        toast.error("Payment was cancelled.");
+      } else if (paymentStatus === "error") {
+        toast.error("An error occurred during payment processing.");
+      }
+
+      // Clean up the URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("payment");
+      url.searchParams.delete("reason");
+      window.history.replaceState({}, "", url.toString());
+    }
+  }, [searchParams]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -74,6 +109,16 @@ function OrderDetailContent({ id }: { id: string }) {
     }
   }, [id, acceptOrder]);
 
+  const handleDeliverConfirm = useCallback(async () => {
+    try {
+      await deliverOrder(id);
+      toast.success("Order marked as delivered");
+      setIsDeliverDialogOpen(false);
+    } catch {
+      // Error handled by store
+    }
+  }, [id, deliverOrder]);
+
   const handleCancelConfirm = useCallback(async () => {
     if (!cancelReason.trim()) return;
     try {
@@ -85,6 +130,20 @@ function OrderDetailContent({ id }: { id: string }) {
       // Error handled by store
     }
   }, [id, cancelReason, cancelOrder]);
+
+  const handleDisputeConfirm = useCallback(async () => {
+    if (!disputeReason.trim()) return;
+    try {
+      await requestDispute(id, disputeReason);
+      toast.success(
+        "Dispute raised successfully. An admin will review your case.",
+      );
+      setIsDisputeDialogOpen(false);
+      setDisputeReason("");
+    } catch {
+      // Error handled by store
+    }
+  }, [id, disputeReason, requestDispute]);
 
   if (isLoadingDetail) {
     return <PageSkeleton variant="details" rows={6} columns={2} />;
@@ -116,6 +175,9 @@ function OrderDetailContent({ id }: { id: string }) {
   const canAccept = order.status === "PENDING" && isBuyer;
   const canCancel =
     ["PENDING", "ACTIVE"].includes(order.status) && (isBuyer || isSeller);
+  const canDeliver = order.status === "ACTIVE" && isSeller;
+  const canDispute =
+    order.status === "DELIVERED" && isSeller && order.source === "GIG";
 
   return (
     <div className="space-y-6 pb-10">
@@ -131,14 +193,22 @@ function OrderDetailContent({ id }: { id: string }) {
         isRefreshing={isRefreshing}
         canAccept={canAccept}
         canCancel={canCancel}
+        canDeliver={canDeliver}
+        canDispute={canDispute}
         isAccepting={isAccepting}
         isCancelling={isCancelling}
+        isDelivering={isDelivering}
+        isDisputing={isDisputing}
         onAcceptClick={() => setIsAcceptDialogOpen(true)}
         onCancelClick={() => setIsCancelDialogOpen(true)}
+        onDeliverClick={() => setIsDeliverDialogOpen(true)}
+        onDisputeClick={() => setIsDisputeDialogOpen(true)}
       />
 
       {/* ── Action Errors ─────────────────────────────────────────────────── */}
-      <OrderActionError message={acceptError || cancelError} />
+      <OrderActionError
+        message={acceptError || cancelError || deliverError || disputeError}
+      />
 
       {/* ── Main Grid ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -180,10 +250,18 @@ function OrderDetailContent({ id }: { id: string }) {
         {/* Right column: Profiles + timestamps */}
         <div className="space-y-5">
           {order.buyer && (
-            <OrderProfileCard label="Buyer" profile={order.buyer} orderId={order.id} />
+            <OrderProfileCard
+              label="Buyer"
+              profile={order.buyer}
+              orderId={order.id}
+            />
           )}
           {order.seller && (
-            <OrderProfileCard label="Seller" profile={order.seller} orderId={order.id} />
+            <OrderProfileCard
+              label="Seller"
+              profile={order.seller}
+              orderId={order.id}
+            />
           )}
           <OrderTimelineCard
             created_at={order.created_at}
@@ -207,6 +285,22 @@ function OrderDetailContent({ id }: { id: string }) {
         onReasonChange={setCancelReason}
         isCancelling={isCancelling}
         onConfirm={handleCancelConfirm}
+      />
+
+      <DeliverOrderDialog
+        open={isDeliverDialogOpen}
+        onOpenChange={setIsDeliverDialogOpen}
+        isDelivering={isDelivering}
+        onConfirm={handleDeliverConfirm}
+      />
+
+      <DisputeOrderDialog
+        open={isDisputeDialogOpen}
+        onOpenChange={setIsDisputeDialogOpen}
+        reason={disputeReason}
+        onReasonChange={setDisputeReason}
+        isDisputing={isDisputing}
+        onConfirm={handleDisputeConfirm}
       />
     </div>
   );

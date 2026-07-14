@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDateInTimezone } from "@/lib/date.utils";
 import {
+  IconAlertTriangle,
   IconCircleCheck,
   IconLoader2,
   IconRefresh,
+  IconSend,
   IconX,
 } from "@tabler/icons-react";
 
@@ -19,14 +21,22 @@ interface OrderDetailHeaderProps {
   onBack: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
-  /** Show accept button in header */
+  /** Show accept button in header (buyer only, PENDING) */
   canAccept?: boolean;
   /** Show cancel button in header */
   canCancel?: boolean;
+  /** Show deliver button in header (seller only, ACTIVE) */
+  canDeliver?: boolean;
+  /** Show dispute button in header (seller only, DELIVERED) */
+  canDispute?: boolean;
   isAccepting?: boolean;
   isCancelling?: boolean;
+  isDelivering?: boolean;
+  isDisputing?: boolean;
   onAcceptClick?: () => void;
   onCancelClick?: () => void;
+  onDeliverClick?: () => void;
+  onDisputeClick?: () => void;
 }
 
 export function OrderDetailHeader({
@@ -40,12 +50,19 @@ export function OrderDetailHeader({
   isRefreshing,
   canAccept,
   canCancel,
+  canDeliver,
+  canDispute,
   isAccepting,
   isCancelling,
+  isDelivering,
+  isDisputing,
   onAcceptClick,
   onCancelClick,
+  onDeliverClick,
+  onDisputeClick,
 }: OrderDetailHeaderProps) {
-  const isAnyLoading = isAccepting || isCancelling;
+  const isAnyLoading =
+    isAccepting || isCancelling || isDelivering || isDisputing;
 
   return (
     <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -86,9 +103,35 @@ export function OrderDetailHeader({
           </Button>
         )}
 
-        {canCancel && (
+        {canDeliver && (
+          <Button onClick={onDeliverClick} disabled={isAnyLoading}>
+            {isDelivering ? (
+              <IconLoader2 className="size-4 mr-1.5 animate-spin" />
+            ) : (
+              <IconSend className="size-4 mr-1.5" />
+            )}
+            Deliver
+          </Button>
+        )}
+
+        {canDispute && (
           <Button
             variant="destructive"
+            onClick={onDisputeClick}
+            disabled={isAnyLoading}
+          >
+            {isDisputing ? (
+              <IconLoader2 className="size-4 mr-1.5 animate-spin" />
+            ) : (
+              <IconAlertTriangle className="size-4 mr-1.5" />
+            )}
+            Dispute
+          </Button>
+        )}
+
+        {canCancel && (
+          <Button
+            variant="outline"
             onClick={onCancelClick}
             disabled={isAnyLoading}
           >

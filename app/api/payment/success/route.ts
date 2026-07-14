@@ -1,5 +1,5 @@
 import { app } from "@/config/env.config";
-import { getSupabaseServerClient } from "@/lib/api/supabase";
+import { EscrowService } from "@/services/escrow.service";
 import { SSLCommerzService } from "@/services/sslcommerz.service";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,10 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
  * Flow:
  * 1. Parse IPN payload from SSLCommerz (form-encoded body)
  * 2. Validate transaction via SSLCommerz validation API
- * 3. Update escrow: payment_status → HOLDING, status → ACTIVE
- * 4. Update order: status → ACTIVE
- * 5. Create wallet_record: DEBIT for buyer (payment sent to escrow)
- * 6. Redirect buyer to order page (if browser request) or return JSON (if IPN)
+ * 3. Call EscrowService.processPaymentSuccess (atomic escrow + wallet_record)
+ * 4. Redirect buyer to order page
  */
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
@@ -39,7 +37,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Must have a tran_id and orderId
     if (!tran_id || !orderId) {
       return NextResponse.redirect(
-        `${app.url}/orders?payment=failed&reason=missing_params`,
+        `${app.url}/profile/orders?payment=failed&reason=missing_params`,
         { status: 303 },
       );
     }
@@ -47,7 +45,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Validate with SSLCommerz (only if status is VALID or VALIDATED)
     if (status !== "VALID" && status !== "VALIDATED") {
       return NextResponse.redirect(
-        `${app.url}/orders/${orderId}?payment=failed&reason=invalid_status`,
+        `${app.url}/profile/orders/${orderId}?payment=failed&reason=invalid_status`,
         { status: 303 },
       );
     }
@@ -60,79 +58,33 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!isValid) {
       return NextResponse.redirect(
-        `${app.url}/orders/${orderId}?payment=failed&reason=validation_failed`,
+        `${app.url}/profile/orders/${orderId}?payment=failed&reason=validation_failed`,
         { status: 303 },
       );
     }
 
-    // Get the Supabase admin client to bypass RLS for escrow update
-    const supabase = getSupabaseServerClient();
+    // Delegate DB operations to the service layer (calls process_payment_success RPC)
+    const result = await EscrowService.processPaymentSuccess(
+      orderId,
+      tran_id,
+      "SSLCOMMERZ",
+    );
 
-    // Fetch escrow for this order
-    const { data: escrowData, error: escrowError } = await supabase
-      .from("escrow")
-      .select("id, amount, sender")
-      .eq("order", orderId)
-      .single();
-
-    if (escrowError || !escrowData) {
+    if (!result.success) {
       return NextResponse.redirect(
-        `${app.url}/orders/${orderId}?payment=failed&reason=escrow_not_found`,
+        `${app.url}/profile/orders/${orderId}?payment=failed&reason=${result.error ?? "processing_error"}`,
         { status: 303 },
       );
-    }
-
-    // Fetch the buyer's wallet for the DEBIT record
-    const { data: walletData } = await supabase
-      .from("wallet")
-      .select("id")
-      .eq("user", escrowData.sender)
-      .single();
-
-    // Update escrow: HOLDING + transaction info
-    await supabase
-      .from("escrow")
-      .update({
-        payment_status: "HOLDING",
-        payment_method: "SSLCOMMERZ",
-        transaction_id: tran_id,
-        status: "ACTIVE",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("order", orderId);
-
-    // Update order: PENDING → ACTIVE
-    await supabase
-      .from("order")
-      .update({
-        status: "ACTIVE",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", orderId);
-
-    // Create wallet_record DEBIT for buyer (if wallet found)
-    if (walletData?.id) {
-      await supabase.from("wallet_record").insert({
-        wallet: walletData.id,
-        amount: escrowData.amount,
-        type: "DEBIT",
-        description: "Payment sent to escrow",
-        order: orderId,
-        escrow: escrowData.id,
-        payment_method: "SSLCOMMERZ",
-        payment_gateway: "SSLCOMMERZ",
-        transaction_id: tran_id,
-      });
     }
 
     // Redirect buyer to order page
     return NextResponse.redirect(
-      `${app.url}/orders/${orderId}?payment=success`,
+      `${app.url}/profile/orders/${orderId}?payment=success`,
       { status: 303 },
     );
   } catch (err) {
     console.error("[payment/success] Error:", err);
-    return NextResponse.redirect(`${app.url}/orders?payment=error`, {
+    return NextResponse.redirect(`${app.url}/profile/orders?payment=error`, {
       status: 303,
     });
   }

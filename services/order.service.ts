@@ -356,6 +356,52 @@ export class OrderService {
   }
 
   /**
+   * Mark an ACTIVE order as DELIVERED (seller only).
+   *
+   * Calls the `deliver_order` RPC which validates:
+   * - Order exists
+   * - Caller is the seller
+   * - Current status is ACTIVE
+   *
+   * Transitions: ACTIVE → DELIVERED
+   */
+  static async deliver(
+    orderId: string,
+    callerProfileId: string,
+  ): Promise<ServiceResult<{ order_id: string }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "deliver_order",
+        {
+          p_order_id: orderId,
+          p_caller_profile_id: callerProfileId,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as {
+        success: boolean;
+        order_id?: string;
+        error?: string;
+      };
+
+      if (!result.success) {
+        return error(result.error ?? "Cannot mark order as delivered");
+      }
+
+      return success({ order_id: result.order_id! });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
    * Accept a PENDING order (buyer only).
    *
    * Calls the `accept_order` RPC which validates:

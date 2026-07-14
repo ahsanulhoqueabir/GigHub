@@ -341,7 +341,7 @@ function ChatPageContent() {
                     onClick={() => selectRoom(room.id)}
                     className={`w-full flex items-center gap-3 p-3.5 text-left transition-all duration-150 border-l-2 cursor-pointer min-w-0 ${
                       isSelected
-                        ? "bg-accent/40 border-primary"
+                        ? "bg-accent/20 border-primary"
                         : "hover:bg-accent/20 border-transparent"
                     }`}
                   >
