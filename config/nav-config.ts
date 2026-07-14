@@ -11,9 +11,11 @@ import {
   IconPhoto,
   IconPlus,
   IconSettings,
+  IconShield,
   IconShoppingCart,
   IconUser,
   IconUsers,
+  IconWallet,
 } from "@tabler/icons-react";
 
 export type NavItem = {
@@ -137,6 +139,24 @@ export const adminNavConfig: NavItem[] = [
       },
     ],
   },
+  {
+    id: "escrow",
+    label: "Escrow & Disputes",
+    href: "/admin/escrow",
+    icon: IconShield,
+    children: [
+      {
+        id: "escrow-list",
+        label: "All Escrows",
+        href: "/admin/escrow",
+      },
+      {
+        id: "escrow-disputes",
+        label: "Disputes",
+        href: "/admin/escrow/disputes",
+      },
+    ],
+  },
 ];
 
 /**
@@ -191,5 +211,17 @@ export const profileNavConfig: NavItem[] = [
     label: "Manage Jobs",
     href: "/profile/jobs",
     icon: IconBriefcase,
+  },
+  {
+    id: "wallet",
+    label: "Wallet",
+    href: "/profile/wallet",
+    icon: IconWallet,
+  },
+  {
+    id: "escrow",
+    label: "Escrow",
+    href: "/profile/escrow",
+    icon: IconShield,
   },
 ];

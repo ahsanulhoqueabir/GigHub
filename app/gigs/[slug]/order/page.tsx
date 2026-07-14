@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useCurrency } from "@/hooks/use-currency";
 import { cn } from "@/lib/utils";
 import { useGigsStore } from "@/store/gigs.store";
+import { useOrdersStore } from "@/store/orders.store";
 import type { GIGPackageTier } from "@/types/db/gig.types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -74,6 +75,9 @@ function GigOrderPageContent() {
   const fetchOrderGig = useGigsStore((s) => s.fetchOrderGig);
   const createGigOrder = useGigsStore((s) => s.createGigOrder);
 
+  const initiatePayment = useOrdersStore((s) => s.initiatePayment);
+  const isInitiatingPayment = useOrdersStore((s) => s.isInitiatingPayment);
+
   const [selectedTier, setSelectedTier] = useState<GIGPackageTier>(
     (searchParams.get("package") as GIGPackageTier) ?? "BASIC",
   );
@@ -102,17 +106,32 @@ function GigOrderPageContent() {
     if (!gig) return;
 
     try {
-      await createGigOrder({
+      const order = await createGigOrder({
         gig: gig.id,
         package: selectedTier,
         description: formData.description,
         note: formData.note || undefined,
       });
 
-      toast.success("Order placed successfully!");
-      router.push("/profile/orders");
+      if (!order?.id) {
+        toast.success("Order placed successfully!");
+        router.push("/profile/orders");
+        return;
+      }
+
+      // ── Auto-initiate SSLCommerz payment ──────────────────────
+      toast.info("Redirecting to payment gateway...");
+
+      const gatewayUrl = await initiatePayment(order.id);
+
+      if (gatewayUrl) {
+        router.push(gatewayUrl);
+      } else {
+        toast.success("Order placed! Redirecting to orders...");
+        router.push("/profile/orders");
+      }
     } catch {
-      toast.error("Failed to place order. Please try again.");
+      toast.error("Failed to place order or initiate payment. Please try again.");
     }
   };
 
@@ -396,9 +415,9 @@ function GigOrderPageContent() {
                 form="order-form"
                 className="w-full"
                 size="lg"
-                disabled={isMutating}
+                disabled={isMutating || isInitiatingPayment}
               >
-                {isMutating ? (
+                {isMutating || isInitiatingPayment ? (
                   "Placing Order..."
                 ) : (
                   <>

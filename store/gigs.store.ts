@@ -66,7 +66,9 @@ interface GigsActions {
   clearOrderGig: () => void;
 
   // Orders
-  createGigOrder: (params: CreateGigOrderParams) => Promise<void>;
+  createGigOrder: (
+    params: CreateGigOrderParams,
+  ) => Promise<{ id: string } | undefined>;
 
   // Mutations
   createGig: (payload: CreateGigInput) => Promise<GigDetail>;
@@ -232,8 +234,9 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
   createGigOrder: async (params) => {
     set({ isMutating: true, mutationError: null });
     try {
-      await api_client.post("/order", params);
+      const { data } = await api_client.post("/order", params);
       set({ isMutating: false });
+      return data?.data; // returns created order
     } catch (err: unknown) {
       set({ isMutating: false, mutationError: getErrorMessage(err) });
       throw err;

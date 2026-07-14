@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { api_client } from "@/lib/api/api-client";
+import { useFileUploadStore } from "@/store/file-upload.store";
 import { useJobProposalsStore } from "@/store/job-proposals.store";
 import { useJobsStore } from "@/store/jobs.store";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -88,41 +88,15 @@ export default function JobApplyPage() {
     setAttachmentFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const uploadFilesStore = useFileUploadStore((s) => s.uploadFiles);
+
   // ── Upload files → R2 → get public URLs ────────────────────────
   const uploadToR2 = async (): Promise<string[]> => {
     if (attachmentFiles.length === 0) return [];
 
     setUploadingFiles(true);
     try {
-      // 1. Get signed URLs
-      const filesPayload = attachmentFiles.map((f) => ({
-        fileName: f.name,
-        contentType: f.type || "application/octet-stream",
-      }));
-
-      const { data: signedData } = await api_client.post("/signed-upload-url", {
-        files: filesPayload,
-        folder: "job-proposals",
-      });
-
-      const signedResults: {
-        signedUrl: string;
-        publicUrl: string;
-      }[] = signedData.data;
-
-      // 2. Upload each file directly to R2 using the signed URL
-      await Promise.all(
-        signedResults.map((item, i) =>
-          fetch(item.signedUrl, {
-            method: "PUT",
-            body: attachmentFiles[i],
-            headers: { "Content-Type": attachmentFiles[i].type },
-          }),
-        ),
-      );
-
-      // 3. Return public URLs
-      return signedResults.map((r) => r.publicUrl);
+      return await uploadFilesStore(attachmentFiles, "job-proposals");
     } finally {
       setUploadingFiles(false);
     }

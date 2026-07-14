@@ -334,6 +334,10 @@ export class OrderService {
             applicant:profile!job_proposal_applicant_fkey (
               id, name, username, avatar
             )
+          ),
+          escrow:escrow!escrow_order_fkey (
+            id, status, payment_status, amount, platform_fee,
+            released_at, disputed_at, resolved_at, dispute_reason, admin_note
           )
         `,
         )
@@ -358,6 +362,8 @@ export class OrderService {
    * - Order exists
    * - Caller is the buyer
    * - Current status is PENDING
+   *
+   * Transitions: PENDING → ACTIVE
    */
   static async accept(
     orderId: string,
@@ -390,6 +396,58 @@ export class OrderService {
       }
 
       return success({ order_id: result.order_id! });
+    } catch (err) {
+      return error((err as Error).message || "An unknown error occurred");
+    }
+  }
+
+  /**
+   * Complete a DELIVERED order (buyer only).
+   *
+   * Calls the `complete_order` RPC which atomically:
+   * 1. Validates caller is buyer & order is DELIVERED
+   * 2. Updates order → COMPLETED
+   * 3. Updates escrow → COMPLETED, sets released_at
+   * 4. Credits seller wallet: balance += (amount - platform_fee)
+   * 5. Creates wallet_record (CREDIT) for seller
+   *
+   * Transitions: DELIVERED → COMPLETED
+   */
+  static async complete(
+    orderId: string,
+    callerProfileId: string,
+  ): Promise<ServiceResult<{ order_id: string; amount_released: number }>> {
+    try {
+      const supabase = getSupabaseServerClient();
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error: rpcError } = await (supabase as any).rpc(
+        "complete_order",
+        {
+          p_order_id: orderId,
+          p_caller_profile_id: callerProfileId,
+        },
+      );
+
+      if (rpcError) {
+        return error(rpcError.message);
+      }
+
+      const result = data as {
+        success: boolean;
+        order_id?: string;
+        amount_released?: number;
+        error?: string;
+      };
+
+      if (!result.success) {
+        return error(result.error ?? "Cannot complete order");
+      }
+
+      return success({
+        order_id: result.order_id!,
+        amount_released: result.amount_released!,
+      });
     } catch (err) {
       return error((err as Error).message || "An unknown error occurred");
     }
