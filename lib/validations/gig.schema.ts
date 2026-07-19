@@ -1,0 +1,15 @@
+export {
+  createGigSchema,
+  updateGigSchema,
+  categoryField,
+  titleField,
+  descriptionField,
+  imagesField,
+  tagsField,
+  gigPackageSchema,
+  faqSchema,
+  faqField,
+  statusField,
+  type CreateGigInput,
+  type UpdateGigInput,
+} from "@gig-hub/types";
