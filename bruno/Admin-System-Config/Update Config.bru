@@ -1,0 +1,62 @@
+meta {
+  name: Update Config
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/system-config
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "maintenance_mode": false,
+    "registration_enabled": true,
+    "platform_fee_percent": 5,
+    "support_email": "support@gighub.com"
+  }
+}
+
+docs {
+  ## Admin — Update System Config
+
+  Admin only. Updates system configuration values (all fields optional).
+
+  ### Request Body
+  | Field                 | Type    | Required | Description                     |
+  |-----------------------|---------|----------|---------------------------------|
+  | maintenance_mode      | boolean | No       | Enable maintenance mode         |
+  | registration_enabled  | boolean | No       | Allow new registrations         |
+  | platform_fee_percent  | number  | No       | Platform fee (0–100)            |
+  | max_gig_images        | number  | No       | Max images per gig              |
+  | max_portfolio_images  | number  | No       | Max portfolio images            |
+  | max_upload_size_mb    | number  | No       | Max upload size in MB           |
+  | support_email         | string  | No       | Support email address           |
+  | support_phone         | string  | No       | Support phone number            |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "System configuration updated successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Validation error
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

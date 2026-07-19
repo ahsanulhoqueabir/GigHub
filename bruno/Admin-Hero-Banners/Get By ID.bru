@@ -1,0 +1,45 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/admin/hero-banners/{{heroBannerId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Get Hero Banner By ID
+
+  Admin only. Returns a single hero banner by ID.
+
+  ### Variables
+  | Variable      | Description       |
+  |---------------|-------------------|
+  | heroBannerId  | Hero banner UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Hero banner ID is required
+  - **404** — Not found
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

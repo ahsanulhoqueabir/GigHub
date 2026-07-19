@@ -1,0 +1,47 @@
+meta {
+  name: Get Dashboard Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/admin/dashboard
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Get Dashboard Data
+
+  Admin only. Returns comprehensive dashboard data (stats, charts, recent items, etc.).
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "total_users": 100,
+      "total_gigs": 50,
+      "total_jobs": 30,
+      "total_orders": 200,
+      "total_revenue": 5000,
+      "recent_users": [...],
+      "recent_orders": [...],
+      "chart_data": { ... }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

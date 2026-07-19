@@ -1,0 +1,25 @@
+meta {
+  name: Records - Unauthorized
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/wallet/records
+  body: none
+  auth: none
+}
+
+docs {
+  ## Wallet Records — Unauthorized
+
+  Tests fetching wallet records without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

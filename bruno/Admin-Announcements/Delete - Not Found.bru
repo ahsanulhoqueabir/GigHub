@@ -1,0 +1,29 @@
+meta {
+  name: Delete - Not Found
+  type: http
+  seq: 10
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/announcements/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Delete Announcement — Not Found
+
+  Tests deleting a non-existent announcement.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Announcement not found"
+  }
+  ```
+}

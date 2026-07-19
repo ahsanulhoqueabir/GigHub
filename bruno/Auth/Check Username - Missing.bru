@@ -1,0 +1,29 @@
+meta {
+  name: Check Username - Missing
+  type: http
+  seq: 22
+}
+
+get {
+  url: {{baseUrl}}/api/auth/check-username
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Check Username — Missing Parameter
+
+  Tests checking username without providing the username query parameter.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Username is required"
+  }
+  ```
+}

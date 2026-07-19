@@ -1,0 +1,64 @@
+meta {
+  name: Generate Upload URL
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/signed-upload-url
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "files": [
+      {
+        "fileName": "profile-pic.jpg",
+        "contentType": "image/jpeg"
+      }
+    ],
+    "folder": "avatars"
+  }
+}
+
+docs {
+  ## Generate Signed Upload URL
+
+  Accepts an array of file descriptors and returns pre-signed PutObject URLs (30-min expiry)
+  so the client can upload files directly to Cloudflare R2.
+
+  ### Request Body
+  | Field    | Type   | Required | Description                                    |
+  |----------|--------|----------|------------------------------------------------|
+  | files    | array  | ✅       | Array of `{ fileName, contentType }` objects   |
+  | folder   | string | No       | Subfolder within user's directory              |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "key": "uuid/profile-pic.jpg",
+        "signedUrl": "https://...",
+        "publicUrl": "https://..."
+      }
+    ]
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Invalid file entries
+  - **401** — Missing/invalid token
+}

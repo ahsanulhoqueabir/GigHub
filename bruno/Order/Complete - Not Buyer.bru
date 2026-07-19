@@ -1,0 +1,29 @@
+meta {
+  name: Complete - Not Buyer
+  type: http
+  seq: 25
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/complete
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Complete Order — Not Buyer
+
+  Tests completing an order when the authenticated user is not the buyer.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Only the buyer can complete this order"
+  }
+  ```
+}

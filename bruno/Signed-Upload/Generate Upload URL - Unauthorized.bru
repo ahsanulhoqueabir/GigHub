@@ -1,0 +1,40 @@
+meta {
+  name: Generate Upload URL - Unauthorized
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/signed-upload-url
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "files": [
+      {
+        "fileName": "test.jpg",
+        "contentType": "image/jpeg"
+      }
+    ]
+  }
+}
+
+docs {
+  ## Generate Signed Upload URL — Unauthorized
+
+  Tests generating upload URL without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

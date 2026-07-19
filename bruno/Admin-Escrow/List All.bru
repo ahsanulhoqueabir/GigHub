@@ -1,0 +1,49 @@
+meta {
+  name: List All
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/admin/escrow
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — List All Escrows
+
+  Admin only. List all escrows with optional status/search filters.
+
+  ### Query Parameters
+  | Parameter | Type   | Description                                              |
+  |-----------|--------|----------------------------------------------------------|
+  | page      | number | Page number (default: 1)                                 |
+  | limit     | number | Items per page (default: 20, max: 50)                    |
+  | status    | string | Filter: `PENDING`, `ACTIVE`, `REVIEW`, `COMPLETED`, `CANCELLED` |
+  | search    | string | Search by transaction_id substring                       |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

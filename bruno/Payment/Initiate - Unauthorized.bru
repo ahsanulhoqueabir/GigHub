@@ -1,0 +1,35 @@
+meta {
+  name: Initiate - Unauthorized
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/payment/initiate
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "{{orderId}}"
+  }
+}
+
+docs {
+  ## Initiate Payment — Unauthorized
+
+  Tests initiating payment without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

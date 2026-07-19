@@ -1,0 +1,25 @@
+meta {
+  name: List - Unauthorized
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/admin/announcements
+  body: none
+  auth: none
+}
+
+docs {
+  ## Admin — List Announcements — Unauthorized
+
+  Tests listing announcements without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Fail Callback
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/payment/fail
+  body: form
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form {
+  value_a: {{orderId}}
+}
+
+docs {
+  ## Payment Fail Callback
+
+  SSLCommerz failure callback. Called when the payment fails.
+  The order and escrow remain in PENDING/UNPAID state.
+
+  ### Form Data
+  | Parameter | Type   | Description |
+  |-----------|--------|-------------|
+  | value_a   | string | Order ID    |
+
+  ### Result (303 Redirect)
+  Redirects to `/profile/orders/{{orderId}}?payment=failed`
+}

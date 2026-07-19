@@ -1,0 +1,42 @@
+meta {
+  name: Success Callback
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/payment/success
+  body: form
+  auth: none
+}
+
+headers {
+  Content-Type: application/x-www-form-urlencoded
+}
+
+body:form {
+  status: VALID
+  tran_id: SSL_TEST_12345678_1700000000000
+  amount: 100.00
+  currency: BDT
+  value_a: {{orderId}}
+}
+
+docs {
+  ## Payment Success Callback
+
+  SSLCommerz IPN (Instant Payment Notification) and success redirect handler.
+  Called by SSLCommerz server-side after a successful payment.
+
+  ### Form Data
+  | Parameter | Type   | Description                  |
+  |-----------|--------|------------------------------|
+  | status    | string | VALID or VALIDATED           |
+  | tran_id   | string | Transaction ID               |
+  | amount    | string | Payment amount               |
+  | currency  | string | Currency code (default: BDT) |
+  | value_a   | string | Order ID (embedded by us)    |
+
+  ### Success (303 Redirect)
+  Redirects to `/profile/orders/{{orderId}}?payment=success`
+}

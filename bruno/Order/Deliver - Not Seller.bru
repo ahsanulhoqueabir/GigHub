@@ -1,0 +1,29 @@
+meta {
+  name: Deliver - Not Seller
+  type: http
+  seq: 22
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/deliver
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Deliver Order — Not Seller
+
+  Tests delivering an order when the authenticated user is not the seller.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Only the seller can deliver this order"
+  }
+  ```
+}

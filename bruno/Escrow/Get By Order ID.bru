@@ -1,0 +1,55 @@
+meta {
+  name: Get By Order ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/escrow/order/{{orderId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Escrow By Order ID
+
+  Returns the escrow record for a specific order. Accessible by participants (buyer/seller) and admins.
+
+  ### Variables
+  | Variable | Description |
+  |----------|-------------|
+  | orderId  | Order UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "order_id": "uuid",
+      "status": "PENDING",
+      "amount": 100,
+      "platform_fee": 5,
+      "transaction_id": "SSL_...",
+      "payment_method": "SSLCOMMERZ",
+      "released_at": null,
+      "dispute_reason": null,
+      "created_at": "2025-01-01T00:00:00Z"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Order ID is required
+  - **404** — Escrow not found
+  - **401** — Missing/invalid token
+}

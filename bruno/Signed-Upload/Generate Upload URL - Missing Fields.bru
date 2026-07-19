@@ -1,0 +1,36 @@
+meta {
+  name: Generate Upload URL - Missing Fields
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/signed-upload-url
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "files": []
+  }
+}
+
+docs {
+  ## Generate Signed Upload URL — Missing Fields
+
+  Tests generating upload URL with an empty files array.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "R2_SIGNED_URLS_BAD_REQUEST"
+  }
+  ```
+}

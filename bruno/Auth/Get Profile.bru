@@ -1,0 +1,56 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 12
+}
+
+get {
+  url: {{baseUrl}}/api/auth/profile
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Profile — Get authenticated user's full profile
+
+  Protected route. Returns the authenticated user's full profile (password excluded)
+  with the department relation expanded.
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "name": "Abir Hasan",
+      "username": "hasan-452187",
+      "email": "abir@example.com",
+      "phone": null,
+      "bio": null,
+      "avatar": null,
+      "cover": null,
+      "role": "USER",
+      "student_id": "2023-123-456",
+      "department": { ... },
+      "skills": [],
+      "website": null,
+      "portfolio": null,
+      "socials": null,
+      "created_at": "2025-01-01T00:00:00Z"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **404** — Profile not found
+}

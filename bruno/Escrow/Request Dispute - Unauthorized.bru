@@ -1,0 +1,36 @@
+meta {
+  name: Request Dispute - Unauthorized
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/escrow/dispute
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "{{orderId}}",
+    "reason": "Test dispute without auth token."
+  }
+}
+
+docs {
+  ## Request Dispute — Unauthorized
+
+  Tests requesting a dispute without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

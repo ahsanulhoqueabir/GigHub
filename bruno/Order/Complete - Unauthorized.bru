@@ -1,0 +1,25 @@
+meta {
+  name: Complete - Unauthorized
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/complete
+  body: none
+  auth: none
+}
+
+docs {
+  ## Complete Order — Unauthorized
+
+  Tests completing an order without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

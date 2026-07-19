@@ -1,0 +1,46 @@
+meta {
+  name: Check Username
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseUrl}}/api/auth/check-username?username=hasan-452187
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Check Username Availability
+
+  Protected route. Checks whether a username is available.
+  The authenticated user's own ID is excluded so they can keep their current username.
+
+  ### Query Parameters
+  | Parameter | Type   | Required | Description |
+  |-----------|--------|----------|-------------|
+  | username  | string | ✅       | Username to check |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "available": true
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Username is required
+  - **401** — Missing/invalid token
+}

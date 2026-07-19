@@ -1,0 +1,37 @@
+meta {
+  name: Request Dispute - Invalid Order
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/escrow/dispute
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "00000000-0000-0000-0000-000000000000",
+    "reason": "This is a test dispute reason for an invalid order."
+  }
+}
+
+docs {
+  ## Request Dispute — Invalid Order ID
+
+  Tests requesting a dispute with a non-existent order UUID.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "Order not found or not in deliverable status"
+  }
+  ```
+}

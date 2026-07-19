@@ -1,0 +1,36 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/admin/announcements
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Test",
+    "content": "Test content"
+  }
+}
+
+docs {
+  ## Admin — Create Announcement — Unauthorized
+
+  Tests creating an announcement without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

@@ -1,0 +1,25 @@
+meta {
+  name: My Wallet - Unauthorized
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/wallet/my
+  body: none
+  auth: none
+}
+
+docs {
+  ## My Wallet — Unauthorized
+
+  Tests fetching wallet without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

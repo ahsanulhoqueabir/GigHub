@@ -1,0 +1,41 @@
+meta {
+  name: Get Token
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/chat/token
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Get Chat Realtime Token
+
+  Generates and returns a Supabase-compatible JWT token for Realtime connections.
+  The token expires in 1 hour.
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "token": "eyJhbGciOiJIUzI1NiJ9..."
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **500** — Secret key not configured
+}

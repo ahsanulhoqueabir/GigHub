@@ -1,0 +1,57 @@
+meta {
+  name: Initiate
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/payment/initiate
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "{{orderId}}"
+  }
+}
+
+docs {
+  ## Initiate Payment
+
+  Initiates an SSLCommerz payment session for a Gig order.
+
+  ### Request Body
+  | Field    | Type   | Required | Description |
+  |----------|--------|----------|-------------|
+  | order_id | string | ✅       | Order UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Payment session created",
+    "data": {
+      "gateway_url": "https://sandbox.sslcommerz.com/...",
+      "tran_id": "SSL_...",
+      "order_id": "uuid"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Order not PENDING
+  - **403** — Only buyer can initiate
+  - **404** — Order not found
+  - **502** — SSLCommerz API failure
+}

@@ -1,0 +1,50 @@
+meta {
+  name: List
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/admin/ad-banners
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — List Ad Banners
+
+  Admin only. Returns a paginated list of ad banners.
+
+  ### Query Parameters
+  | Parameter | Type   | Description                                      |
+  |-----------|--------|--------------------------------------------------|
+  | page      | number | Page number (default: 1)                         |
+  | limit     | number | Items per page (default: 50, max: 1000)          |
+  | sortBy    | string | Sort field: `name`, `placement`, `sort_order`, `is_active`, `created_at` |
+  | sortOrder | string | `asc` or `desc`                                  |
+  | placement | string | Filter by placement (optional)                   |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

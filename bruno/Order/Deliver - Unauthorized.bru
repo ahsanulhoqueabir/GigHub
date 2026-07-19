@@ -1,0 +1,25 @@
+meta {
+  name: Deliver - Unauthorized
+  type: http
+  seq: 21
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/deliver
+  body: none
+  auth: none
+}
+
+docs {
+  ## Deliver Order — Unauthorized
+
+  Tests delivering an order without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

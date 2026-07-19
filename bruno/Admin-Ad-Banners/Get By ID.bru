@@ -1,0 +1,45 @@
+meta {
+  name: Get By ID
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/admin/ad-banners/{{adBannerId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Get Ad Banner By ID
+
+  Admin only. Returns a single ad banner by ID.
+
+  ### Variables
+  | Variable    | Description     |
+  |-------------|-----------------|
+  | adBannerId  | Ad banner UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Ad banner ID is required
+  - **404** — Not found
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

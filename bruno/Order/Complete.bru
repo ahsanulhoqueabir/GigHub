@@ -1,0 +1,54 @@
+meta {
+  name: Complete
+  type: http
+  seq: 23
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/complete
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Complete Order
+
+  Buyer completes a DELIVERED order, releasing escrow funds to the seller.
+
+  ### Transitions
+  DELIVERED → COMPLETED
+
+  Atomically:
+  1. Validates caller is buyer & order is DELIVERED
+  2. Updates order → COMPLETED
+  3. Updates escrow → COMPLETED + released_at
+  4. Credits seller wallet: balance += (amount - platform_fee)
+  5. Creates CREDIT wallet_record for seller
+
+  ### Variables
+  | Variable | Description |
+  |----------|-------------|
+  | orderId  | Order UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Order completed and payment released to seller",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Order not DELIVERED / Not the buyer
+  - **401** — Missing/invalid token
+}

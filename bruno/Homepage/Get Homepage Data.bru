@@ -1,0 +1,32 @@
+meta {
+  name: Get Homepage Data
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/homepage
+  body: none
+  auth: none
+}
+
+docs {
+  ## Get Homepage Data
+
+  Public endpoint. Returns homepage data (latest gigs, jobs, and tuitions).
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "latest_gigs": [...],
+      "latest_jobs": [...],
+      "stats": { ... }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **500** — Server error
+}

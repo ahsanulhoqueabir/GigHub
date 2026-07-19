@@ -4,5 +4,29 @@
   "type": "collection",
   "ignore": ["node_modules", ".git"],
   "preserveFolderStructure": true,
-  "folders": ["Admin-Users", "Auth", "Category", "Gig", "Job"]
+  "folders": [
+    "Admin-Ad-Banners",
+    "Admin-Announcements",
+    "Admin-Dashboard",
+    "Admin-Escrow",
+    "Admin-Hero-Banners",
+    "Admin-System-Config",
+    "Admin-Users",
+    "Applied-Jobs",
+    "Auth",
+    "Category",
+    "Chat",
+    "Department",
+    "Escrow",
+    "Gig",
+    "Homepage",
+    "Incoming-Proposals",
+    "Job",
+    "Job-Proposal",
+    "Order",
+    "Payment",
+    "Signed-Upload",
+    "Site-Data",
+    "Wallet"
+  ]
 }

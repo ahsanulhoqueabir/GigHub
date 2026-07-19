@@ -1,0 +1,47 @@
+meta {
+  name: Deliver
+  type: http
+  seq: 20
+}
+
+patch {
+  url: {{baseUrl}}/api/order/{{orderId}}/deliver
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Deliver Order
+
+  Seller marks an ACTIVE order as DELIVERED.
+
+  ### Transitions
+  ACTIVE → DELIVERED
+
+  ### Variables
+  | Variable | Description |
+  |----------|-------------|
+  | orderId  | Order UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Order marked as delivered",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Order not ACTIVE / Not the seller
+  - **401** — Missing/invalid token
+}

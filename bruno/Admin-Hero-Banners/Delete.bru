@@ -1,0 +1,45 @@
+meta {
+  name: Delete
+  type: http
+  seq: 7
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/hero-banners/{{heroBannerId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Delete Hero Banner
+
+  Admin only. Deletes a hero banner by ID.
+
+  ### Variables
+  | Variable      | Description       |
+  |---------------|-------------------|
+  | heroBannerId  | Hero banner UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Hero banner deleted successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Cannot delete
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

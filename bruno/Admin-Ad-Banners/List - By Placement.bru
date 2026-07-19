@@ -1,0 +1,37 @@
+meta {
+  name: List - By Placement
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/admin/ad-banners?placement=sidebar
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — List Ad Banners — Filtered By Placement
+
+  Tests filtering ad banners by placement.
+
+  ### Query Parameters
+  | Parameter | Type   | Description            |
+  |-----------|--------|------------------------|
+  | placement | string | Filter by placement    |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}

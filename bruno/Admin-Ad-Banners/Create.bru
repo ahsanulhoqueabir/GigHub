@@ -1,0 +1,66 @@
+meta {
+  name: Create
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/admin/ad-banners
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Sidebar Ad",
+    "placement": "sidebar",
+    "image_url": "https://example.com/ad.jpg",
+    "alt_text": "Advertisement",
+    "target_url": "https://example.com",
+    "sort_order": 1,
+    "is_active": true
+  }
+}
+
+docs {
+  ## Admin — Create Ad Banner
+
+  Admin only. Creates a new ad banner.
+
+  ### Request Body
+  | Field      | Type    | Required | Description                    |
+  |------------|---------|----------|--------------------------------|
+  | name       | string  | ✅       | Banner name                    |
+  | placement  | string  | ✅       | Placement identifier           |
+  | image_url  | string  | ✅       | Banner image URL               |
+  | alt_text   | string  | ✅       | Alt text for accessibility     |
+  | target_url | string  | No       | Click target URL               |
+  | sort_order | number  | No       | Display order (default: 0)     |
+  | is_active  | boolean | No       | Active status (default: true)  |
+  | starts_at  | string  | No       | ISO-8601 start date            |
+  | ends_at    | string  | No       | ISO-8601 end date              |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (201)
+  ```json
+  {
+    "success": true,
+    "message": "Ad banner created successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Validation error
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

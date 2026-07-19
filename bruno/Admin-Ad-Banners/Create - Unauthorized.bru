@@ -1,0 +1,38 @@
+meta {
+  name: Create - Unauthorized
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/admin/ad-banners
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Test Ad",
+    "placement": "sidebar",
+    "image_url": "https://example.com/ad.jpg",
+    "alt_text": "Test"
+  }
+}
+
+docs {
+  ## Admin — Create Ad Banner — Unauthorized
+
+  Tests creating an ad banner without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

@@ -1,0 +1,47 @@
+meta {
+  name: List Disputes
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/admin/escrow/disputes
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — List Disputed Escrows
+
+  Admin only. Lists all disputed escrows (status = REVIEW).
+
+  ### Query Parameters
+  | Parameter | Type   | Description                       |
+  |-----------|--------|-----------------------------------|
+  | page      | number | Page number (default: 1)          |
+  | limit     | number | Items per page (default: 20, max: 50) |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

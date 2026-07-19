@@ -1,0 +1,25 @@
+meta {
+  name: Check Username - Unauthorized
+  type: http
+  seq: 23
+}
+
+get {
+  url: {{baseUrl}}/api/auth/check-username?username=testuser
+  body: none
+  auth: none
+}
+
+docs {
+  ## Check Username — Unauthorized
+
+  Tests checking username without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}

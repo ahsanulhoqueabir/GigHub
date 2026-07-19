@@ -1,0 +1,44 @@
+meta {
+  name: My Wallet
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/wallet/my
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## My Wallet
+
+  Returns the authenticated user's wallet (balance, currency, name).
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": "uuid",
+      "profile_id": "uuid",
+      "balance": 500.00,
+      "currency": "BDT",
+      "created_at": "2025-01-01T00:00:00Z"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **404** — Wallet not found
+}

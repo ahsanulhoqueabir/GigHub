@@ -1,0 +1,61 @@
+meta {
+  name: Records
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/wallet/records
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Wallet Records
+
+  Returns paginated wallet records (transaction history) for the authenticated user.
+
+  ### Query Parameters
+  | Parameter | Type   | Description                              |
+  |-----------|--------|------------------------------------------|
+  | page      | number | Page number (default: 1)                 |
+  | limit     | number | Items per page (default: 20, max: 50)    |
+  | type      | string | Filter: `CREDIT` or `DEBIT` (optional)   |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [
+        {
+          "id": "uuid",
+          "wallet_id": "uuid",
+          "type": "CREDIT",
+          "amount": 100.00,
+          "description": "Payment received for order ...",
+          "created_at": "2025-01-01T00:00:00Z"
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "limit": 20,
+        "total": 0
+      }
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **401** — Missing/invalid token
+  - **400** — Bad request
+}

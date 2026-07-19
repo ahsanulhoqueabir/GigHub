@@ -1,0 +1,37 @@
+meta {
+  name: Records - By Type
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/wallet/records?type=CREDIT
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Wallet Records — Filtered By Type
+
+  Tests filtering wallet records by type (CREDIT or DEBIT).
+
+  ### Query Parameters
+  | Parameter | Type   | Description            |
+  |-----------|--------|------------------------|
+  | type      | string | `CREDIT` or `DEBIT`    |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "items": [...],
+      "pagination": { ... }
+    }
+  }
+  ```
+}

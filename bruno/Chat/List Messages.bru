@@ -1,0 +1,53 @@
+meta {
+  name: List Messages
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/chat/rooms/{{roomId}}/messages?limit=50
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## List Chat Messages
+
+  Returns cursor-paginated chat messages for a room.
+
+  ### Query Parameters
+  | Parameter | Type   | Description                                      |
+  |-----------|--------|--------------------------------------------------|
+  | cursor    | string | ISO-8601 created_at timestamp for cursor pagination |
+  | limit     | number | Items per page (default: 50, max: 50)            |
+
+  ### Variables
+  | Variable | Description     |
+  |----------|-----------------|
+  | roomId   | Chat room UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "messages": [...],
+      "next_cursor": "2025-01-01T00:00:00Z"
+    }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Room ID is required
+  - **403** — Not a participant
+  - **401** — Missing/invalid token
+}

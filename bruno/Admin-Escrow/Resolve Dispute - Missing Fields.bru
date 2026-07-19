@@ -1,0 +1,37 @@
+meta {
+  name: Resolve Dispute - Missing Fields
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/admin/escrow/resolve
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "",
+    "resolution": ""
+  }
+}
+
+docs {
+  ## Admin — Resolve Dispute — Missing Fields
+
+  Tests resolving a dispute with empty fields.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "...validation error..."
+  }
+  ```
+}

@@ -1,0 +1,45 @@
+meta {
+  name: Delete
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/announcements/{{announcementId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Delete Announcement
+
+  Admin only. Deletes an announcement by ID.
+
+  ### Variables
+  | Variable        | Description        |
+  |-----------------|--------------------|
+  | announcementId  | Announcement UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Announcement deleted successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Cannot delete (in use?)
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

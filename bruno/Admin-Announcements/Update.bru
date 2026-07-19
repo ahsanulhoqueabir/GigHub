@@ -1,0 +1,53 @@
+meta {
+  name: Update
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/announcements/{{announcementId}}
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Updated Announcement Title",
+    "is_active": false
+  }
+}
+
+docs {
+  ## Admin — Update Announcement
+
+  Admin only. Updates an existing announcement (all fields optional).
+
+  ### Variables
+  | Variable        | Description        |
+  |-----------------|--------------------|
+  | announcementId  | Announcement UUID  |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Announcement updated successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Validation error
+  - **401** — Missing/invalid token
+  - **403** — Forbidden (not admin)
+}

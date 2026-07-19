@@ -1,0 +1,39 @@
+meta {
+  name: Create - Missing Fields
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/admin/ad-banners
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "",
+    "placement": "",
+    "image_url": "",
+    "alt_text": ""
+  }
+}
+
+docs {
+  ## Admin — Create Ad Banner — Missing Fields
+
+  Tests creating an ad banner with empty required fields.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "...validation error..."
+  }
+  ```
+}

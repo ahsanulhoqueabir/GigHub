@@ -1,0 +1,29 @@
+meta {
+  name: Get By ID - Not Found
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/admin/announcements/00000000-0000-0000-0000-000000000000
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+}
+
+docs {
+  ## Admin — Get Announcement By ID — Not Found
+
+  Tests fetching a non-existent announcement.
+
+  ### Expected Error Response (404)
+  ```json
+  {
+    "success": false,
+    "error": "Announcement not found"
+  }
+  ```
+}

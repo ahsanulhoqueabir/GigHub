@@ -1,0 +1,37 @@
+meta {
+  name: Request Dispute - Missing Fields
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/escrow/dispute
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "order_id": "",
+    "reason": ""
+  }
+}
+
+docs {
+  ## Request Dispute — Missing Fields
+
+  Tests requesting a dispute with empty order_id and reason.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "error": "...validation error..."
+  }
+  ```
+}

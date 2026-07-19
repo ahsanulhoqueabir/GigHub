@@ -1,0 +1,64 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 13
+}
+
+patch {
+  url: {{baseUrl}}/api/auth/profile
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "Abir Hasan Updated",
+    "bio": "Full-stack developer and designer",
+    "phone": "01700000000",
+    "skills": ["JavaScript", "TypeScript", "React", "Node.js"]
+  }
+}
+
+docs {
+  ## Update Profile — Update own profile
+
+  Protected route. Updates the authenticated user's own profile.
+  Sensitive fields (role, status, verified, etc.) are sanitised server-side.
+
+  ### Request Body
+  | Field    | Type   | Required | Description                |
+  |----------|--------|----------|----------------------------|
+  | name     | string | No       | Full name                  |
+  | username | string | No       | Unique username            |
+  | phone    | string | No       | Phone number               |
+  | bio      | string | No       | Short biography            |
+  | avatar   | string | No       | Avatar image URL           |
+  | cover    | string | No       | Cover image URL            |
+  | skills   | array  | No       | Array of skill strings     |
+  | website  | string | No       | Website URL                |
+  | portfolio| string | No       | Portfolio URL              |
+  | socials  | object | No       | `{ github, linkedin, twitter, facebook, instagram }` |
+
+  ### Headers
+  | Header        | Value               | Required |
+  |---------------|---------------------|----------|
+  | Authorization | Bearer {{authToken}}| ✅       |
+
+  ### Success Response (200)
+  ```json
+  {
+    "success": true,
+    "message": "Profile updated successfully",
+    "data": { ... }
+  }
+  ```
+
+  ### Error Responses
+  - **400** — Validation error
+  - **401** — Missing/invalid token
+}

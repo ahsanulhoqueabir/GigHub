@@ -1,0 +1,25 @@
+meta {
+  name: Get Dashboard Data - Unauthorized
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/admin/dashboard
+  body: none
+  auth: none
+}
+
+docs {
+  ## Admin — Get Dashboard Data — Unauthorized
+
+  Tests fetching dashboard data without an auth token.
+
+  ### Expected Error Response (401)
+  ```json
+  {
+    "success": false,
+    "error": "Authentication required"
+  }
+  ```
+}
