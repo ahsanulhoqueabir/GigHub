@@ -1,7 +1,15 @@
 import axios, { AxiosError, AxiosInstance } from "axios";
-import { API_BASE_URL } from "./config";
 import { AuthNavigationHelper } from "./auth-navigation-helper";
-import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
+import { API_BASE_URL } from "./config";
+
+/**
+ * Helper accessor to retrieve useAuthStore lazily, avoiding require cycles between
+ * store/auth.store.ts and lib/api/api-client.ts.
+ */
+const getAuthStore = () => {
+  const { useAuthStore } = require("@/store/auth.store");
+  return useAuthStore;
+};
 
 /**
  * Axios singleton for use in Zustand stores. Automatically attaches the
@@ -19,9 +27,11 @@ const createApiClient = (): AxiosInstance => {
   instance.interceptors.request.use(
     async (config) => {
       const isPublic = config.url?.startsWith("/auth/") ?? false;
+      const authState = getAuthStore().getState();
 
       if (!isPublic) {
-        const isAuthenticated = selectIsAuthenticated(useAuthStore.getState());
+        const isAuthenticated =
+          authState.user !== null && authState.accessToken !== null;
 
         if (!isAuthenticated) {
           return Promise.reject(
@@ -30,9 +40,8 @@ const createApiClient = (): AxiosInstance => {
         }
       }
 
-      const { accessToken } = useAuthStore.getState();
-      if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+      if (authState.accessToken) {
+        config.headers.Authorization = `Bearer ${authState.accessToken}`;
       }
       return config;
     },
@@ -58,9 +67,9 @@ const createApiClient = (): AxiosInstance => {
           }
 
           try {
-            await useAuthStore.getState().initAuth();
+            await getAuthStore().getState().initAuth();
 
-            const { accessToken } = useAuthStore.getState();
+            const { accessToken } = getAuthStore().getState();
 
             if (!accessToken) {
               AuthNavigationHelper.handleAuthError(error);

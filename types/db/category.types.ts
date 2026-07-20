@@ -1,8 +1,11 @@
+import type { CategoryMinimal as BaseCategoryMinimal } from "@gig-hub/types";
+
 export {
-  type CategoryCore,
-  type Category,
-  type CategoryMinimal,
-  type CategoryTree,
-  type CategoryForm,
   DefaultCategoryForm,
+  type Category,
+  type CategoryCore,
+  type CategoryForm,
+  type CategoryTree,
 } from "@gig-hub/types";
+
+export type CategoryMinimal = BaseCategoryMinimal & { image?: string | null };
