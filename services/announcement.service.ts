@@ -1,5 +1,6 @@
 import { error, success } from "@/lib/api/api-response";
 import { getSupabaseServerClient } from "@/lib/api/supabase";
+import { sendAnnouncementPush } from "@/lib/firebase/send-topic-notification";
 import { paginationParams } from "@/lib/pagination";
 import type {
   CreateAnnouncementInput,
@@ -28,6 +29,7 @@ export class AnnouncementService {
           content: params.content,
           type: params.type ?? "info",
           is_active: params.is_active,
+          send_push: params.send_push,
           starts_at: params.starts_at ?? null,
           ends_at: params.ends_at ?? null,
         })
@@ -38,7 +40,20 @@ export class AnnouncementService {
         return error(sbError.message);
       }
 
-      return success(data as Announcement);
+      const announcement = data as Announcement;
+
+      // Database insert is the source of truth; Firebase delivery is
+      // best-effort, non-blocking, and must never fail or roll back the
+      // create request or delay the API response.
+      if (announcement.send_push) {
+        sendAnnouncementPush({
+          id: announcement.id,
+          title: announcement.title,
+          content: announcement.content,
+        });
+      }
+
+      return success(announcement);
     } catch (err) {
       return error((err as Error).message || "An unknown error occurred");
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { ListPage } from "@/components/list-page/ListPage";
+import { BooleanBadge } from "@/components/shared/boolean-badge";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useReturnTo } from "@/hooks/use-return-to";
 import { formatShortDate } from "@/lib/date.utils";
@@ -95,6 +96,17 @@ export default function AnnouncementsListPage() {
           sortable: true,
           render: (_: unknown, item: Announcement) => (
             <StatusBadge status={item.is_active ? "ACTIVE" : "DRAFT"} />
+          ),
+        },
+        {
+          key: "send_push" as keyof Announcement,
+          label: "Push",
+          width: 10,
+          render: (_: unknown, item: Announcement) => (
+            <BooleanBadge
+              value={item.send_push}
+              labels={{ true: "Sent", false: "No push" }}
+            />
           ),
         },
         {

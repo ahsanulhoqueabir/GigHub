@@ -33,6 +33,8 @@ interface AnnouncementFormProps {
 }
 
 const ANNOUNCEMENT_TYPES = [
+  { value: "announcement", label: "Announcement" },
+  { value: "update", label: "Update" },
   { value: "info", label: "Info" },
   { value: "warning", label: "Warning" },
   { value: "success", label: "Success" },
@@ -54,8 +56,9 @@ export function AnnouncementForm({
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
     content: initialData?.content || "",
-    type: initialData?.type || "info",
+    type: initialData?.type || "update",
     is_active: initialData?.is_active ?? true,
+    send_push: initialData?.send_push ?? true,
     starts_at: initialData?.starts_at || "",
     ends_at: initialData?.ends_at || "",
   });
@@ -158,6 +161,18 @@ export function AnnouncementForm({
                   setFormData((prev) => ({ ...prev, is_active: val }))
                 }
               />
+              {!isUpdate && (
+                <div className="mt-4">
+                  <BooleanField
+                    label="Send Push Notification"
+                    description="Notify all subscribed devices when this announcement is created. Only applies on creation — it cannot be resent later."
+                    value={formData.send_push}
+                    onChange={(val) =>
+                      setFormData((prev) => ({ ...prev, send_push: val }))
+                    }
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
