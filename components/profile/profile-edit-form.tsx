@@ -32,7 +32,16 @@ interface ProfileEditFormProps {
   onSuccess?: () => void;
 }
 
-const SOCIAL_LABELS: Record<string, string> = {
+const SOCIAL_KEYS = [
+  "github",
+  "linkedin",
+  "twitter",
+  "facebook",
+  "instagram",
+] as const;
+type SocialKey = (typeof SOCIAL_KEYS)[number];
+
+const SOCIAL_LABELS: Record<SocialKey, string> = {
   github: "GitHub",
   linkedin: "LinkedIn",
   twitter: "Twitter",
@@ -345,19 +354,19 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
             <div className="space-y-3">
               <h3 className="text-sm font-medium">Social Media Links</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {Object.entries(SOCIAL_LABELS).map(([key, label]) => (
+                {(Object.keys(SOCIAL_LABELS) as SocialKey[]).map((key) => (
                   <FormField
                     key={key}
                     control={form.control}
-                    name={`socials.${String(key)}`}
+                    name={`socials.${key}`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{label}</FormLabel>
+                        <FormLabel>{SOCIAL_LABELS[key]}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value ?? ""}
-                            placeholder={`${label} URL`}
+                            placeholder={`${SOCIAL_LABELS[key]} URL`}
                           />
                         </FormControl>
                         <FormMessage />
