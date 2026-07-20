@@ -125,18 +125,26 @@ buildscript {
 ### Windows (PowerShell)
 
 ```powershell
-# 1. Navigate to the project root directory
-cd "e:\web dev\Own\gighub\app"
-
 # 2. (Optional) Re-generate native android directory if needed
 npx expo prebuild --platform android
 
-# 3. Navigate to android directory
-cd android
+# Navigate to android directory
+cd "e:\web dev\Own\gighub\app\android"
 
-# 4. Set JAVA_HOME to JDK 21 and run clean release build (APKs + AAB)
+# Set JAVA_HOME to JDK 21
 $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
-.\gradlew.bat clean assembleRelease bundleRelease --no-daemon
+
+# 1. Build arm64-v8a Release APK (~35 MB - Modern 64-bit phones):
+.\gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+
+# 2. Build armeabi-v7a Release APK (~30 MB - Older 32-bit phones):
+.\gradlew.bat assembleRelease -PreactNativeArchitectures=armeabi-v7a --no-daemon
+
+# 3. Build x86_64 Release APK (~36 MB - Emulators & Intel Chromebooks):
+.\gradlew.bat assembleRelease -PreactNativeArchitectures=x86_64 --no-daemon
+
+# 4. Build Universal Release APK (~107 MB - All devices) + AAB for Play Store:
+.\gradlew.bat assembleRelease bundleRelease --no-daemon
 ```
 
 ### Linux / macOS (Bash)

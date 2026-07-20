@@ -10,3 +10,5 @@ export const sb = {
     process.env.EXPO_PUBLIC_SUPABASE_PUBLISH_KEY ||
     "sb_publishable_-YISkb3XE6n77ea1Cooedw_YqOA3Euf",
 };
+
+
