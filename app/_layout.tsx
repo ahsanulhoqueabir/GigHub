@@ -8,7 +8,9 @@ cssInterop(ExpoImage, { className: "style" });
 
 import { ToastHost } from "@/components/ui/Toast";
 import { COLORS } from "@/constants/colors";
+import { useNotificationListeners } from "@/lib/notifications/listeners";
 import { useAuthStore } from "@/store/auth.store";
+import { useNotificationsStore } from "@/store/notifications.store";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -32,6 +34,8 @@ export default function RootLayout() {
   const initAuth = useAuthStore((s) => s.initAuth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSplashVisible, setIsSplashVisible] = useState(true);
+
+  useNotificationListeners();
 
   // Animated values for logo pulse & splash fade out
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -79,6 +83,10 @@ export default function RootLayout() {
   useEffect(() => {
     if (!hasHydrated) return;
 
+    // Fire-and-forget: notification permission/topic setup must never
+    // block splash/auth flow or app usage.
+    useNotificationsStore.getState().initNotifications();
+
     const startTime = Date.now();
 
     initAuth().finally(async () => {
@@ -117,6 +125,8 @@ export default function RootLayout() {
           <Stack.Screen name="job/[slug]" />
           <Stack.Screen name="order/[id]" />
           <Stack.Screen name="chat/[conversationId]" />
+          <Stack.Screen name="announcements/index" />
+          <Stack.Screen name="announcements/[id]" />
           <Stack.Screen name="admin" />
           <Stack.Screen
             name="unauthorized"

@@ -69,7 +69,23 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 bg-white dark:bg-gray-950">
-      <Header title="GigHub" showLogo />
+      <Header
+        title="GigHub"
+        showLogo
+        right={
+          <Pressable
+            hitSlop={8}
+            onPress={() => router.push("/announcements")}
+            className="h-9 w-9 items-center justify-center rounded-full active:bg-gray-100 dark:active:bg-gray-800"
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={22}
+              color={COLORS.gray500}
+            />
+          </Pressable>
+        }
+      />
 
       <ScrollView
         contentContainerClassName="gap-7 pb-12 pt-4"

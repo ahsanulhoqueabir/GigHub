@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "324616192102",
+    "project_id": "gighub-99847",
+    "storage_bucket": "gighub-99847.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324616192102:android:51a108ff0765333f23eda7",
+        "android_client_info": {
+          "package_name": "gighub.ahsanull.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiYE4EX6AUPqhexLd393cN1SZ4DiswIrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

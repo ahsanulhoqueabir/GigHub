@@ -18,10 +18,9 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
-      "package": "com.anonymous.gighub"
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "gighub.ahsanull.com",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -45,7 +44,8 @@
         }
       ],
       "expo-status-bar",
-      "expo-font"
+      "expo-font",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true
@@ -58,5 +58,3 @@
     }
   }
 }
-
-
