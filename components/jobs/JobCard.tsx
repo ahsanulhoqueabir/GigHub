@@ -33,95 +33,100 @@ function formatDeadline(value?: string) {
   });
 }
 
-interface JobCardProps {
+export interface JobCardProps {
   job: JobListItem;
   width?: number;
 }
 
-export function JobCard({ job, width }: JobCardProps) {
+/**
+ * Dedicated Card Layout for Tuition / Tutoring Listings
+ */
+export function TuitionJobCard({ job, width }: JobCardProps) {
   const deadline = formatDeadline(job.deadline);
-  const isTuition = job.type === "TUTION";
 
   return (
     <Pressable
       onPress={() => router.push(`/job/${job.slug}`)}
       style={width ? { width } : undefined}
-      className={`gap-2.5 rounded-2xl p-4 active:opacity-90 ${
-        isTuition
-          ? "border-2 border-warning/60 bg-amber-50/40 dark:border-warning/70 dark:bg-amber-950/20"
-          : "border border-gray-100 bg-white dark:border-gray-800 dark:bg-gray-900"
-      }`}
+      className="relative overflow-hidden gap-3 rounded-2xl border border-amber-200/80 bg-amber-50/50 p-4 active:opacity-90 dark:border-amber-900/50 dark:bg-amber-950/20 shadow-sm"
     >
-      <View className="flex-row items-center justify-between gap-2">
-        <View className="flex-row items-center gap-1.5">
-          <Badge variant={TYPE_VARIANTS[job.type]}>
-            {TYPE_LABELS[job.type]}
-          </Badge>
-          {isTuition ? (
-            <View className="flex-row items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 border border-warning/30">
-              <Ionicons name="school" size={11} color={COLORS.warning} />
-              <Text className="text-[10px] font-bold text-warning">
-                Special
-              </Text>
-            </View>
-          ) : null}
-        </View>
-        {job.budget ? (
-          <Text
-            className={`font-bold ${isTuition ? "text-base text-primary dark:text-green-400" : "text-sm text-gray-900 dark:text-gray-100"}`}
-          >
-            {CURRENCY_SYMBOL} {job.budget}
+      {/* Absolute Watermark Icon */}
+      <View className="absolute -top-3 -left-3 pointer-events-none opacity-10 dark:opacity-20">
+        <Ionicons name="school" size={96} color={COLORS.warning} />
+      </View>
+
+      {/* Header: Badge & Remuneration */}
+      <View className="flex-row items-center justify-end gap-2">
+        {/* <View className="rounded-full bg-amber-500/15 px-2.5 py-1 border border-amber-500/30">
+          <Text className="text-xs font-bold text-amber-800 dark:text-amber-300">
+            Tuition
           </Text>
+        </View> */}
+
+        {job.budget ? (
+          <View className="rounded-full bg-emerald-500/10 px-3 py-1 border border-emerald-500/20">
+            <Text className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+              {CURRENCY_SYMBOL} {job.budget}
+            </Text>
+          </View>
         ) : null}
       </View>
 
-      <Text
-        numberOfLines={2}
-        className="text-[15px] font-semibold leading-5 text-gray-900 dark:text-gray-100"
-      >
-        {job.title}
-      </Text>
-      <Text
-        numberOfLines={2}
-        className="text-xs leading-4 text-gray-500 dark:text-gray-400"
-      >
-        {job.description}
-      </Text>
+      {/* Content: Title & Description */}
+      <View className="gap-1">
+        <Text
+          numberOfLines={2}
+          className="text-base font-bold leading-6 text-gray-900 dark:text-gray-100"
+        >
+          {job.title}
+        </Text>
+        <Text
+          numberOfLines={3}
+          className="text-sm leading-5 text-amber-950/70 dark:text-amber-200/70"
+        >
+          {job.description}
+        </Text>
+      </View>
 
+      {/* Required Subjects / Skills */}
       {job.required_skills && job.required_skills.length > 0 ? (
         <View className="flex-row flex-wrap gap-1.5">
           {job.required_skills.slice(0, 3).map((skill) => (
-            <Badge key={skill} variant={isTuition ? "warning" : "default"}>
-              {skill}
-            </Badge>
+            <View
+              key={skill}
+              className="rounded-lg bg-amber-100/90 px-2.5 py-0.5 border border-amber-200/60 dark:bg-amber-900/40 dark:border-amber-800/40"
+            >
+              <Text className="text-xs font-semibold text-amber-900 dark:text-amber-300">
+                {skill}
+              </Text>
+            </View>
           ))}
         </View>
       ) : null}
 
-      <View
-        className={`mt-1 flex-row items-center justify-between border-t pt-2.5 ${isTuition ? "border-amber-200/70 dark:border-amber-900/40" : "border-gray-100 dark:border-gray-800"}`}
-      >
-        <View className="flex-row items-center gap-1.5">
+      {/* Footer: Poster Avatar & Meta Info */}
+      <View className="mt-0.5 flex-row items-center justify-between border-t border-amber-200/70 pt-2.5 dark:border-amber-900/40">
+        <View className="flex-row items-center gap-1.5 flex-1 pr-2">
           <Avatar uri={job.owner.avatar} name={job.owner.name} size="sm" />
           <Text
             numberOfLines={1}
-            className="max-w-28 text-xs font-medium text-gray-600 dark:text-gray-300"
+            className="flex-1 text-sm font-semibold text-gray-800 dark:text-gray-200"
           >
             {job.owner.name}
           </Text>
         </View>
 
-        <View className="flex-row items-center gap-2">
+        <View className="flex-row items-center gap-2.5">
           {job.location ? (
             <View className="flex-row items-center gap-1">
               <Ionicons
                 name="location-outline"
                 size={12}
-                color={isTuition ? COLORS.warning : COLORS.gray400}
+                color={COLORS.warning}
               />
               <Text
                 numberOfLines={1}
-                className={`max-w-20 text-[11px] ${isTuition ? "font-medium text-amber-900 dark:text-amber-300" : "text-gray-400 dark:text-gray-500"}`}
+                className="max-w-[80px] text-xs font-medium text-amber-900 dark:text-amber-300"
               >
                 {job.location}
               </Text>
@@ -129,8 +134,8 @@ export function JobCard({ job, width }: JobCardProps) {
           ) : null}
           {deadline ? (
             <View className="flex-row items-center gap-1">
-              <Ionicons name="time-outline" size={12} color={COLORS.gray400} />
-              <Text className="text-[11px] text-gray-400 dark:text-gray-500">
+              <Ionicons name="time-outline" size={12} color={COLORS.gray500} />
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
                 {deadline}
               </Text>
             </View>
@@ -139,4 +144,105 @@ export function JobCard({ job, width }: JobCardProps) {
       </View>
     </Pressable>
   );
+}
+
+/**
+ * Standard Card Layout for Regular Jobs (Full-time, Part-time, Contract, etc.)
+ */
+export function StandardJobCard({ job, width }: JobCardProps) {
+  const deadline = formatDeadline(job.deadline);
+
+  return (
+    <Pressable
+      onPress={() => router.push(`/job/${job.slug}`)}
+      style={width ? { width } : undefined}
+      className="gap-3 rounded-2xl border border-gray-100 bg-white p-4 active:opacity-90 dark:border-gray-800/80 dark:bg-gray-900 shadow-sm"
+    >
+      {/* Header: Type Badge & Budget */}
+      <View className="flex-row items-center justify-between gap-2">
+        <Badge variant={TYPE_VARIANTS[job.type]}>{TYPE_LABELS[job.type]}</Badge>
+        {job.budget ? (
+          <Text className="text-sm font-bold text-primary dark:text-emerald-400">
+            {CURRENCY_SYMBOL} {job.budget}
+          </Text>
+        ) : null}
+      </View>
+
+      {/* Content: Title & Description */}
+      <View className="gap-1">
+        <Text
+          numberOfLines={2}
+          className="text-base font-bold leading-6 text-gray-900 dark:text-gray-100"
+        >
+          {job.title}
+        </Text>
+        <Text
+          numberOfLines={3}
+          className="text-sm leading-5 text-gray-600 dark:text-gray-400"
+        >
+          {job.description}
+        </Text>
+      </View>
+
+      {/* Required Skills */}
+      {job.required_skills && job.required_skills.length > 0 ? (
+        <View className="flex-row flex-wrap gap-1.5">
+          {job.required_skills.slice(0, 3).map((skill) => (
+            <Badge key={skill} variant="default">
+              {skill}
+            </Badge>
+          ))}
+        </View>
+      ) : null}
+
+      {/* Footer: Poster & Meta */}
+      <View className="mt-0.5 flex-row items-center justify-between border-t border-gray-100 pt-2.5 dark:border-gray-800">
+        <View className="flex-row items-center gap-1.5 flex-1 pr-2">
+          <Avatar uri={job.owner.avatar} name={job.owner.name} size="sm" />
+          <Text
+            numberOfLines={1}
+            className="flex-1 text-sm font-semibold text-gray-700 dark:text-gray-200"
+          >
+            {job.owner.name}
+          </Text>
+        </View>
+
+        <View className="flex-row items-center gap-2.5">
+          {job.location ? (
+            <View className="flex-row items-center gap-1">
+              <Ionicons
+                name="location-outline"
+                size={12}
+                color={COLORS.gray400}
+              />
+              <Text
+                numberOfLines={1}
+                className="max-w-[80px] text-xs text-gray-500 dark:text-gray-400"
+              >
+                {job.location}
+              </Text>
+            </View>
+          ) : null}
+          {deadline ? (
+            <View className="flex-row items-center gap-1">
+              <Ionicons name="time-outline" size={12} color={COLORS.gray400} />
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {deadline}
+              </Text>
+            </View>
+          ) : null}
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
+/**
+ * Main JobCard component dispatcher
+ */
+export function JobCard(props: JobCardProps) {
+  if (props.job.type === "TUTION") {
+    return <TuitionJobCard {...props} />;
+  }
+  return <StandardJobCard {...props} />;
 }

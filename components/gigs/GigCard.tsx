@@ -53,14 +53,14 @@ export function GigCard({ gig, width }: GigCardProps) {
           <Avatar uri={gig.seller.avatar} name={gig.seller.name} size="sm" />
           <Text
             numberOfLines={1}
-            className="flex-1 text-xs text-gray-500 dark:text-gray-400"
+            className="flex-1 text-sm font-medium text-gray-600 dark:text-gray-300"
           >
             {gig.seller.name}
           </Text>
           {gig.seller.verified ? (
             <Ionicons
               name="checkmark-circle"
-              size={13}
+              size={14}
               color={COLORS.primary}
             />
           ) : null}
@@ -68,7 +68,7 @@ export function GigCard({ gig, width }: GigCardProps) {
 
         <Text
           numberOfLines={2}
-          className="text-sm font-medium leading-5 text-gray-900 dark:text-gray-100"
+          className="text-base font-semibold leading-5 text-gray-900 dark:text-gray-100"
         >
           {gig.title}
         </Text>
