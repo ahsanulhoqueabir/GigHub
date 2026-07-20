@@ -1,7 +1,7 @@
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { ProfileService } from "@/services/profile.service";
 import { updateProfileSchema } from "@/lib/validations/profile.schema";
+import { ProfileService } from "@/services/profile.service";
 
 // ─── GET /api/admin/users/:id (admin only) ────────────────────────
 // Returns a single profile's details.
@@ -44,7 +44,7 @@ export const PATCH = withAuth({
       if (payload instanceof Response) return payload;
 
       // Ensure at least one field is being updated
-      if (Object.keys(payload).length === 0) {
+      if (Object.keys(payload as Record<string, unknown>).length === 0) {
         return fail({
           error: "At least one field must be provided for update",
         });

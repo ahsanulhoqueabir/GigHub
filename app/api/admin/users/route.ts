@@ -1,9 +1,12 @@
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { ProfileService } from "@/services/profile.service";
-import { createUserSchema } from "@/lib/validations/profile.schema";
 import { parsePagination, parseSorting } from "@/lib/api/request-payload";
 import { paginationMeta } from "@/lib/pagination";
+import {
+  createUserSchema,
+  type CreateUserInput,
+} from "@/lib/validations/profile.schema";
+import { ProfileService } from "@/services/profile.service";
 
 // ─── GET /api/admin/users (admin only) ────────────────────────────
 // Returns a paginated list of all profiles.
@@ -67,9 +70,10 @@ export const GET = withAuth({
 export const POST = withAuth({
   handler: async ({ req }) => {
     try {
-      const payload = await parseBody(req, createUserSchema);
-      if (payload instanceof Response) return payload;
+      const body = await parseBody(req, createUserSchema);
+      if (body instanceof Response) return body;
 
+      const payload = body as CreateUserInput;
       const result = await ProfileService.create({
         name: payload.name,
         email: payload.email,

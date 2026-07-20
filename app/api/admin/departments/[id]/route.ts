@@ -1,7 +1,7 @@
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { DepartmentService } from "@/services/department.service";
 import { updateDepartmentSchema } from "@/lib/validations/department.schema";
+import { DepartmentService } from "@/services/department.service";
 
 // ─── GET /api/admin/departments/:id (admin only) ──────────────────
 // Returns a department by ID (no status filter — can see DELETED too).
@@ -43,7 +43,7 @@ export const PATCH = withAuth({
       if (payload instanceof Response) return payload;
 
       // Ensure at least one field is being updated
-      if (Object.keys(payload).length === 0) {
+      if (Object.keys(payload as Record<string, unknown>).length === 0) {
         return fail({
           error: "At least one field must be provided for update",
         });

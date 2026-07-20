@@ -512,7 +512,7 @@ export function JobForm({
             {/* Uploaded attachments list (existing URLs) */}
             {(watchedAttachments ?? []).length > 0 && (
               <ul className="space-y-2">
-                {(watchedAttachments ?? []).map((url, idx) => {
+                {(watchedAttachments ?? []).map((url: string, idx: number) => {
                   const fileName = url.split("/").pop() || url;
                   return (
                     <li
@@ -528,7 +528,7 @@ export function JobForm({
                           form.setValue(
                             "attachments",
                             (watchedAttachments ?? []).filter(
-                              (_, i) => i !== idx,
+                              (_: string, i: number) => i !== idx,
                             ),
                           )
                         }

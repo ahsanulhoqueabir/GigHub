@@ -1,6 +1,9 @@
 import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { updateOwnProfileSchema } from "@/lib/validations/own-profile.schema";
+import {
+  updateOwnProfileSchema,
+  type UpdateOwnProfileInput,
+} from "@/lib/validations/own-profile.schema";
 import { ProfileService } from "@/services/profile.service";
 import { NextRequest } from "next/server";
 
@@ -31,12 +34,13 @@ export const GET = withAuth({
  */
 export const PATCH = withAuth({
   handler: async ({ user, req }) => {
-    const body = await parseBody(
+    const parsed = await parseBody(
       req as unknown as NextRequest,
       updateOwnProfileSchema,
     );
-    if (body instanceof Response) return body;
+    if (parsed instanceof Response) return parsed;
 
+    const body = parsed as UpdateOwnProfileInput;
     const result = await ProfileService.updateOwn(user.profile, body);
 
     if (!result.success) {

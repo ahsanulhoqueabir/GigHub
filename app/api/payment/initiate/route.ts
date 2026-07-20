@@ -1,8 +1,11 @@
 import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
+import {
+  initiatePaymentSchema,
+  type InitiatePaymentInput,
+} from "@/lib/validations/payment.schema";
 import { OrderService } from "@/services/order.service";
 import { SSLCommerzService } from "@/services/sslcommerz.service";
-import { initiatePaymentSchema } from "@/lib/validations/payment.schema";
 
 /**
  * POST /api/payment/initiate
@@ -21,10 +24,10 @@ import { initiatePaymentSchema } from "@/lib/validations/payment.schema";
 export const POST = withAuth({
   handler: async ({ req, user }) => {
     try {
-      const body = await parseBody(req, initiatePaymentSchema);
-      if (body instanceof Response) return body as never;
+      const parsed = await parseBody(req, initiatePaymentSchema);
+      if (parsed instanceof Response) return parsed as never;
 
-      const { order_id } = body;
+      const { order_id } = parsed as InitiatePaymentInput;
 
       // Fetch order to validate and get details
       const orderResult = await OrderService.getById(order_id);

@@ -1,13 +1,14 @@
-import { NextRequest } from "next/server";
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
+import { signUpSchema, type SignUpInput } from "@/lib/validations/auth.schema";
 import { AuthService } from "@/services/auth.service";
-import { signUpSchema } from "@/lib/validations/auth.schema";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await parseBody(request, signUpSchema);
-    if (payload instanceof Response) return payload;
+    const parsed = await parseBody(request, signUpSchema);
+    if (parsed instanceof Response) return parsed;
 
+    const payload = parsed as SignUpInput;
     // Create account via service
     const result = await AuthService.signup({
       name: payload.name,

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { verifyJwt } from "@/lib/jwt.helper";
 import type { JwtPayload } from "@/types/business/user.types";
 import type { UserRole } from "@/types/db/profile.types";
+import { NextRequest, NextResponse } from "next/server";
 
 export type WithAuthOptions = {
   allowedRoles?: UserRole[];
@@ -15,7 +15,7 @@ export type AuthenticatedHandlerContext = {
 
 export type AuthenticatedHandler = (
   ctx: AuthenticatedHandlerContext,
-) => Promise<NextResponse>;
+) => Promise<Response>;
 
 type WithAuthConfig = {
   handler: AuthenticatedHandler;
@@ -49,13 +49,13 @@ type WithAuthConfig = {
  */
 export function withAuth(
   config: WithAuthConfig,
-): (req: NextRequest, context?: { params?: unknown }) => Promise<NextResponse> {
+): (req: NextRequest, context?: { params?: unknown }) => Promise<Response> {
   const { handler, options } = config;
 
   return async (
     req: NextRequest,
     context?: { params?: unknown },
-  ): Promise<NextResponse> => {
+  ): Promise<Response> => {
     try {
       const authHeader = req.headers.get("Authorization");
 

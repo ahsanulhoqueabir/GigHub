@@ -95,7 +95,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
   const removeSkill = (skill: string) => {
     form.setValue(
       "skills",
-      skillsValue.filter((s) => s !== skill),
+      skillsValue.filter((s: unknown) => s !== skill),
     );
   };
 
@@ -297,7 +297,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
                       {/* Existing skills as badges */}
                       {skillsValue.length > 0 && (
                         <div className="flex flex-wrap gap-1.5">
-                          {skillsValue.map((skill) => (
+                          {skillsValue.map((skill: string) => (
                             <Badge
                               key={skill}
                               variant="secondary"
@@ -349,7 +349,7 @@ export function ProfileEditForm({ profile, onSuccess }: ProfileEditFormProps) {
                   <FormField
                     key={key}
                     control={form.control}
-                    name={`socials.${key as keyof NonNullable<UpdateOwnProfileInput["socials"]>}`}
+                    name={`socials.${String(key)}`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>{label}</FormLabel>

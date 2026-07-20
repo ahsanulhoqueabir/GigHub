@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
-import { ok, fail, parseBody } from "@/lib/api/api-response";
+import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
-import { GigService } from "@/services/gig.service";
-import { updateGigSchema } from "@/lib/validations/gig.schema";
 import { getRouteParam } from "@/lib/api/request-payload";
+import { updateGigSchema } from "@/lib/validations/gig.schema";
+import { GigService } from "@/services/gig.service";
+import { NextRequest } from "next/server";
 
 // ─── GET /api/gig/:id (public) ────────────────────────────────────
 // Returns a single gig by ID with seller, category, and reviews.
@@ -47,7 +47,7 @@ export const PATCH = withAuth({
       if (payload instanceof Response) return payload;
 
       // Ensure at least one field is being updated
-      if (Object.keys(payload).length === 0) {
+      if (Object.keys(payload as Record<string, unknown>).length === 0) {
         return fail({
           error: "At least one field must be provided for update",
         });

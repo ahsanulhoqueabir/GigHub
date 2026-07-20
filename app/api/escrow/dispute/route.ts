@@ -1,7 +1,10 @@
 import { fail, ok, parseBody } from "@/lib/api/api-response";
 import { withAuth } from "@/lib/api/auth-middleware";
+import {
+  requestDisputeSchema,
+  type RequestDisputeInput,
+} from "@/lib/validations/escrow.schema";
 import { EscrowService } from "@/services/escrow.service";
-import { requestDisputeSchema } from "@/lib/validations/escrow.schema";
 
 /**
  * POST /api/escrow/dispute
@@ -17,10 +20,10 @@ import { requestDisputeSchema } from "@/lib/validations/escrow.schema";
 export const POST = withAuth({
   handler: async ({ req, user }) => {
     try {
-      const body = await parseBody(req, requestDisputeSchema);
-      if (body instanceof Response) return body as never;
+      const parsed = await parseBody(req, requestDisputeSchema);
+      if (parsed instanceof Response) return parsed as never;
 
-      const { order_id, reason } = body;
+      const { order_id, reason } = parsed as RequestDisputeInput;
 
       const result = await EscrowService.requestDispute(
         order_id,

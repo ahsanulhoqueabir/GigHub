@@ -176,7 +176,7 @@ export function GigForm({
   const removeImage = (index: number) => {
     form.setValue(
       "images",
-      imagesValue.filter((_, i) => i !== index),
+      imagesValue.filter((_: unknown, i: number) => i !== index),
     );
   };
 
@@ -226,7 +226,7 @@ export function GigForm({
   const removeTag = (tag: string) => {
     form.setValue(
       "tags",
-      tagsValue.filter((t) => t !== tag),
+      tagsValue.filter((t: unknown) => t !== tag),
     );
   };
 
@@ -257,7 +257,7 @@ export function GigForm({
     const currentFeatures = packagesValue[packageIndex]?.features || [];
     form.setValue(
       `packages.${packageIndex}.features`,
-      currentFeatures.filter((_, idx) => idx !== featureIndex),
+      currentFeatures.filter((_: unknown, idx: number) => idx !== featureIndex),
     );
   };
 
@@ -352,7 +352,7 @@ export function GigForm({
                 <div className="space-y-3">
                   {tagsValue.length > 0 && (
                     <div className="flex flex-wrap gap-2">
-                      {tagsValue.map((tag) => (
+                      {tagsValue.map((tag: string) => (
                         <Badge
                           key={tag}
                           variant="secondary"
@@ -439,7 +439,7 @@ export function GigForm({
         <CardContent className="space-y-6">
           {imagesValue.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {imagesValue.map((url, idx) => (
+              {imagesValue.map((url: string, idx: number) => (
                 <div
                   key={idx}
                   className="relative aspect-video rounded-lg overflow-hidden border border-border group"
@@ -646,26 +646,28 @@ export function GigForm({
                         packagesValue[packageIdx]?.features || [];
                       return pkgFeatures.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
-                          {pkgFeatures.map((feature, featureIdx) => (
-                            <div
-                              key={featureIdx}
-                              className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/20 text-sm hover:bg-muted/40 transition-all duration-200 group"
-                            >
-                              <span className="flex items-center gap-2 font-medium">
-                                <IconCheck className="size-4 text-emerald-500 shrink-0" />
-                                {feature}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  removeFeature(packageIdx, featureIdx)
-                                }
-                                className="text-muted-foreground hover:text-destructive p-1 rounded-md hover:bg-destructive/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200"
+                          {pkgFeatures.map(
+                            (feature: string, featureIdx: number) => (
+                              <div
+                                key={featureIdx}
+                                className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-muted/20 text-sm hover:bg-muted/40 transition-all duration-200 group"
                               >
-                                <IconTrash className="size-4" />
-                              </button>
-                            </div>
-                          ))}
+                                <span className="flex items-center gap-2 font-medium">
+                                  <IconCheck className="size-4 text-emerald-500 shrink-0" />
+                                  {feature}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeFeature(packageIdx, featureIdx)
+                                  }
+                                  className="text-muted-foreground hover:text-destructive p-1 rounded-md hover:bg-destructive/10 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-200"
+                                >
+                                  <IconTrash className="size-4" />
+                                </button>
+                              </div>
+                            ),
+                          )}
                         </div>
                       ) : (
                         <div className="text-xs text-muted-foreground bg-muted/10 border border-dashed rounded-lg p-3 text-center">
