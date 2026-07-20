@@ -17,6 +17,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   PENDING: "warning",
@@ -95,7 +97,9 @@ function getSourceConfig(source?: string): SourceConfig {
 }
 
 export default function OrderDetailScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+
   const isAuthenticated = useAuthStore((s) => s.accessToken !== null);
   const user = useAuthStore((s) => s.user);
 
@@ -222,7 +226,13 @@ export default function OrderDetailScreen() {
     <View className="flex-1 bg-white dark:bg-gray-950">
       <Header title="Order Details" showBack />
 
-      <ScrollView contentContainerClassName="gap-4 px-6 py-5 pb-10">
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
+        contentContainerClassName="gap-4 px-6 py-5"
+      >
+
         <View className="flex-row items-start justify-between gap-2">
           <View className="flex-1 gap-1">
             <View className="flex-row items-center gap-2">

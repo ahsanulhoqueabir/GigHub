@@ -22,6 +22,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   DRAFT: "default",
@@ -32,7 +34,9 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
 };
 
 export default function AppliedJobsScreen() {
+  const insets = useSafeAreaInsets();
   const appliedJobs = useJobProposalsStore((s) => s.appliedJobs);
+
   const isLoading = useJobProposalsStore((s) => s.isLoadingApplied);
   const pagination = useJobProposalsStore((s) => s.appliedPagination);
   const fetchAppliedJobs = useJobProposalsStore((s) => s.fetchAppliedJobs);
@@ -130,7 +134,11 @@ export default function AppliedJobsScreen() {
         <FlatList
           data={appliedJobs}
           keyExtractor={(item) => item.id}
-          contentContainerClassName="gap-3 px-6 py-4"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-3 px-6 pt-4"
+
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

@@ -12,6 +12,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   ACTIVE: "success",
@@ -20,7 +22,9 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
 };
 
 export default function AdminUsersScreen() {
+  const insets = useSafeAreaInsets();
   const users = useUsersStore((s) => s.users);
+
   const isLoading = useUsersStore((s) => s.isLoading);
   const pagination = useUsersStore((s) => s.pagination);
   const currentPage = useUsersStore((s) => s.currentPage);
@@ -115,7 +119,11 @@ export default function AdminUsersScreen() {
         <FlatList
           data={filteredUsers}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
           refreshControl={
+
             <RefreshControl
               refreshing={isLoading}
               onRefresh={() => fetchUsers(1, 20)}

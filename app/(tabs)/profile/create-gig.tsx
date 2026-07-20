@@ -29,8 +29,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const TIERS: GIGPackageTier[] = ["BASIC", "STANDARD", "PREMIUM"];
+
 
 const FAQ_SUGGESTIONS = [
   "Do you provide source files?",
@@ -52,7 +54,9 @@ function emptyPackage(tier: GIGPackageTier): GigPackage {
 }
 
 export default function CreateGigScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id?: string }>();
+
   const isEditing = !!id;
 
   const currentGig = useGigsStore((s) => s.currentGig);
@@ -310,9 +314,13 @@ export default function CreateGigScreen() {
 
       {isLoading ? null : (
         <ScrollView
-          contentContainerClassName="gap-4 px-6 pb-16 pt-6"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-4 px-6 pt-6"
           keyboardShouldPersistTaps="handled"
         >
+
           {uploadingImages ? (
             <View className="mb-2 rounded-xl bg-primary/10 p-3.5 dark:bg-primary/20 flex-row items-center gap-3">
               <ActivityIndicator color={COLORS.primary} size="small" />

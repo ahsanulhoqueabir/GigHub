@@ -22,6 +22,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 type ManageGigItem = GigListItem & { status: Status };
 
@@ -34,7 +36,9 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
 };
 
 export default function MyGigsScreen() {
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
+
   const gigs = useGigsStore((s) => s.gigs) as ManageGigItem[];
   const isLoading = useGigsStore((s) => s.isLoadingList);
   const pagination = useGigsStore((s) => s.listPagination);
@@ -111,7 +115,11 @@ export default function MyGigsScreen() {
         <FlatList
           data={gigs}
           keyExtractor={(item) => item.id}
-          contentContainerClassName="gap-3 px-6 py-4"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-3 px-6 pt-4"
+
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

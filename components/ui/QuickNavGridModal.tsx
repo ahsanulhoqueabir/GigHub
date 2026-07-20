@@ -231,7 +231,13 @@ export function QuickNavGridModal({
         </View>
 
         {/* Category Grid Items */}
-        <ScrollView contentContainerClassName="px-6 pb-12 pt-4">
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="px-6 pt-4"
+        >
+
           {navCategories.map((group) => (
             <View key={group.category} className="mb-6">
               <Text className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">

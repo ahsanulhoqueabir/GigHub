@@ -31,8 +31,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const JOB_TYPE_OPTIONS: SelectOption[] = [
+
   { value: "PARTTIME", label: "Part-time" },
   { value: "FULLTIME", label: "Full-time" },
   { value: "CONTRACT", label: "Contract" },
@@ -42,7 +44,9 @@ const JOB_TYPE_OPTIONS: SelectOption[] = [
 ];
 
 export default function PostJobScreen() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id?: string }>();
+
   const isEditing = !!id;
 
   const currentJob = useJobsStore((s) => s.currentJob);
@@ -248,9 +252,13 @@ export default function PostJobScreen() {
 
       {isLoading ? null : (
         <ScrollView
-          contentContainerClassName="gap-4 px-6 pb-16 pt-6"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-4 px-6 pt-6"
           keyboardShouldPersistTaps="handled"
         >
+
           {uploadingFiles ? (
             <View className="mb-2 rounded-xl bg-primary/10 p-3.5 dark:bg-primary/20 flex-row items-center gap-3">
               <ActivityIndicator color={COLORS.primary} size="small" />

@@ -13,6 +13,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString(undefined, {
@@ -67,6 +69,7 @@ function RecordRow({ item }: { item: WalletRecord }) {
 }
 
 export default function WalletScreen() {
+  const insets = useSafeAreaInsets();
   const wallet = useWalletStore((s) => s.wallet);
   const isLoadingWallet = useWalletStore((s) => s.isLoadingWallet);
   const fetchWallet = useWalletStore((s) => s.fetchWallet);
@@ -74,6 +77,7 @@ export default function WalletScreen() {
   const records = useWalletStore((s) => s.records);
   const isLoadingRecords = useWalletStore((s) => s.isLoadingRecords);
   const pagination = useWalletStore((s) => s.pagination);
+
   const fetchRecords = useWalletStore((s) => s.fetchRecords);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -105,6 +109,9 @@ export default function WalletScreen() {
         data={records}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <RecordRow item={item} />}
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

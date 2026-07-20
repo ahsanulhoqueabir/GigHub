@@ -15,9 +15,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ChangePasswordScreen() {
+  const insets = useSafeAreaInsets();
   const changePassword = useProfileStore((s) => s.changePassword);
+
   const isChangingPassword = useProfileStore((s) => s.isChangingPassword);
 
   const [currentPassword, setCurrentPassword] = useState("");
@@ -66,9 +69,13 @@ export default function ChangePasswordScreen() {
       <Header title="Change Password" showBack />
 
       <ScrollView
-        contentContainerClassName="px-6 pb-10 pt-6"
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
+        contentContainerClassName="px-6 pt-6"
         keyboardShouldPersistTaps="handled"
       >
+
         {/* Banner Card */}
         <View className="mb-6 items-center rounded-2xl bg-green-50/60 p-5 dark:bg-green-950/30 border border-green-100 dark:border-green-900/40">
           <View className="mb-3 h-14 w-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/60">

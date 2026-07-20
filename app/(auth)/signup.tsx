@@ -16,6 +16,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface DepartmentOption {
   id: string;
@@ -26,7 +27,9 @@ interface DepartmentOption {
 const STEPS = ["Account", "Campus Details"] as const;
 
 export default function SignUpScreen() {
+  const insets = useSafeAreaInsets();
   const signUp = useAuthStore((s) => s.signUp);
+
   const isProcessing = useAuthStore((s) => s.isProcessing);
 
   const [step, setStep] = useState(0);
@@ -144,9 +147,13 @@ export default function SignUpScreen() {
       </View>
 
       <ScrollView
-        contentContainerClassName="px-6 pb-10 pt-6"
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
+        contentContainerClassName="px-6 pt-6"
         keyboardShouldPersistTaps="handled"
       >
+
         {step === 0 ? (
           <>
             <Text className="mb-1 text-2xl font-bold text-gray-900 dark:text-gray-100">

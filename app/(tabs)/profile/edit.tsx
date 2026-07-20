@@ -21,8 +21,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SOCIAL_FIELDS: {
+
   key: "github" | "linkedin" | "twitter" | "facebook" | "instagram";
   label: string;
 }[] = [
@@ -34,7 +36,9 @@ const SOCIAL_FIELDS: {
 ];
 
 export default function EditProfileScreen() {
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
+
   const profile = useProfileStore((s) => s.profile);
   const isLoading = useProfileStore((s) => s.isLoading);
   const isUpdating = useProfileStore((s) => s.isUpdating);
@@ -158,9 +162,13 @@ export default function EditProfileScreen() {
         </View>
       ) : (
         <ScrollView
-          contentContainerClassName="px-6 pb-16 pt-6"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="px-6 pt-6"
           keyboardShouldPersistTaps="handled"
         >
+
           <View className="items-center">
             <Pressable
               onPress={handlePickAvatar}

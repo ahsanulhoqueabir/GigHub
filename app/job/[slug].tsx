@@ -24,8 +24,10 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const MAX_ATTACHMENTS = 5;
+
 
 function formatFileSize(bytes?: number) {
   if (!bytes) return "";
@@ -61,7 +63,9 @@ function formatDate(value?: string) {
 }
 
 export default function JobDetailScreen() {
+  const insets = useSafeAreaInsets();
   const { slug } = useLocalSearchParams<{ slug: string }>();
+
 
   const job = useJobsStore((s) => s.currentJob);
   const isLoading = useJobsStore((s) => s.isLoadingDetail);
@@ -168,7 +172,12 @@ export default function JobDetailScreen() {
     <View className="flex-1 bg-white dark:bg-gray-950">
       <Header title="Job Details" showBack />
 
-      <ScrollView contentContainerClassName="gap-4 px-6 py-5 pb-32">
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: (isOwner ? 24 : 85) + Math.max(insets.bottom, 16),
+        }}
+        contentContainerClassName="gap-4 px-6 py-5"
+      >
         {isTuition ? (
           <View className="flex-row items-center gap-2 rounded-xl bg-amber-50 border border-amber-200/80 p-3 dark:bg-amber-950/30 dark:border-amber-900/50">
             <Ionicons name="school" size={20} color={COLORS.warning} />
@@ -293,7 +302,10 @@ export default function JobDetailScreen() {
       </ScrollView>
 
       {!isOwner ? (
-        <View className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-950">
+        <View
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+          className="absolute bottom-0 left-0 right-0 border-t border-gray-100 bg-white px-6 pt-4 dark:border-gray-800 dark:bg-gray-950"
+        >
           <Button onPress={handleApplyPress}>Apply for this Job</Button>
         </View>
       ) : null}

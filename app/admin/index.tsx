@@ -13,6 +13,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 type StatCardConfig = {
   label: string;
@@ -23,7 +25,9 @@ type StatCardConfig = {
 };
 
 export default function AdminDashboardScreen() {
+  const insets = useSafeAreaInsets();
   const data = useAdminDashboardStore((s) => s.data);
+
   const isLoading = useAdminDashboardStore((s) => s.isLoading);
   const fetchDashboard = useAdminDashboardStore((s) => s.fetchDashboard);
 
@@ -101,8 +105,12 @@ export default function AdminDashboardScreen() {
       <Header title="Admin Dashboard" showBack hideAuthControls />
 
       <ScrollView
-        contentContainerClassName="gap-4 px-4 py-5 pb-10"
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
+        contentContainerClassName="gap-4 px-4 py-5"
         refreshControl={
+
           <RefreshControl
             refreshing={isLoading}
             onRefresh={fetchDashboard}

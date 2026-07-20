@@ -22,6 +22,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   PENDING: "warning",
@@ -32,7 +34,9 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
 };
 
 export default function IncomingProposalsScreen() {
+  const insets = useSafeAreaInsets();
   const { jobId } = useLocalSearchParams<{ jobId?: string }>();
+
 
   const proposals = useJobProposalsStore((s) => s.incomingProposals);
   const isLoading = useJobProposalsStore((s) => s.isLoadingIncoming);
@@ -97,7 +101,11 @@ export default function IncomingProposalsScreen() {
         <FlatList
           data={proposals}
           keyExtractor={(item) => item.id}
-          contentContainerClassName="gap-3 px-6 py-4"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-3 px-6 pt-4"
+
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

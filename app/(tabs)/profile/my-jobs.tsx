@@ -21,6 +21,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 type ManageJobItem = JobListItem & { status: Status };
 
@@ -34,7 +36,9 @@ const STATUS_VARIANTS: Record<string, BadgeVariant> = {
 };
 
 export default function MyJobsScreen() {
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
+
   const jobs = useJobsStore((s) => s.jobs) as ManageJobItem[];
   const isLoading = useJobsStore((s) => s.isLoadingList);
   const pagination = useJobsStore((s) => s.listPagination);
@@ -111,7 +115,11 @@ export default function MyJobsScreen() {
         <FlatList
           data={jobs}
           keyExtractor={(item) => item.id}
-          contentContainerClassName="gap-3 px-6 py-4"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-3 px-6 pt-4"
+
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

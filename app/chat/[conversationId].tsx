@@ -327,9 +327,10 @@ export default function ConversationScreen() {
 
         {/* Composer */}
         <View
-          style={{ paddingBottom: Math.max(insets.bottom, 10) }}
+          style={{ paddingBottom: Math.max(insets.bottom, 12) }}
           className="flex-row items-center gap-2 border-t border-gray-100 bg-white px-3 pt-2 dark:border-gray-800 dark:bg-gray-950"
         >
+
           <Pressable
             disabled={isBusy}
             onPress={() => setAttachSheetVisible(true)}

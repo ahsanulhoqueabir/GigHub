@@ -18,12 +18,16 @@ import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
 import { Dimensions, Linking, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const TIERS: GIGPackageTier[] = ["BASIC", "STANDARD", "PREMIUM"];
 
 export default function GigDetailScreen() {
+  const insets = useSafeAreaInsets();
   const { slug } = useLocalSearchParams<{ slug: string }>();
+
 
   const gig = useGigsStore((s) => s.currentGig);
   const isLoading = useGigsStore((s) => s.isLoadingDetail);
@@ -112,7 +116,7 @@ export default function GigDetailScreen() {
     <View className="flex-1 bg-white dark:bg-gray-950">
       <Header title="Gig Details" showBack />
 
-      <ScrollView contentContainerClassName="pb-32">
+      <ScrollView contentContainerStyle={{ paddingBottom: 85 + Math.max(insets.bottom, 16) }}>
         {gig.images && gig.images.length > 0 ? (
           <ScrollView
             horizontal
@@ -290,7 +294,10 @@ export default function GigDetailScreen() {
       </ScrollView>
 
       {/* Sticky CTA */}
-      <View className="absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-gray-100 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-950">
+      <View
+        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        className="absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-gray-100 bg-white px-6 pt-4 dark:border-gray-800 dark:bg-gray-950"
+      >
         <View className="flex-1">
           <Text className="text-xs text-gray-400 dark:text-gray-500">
             {activeTier}

@@ -17,6 +17,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 const PAYMENT_STATUS_VARIANTS: Record<string, BadgeVariant> = {
   UNPAID: "default",
@@ -40,7 +42,9 @@ function orderId(order: Escrow["order"]): string | null {
 }
 
 export default function EscrowScreen() {
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
+
   const escrows = useEscrowStore((s) => s.escrows);
   const isLoading = useEscrowStore((s) => s.isLoading);
   const pagination = useEscrowStore((s) => s.pagination);
@@ -86,7 +90,11 @@ export default function EscrowScreen() {
         <FlatList
           data={escrows}
           keyExtractor={(item) => item.id}
-          contentContainerClassName="gap-3 px-6 py-4"
+          contentContainerStyle={{
+            paddingBottom: Math.max(insets.bottom + 24, 32),
+          }}
+          contentContainerClassName="gap-3 px-6 pt-4"
+
           refreshControl={
             <RefreshControl
               refreshing={refreshing}

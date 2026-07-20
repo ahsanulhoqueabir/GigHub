@@ -14,8 +14,11 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 
 export default function LoginScreen() {
+  const insets = useSafeAreaInsets();
   const login = useAuthStore((s) => s.login);
   const isProcessing = useAuthStore((s) => s.isProcessing);
 
@@ -59,10 +62,15 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView
-        contentContainerClassName="flex-grow justify-center px-5 py-8"
+        contentContainerStyle={{
+          paddingTop: Math.max(insets.top + 16, 24),
+          paddingBottom: Math.max(insets.bottom + 24, 32),
+        }}
+        contentContainerClassName="flex-grow justify-center px-5"
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+
         {/* Background Accent Gradients / Blobs */}
         <View className="absolute top-10 -left-16 w-56 h-56 bg-indigo-500/10 dark:bg-indigo-500/15 rounded-full blur-3xl" />
         <View className="absolute bottom-12 -right-16 w-56 h-56 bg-purple-500/10 dark:bg-purple-500/15 rounded-full blur-3xl" />
