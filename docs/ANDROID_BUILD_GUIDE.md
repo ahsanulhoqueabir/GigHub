@@ -28,7 +28,7 @@ The project is configured to generate separate, architecture-specific APKs:
 
 ### Key Features
 
-- **Universal APK**: Disabled (`universalApk false`) to save storage.
+- **Universal APK**: Enabled (`universalApk true`) for 100% device installation compatibility (`app-universal-release.apk`).
 - **Hermes JS Engine**: Enabled.
 - **R8 / ProGuard Shrinking**: Preserved for production builds.
 - **Version Code Overrides**: Automatically shifts version codes per ABI so Google Play and device installs succeed seamlessly.
@@ -154,10 +154,11 @@ export JAVA_HOME="/path/to/jdk-21"
 
 ## 5. Generated Build Artifacts & Locations
 
-### Release APKs (Split by Architecture)
+### Release APKs (Split by Architecture & Universal)
 
 Location: `android/app/build/outputs/apk/release/`
 
+- **`app-universal-release.apk`**: Universal APK containing all native binaries (~83 MB) — **Best for direct sideloading on any physical phone**
 - **`app-arm64-v8a-release.apk`**: Release APK for modern 64-bit devices (~35 MB)
 - **`app-armeabi-v7a-release.apk`**: Release APK for 32-bit devices (~30 MB)
 - **`app-x86_64-release.apk`**: Release APK for emulators / Intel Chromebooks (~36 MB)
