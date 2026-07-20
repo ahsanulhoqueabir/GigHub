@@ -7,16 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "dark": {
-        "image": "./assets/splash-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -44,7 +34,18 @@
         {
           "photosPermission": "Allow GigHub to access your photos to upload gig images and your profile avatar."
         }
-      ]
+      ],
+      "expo-image",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "expo-status-bar",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
