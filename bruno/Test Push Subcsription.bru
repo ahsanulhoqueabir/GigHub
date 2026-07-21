@@ -1,0 +1,22 @@
+meta {
+  name: Test Push Subcsription
+  type: http
+  seq: 24
+}
+
+post {
+  url: {{baseUrl}}/api/push/subscribe
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "token": "test"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
