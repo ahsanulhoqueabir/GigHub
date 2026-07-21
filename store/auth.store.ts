@@ -34,6 +34,8 @@ interface AuthActions {
   initAuth: () => Promise<void>;
   /** Set hydration flag (called by persist onRehydrate) */
   setHasHydrated: (value: boolean) => void;
+  /** Update current auth user fields */
+  updateUser: (partialUser: Partial<AuthUser>) => void;
   /** Clear any error */
   clearError: () => void;
 }
@@ -149,6 +151,13 @@ export const useAuthStore = create<AuthStore>()(
           // Token invalid/expired — clear everything
           set({ ...initialState, hasHydrated: get().hasHydrated });
         }
+      },
+
+      /* ── Update User ────────────────────────────────────────────── */
+      updateUser: (partialUser) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, ...partialUser } : null,
+        }));
       },
 
       /* ── Clear Error ────────────────────────────────────────────── */

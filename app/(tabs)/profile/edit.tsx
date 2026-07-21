@@ -11,7 +11,7 @@ import { toast } from "@/store/toast.store";
 import type { Socials } from "@/types/db/profile.types";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -45,8 +45,10 @@ export default function EditProfileScreen() {
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const updateProfile = useProfileStore((s) => s.updateProfile);
 
+  const isInitialized = useRef(false);
+
   const [avatar, setAvatar] = useState<string | null | undefined>(
-    profile?.avatar,
+    profile?.avatar ?? user?.avatar,
   );
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [name, setName] = useState(profile?.name ?? user?.name ?? "");
@@ -66,10 +68,11 @@ export default function EditProfileScreen() {
     fetchProfile();
   }, [fetchProfile]);
 
-  // Sync state whenever profile or user changes
+  // Sync state ONLY ONCE when profile or user details become available
   useEffect(() => {
-    if (!profile && !user) return;
-    setAvatar(profile?.avatar);
+    if ((!profile && !user) || isInitialized.current) return;
+
+    setAvatar(profile?.avatar ?? user?.avatar);
     setName(profile?.name ?? user?.name ?? "");
     setUsername(profile?.username ?? "");
     setPhone(profile?.phone ?? "");
@@ -78,6 +81,7 @@ export default function EditProfileScreen() {
     setPortfolio(profile?.portfolio ?? "");
     setSkills(profile?.skills ?? []);
     setSocials(profile?.socials ?? {});
+    isInitialized.current = true;
   }, [profile, user]);
 
   const handlePickAvatar = async () => {

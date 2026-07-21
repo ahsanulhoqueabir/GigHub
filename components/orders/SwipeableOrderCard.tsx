@@ -11,7 +11,6 @@ type SourceConfig = {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
-  borderLeftClass: string;
   badgeBgClass: string;
   badgeTextClass: string;
 };
@@ -31,7 +30,6 @@ const SOURCE_CONFIGS: Record<string, SourceConfig> = {
     label: "JOB",
     icon: "briefcase-outline",
     iconColor: "#D97706",
-    borderLeftClass: "border-l-4 border-l-amber-500",
     badgeBgClass:
       "bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60",
     badgeTextClass: "text-amber-700 dark:text-amber-300",
@@ -40,7 +38,6 @@ const SOURCE_CONFIGS: Record<string, SourceConfig> = {
     label: "GIG",
     icon: "cube-outline",
     iconColor: "#4F46E5",
-    borderLeftClass: "border-l-4 border-l-indigo-500",
     badgeBgClass:
       "bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/60",
     badgeTextClass: "text-indigo-700 dark:text-indigo-300",
@@ -49,7 +46,6 @@ const SOURCE_CONFIGS: Record<string, SourceConfig> = {
     label: "TUITION",
     icon: "school-outline",
     iconColor: "#0284C7",
-    borderLeftClass: "border-l-4 border-l-sky-500",
     badgeBgClass:
       "bg-sky-50 dark:bg-sky-950/60 border border-sky-200/80 dark:border-sky-800/60",
     badgeTextClass: "text-sky-700 dark:text-sky-300",
@@ -58,7 +54,6 @@ const SOURCE_CONFIGS: Record<string, SourceConfig> = {
     label: "CUSTOM",
     icon: "sparkles-outline",
     iconColor: "#059669",
-    borderLeftClass: "border-l-4 border-l-emerald-500",
     badgeBgClass:
       "bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60",
     badgeTextClass: "text-emerald-700 dark:text-emerald-300",
@@ -72,7 +67,6 @@ function getSourceConfig(source?: string): SourceConfig {
       label: source || "ORDER",
       icon: "document-text-outline",
       iconColor: "#6B7280",
-      borderLeftClass: "border-l-4 border-l-gray-400",
       badgeBgClass:
         "bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
       badgeTextClass: "text-gray-700 dark:text-gray-300",
@@ -108,9 +102,9 @@ export function SwipeableOrderCard({ order }: SwipeableOrderCardProps) {
           params: { id: order.id },
         })
       }
-      className={`overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm shadow-gray-200/50 active:opacity-90 dark:border-gray-800/80 dark:bg-gray-900 dark:shadow-none ${sourceCfg.borderLeftClass}`}
+      className="overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm shadow-gray-200/60 active:opacity-90 dark:border-gray-800/80 dark:bg-gray-900 dark:shadow-none"
     >
-      {/* Header row: Source Badge + Code & Status Badge */}
+      {/* Header row: Source Tag + Order Code & Status Badge */}
       <View className="flex-row items-center justify-between gap-2">
         <View className="flex-row items-center gap-2">
           <View
@@ -127,9 +121,11 @@ export function SwipeableOrderCard({ order }: SwipeableOrderCardProps) {
               {sourceCfg.label}
             </Text>
           </View>
-          <Text className="text-[11px] font-semibold text-gray-400 dark:text-gray-500">
-            #{order.code}
-          </Text>
+          <View className="rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-800/80">
+            <Text className="text-[11px] font-bold text-gray-500 dark:text-gray-400">
+              #{order.code}
+            </Text>
+          </View>
         </View>
 
         <Badge variant={STATUS_VARIANTS[order.status] ?? "default"}>
@@ -140,21 +136,21 @@ export function SwipeableOrderCard({ order }: SwipeableOrderCardProps) {
       {/* Title */}
       <Text
         numberOfLines={2}
-        className="mt-2.5 text-base font-bold leading-snug text-gray-900 dark:text-gray-100"
+        className="mt-3 text-base font-bold leading-snug text-gray-900 dark:text-gray-100"
       >
         {order.title}
       </Text>
 
       {/* Date preview row */}
-      <View className="mt-1.5 flex-row items-center gap-1">
-        <Ionicons name="calendar-outline" size={12} color="#9CA3AF" />
+      <View className="mt-1.5 flex-row items-center gap-1.5">
+        <Ionicons name="calendar-outline" size={13} color="#9CA3AF" />
         <Text className="text-[11px] font-medium text-gray-400 dark:text-gray-500">
           {formatDate(order.created_at)}
         </Text>
       </View>
 
-      {/* Footer row: Counterparty & Price */}
-      <View className="mt-3.5 flex-row items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800/70">
+      {/* Footer row: Counterparty & Price embedded panel */}
+      <View className="mt-3.5 flex-row items-center justify-between rounded-xl border border-gray-100/90 bg-gray-50/80 px-3 py-2.5 dark:border-gray-800/60 dark:bg-gray-850/50">
         <View className="flex-row items-center gap-2.5">
           <Avatar
             uri={counterparty?.avatar}
@@ -162,24 +158,28 @@ export function SwipeableOrderCard({ order }: SwipeableOrderCardProps) {
             size="sm"
           />
           <View>
-            <Text className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+            <Text className="text-[9px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               {isBuyer ? "Seller" : "Buyer"}
             </Text>
             <Text
               numberOfLines={1}
-              className="max-w-[130px] text-xs font-semibold text-gray-800 dark:text-gray-200"
+              className="max-w-[125px] text-xs font-bold text-gray-800 dark:text-gray-200"
             >
               {counterparty?.name ?? "—"}
             </Text>
           </View>
         </View>
 
-        <View className="items-end">
-          <Text className="text-base font-extrabold text-gray-900 dark:text-gray-100">
+        <View className="flex-row items-center gap-2">
+          <Text className="text-base font-black text-gray-900 dark:text-emerald-400">
             {formatPrice(order.total_price)}
           </Text>
+          <View className="h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-gray-800 border border-gray-200/60 dark:border-gray-700/60">
+            <Ionicons name="chevron-forward" size={12} color="#6B7280" />
+          </View>
         </View>
       </View>
     </Pressable>
   );
 }
+

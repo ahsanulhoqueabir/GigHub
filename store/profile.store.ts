@@ -1,6 +1,7 @@
 import { api_client } from "@/lib/api/api-client";
 import { getErrorMessage } from "@/lib/api/api-response";
 import type { SafeProfile } from "@/lib/api/strip-password";
+import { useAuthStore } from "@/store/auth.store";
 import { create } from "zustand";
 
 // ─── State ─────────────────────────────────────────────────────────────────
@@ -76,10 +77,19 @@ export const useProfileStore = create<ProfileStore>()((set) => ({
 
     try {
       const { data } = await api_client.patch("/auth/profile", params);
+      const updatedProfile = data.data ?? null;
       set({
-        profile: data.data ?? null,
+        profile: updatedProfile,
         isUpdating: false,
       });
+
+      if (updatedProfile) {
+        useAuthStore.getState().updateUser({
+          name: updatedProfile.name,
+          username: updatedProfile.username,
+          avatar: updatedProfile.avatar ?? null,
+        });
+      }
     } catch (err: unknown) {
       set({
         isUpdating: false,
