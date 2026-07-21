@@ -120,24 +120,30 @@ buildscript {
 
 ---
 
-## 4. Step-by-Step Build Execution
+### 🚀 Automatic Version Increment & Build (Recommended)
 
-With `splits { abi { enable true; universalApk true; include "arm64-v8a", "armeabi-v7a", "x86_64" } }` configured in `android/app/build.gradle`, a single build command produces **all 4 APKs simultaneously** (`arm64-v8a`, `armeabi-v7a`, `x86_64`, and `universal`) along with the **Play Store App Bundle (.aab)**.
+Simply run:
+```bash
+npm run release
+```
+This script will automatically:
+1. Increment the version (`P.Q.R` format, e.g., `2.0.1` ➔ `2.0.2`).
+2. Roll over `R` to `0` when reaching `10` and increment `Q` (e.g. `2.0.10` ➔ `2.1.0`).
+3. Update `app.json`, `package.json`, and `android/app/build.gradle` (`versionName` & `versionCode`).
+4. Execute `assembleRelease bundleRelease` automatically.
 
-### Windows (PowerShell)
+*(To bump version without triggering a build, run: `npm run release:bump`)*
+
+---
+
+### Manual Step-by-Step Build Execution
+
+With `splits { abi { enable true; universalApk true; include "arm64-v8a", "armeabi-v7a", "x86_64" } }` configured in `android/app/build.gradle`, running Gradle directly produces **all 4 APKs simultaneously** along with the **Play Store App Bundle (.aab)**:
 
 ```powershell
-# 1. Navigate to android directory
 cd "e:\web dev\Own\gighub\app\android"
-
-# 2. Set JAVA_HOME to JDK 21 (Android Studio JBR)
 $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
-
-# 3. Build ALL 4 APKs (v8a, v7a, x86_64, universal) + AAB bundle in a single command:
 .\gradlew.bat assembleRelease bundleRelease --no-daemon
-
-# (Optional) If you only want to build a single specific ABI (e.g. arm64-v8a only):
-.\gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
 ```
 
 ### Linux / macOS (Bash)
