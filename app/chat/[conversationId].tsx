@@ -103,8 +103,7 @@ export default function ConversationScreen() {
     return () => {
       selectRoom("");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationId, isAuthenticated]);
+  }, [conversationId, isAuthenticated, fetchRooms, selectRoom]);
 
   const room = rooms.find((r) => r.id === conversationId);
   const recipient = room ? getRecipient(room, user?.id) : null;

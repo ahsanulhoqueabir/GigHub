@@ -16,9 +16,8 @@ import { toast } from "@/store/toast.store";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 
 const STATUS_VARIANTS: Record<string, BadgeVariant> = {
   PENDING: "warning",
@@ -151,6 +150,17 @@ export default function OrderDetailScreen() {
 
   const isBuyer = user?.id === order.buyer?.id;
   const isSeller = user?.id === order.seller?.id;
+  const sellerFirstName = order.seller?.name
+    ? order.seller.name.trim().split(" ")[0]
+    : "Seller";
+
+  const handleChatWithSeller = () => {
+    router.push({
+      pathname: "/(tabs)/chat",
+      params: { order: order.id },
+    });
+  };
+
   const canAccept = order.status === "PENDING" && isBuyer;
   const canCancel =
     ["PENDING", "ACTIVE"].includes(order.status) && (isBuyer || isSeller);
@@ -232,7 +242,6 @@ export default function OrderDetailScreen() {
         }}
         contentContainerClassName="gap-4 px-6 py-5"
       >
-
         <View className="flex-row items-start justify-between gap-2">
           <View className="flex-1 gap-1">
             <View className="flex-row items-center gap-2">
@@ -374,6 +383,8 @@ export default function OrderDetailScreen() {
               label="Seller"
               name={order.seller.name}
               avatar={order.seller.avatar}
+              onPress={isBuyer ? handleChatWithSeller : undefined}
+              showChatIcon={isBuyer}
             />
           ) : null}
         </View>
@@ -387,6 +398,20 @@ export default function OrderDetailScreen() {
         </View>
 
         <View className="gap-2.5 pt-2">
+          {isBuyer && order.seller ? (
+            <Button variant="primary" onPress={handleChatWithSeller}>
+              <View className="flex-row items-center gap-2">
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={18}
+                  color={COLORS.white}
+                />
+                <Text className="text-base font-semibold text-white dark:text-gray-100">
+                  {`Chat with ${sellerFirstName}`}
+                </Text>
+              </View>
+            </Button>
+          ) : null}
           {canAccept ? (
             <Button onPress={() => setAcceptVisible(true)}>Accept Order</Button>
           ) : null}
@@ -510,25 +535,50 @@ function ProfileCard({
   label,
   name,
   avatar,
+  onPress,
+  showChatIcon,
 }: {
   label: string;
   name?: string | null;
   avatar?: string | null;
+  onPress?: () => void;
+  showChatIcon?: boolean;
 }) {
-  return (
-    <View className="flex-1 flex-row items-center gap-2.5 rounded-2xl border border-gray-100 p-3 dark:border-gray-800">
-      <Avatar uri={avatar} name={name} size="sm" />
-      <View className="flex-1">
-        <Text className="text-[10px] text-gray-400 dark:text-gray-500">
-          {label}
-        </Text>
-        <Text
-          numberOfLines={1}
-          className="text-xs font-semibold text-gray-900 dark:text-gray-100"
-        >
-          {name ?? "—"}
-        </Text>
+  const content = (
+    <View className="flex-1 flex-row items-center justify-between rounded-2xl border border-gray-100 p-3 dark:border-gray-800">
+      <View className="min-w-0 flex-1 flex-row items-center gap-2.5">
+        <Avatar uri={avatar} name={name} size="sm" />
+        <View className="min-w-0 flex-1">
+          <Text className="text-[10px] text-gray-400 dark:text-gray-500">
+            {label}
+          </Text>
+          <Text
+            numberOfLines={1}
+            className="text-xs font-semibold text-gray-900 dark:text-gray-100"
+          >
+            {name ?? "—"}
+          </Text>
+        </View>
       </View>
+      {showChatIcon ? (
+        <View className="h-7 w-7 items-center justify-center rounded-full bg-primary/10">
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={14}
+            color={COLORS.primary}
+          />
+        </View>
+      ) : null}
     </View>
   );
+
+  if (onPress) {
+    return (
+      <Pressable className="flex-1" onPress={onPress}>
+        {content}
+      </Pressable>
+    );
+  }
+
+  return content;
 }

@@ -25,6 +25,7 @@ interface ChatState {
 
 interface ChatActions {
   fetchRooms: () => Promise<void>;
+  fetchRoomByOrderId: (orderId: string) => Promise<ChatRoomWithDetails | null>;
   selectRoom: (roomId: string) => Promise<void>;
   fetchMessages: (roomId: string, isLoadMore?: boolean) => Promise<void>;
   sendMessage: (
@@ -67,6 +68,30 @@ export const useChatStore = create<ChatState & ChatActions>((set, get) => ({
       const msg = err instanceof Error ? err.message : "Failed to load chat rooms";
       set({ isLoadingRooms: false, error: msg });
     }
+  },
+
+  /**
+   * Find or fetch chat room associated with a specific order ID.
+   */
+  fetchRoomByOrderId: async (orderId: string) => {
+    if (!orderId) return null;
+
+    // 1. Check existing loaded rooms
+    const existing = get().rooms.find((r) => r.order?.id === orderId);
+    if (existing) return existing;
+
+    // 2. Fetch fresh rooms list from API
+    try {
+      const { data } = await api_client.get("/chat/rooms");
+      const freshRooms = (data.data || []) as ChatRoomWithDetails[];
+      set({ rooms: freshRooms });
+      const found = freshRooms.find((r) => r.order?.id === orderId);
+      if (found) return found;
+    } catch (err) {
+      console.error("Error fetching rooms in fetchRoomByOrderId:", err);
+    }
+
+    return null;
   },
 
   /**

@@ -74,13 +74,13 @@ Below the `android { ... }` block, unique version codes are assigned per ABI:
 
 ```groovy
 // Map for the different ABI that React Native supports.
-def abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86_64": 3]
+def abiCodes = ["armeabi-v7a": 1, "arm64-v8a": 2, "x86": 3, "x86_64": 4]
 
 // Assign a different version code for each output APK
 android.applicationVariants.all { variant ->
-    variant.outputs.each { output ->
+    variant.outputs.all { output ->
         def versionCodes = abiCodes
-        def abi = output.getFilter(com.android.build.OutputFile.ABI)
+        def abi = output.filters.find { it.filterType == 'ABI' }?.identifier
         if (abi != null) {
             output.versionCodeOverride =
                 versionCodes.get(abi) * 1048576 + variant.versionCode
@@ -145,6 +145,13 @@ $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
 
 # 4. Build Universal Release APK (~107 MB - All devices) + AAB for Play Store:
 .\gradlew.bat assembleRelease bundleRelease --no-daemon
+```
+
+#5. Single command
+
+```
+.\gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
+
 ```
 
 ### Linux / macOS (Bash)

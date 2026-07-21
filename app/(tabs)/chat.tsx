@@ -6,10 +6,11 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { COLORS } from "@/constants/colors";
 import { selectIsAuthenticated, useAuthStore } from "@/store/auth.store";
 import { useChatStore } from "@/store/chat.store";
+import { toast } from "@/store/toast.store";
 import type { ChatRoomWithDetails } from "@/types/business/chat.types";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
-import { useCallback, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { FlatList, Pressable, RefreshControl, Text, View } from "react-native";
 
 function formatTime(isoString: string) {
@@ -35,11 +36,13 @@ function getRecipient(room: ChatRoomWithDetails, userId?: string) {
 }
 
 export default function ChatListScreen() {
+  const { order: orderIdQuery } = useLocalSearchParams<{ order?: string }>();
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const user = useAuthStore((s) => s.user);
   const rooms = useChatStore((s) => s.rooms);
   const isLoadingRooms = useChatStore((s) => s.isLoadingRooms);
   const fetchRooms = useChatStore((s) => s.fetchRooms);
+  const fetchRoomByOrderId = useChatStore((s) => s.fetchRoomByOrderId);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -50,6 +53,31 @@ export default function ChatListScreen() {
       }
     }, [isAuthenticated, fetchRooms]),
   );
+
+  useEffect(() => {
+    if (!isAuthenticated || !orderIdQuery) return;
+
+    let isMounted = true;
+    const navigateToOrderRoom = async () => {
+      const room = await fetchRoomByOrderId(orderIdQuery);
+      if (!isMounted) return;
+
+      if (room) {
+        router.push({
+          pathname: "/chat/[conversationId]",
+          params: { conversationId: room.id },
+        });
+      } else {
+        toast.error("No active chat available for this order");
+      }
+    };
+
+    navigateToOrderRoom();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, orderIdQuery, fetchRoomByOrderId]);
 
   if (!isAuthenticated) {
     return (
@@ -124,8 +152,10 @@ export default function ChatListScreen() {
             size={40}
             color={COLORS.gray400}
           />
-          <Text className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-            No conversations found
+          <Text className="mt-3 text-center text-sm text-gray-500 dark:text-gray-400">
+            {orderIdQuery
+              ? "No active chat available for this order"
+              : "No conversations found"}
           </Text>
         </View>
       ) : (
