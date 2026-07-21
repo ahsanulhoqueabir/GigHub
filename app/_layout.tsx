@@ -6,8 +6,10 @@ import { cssInterop } from "nativewind";
 
 cssInterop(ExpoImage, { className: "style" });
 
+import { OfflineOverlay } from "@/components/ui/OfflineOverlay";
 import { ToastHost } from "@/components/ui/Toast";
 import { COLORS } from "@/constants/colors";
+import { useNetworkStatus } from "@/lib/network/useNetworkStatus";
 import { useNotificationListeners } from "@/lib/notifications/listeners";
 import { useAuthStore } from "@/store/auth.store";
 import { useNotificationsStore } from "@/store/notifications.store";
@@ -34,6 +36,12 @@ export default function RootLayout() {
   const initAuth = useAuthStore((s) => s.initAuth);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isSplashVisible, setIsSplashVisible] = useState(true);
+
+  const {
+    isOffline,
+    isChecking: isNetworkChecking,
+    refresh: refreshNetwork,
+  } = useNetworkStatus();
 
   useNotificationListeners();
 
@@ -194,6 +202,13 @@ export default function RootLayout() {
             </View>
           </Animated.View>
         )}
+
+        {/* Offline Overlay Screen */}
+        <OfflineOverlay
+          isOffline={isOffline}
+          isChecking={isNetworkChecking}
+          onRetry={refreshNetwork}
+        />
 
         <ToastHost />
       </SafeAreaProvider>
