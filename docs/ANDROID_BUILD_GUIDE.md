@@ -63,7 +63,7 @@ android {
         abi {
             reset()
             enable true
-            universalApk false
+            universalApk true
             include "arm64-v8a", "armeabi-v7a", "x86_64"
         }
     }
@@ -122,36 +122,22 @@ buildscript {
 
 ## 4. Step-by-Step Build Execution
 
+With `splits { abi { enable true; universalApk true; include "arm64-v8a", "armeabi-v7a", "x86_64" } }` configured in `android/app/build.gradle`, a single build command produces **all 4 APKs simultaneously** (`arm64-v8a`, `armeabi-v7a`, `x86_64`, and `universal`) along with the **Play Store App Bundle (.aab)**.
+
 ### Windows (PowerShell)
 
 ```powershell
-# 2. (Optional) Re-generate native android directory if needed
-npx expo prebuild --platform android
-
-# Navigate to android directory
+# 1. Navigate to android directory
 cd "e:\web dev\Own\gighub\app\android"
 
-# Set JAVA_HOME to JDK 21
+# 2. Set JAVA_HOME to JDK 21 (Android Studio JBR)
 $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
 
-# 1. Build arm64-v8a Release APK (~35 MB - Modern 64-bit phones):
-.\gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
-
-# 2. Build armeabi-v7a Release APK (~30 MB - Older 32-bit phones):
-.\gradlew.bat assembleRelease -PreactNativeArchitectures=armeabi-v7a --no-daemon
-
-# 3. Build x86_64 Release APK (~36 MB - Emulators & Intel Chromebooks):
-.\gradlew.bat assembleRelease -PreactNativeArchitectures=x86_64 --no-daemon
-
-# 4. Build Universal Release APK (~107 MB - All devices) + AAB for Play Store:
+# 3. Build ALL 4 APKs (v8a, v7a, x86_64, universal) + AAB bundle in a single command:
 .\gradlew.bat assembleRelease bundleRelease --no-daemon
-```
 
-#5. Single command
-
-```
+# (Optional) If you only want to build a single specific ABI (e.g. arm64-v8a only):
 .\gradlew.bat assembleRelease -PreactNativeArchitectures=arm64-v8a --no-daemon
-
 ```
 
 ### Linux / macOS (Bash)
@@ -160,7 +146,7 @@ $env:JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
 # 1. Navigate to android directory
 cd android
 
-# 2. Set JAVA_HOME and run clean release build
+# 2. Set JAVA_HOME and run release build for all 4 APKs + AAB
 export JAVA_HOME="/path/to/jdk-21"
 ./gradlew clean assembleRelease bundleRelease --no-daemon
 ```
@@ -169,20 +155,20 @@ export JAVA_HOME="/path/to/jdk-21"
 
 ## 5. Generated Build Artifacts & Locations
 
-### Release APKs (Split by Architecture & Universal)
+### Release APKs (Simultaneously generated in one command)
 
 Location: `android/app/build/outputs/apk/release/`
 
-- **`app-universal-release.apk`**: Universal APK containing all native binaries (~83 MB) — **Best for direct sideloading on any physical phone**
-- **`app-arm64-v8a-release.apk`**: Release APK for modern 64-bit devices (~35 MB)
-- **`app-armeabi-v7a-release.apk`**: Release APK for 32-bit devices (~30 MB)
-- **`app-x86_64-release.apk`**: Release APK for emulators / Intel Chromebooks (~36 MB)
+- **`app-arm64-v8a-release.apk`**: Release APK for modern 64-bit ARM devices (~46 MB)
+- **`app-armeabi-v7a-release.apk`**: Release APK for older 32-bit ARM devices (~40 MB)
+- **`app-x86_64-release.apk`**: Release APK for 64-bit Android Emulators & Intel Chromebooks (~47 MB)
+- **`app-universal-release.apk`**: Universal APK containing all native binaries (~102 MB) — **Best for direct sideloading on any physical phone**
 
 ### Android App Bundle (AAB)
 
 Location: `android/app/build/outputs/bundle/release/`
 
-- **`app-release.aab`**: Production App Bundle for Google Play Store upload (~51 MB)
+- **`app-release.aab`**: Production App Bundle for Google Play Store upload (~72 MB)
 
 ---
 
