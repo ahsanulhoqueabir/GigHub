@@ -1,0 +1,53 @@
+{
+  "name": "@gig-hub/types",
+  "version": "1.0.1",
+  "description": "Shared TypeScript definitions and Zod validation schemas for GigHub Web and React Native apps",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.mjs",
+      "require": "./dist/types/index.js"
+    },
+    "./validations": {
+      "types": "./dist/validations/index.d.ts",
+      "import": "./dist/validations/index.mjs",
+      "require": "./dist/validations/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "gighub",
+    "types",
+    "validation",
+    "zod",
+    "react-native",
+    "nextjs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "zod": "^3.0.0 || ^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "zod": "^4.4.3"
+  }
+}
