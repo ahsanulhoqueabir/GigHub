@@ -1,4 +1,5 @@
 # GigHub : Campus-Centric Freelance & Task Marketplace
+<img width="2752" height="1536" alt="Gemini_Generated_Image_ok2zf6ok2zf6ok2z (1)" src="https://github.com/user-attachments/assets/ceb32c85-ce87-4119-a9ac-a285d1082aa8" />
 
 [![Project Status: Under Development](https://img.shields.io/badge/Status-Under--Development-orange.svg)](https://github.com/ahsanulhoqueabir/GigHub)
 [![Target Platform: JnU](https://img.shields.io/badge/Platform-Jagannath%20University-blue.svg)](https://jnu.ac.bd)
