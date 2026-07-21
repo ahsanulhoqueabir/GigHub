@@ -146,7 +146,14 @@ export const useAuthStore = create<AuthStore>()(
 
         try {
           const { data } = await api_client.get("/auth/me");
-          set({ user: data.data.user, error: null });
+          const rawUser = data?.data?.user || data?.data;
+          const user = rawUser
+            ? {
+                ...rawUser,
+                id: rawUser.id || rawUser._id,
+              }
+            : null;
+          set({ user, error: null });
         } catch {
           // Token invalid/expired — clear everything
           set({ ...initialState, hasHydrated: get().hasHydrated });

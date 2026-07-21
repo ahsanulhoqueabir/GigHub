@@ -94,10 +94,20 @@ export default function JobDetailScreen() {
     return () => clearDetail();
   }, [slug, fetchJobBySlug, clearDetail]);
 
+  const currentUserId = user?.id || (user as any)?._id;
+  const jobOwnerId = job?.owner?.id || (job?.owner as any)?._id;
+  const isOwner = Boolean(
+    currentUserId && jobOwnerId && currentUserId === jobOwnerId,
+  );
+
   const handleApplyPress = () => {
     if (!isAuthenticated) {
       toast.warning("You must log in first to apply for this job!");
       router.push("/(auth)/login");
+      return;
+    }
+    if (isOwner) {
+      toast.error("You cannot submit a proposal for your own job!");
       return;
     }
     resetFiles();
@@ -163,8 +173,6 @@ export default function JobDetailScreen() {
       </View>
     );
   }
-
-  const isOwner = user?.id === job.owner.id;
 
   const isTuition = job.type === "TUTION";
 

@@ -90,7 +90,11 @@ interface SwipeableOrderCardProps {
 export function SwipeableOrderCard({ order }: SwipeableOrderCardProps) {
   const user = useAuthStore((s) => s.user);
 
-  const isBuyer = user?.id === order.buyer?.id;
+  const currentUserId = user?.id || (user as any)?._id;
+  const buyerId = order.buyer?.id || (order.buyer as any)?._id;
+  const isBuyer = Boolean(
+    currentUserId && buyerId && currentUserId === buyerId,
+  );
   const counterparty = isBuyer ? order.seller : order.buyer;
   const sourceCfg = getSourceConfig(order.source);
 

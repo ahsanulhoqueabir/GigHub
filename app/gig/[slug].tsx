@@ -16,8 +16,9 @@ import type { GIGPackageTier } from "@/types/db/gig.types";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
+import { openInAppBrowser } from "@/lib/in-app-browser";
 import { useEffect, useMemo, useState } from "react";
-import { Dimensions, Linking, ScrollView, Text, View } from "react-native";
+import { Dimensions, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
@@ -37,6 +38,7 @@ export default function GigDetailScreen() {
   const isMutating = useGigsStore((s) => s.isMutating);
 
   const initiatePayment = useOrdersStore((s) => s.initiatePayment);
+  const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.accessToken !== null);
 
   const [activeTier, setActiveTier] = useState<GIGPackageTier>("BASIC");
@@ -62,10 +64,20 @@ export default function GigDetailScreen() {
 
   const selectedPackage = gig?.packages.find((p) => p.tier === activeTier);
 
+  const currentUserId = user?.id || (user as any)?._id;
+  const gigSellerId = gig?.seller?.id || (gig?.seller as any)?._id;
+  const isOwner = Boolean(
+    currentUserId && gigSellerId && currentUserId === gigSellerId,
+  );
+
   const handleCheckout = () => {
     if (!isAuthenticated) {
       toast.warning("You must log in first to place an order!");
       router.push("/(auth)/login");
+      return;
+    }
+    if (isOwner) {
+      toast.error("You cannot order your own gig!");
       return;
     }
     setCheckoutVisible(true);
@@ -88,12 +100,13 @@ export default function GigDetailScreen() {
       setNote("");
 
       if (gatewayUrl) {
-        await Linking.openURL(gatewayUrl);
-        toast.success("Complete your payment in the browser");
+        toast.success("Order created! Complete your payment inside the app.");
+        await openInAppBrowser(gatewayUrl);
+        router.replace(`/order/${order.id}` as any);
       } else {
-        toast.success("Order created");
+        toast.success("Order created successfully!");
+        router.replace(`/order/${order.id}` as any);
       }
-      router.back();
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -116,7 +129,11 @@ export default function GigDetailScreen() {
     <View className="flex-1 bg-white dark:bg-gray-950">
       <Header title="Gig Details" showBack />
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 85 + Math.max(insets.bottom, 16) }}>
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: (isOwner ? 24 : 85) + Math.max(insets.bottom, 16),
+        }}
+      >
         {gig.images && gig.images.length > 0 ? (
           <ScrollView
             horizontal
@@ -294,22 +311,24 @@ export default function GigDetailScreen() {
       </ScrollView>
 
       {/* Sticky CTA */}
-      <View
-        style={{ paddingBottom: Math.max(insets.bottom, 16) }}
-        className="absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-gray-100 bg-white px-6 pt-4 dark:border-gray-800 dark:bg-gray-950"
-      >
-        <View className="flex-1">
-          <Text className="text-xs text-gray-400 dark:text-gray-500">
-            {activeTier}
-          </Text>
-          <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {formatPrice(selectedPackage?.price)}
-          </Text>
+      {!isOwner ? (
+        <View
+          style={{ paddingBottom: Math.max(insets.bottom, 16) }}
+          className="absolute bottom-0 left-0 right-0 flex-row items-center gap-3 border-t border-gray-100 bg-white px-6 pt-4 dark:border-gray-800 dark:bg-gray-950"
+        >
+          <View className="flex-1">
+            <Text className="text-xs text-gray-400 dark:text-gray-500">
+              {activeTier}
+            </Text>
+            <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">
+              {formatPrice(selectedPackage?.price)}
+            </Text>
+          </View>
+          <Button onPress={handleCheckout} className="flex-1">
+            Order Now
+          </Button>
         </View>
-        <Button onPress={handleCheckout} className="flex-1">
-          Order Now
-        </Button>
-      </View>
+      ) : null}
 
       <Modal
         visible={checkoutVisible}

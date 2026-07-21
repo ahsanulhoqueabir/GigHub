@@ -148,8 +148,16 @@ export default function OrderDetailScreen() {
     );
   }
 
-  const isBuyer = user?.id === order.buyer?.id;
-  const isSeller = user?.id === order.seller?.id;
+  const currentUserId = user?.id || (user as any)?._id;
+  const buyerId = order.buyer?.id || (order.buyer as any)?._id;
+  const sellerId = order.seller?.id || (order.seller as any)?._id;
+
+  const isBuyer = Boolean(
+    currentUserId && buyerId && currentUserId === buyerId,
+  );
+  const isSeller = Boolean(
+    currentUserId && sellerId && currentUserId === sellerId,
+  );
   const sellerFirstName = order.seller?.name
     ? order.seller.name.trim().split(" ")[0]
     : "Seller";
@@ -161,7 +169,7 @@ export default function OrderDetailScreen() {
     });
   };
 
-  const canAccept = order.status === "PENDING" && isBuyer;
+  const canAccept = order.status === "PENDING" && isSeller;
   const canCancel =
     ["PENDING", "ACTIVE"].includes(order.status) && (isBuyer || isSeller);
   const canDeliver = order.status === "ACTIVE" && isSeller;
