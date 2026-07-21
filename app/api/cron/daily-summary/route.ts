@@ -38,7 +38,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     return ok({
-      data: { message_id: result.data.message_id },
+      data: { message_ids: result.data.message_ids },
       message: "Daily summary sent to Telegram",
     });
   } catch (err) {

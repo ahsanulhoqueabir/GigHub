@@ -51,4 +51,14 @@ export const telegram = {
   botToken: process.env.TELEGRAM_BOT_TOKEN!,
   chatId: process.env.TELEGRAM_CHAT_ID!,
   threadId: process.env.TELEGRAM_THREAD_ID!,
+  chats: [
+    {
+      chat: -1003852059194,
+      thread: 199,
+    },
+    {
+      chat: -1004450663284,
+      thread: 25,
+    },
+  ],
 };

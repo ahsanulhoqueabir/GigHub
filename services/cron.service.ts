@@ -82,22 +82,22 @@ function formatSummaryMessage(summary: DbDailySummary): string {
 }
 
 /**
- * Send a message to the configured Telegram chat/thread via the Bot API.
+ * Send a message to a specific Telegram chat/thread via the Bot API.
  */
 async function sendTelegramMessage(
   text: string,
+  target: { chat: number; thread?: number },
 ): Promise<ServiceResult<{ message_id: number }>> {
   const url = `https://api.telegram.org/bot${telegram.botToken}/sendMessage`;
 
   const body: Record<string, string | number> = {
-    chat_id: telegram.chatId,
+    chat_id: target.chat,
     text,
     parse_mode: "Markdown",
   };
 
-  // Only include thread_id if it's provided and non-empty
-  if (telegram.threadId) {
-    body.message_thread_id = telegram.threadId;
+  if (target.thread) {
+    body.message_thread_id = target.thread;
   }
 
   try {
@@ -119,6 +119,49 @@ async function sendTelegramMessage(
   }
 }
 
+/**
+ * Send a message to all configured Telegram chats/threads.
+ * Returns success if at least one message was sent successfully.
+ */
+async function sendTelegramMessageToAll(
+  text: string,
+): Promise<ServiceResult<{ message_ids: number[] }>> {
+  const targets: Array<{ chat: number; thread?: number }> =
+    telegram.chats.length > 0
+      ? telegram.chats
+      : [
+          {
+            chat: Number(telegram.chatId),
+            thread: telegram.threadId ? Number(telegram.threadId) : undefined,
+          },
+        ];
+
+  const results = await Promise.allSettled(
+    targets.map((t) => sendTelegramMessage(text, t)),
+  );
+
+  const messageIds: number[] = [];
+  const errors: string[] = [];
+
+  for (const result of results) {
+    if (result.status === "fulfilled") {
+      if (result.value.success) {
+        messageIds.push(result.value.data!.message_id);
+      } else {
+        errors.push(result.value.error!);
+      }
+    } else {
+      errors.push(result.reason?.message ?? "Unknown error");
+    }
+  }
+
+  if (messageIds.length === 0) {
+    return error(errors.join("; ") || "Failed to send to any Telegram chat");
+  }
+
+  return success({ message_ids: messageIds });
+}
+
 // ── Main Service ────────────────────────────────────────────────────
 
 /**
@@ -126,15 +169,15 @@ async function sendTelegramMessage(
  */
 export class CronService {
   /**
-   * Fetch the daily DB summary via RPC and send it to Telegram.
+   * Fetch the daily DB summary via RPC and send it to all configured Telegram chats.
    *
    * Steps:
    * 1. Call `get_db_daily_summary()` RPC
    * 2. Format the result into a Markdown message
-   * 3. Send it to the configured Telegram chat/thread
+   * 3. Send it to each configured Telegram chat/thread
    */
   static async runDailySummary(): Promise<
-    ServiceResult<{ message_id: number }>
+    ServiceResult<{ message_ids: number[] }>
   > {
     try {
       const supabase = getSupabaseServerClient();
@@ -151,7 +194,7 @@ export class CronService {
       const summary = data as DbDailySummary;
       const message = formatSummaryMessage(summary);
 
-      return await sendTelegramMessage(message);
+      return await sendTelegramMessageToAll(message);
     } catch (err) {
       return error((err as Error).message || "An unknown error occurred");
     }
