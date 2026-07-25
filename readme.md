@@ -1,9 +1,29 @@
 # GigHub : Campus-Centric Freelance & Task Marketplace
-<img width="2752" height="1536" alt="Gemini_Generated_Image_ok2zf6ok2zf6ok2z (1)" src="https://github.com/user-attachments/assets/ceb32c85-ce87-4119-a9ac-a285d1082aa8" />
+
+<img width="2752" height="1536" alt="GigHub Banner" src="https://res.cloudinary.com/hvbrllbm/image/upload/v1785007083/ChatGPT_Image_Jul_26_2026_01_17_26_AM_ecsqpz.png" />
+
+<div align="center">
 
 [![Project Status: Under Development](https://img.shields.io/badge/Status-Under--Development-orange.svg)](https://github.com/ahsanulhoqueabir/GigHub)
 [![Target Platform: JnU](https://img.shields.io/badge/Platform-Jagannath%20University-blue.svg)](https://jnu.ac.bd)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+<!-- Big action buttons -->
+<p align="center">
+  <a href="https://gighub.ahsanull.com/">
+    <img src="https://img.shields.io/badge/🌐%20Website-Visit%20GigHub-8A2BE2?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" width="250" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/ahsanulhoqueabir/GigHub/releases">
+    <img src="https://img.shields.io/badge/📱%20App-Download%20APK-00C853?style=for-the-badge&logo=android&logoColor=white" alt="Download App" width="250" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://www.npmjs.com/package/@gig-hub/types">
+    <img src="https://img.shields.io/badge/📦%20npm-@gig--hub/types-CB3837?style=for-the-badge&logo=npm&logoColor=white" alt="npm Package" width="250" />
+  </a>
+</p>
+
+</div>
 
 **GigHub** is a closed, campus-exclusive freelance and task marketplace designed specifically for the students of **Jagannath University (JnU), Dhaka**. It empowers students to monetize their skills, find help for their projects, and build professional portfolios — all within a trusted campus ecosystem with escrow-protected transactions.
 
@@ -64,10 +84,10 @@ GigHub is built using a modern, scalable architecture designed for high performa
 | **Web Frontend**   | [Next.js 14](https://nextjs.org/) (App Router, Server Components)                                                                 |
 | **Mobile App**     | [React Native](https://reactnative.dev/) (Android & iOS)                                                                          |
 | **Database**       | [Supabase](https://supabase.com/) (PostgreSQL + Realtime Broadcast)                                                               |
-| **Authentication** | [Supabase Auth](https://supabase.com/auth) (Email + Google OAuth)                                                                 |
+| **Authentication** | Custom (Email/Google OAuth, passwords hashed with [Argon2](https://en.wikipedia.org/wiki/Argon2))                                 |
 | **File Storage**   | [Cloudflare R2](https://www.cloudflare.com/developer-platform/r2/) — all files (docs, assets, uploads); served via Cloudflare CDN |
 | **Image CDN**      | [Cloudinary](https://cloudinary.com/) — only banners, gig images, avatars (image-specific optimization & transformations)         |
-| **Shared Types**   | [`@gig-hub/types`](https://www.npmjs.com/) (Zod schemas + TypeScript types, shared package)                                       |
+| **Shared Types**   | [`@gig-hub/types`](https://www.npmjs.com/package/@gig-hub/types) (Zod schemas + TypeScript types, shared package)                 |
 | **Real-time**      | [Supabase Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)                                                |
 | **Payments**       | [SSLCommerz](https://sslcommerz.com/)                                                                                             |
 
@@ -135,8 +155,11 @@ graph TB
 
     subgraph "Supabase"
         PG[("PostgreSQL<br/>(Database)")]
-        SB_AUTH["Auth<br/>(Email/Google OAuth)"]
         SB_REALTIME["Realtime Broadcast<br/>(Chat, Notifications)"]
+    end
+
+    subgraph "Auth (Custom)"
+        AUTH["Argon2-hashed passwords<br/>+ JWT session management"]
     end
 
     subgraph "Storage"
@@ -157,7 +180,7 @@ graph TB
     WEB --> CL
     MOBILE --> CL
     API --> MID
-    MID --> SB_AUTH
+    MID --> AUTH
     API --> PG
     API --> SB_REALTIME
     API --> R2
@@ -167,8 +190,6 @@ graph TB
 ```
 
 ### Deployment Architecture
-
-> 📝 _Detailed deployment diagram will be refined later. Below is the current target setup._
 
 ```mermaid
 graph TB
@@ -180,8 +201,11 @@ graph TB
 
         subgraph "Supabase Cloud"
             SB_DB[("PostgreSQL<br/>(Managed)")]
-            SB_AUTH2["Auth Service"]
             SB_RT["Realtime Broadcast"]
+        end
+
+        subgraph "Auth Service (Custom)"
+            AUTH_SVC["Argon2 Hashing<br/>+ JWT Auth API"]
         end
 
         subgraph "Cloudflare"
@@ -208,7 +232,7 @@ graph TB
     GH_ACTIONS -->|Deploy| NEXT_WEB
     GH_ACTIONS -->|Deploy| NEXT_API
     NEXT_API -->|Auth & DB| SB_DB
-    NEXT_API -->|Auth & DB| SB_AUTH2
+    NEXT_API -->|Auth| AUTH_SVC
     NEXT_API -->|File upload| R2_BUCKET
     NEXT_API -->|Image optimize| CL_IMG
     NEXT_API -->|Payment| SSL_GW
@@ -218,8 +242,6 @@ graph TB
 ```
 
 ### Database Schema (Actual)
-
-> 📝 _Based on the actual Supabase PostgreSQL schema._
 
 ```mermaid
 erDiagram
@@ -524,8 +546,6 @@ erDiagram
 
 ### System Flow Diagrams (Placeholder)
 
-> 📝 _Detailed sequence/flow diagrams will be added here. Below are representative flows._
-
 **Order Lifecycle Flow:**
 
 ```mermaid
@@ -587,12 +607,13 @@ sequenceDiagram
 
 ### 🔑 Auth & Data Flow
 
-1. Student authenticates via **Supabase Auth** (Email/Google).
-2. Next.js API routes verify the Supabase session and resolve the user to `profiles.id`.
+1. Student authenticates via **Custom Auth** (Email/Google OAuth, passwords hashed with Argon2).
+2. Next.js API routes verify the JWT session and resolve the user to `profiles.id`.
 3. All platform data is stored in **Supabase (PostgreSQL)**.
 4. **Supabase Realtime Broadcast** handles live chat & notifications — no separate WebSocket server needed.
 5. All files are uploaded to **Cloudflare R2** (served via Cloudflare CDN); **Cloudinary** handles only image-specific optimization (banners, gig images, avatars).
-6. Shared Zod schemas & TypeScript types live in `@gig-hub/types` — consumed by both `web` and `app`.
+6. Shared Zod schemas & TypeScript types live in [`@gig-hub/types`](https://www.npmjs.com/package/@gig-hub/types) — consumed by both `web` and `app`.
+7. Mobile app can be downloaded from the [GitHub Releases](https://github.com/ahsanulhoqueabir/GigHub/releases) section.
 
 ---
 
@@ -603,7 +624,7 @@ graph LR
     %%═╡ Phase 1 ╞══════════════════════════════════════╡
     subgraph Phase1["🏗️ Phase 1 — Foundation (Weeks 1–4)"]
         direction TB
-        A1["Supabase Auth<br/>Email + Google OAuth"]
+        A1["Custom Auth<br/>Argon2 + JWT + Google OAuth"]
         A2["Profile CRUD<br/>& R2 Storage Setup"]
         A3["@gig-hub/types<br/>Package Scaffolding"]
         A1 --> A2 --> A3
@@ -650,13 +671,24 @@ graph LR
 
 ### 📋 Phase Details
 
-| Phase                     | Sprints      | Focus                 | Deliverables                                                        |
-| :------------------------ | :----------- | :-------------------- | :------------------------------------------------------------------ |
-| **🏗️ P1 — Foundation**    | Sprint 1–2   | Auth, Profiles, Types | Supabase Auth, Profile CRUD, R2 setup, `@gig-hub/types` scaffolding |
-| **🛒 P2 — Marketplace**   | Sprint 3–5   | Gigs, Jobs, Search    | Gig CRUD + packages, Job board + proposals, Search & filters        |
-| **💸 P3 — Transactions**  | Sprint 6–8   | Orders, Payments      | Order lifecycle, SSLCommerz, Escrow hold/release logic              |
-| **📢 P4 — Communication** | Sprint 9–10  | Chat, Notifications   | Supabase Realtime Chat, Push notifications                          |
-| **💎 P5 — Quality**       | Sprint 11–13 | Reviews, Admin        | Ratings system, Admin panel, Dispute resolution, Dashboard          |
+| Phase                     | Sprints      | Focus                 | Deliverables                                                                     |
+| :------------------------ | :----------- | :-------------------- | :------------------------------------------------------------------------------- |
+| **🏗️ P1 — Foundation**    | Sprint 1–2   | Auth, Profiles, Types | Custom Auth (Argon2 + JWT), Profile CRUD, R2 setup, `@gig-hub/types` scaffolding |
+| **🛒 P2 — Marketplace**   | Sprint 3–5   | Gigs, Jobs, Search    | Gig CRUD + packages, Job board + proposals, Search & filters                     |
+| **💸 P3 — Transactions**  | Sprint 6–8   | Orders, Payments      | Order lifecycle, SSLCommerz, Escrow hold/release logic                           |
+| **📢 P4 — Communication** | Sprint 9–10  | Chat, Notifications   | Supabase Realtime Chat, Push notifications                                       |
+| **💎 P5 — Quality**       | Sprint 11–13 | Reviews, Admin        | Ratings system, Admin panel, Dispute resolution, Dashboard                       |
+
+---
+
+## 🔗 Quick Links
+
+| Resource            | Link                                                                   |
+| :------------------ | :--------------------------------------------------------------------- |
+| 🌐 **Website**      | [gighub.ahsanull.com](https://gighub.ahsanull.com/)                    |
+| 📦 **npm Package**  | [`@gig-hub/types`](https://www.npmjs.com/package/@gig-hub/types)       |
+| 📱 **Download App** | [GitHub Releases](https://github.com/ahsanulhoqueabir/GigHub/releases) |
+| 🐙 **GitHub Repo**  | [ahsanulhoqueabir/GigHub](https://github.com/ahsanulhoqueabir/GigHub)  |
 
 ---
 
