@@ -1,4 +1,3 @@
-import { app } from "@/config/env.config";
 import { EscrowService } from "@/services/escrow.service";
 import { SSLCommerzService } from "@/services/sslcommerz.service";
 import { NextRequest, NextResponse } from "next/server";
@@ -32,12 +31,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       amount,
       currency = "BDT",
       value_a: orderId,
+      value_b: platform,
     } = payload;
 
     // Must have a tran_id and orderId
     if (!tran_id || !orderId) {
       return NextResponse.redirect(
-        `${app.url}/profile/orders?payment=failed&reason=missing_params`,
+        SSLCommerzService.buildReturnUrl(platform, "", "failed", "missing_params"),
         { status: 303 },
       );
     }
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // Validate with SSLCommerz (only if status is VALID or VALIDATED)
     if (status !== "VALID" && status !== "VALIDATED") {
       return NextResponse.redirect(
-        `${app.url}/profile/orders/${orderId}?payment=failed&reason=invalid_status`,
+        SSLCommerzService.buildReturnUrl(platform, orderId, "failed", "invalid_status"),
         { status: 303 },
       );
     }
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!isValid) {
       return NextResponse.redirect(
-        `${app.url}/profile/orders/${orderId}?payment=failed&reason=validation_failed`,
+        SSLCommerzService.buildReturnUrl(platform, orderId, "failed", "validation_failed"),
         { status: 303 },
       );
     }
@@ -72,20 +72,26 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (!result.success) {
       return NextResponse.redirect(
-        `${app.url}/profile/orders/${orderId}?payment=failed&reason=${result.error ?? "processing_error"}`,
+        SSLCommerzService.buildReturnUrl(
+          platform,
+          orderId,
+          "failed",
+          result.error ?? "processing_error",
+        ),
         { status: 303 },
       );
     }
 
-    // Redirect buyer to order page
+    // Redirect buyer back to the order page (website) or into the app (deep link)
     return NextResponse.redirect(
-      `${app.url}/profile/orders/${orderId}?payment=success`,
+      SSLCommerzService.buildReturnUrl(platform, orderId, "success"),
       { status: 303 },
     );
   } catch (err) {
     console.error("[payment/success] Error:", err);
-    return NextResponse.redirect(`${app.url}/profile/orders?payment=error`, {
-      status: 303,
-    });
+    return NextResponse.redirect(
+      SSLCommerzService.buildReturnUrl(undefined, "", "error"),
+      { status: 303 },
+    );
   }
 }

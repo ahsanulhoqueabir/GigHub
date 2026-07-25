@@ -256,6 +256,35 @@ export class SSLCommerzService {
   }
 
   /**
+   * Build the buyer-facing redirect URL after a payment attempt.
+   *
+   * App-initiated payments (`platform === "app"`) redirect to the app's
+   * `gighub://` deep link scheme so Chrome Custom Tabs / SFSafariViewController
+   * hands control straight back to the app — no separate browser session or
+   * website login required. Web-initiated payments keep the existing
+   * same-origin website redirect.
+   */
+  static buildReturnUrl(
+    platform: string | undefined,
+    orderId: string,
+    status: "success" | "failed" | "cancelled" | "error",
+    reason?: string,
+  ): string {
+    const query = reason
+      ? `payment=${status}&reason=${encodeURIComponent(reason)}`
+      : `payment=${status}`;
+
+    if (platform === "app") {
+      return orderId
+        ? `gighub://order/${orderId}?${query}`
+        : `gighub://orders?${query}`;
+    }
+
+    const path = orderId ? `/profile/orders/${orderId}` : "/profile/orders";
+    return `${app.url}${path}?${query}`;
+  }
+
+  /**
    * Build the standard callback URLs for SSLCommerz.
    *
    * @param orderId - The order ID to embed as a path segment

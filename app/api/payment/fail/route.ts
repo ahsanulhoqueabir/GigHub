@@ -1,4 +1,4 @@
-import { app } from "@/config/env.config";
+import { SSLCommerzService } from "@/services/sslcommerz.service";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -15,15 +15,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const formData = await req.formData();
     const orderId = formData.get("value_a")?.toString() ?? "";
+    const platform = formData.get("value_b")?.toString();
 
-    const redirectUrl = orderId
-      ? `${app.url}/profile/orders/${orderId}?payment=failed`
-      : `${app.url}/profile/orders?payment=failed`;
-
-    return NextResponse.redirect(redirectUrl, { status: 303 });
+    return NextResponse.redirect(
+      SSLCommerzService.buildReturnUrl(platform, orderId, "failed"),
+      { status: 303 },
+    );
   } catch {
-    return NextResponse.redirect(`${app.url}/profile/orders?payment=failed`, {
-      status: 303,
-    });
+    return NextResponse.redirect(
+      SSLCommerzService.buildReturnUrl(undefined, "", "failed"),
+      { status: 303 },
+    );
   }
 }

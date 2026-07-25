@@ -29,6 +29,10 @@ export const POST = withAuth({
 
       const { order_id } = parsed as InitiatePaymentInput;
 
+      // Mobile app clients send this header so callback routes know to
+      // redirect back into the app (deep link) instead of the website.
+      const platform = req.headers.get("x-client-platform") === "app" ? "app" : "web";
+
       // Fetch order to validate and get details
       const orderResult = await OrderService.getById(order_id);
       if (!orderResult.success) {
@@ -73,6 +77,7 @@ export const POST = withAuth({
         product_category: "Service",
         product_profile: "general",
         value_a: order_id, // embed order_id for IPN handler
+        value_b: platform, // "app" | "web" — tells the callback routes where to redirect
       });
 
       if (sslResult.status !== "SUCCESS") {
