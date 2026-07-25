@@ -9,13 +9,14 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { COLORS } from "@/constants/colors";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { formatPrice } from "@/lib/currency";
+import { openPaymentSession } from "@/lib/in-app-browser";
 import { useAuthStore } from "@/store/auth.store";
 import { useEscrowStore } from "@/store/escrow.store";
 import { useOrdersStore } from "@/store/orders.store";
 import { toast } from "@/store/toast.store";
 import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -97,7 +98,10 @@ function getSourceConfig(source?: string): SourceConfig {
 
 export default function OrderDetailScreen() {
   const insets = useSafeAreaInsets();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, payment } = useLocalSearchParams<{
+    id: string;
+    payment?: string;
+  }>();
 
   const isAuthenticated = useAuthStore((s) => s.accessToken !== null);
   const user = useAuthStore((s) => s.user);
@@ -114,6 +118,8 @@ export default function OrderDetailScreen() {
   const completeOrder = useOrdersStore((s) => s.completeOrder);
   const isCompleting = useOrdersStore((s) => s.isCompleting);
   const clearErrors = useOrdersStore((s) => s.clearErrors);
+  const initiatePayment = useOrdersStore((s) => s.initiatePayment);
+  const isInitiatingPayment = useOrdersStore((s) => s.isInitiatingPayment);
 
   const requestDispute = useEscrowStore((s) => s.requestDispute);
   const isDisputing = useEscrowStore((s) => s.isDisputing);
@@ -134,6 +140,28 @@ export default function OrderDetailScreen() {
     if (id) fetchOrderDetail(id);
     return () => clearErrors();
   }, [id, isAuthenticated, fetchOrderDetail, clearErrors]);
+
+  // Re-sync order/escrow status whenever this screen regains focus — covers
+  // returning from the SSLCommerz Custom Tab, which may land back on an
+  // already-mounted instance of this screen without remounting it.
+  useFocusEffect(
+    useCallback(() => {
+      if (id) fetchOrderDetail(id);
+    }, [id]),
+  );
+
+  // Returning from the SSLCommerz Custom Tab via the gighub:// deep link
+  useEffect(() => {
+    if (!payment) return;
+    if (payment === "success") {
+      toast.success("Payment successful!");
+    } else if (payment === "cancelled") {
+      toast.info("Payment was cancelled.");
+    } else if (payment === "failed" || payment === "error") {
+      toast.error("Payment failed. Please try again.");
+    }
+    router.setParams({ payment: "" });
+  }, [payment]);
 
   if (isLoadingDetail || !order) {
     return (
@@ -176,6 +204,11 @@ export default function OrderDetailScreen() {
   const canComplete = order.status === "DELIVERED" && isBuyer;
   const canDispute =
     order.status === "DELIVERED" && isSeller && order.source === "GIG";
+  const canPay =
+    isBuyer &&
+    order.status === "PENDING" &&
+    order.escrow?.payment_status !== "HOLDING" &&
+    order.escrow?.payment_status !== "RELEASED";
 
   const sourceCfg = getSourceConfig(order.source);
 
@@ -219,6 +252,19 @@ export default function OrderDetailScreen() {
       toast.success("Order cancelled");
       setCancelVisible(false);
       setCancelReason("");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
+  const handlePay = async () => {
+    try {
+      const gatewayUrl = await initiatePayment(order.id);
+      if (gatewayUrl) {
+        await openPaymentSession(gatewayUrl);
+      } else {
+        toast.error("Could not start payment. Please try again.");
+      }
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -416,6 +462,16 @@ export default function OrderDetailScreen() {
                 />
                 <Text className="text-base font-semibold text-white dark:text-gray-100">
                   {`Chat with ${sellerFirstName}`}
+                </Text>
+              </View>
+            </Button>
+          ) : null}
+          {canPay ? (
+            <Button onPress={handlePay} isLoading={isInitiatingPayment}>
+              <View className="flex-row items-center gap-2">
+                <Ionicons name="card-outline" size={18} color={COLORS.white} />
+                <Text className="text-base font-semibold text-white dark:text-gray-100">
+                  Complete Payment
                 </Text>
               </View>
             </Button>

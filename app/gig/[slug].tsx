@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { COLORS } from "@/constants/colors";
 import { getErrorMessage } from "@/lib/api/api-response";
 import { formatPrice } from "@/lib/currency";
+import { openPaymentSession } from "@/lib/in-app-browser";
 import { useAuthStore } from "@/store/auth.store";
 import { useGigsStore } from "@/store/gigs.store";
 import { useOrdersStore } from "@/store/orders.store";
@@ -16,7 +17,6 @@ import type { GIGPackageTier } from "@/types/db/gig.types";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
-import { openInAppBrowser } from "@/lib/in-app-browser";
 import { useEffect, useMemo, useState } from "react";
 import { Dimensions, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -98,14 +98,16 @@ export default function GigDetailScreen() {
       setCheckoutVisible(false);
       setDescription("");
       setNote("");
+      router.replace(`/order/${order.id}` as any);
 
       if (gatewayUrl) {
-        toast.success("Order created! Complete your payment inside the app.");
-        await openInAppBrowser(gatewayUrl);
-        router.replace(`/order/${order.id}` as any);
+        toast.success("Complete your payment to confirm the order.");
+        // Opens as an in-app Custom Tab / SFSafariViewController sheet — SSLCommerz
+        // redirects back to a gighub:// deep link on completion, which returns the
+        // user straight to this order's detail screen without leaving the app.
+        await openPaymentSession(gatewayUrl);
       } else {
         toast.success("Order created successfully!");
-        router.replace(`/order/${order.id}` as any);
       }
     } catch (err) {
       toast.error(getErrorMessage(err));
