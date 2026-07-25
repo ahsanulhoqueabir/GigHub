@@ -123,11 +123,12 @@ export const useJobsStore = create<JobsStore>()((set, get) => ({
       if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await apiPublic.get("/job", { params });
-      set({
-        jobs: data.data?.items ?? [],
+      const items = data.data?.items ?? [];
+      set((state) => ({
+        jobs: page === 1 ? items : [...state.jobs, ...items],
         listPagination: data.data?.pagination ?? defaultPagination(),
         isLoadingList: false,
-      });
+      }));
     } catch (err: unknown) {
       set({ isLoadingList: false, listError: getErrorMessage(err) });
     }

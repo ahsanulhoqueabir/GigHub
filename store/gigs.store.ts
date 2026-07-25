@@ -127,11 +127,12 @@ export const useGigsStore = create<GigsStore>()((set, get) => ({
       if (mergedFilters.tags) params.tags = mergedFilters.tags;
 
       const { data } = await apiPublic.get("/gig", { params });
-      set({
-        gigs: data.data?.items ?? [],
+      const items = data.data?.items ?? [];
+      set((state) => ({
+        gigs: page === 1 ? items : [...state.gigs, ...items],
         listPagination: data.data?.pagination ?? defaultPagination(),
         isLoadingList: false,
-      });
+      }));
     } catch (err: unknown) {
       set({ isLoadingList: false, listError: getErrorMessage(err) });
     }

@@ -88,22 +88,21 @@ export default function ExploreScreen() {
       const [sortBy, sortOrder] = sort.split(":") as [string, "asc" | "desc"];
 
       if (activeTab === "gigs") {
-        fetchGigs(
+        return fetchGigs(
           { search: search || undefined, category, sortBy, sortOrder },
           page,
         );
-      } else {
-        fetchJobs(
-          {
-            search: search || undefined,
-            category,
-            type: jobType,
-            sortBy,
-            sortOrder,
-          },
-          page,
-        );
       }
+      return fetchJobs(
+        {
+          search: search || undefined,
+          category,
+          type: jobType,
+          sortBy,
+          sortOrder,
+        },
+        page,
+      );
     },
     [activeTab, category, jobType, sort, search, fetchGigs, fetchJobs],
   );
@@ -111,6 +110,14 @@ export default function ExploreScreen() {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    if (params.tab === "jobs") setActiveTab("jobs");
+    else if (params.tab === "gigs") setActiveTab("gigs");
+    setCategory(params.category);
+    setJobType(params.type);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.tab, params.category, params.type]);
 
   useEffect(() => {
     runSearch(1);
@@ -132,10 +139,10 @@ export default function ExploreScreen() {
   const pagination = activeTab === "gigs" ? gigsPagination : jobsPagination;
   const isLoading = activeTab === "gigs" ? gigsLoading : jobsLoading;
 
-  const onEndReached = () => {
+  const onEndReached = async () => {
     if (isLoadingMore || isLoading || !pagination.hasNext) return;
     setIsLoadingMore(true);
-    runSearch(pagination.currentPage + 1);
+    await runSearch(pagination.currentPage + 1);
     setIsLoadingMore(false);
   };
 
