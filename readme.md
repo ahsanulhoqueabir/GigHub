@@ -241,6 +241,43 @@ graph TB
     R2_BUCKET -->|Image source| CL_IMG
 ```
 
+### Database Relationship (Overview)
+<p align="center">
+  <img src="https://res.cloudinary.com/hvbrllbm/image/upload/v1785083565/erd_xxwlbg.webp"
+       alt="Database Relationship"
+       width="900">
+</p>
+
+The GigHub database is designed using a relational Entity-Relationship (ER) model that organizes the platform into several interconnected functional modules. This modular design ensures data integrity, scalability, and efficient relationship management while supporting the complete freelancing workflow within a university ecosystem.
+
+Core Identity
+
+The Profiles entity serves as the central entity of the database. Every user has a unique profile associated with a single wallet, while multiple users can belong to the same academic department. This structure provides a unified identity for authentication, user information, and financial operations.
+
+Service Marketplace
+
+The marketplace enables students to create and discover freelance services (gigs). Each gig belongs to one category and can have multiple tags, allowing flexible classification and improved searchability. Orders are directly linked to gigs, forming the foundation of the service transaction process.
+
+Job Board
+
+The job board supports client-posted job opportunities. A single job can receive multiple proposals from different students, while the selected proposal is associated with an order. This relationship enables a structured hiring workflow similar to professional freelancing platforms.
+
+Order Management
+
+Orders represent the core transaction entity of the platform. Each order is created from either a gig purchase or an accepted job proposal. Orders maintain one-to-many relationships with milestones and deliveries, enabling progress tracking and structured project completion.
+
+Escrow & Finance
+
+To ensure secure transactions, every order is associated with a single escrow record. Each escrow record stores multiple financial transactions, while each wallet can generate multiple withdrawal requests. This design supports transparent payment processing and financial accountability.
+
+Communication & Feedback
+
+Communication is organized through contextual chat rooms linked to orders. Each chat room contains multiple messages exchanged between participants. Upon order completion, a review can be submitted, while reports allow users to flag inappropriate behaviour or content, contributing to platform trust and moderation.
+
+Overall Design Rationale
+
+The ER model separates major business functions into independent yet interconnected modules. This normalization minimizes data redundancy, preserves referential integrity through foreign key relationships, and simplifies future maintenance and feature expansion. As a result, the schema provides a scalable foundation for GigHub's campus-exclusive freelancing ecosystem, supporting user management, service transactions, secure payments, communication, and feedback within a single integrated database
+
 ### Database Schema (Actual)
 
 ```mermaid
