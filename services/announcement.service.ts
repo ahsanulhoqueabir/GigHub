@@ -43,13 +43,16 @@ export class AnnouncementService {
       const announcement = data as Announcement;
 
       // Database insert is the source of truth; Firebase delivery is
-      // best-effort, non-blocking, and must never fail or roll back the
-      // create request or delay the API response.
+      // best-effort and must never fail or roll back the create request.
+      // We await but catch any error so the API response is never blocked
+      // or failed due to a push delivery issue.
       if (announcement.send_push) {
         sendAnnouncementPush({
           id: announcement.id,
           title: announcement.title,
           content: announcement.content,
+        }).catch(() => {
+          /* best-effort — never throw from push */
         });
       }
 

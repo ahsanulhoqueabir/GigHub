@@ -2,8 +2,6 @@ import { fb } from "@/config/env.config";
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getMessaging, type Messaging } from "firebase-admin/messaging";
 
-let app: App | undefined;
-
 /**
  * Env vars holding a multi-line PEM key are prone to mangling depending on
  * how the hosting platform stores them — some strip the outer quotes,
@@ -19,26 +17,35 @@ function normalizePrivateKey(key: string): string {
   return unquoted.replace(/\\n/g, "\n");
 }
 
+/**
+ * Returns the singleton Firebase Admin App instance.
+ *
+ * Relies on firebase-admin's internal singleton registry (`getApps()`)
+ * rather than a module-level variable because Next.js serverless
+ * functions may get a fresh module scope per invocation.
+ */
 function getFirebaseAdminApp(): App {
-  if (app) return app;
-
   const existing = getApps();
   if (existing.length > 0) {
-    app = existing[0];
-    return app;
+    return existing[0];
   }
 
-  app = initializeApp({
+  return initializeApp({
     credential: cert({
       projectId: fb.projectId,
       clientEmail: fb.clientEmail,
       privateKey: normalizePrivateKey(fb.privateKey),
     }),
   });
-
-  return app;
 }
 
+/**
+ * Returns the Firebase Messaging instance.
+ *
+ * The app is lazily initialized and then cached inside firebase-admin's
+ * internal singleton registry — safe to call repeatedly across
+ * serverless invocations.
+ */
 export function getFirebaseMessaging(): Messaging {
   return getMessaging(getFirebaseAdminApp());
 }
