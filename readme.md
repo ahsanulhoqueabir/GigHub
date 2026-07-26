@@ -1,6 +1,6 @@
 # GigHub : Campus-Centric Freelance & Task Marketplace
 
-<img width="2752" height="1536" alt="GigHub Banner" src="https://res.cloudinary.com/hvbrllbm/image/upload/v1785007083/ChatGPT_Image_Jul_26_2026_01_17_26_AM_ecsqpz.png" />
+<img width="2752" height="1236" alt="GigHub Banner" src="https://res.cloudinary.com/hvbrllbm/image/upload/v1785007083/ChatGPT_Image_Jul_26_2026_01_17_26_AM_ecsqpz.png" />
 
 <div align="center">
 
