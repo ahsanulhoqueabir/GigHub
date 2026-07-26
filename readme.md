@@ -242,7 +242,11 @@ graph TB
 ```
 
 ### Database Relationship (Overview)
-![Database Diagram](erd.webp)
+<p align="center">
+  <img src="erd.webp"
+       alt="Database Relationship"
+       width="900">
+</p>
 
 The GigHub database is designed using a relational Entity-Relationship (ER) model that organizes the platform into several interconnected functional modules. This modular design ensures data integrity, scalability, and efficient relationship management while supporting the complete freelancing workflow within a university ecosystem.
 
