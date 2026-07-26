@@ -11,6 +11,7 @@ import { ToastHost } from "@/components/ui/Toast";
 import { COLORS } from "@/constants/colors";
 import { useNetworkStatus } from "@/lib/network/useNetworkStatus";
 import { useNotificationListeners } from "@/lib/notifications/listeners";
+import { useAnnouncementsStore } from "@/store/announcements.store";
 import { useAuthStore } from "@/store/auth.store";
 import { useNotificationsStore } from "@/store/notifications.store";
 import { Stack } from "expo-router";
@@ -20,6 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  AppState,
   Easing,
   Image,
   Text,
@@ -120,6 +122,19 @@ export default function RootLayout() {
       }, remainingTime);
     });
   }, [hasHydrated, initAuth, splashOpacityAnim]);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "background" || nextAppState === "inactive") {
+        const now = new Date().toISOString();
+        useAnnouncementsStore.getState().setLastUsedTimestamp(now);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

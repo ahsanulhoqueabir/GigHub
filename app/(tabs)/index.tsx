@@ -6,6 +6,7 @@ import { JobCard } from "@/components/jobs/JobCard";
 import { Header } from "@/components/ui/Header";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { COLORS } from "@/constants/colors";
+import { useAnnouncementsStore } from "@/store/announcements.store";
 import { useCategoriesStore } from "@/store/categories.store";
 import { useHomeStore } from "@/store/home.store";
 import type { CategoryMinimal } from "@/types/db/category.types";
@@ -33,6 +34,8 @@ export default function HomeScreen() {
 
   const categories = useCategoriesStore((s) => s.categories);
   const fetchCategories = useCategoriesStore((s) => s.fetchCategories);
+
+  const lastUsedTimestamp = useAnnouncementsStore((s) => s.lastUsedTimestamp);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -67,6 +70,12 @@ export default function HomeScreen() {
 
   const adBanner = siteData?.ad_banners?.find((b) => b.is_active);
 
+  const announcements = siteData?.announcements ?? [];
+  const lastTime = lastUsedTimestamp ? new Date(lastUsedTimestamp).getTime() : 0;
+  const newCount = announcements.filter(
+    (item) => new Date(item.created_at).getTime() > lastTime,
+  ).length;
+
   return (
     <View className="flex-1 bg-white dark:bg-gray-950">
       <Header
@@ -76,13 +85,20 @@ export default function HomeScreen() {
           <Pressable
             hitSlop={8}
             onPress={() => router.push("/announcements")}
-            className="h-9 w-9 items-center justify-center rounded-full active:bg-gray-100 dark:active:bg-gray-800"
+            className="relative h-9 w-9 items-center justify-center rounded-full active:bg-gray-100 dark:active:bg-gray-800"
           >
             <Ionicons
               name="notifications-outline"
               size={22}
               color={COLORS.gray500}
             />
+            {newCount > 0 && (
+              <View className="absolute -right-0.5 -top-0.5 h-4 min-w-[16px] items-center justify-center rounded-full border border-white bg-red-500 px-1 dark:border-gray-950">
+                <Text className="text-center text-[9px] font-extrabold leading-3 text-white">
+                  {newCount > 9 ? "9+" : newCount}
+                </Text>
+              </View>
+            )}
           </Pressable>
         }
       />

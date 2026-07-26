@@ -60,18 +60,23 @@ export default function AnnouncementsListScreen() {
     (s) => s.fetchAnnouncements,
   );
   const fetchMore = useAnnouncementsStore((s) => s.fetchMore);
+  const setLastUsedTimestamp = useAnnouncementsStore(
+    (s) => s.setLastUsedTimestamp,
+  );
 
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchAnnouncements(1);
-  }, [fetchAnnouncements]);
+    setLastUsedTimestamp(new Date().toISOString());
+  }, [fetchAnnouncements, setLastUsedTimestamp]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchAnnouncements(1);
+    setLastUsedTimestamp(new Date().toISOString());
     setRefreshing(false);
-  }, [fetchAnnouncements]);
+  }, [fetchAnnouncements, setLastUsedTimestamp]);
 
   return (
     <View className="flex-1 bg-white dark:bg-gray-950">

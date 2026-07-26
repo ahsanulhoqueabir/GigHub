@@ -1,6 +1,7 @@
 import { apiPublic } from "@/lib/api/api-public";
 import { getErrorMessage } from "@/lib/api/api-response";
 import type { AdBanner } from "@/types/db/ad-banner.types";
+import type { Announcement } from "@/types/db/announcement.types";
 import type { GigListItem } from "@/types/db/gig.types";
 import type { HeroBanner } from "@/types/db/hero-banner.types";
 import type { JobListItem } from "@/types/db/job.types";
@@ -15,6 +16,7 @@ interface HomepageData {
 interface PublicSiteData {
   hero_banners: HeroBanner[];
   ad_banners: AdBanner[];
+  announcements: Announcement[];
 }
 
 interface HomeState {
