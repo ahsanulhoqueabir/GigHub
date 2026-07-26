@@ -243,7 +243,7 @@ graph TB
 
 ### Database Relationship (Overview)
 <p align="center">
-  <img src="erd.webp"
+  <img src="https://res.cloudinary.com/hvbrllbm/image/upload/v1785083565/erd_xxwlbg.webp"
        alt="Database Relationship"
        width="900">
 </p>
